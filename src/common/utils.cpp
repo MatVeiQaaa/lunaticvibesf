@@ -357,11 +357,17 @@ static std::string resolveCaseInsensitivePath(std::string input)
             continue;
         }
 
+        std::string_view prefix;
         if (segment == ".") {
+            prefix = CURRENT_PATH_RELATIVE_PREFIX;
+        } else if (segment == "..") {
+            prefix = "../";
+        }
+        if (!prefix.empty()) {
             if (!out.empty() && out.back() != '/') {
                 out += '/';
             }
-            out += CURRENT_PATH_RELATIVE_PREFIX;
+            out += prefix;
             segments_traversed += 1;
             continue;
         }

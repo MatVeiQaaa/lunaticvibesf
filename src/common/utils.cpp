@@ -528,6 +528,7 @@ double normalizeLinearGrowth(double prev, double curr)
 }
 
 void lunaticvibes::trim_in_place(std::string& s) {
+    // FIXME: ignore UTF-8, that would fix debug assertions failing on Windows when running tests.
     static auto not_space = [](int c) { return !std::isspace(c); };
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_space));
     s.erase(std::find_if(s.rbegin(), s.rend(), not_space).base(), s.end());

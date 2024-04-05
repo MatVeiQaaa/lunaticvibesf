@@ -27,6 +27,7 @@ std::string any_to_str(const std::any& a)
     if (a.type() == typeid(int))              ss << std::any_cast<int>(a);
     else if (a.type() == typeid(bool))        ss << std::any_cast<bool>(a);
     else if (a.type() == typeid(long long))   ss << std::any_cast<long long>(a);
+    else if (a.type() == typeid(unsigned))    ss << std::any_cast<unsigned>(a);
     else if (a.type() == typeid(time_t))      ss << std::any_cast<time_t>(a);
     else if (a.type() == typeid(double))      ss << std::any_cast<double>(a);
     else if (a.type() == typeid(std::string)) ss << "'" << std::any_cast<std::string>(a) << "'";
@@ -35,11 +36,13 @@ std::string any_to_str(const std::any& a)
     return ss.str();
 }
 
+// TODO: use std::variant instead of std::any
 void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
 {
     if (a.type() == typeid(int)) sqlite3_bind_int(stmt, i, std::any_cast<int>(a));
     else if (a.type() == typeid(bool)) sqlite3_bind_int(stmt, i, int(std::any_cast<bool>(a)));
     else if (a.type() == typeid(long long)) sqlite3_bind_int64(stmt, i, std::any_cast<long long>(a));
+    else if (a.type() == typeid(unsigned)) sqlite3_bind_int64(stmt, i, std::any_cast<unsigned>(a));
     else if (a.type() == typeid(time_t)) sqlite3_bind_int64(stmt, i, std::any_cast<time_t>(a));
     else if (a.type() == typeid(double)) sqlite3_bind_double(stmt, i, std::any_cast<double>(a));
     else if (a.type() == typeid(std::string)) sqlite3_bind_text(stmt, i, std::any_cast<std::string>(a).c_str(), (int)std::any_cast<std::string>(a).length(), SQLITE_TRANSIENT);
@@ -89,9 +92,9 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql, st
             case SQLITE_INTEGER: row[i] = sqlite3_column_int64(stmt, i); break;
             case SQLITE_FLOAT: row[i] = sqlite3_column_double(stmt, i); break;
             case SQLITE_TEXT: row[i] = std::make_any<std::string>((const char *)sqlite3_column_text(stmt, i)); break;
-            case SQLITE_BLOB: LOG_ERROR << "[sqlite3] Fetched unsupported type SQLITE_BLOB which is not supported"; break;
-            case SQLITE_NULL: LOG_ERROR << "[sqlite3] Fetched unsupported type SQLITE_NULL which is not supported"; break;
-            default: LOG_ERROR << "[sqlite3] Unknown column type c=" << c; break;
+            case SQLITE_BLOB: LOG_ERROR << "[sqlite3] row[" << i << "]: fetched unsupported type SQLITE_BLOB"; break;
+            case SQLITE_NULL: break; // assume !row[i].has_value()
+            default: LOG_ERROR << "[sqlite3] row[" << i << "]: unknown column type c=" << c; break;
             }
         }
     }

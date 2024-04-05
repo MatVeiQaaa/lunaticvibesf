@@ -3,6 +3,7 @@
 #include <regex>
 #include <set>
 #include <thread>
+#include <vector>
 
 #include "common/chartformat/chartformat_types.h"
 #include "common/log.h"
@@ -16,6 +17,7 @@
 #include <boost/asio/post.hpp>
 #include <boost/asio/thread_pool.hpp>
 
+// TODO: NOT NULL everything.
 const char* CREATE_FOLDER_TABLE_STR =
 "CREATE TABLE IF NOT EXISTS folder( "
 "pathmd5 TEXT PRIMARY KEY UNIQUE NOT NULL, "
@@ -26,6 +28,7 @@ const char* CREATE_FOLDER_TABLE_STR =
 "modtime INTEGER"
 ");";
 
+// TODO: NOT NULL everything.
 const char* CREATE_SONG_TABLE_STR =
 "CREATE TABLE IF NOT EXISTS song("
 "md5 TEXT NOT NULL, "           // 0
@@ -382,7 +385,6 @@ bool SongDB::removeChart(const HashMD5& md5, const HashMD5& parent)
     return true;
 }
 
-// search from genre, version, artist, artist2, title, title2
 std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const HashMD5& folder, const std::string& tagRaw, unsigned limit) const
 {
     LOG_INFO << "[SongDB] Search for songs matching: " << tagRaw;
@@ -450,10 +452,9 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
     return ret;
 }
 
-// chart may duplicate, return all found
 std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const HashMD5& target, bool checksum) const
 {
-    // LOG_DEBUG << "[SongDB] Search for song " << target.hexdigest();
+    LOG_DEBUG << "[SongDB] Search for song " << target.hexdigest();
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
 
@@ -462,6 +463,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
         return ret;
     }
     for (const auto& index : songQueryHashMap.at(target))
+    try
     {
         const auto& r = songQueryPool[index];
         switch (eChartFormat(ANY_INT(r[3])))
@@ -492,6 +494,11 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
         default: break;
         }
     }
+    // TODO: remove after adding NOT NULL to every table field.
+    catch (const std::bad_any_cast& e)
+    {
+        LOG_ERROR << "std::bad_any_cast: " << e.what();
+    }
 
     if (checksum)
     {
@@ -512,7 +519,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
         }
     }
 
-    // LOG_DEBUG << "[SongDB] found " << ret.size() << " songs";
+    LOG_DEBUG << "[SongDB] found " << ret.size() << " songs";
     return ret;
 }
 
@@ -1221,6 +1228,7 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
     if (songQueryParentMap.find(root) != songQueryParentMap.end())
     {
         for (const auto& index : songQueryParentMap.at(root))
+        try
         {
             const auto& c = songQueryPool[index];
             auto type = (eChartFormat)ANY_INT(c[3]);
@@ -1249,6 +1257,11 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
             default:
                 break;
             }
+        }
+        // TODO: remove after adding NOT NULL to every table field.
+        catch (const std::bad_any_cast& e)
+        {
+            LOG_ERROR << "std::bad_any_cast: " << e.what();
         }
     }
 

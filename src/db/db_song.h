@@ -56,9 +56,11 @@ protected:
     bool removeChart(const HashMD5& md5, const HashMD5& parent);
     
 public:
-    std::vector<std::shared_ptr<ChartFormatBase>> findChartByName(const HashMD5& folder, const std::string&, unsigned limit = 1000) const;  // search from genre, version, artist, artist2, title, title2
-    std::vector<std::shared_ptr<ChartFormatBase>> findChartByHash(const HashMD5&, bool checksum = true) const;  // chart may duplicate, return a list
-    std::vector<std::shared_ptr<ChartFormatBase>> findChartFromTime(const HashMD5& folder, unsigned long long addTime) const;
+    // Search from genre, version, artist, artist2, title, title2.
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByName(const HashMD5& folder, const std::string&, unsigned limit = 1000) const;
+    // May contain duplicates.
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByHash(const HashMD5&, bool checksum = true) const;
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartFromTime(const HashMD5& folder, unsigned long long addTime) const;
 
 protected:
     std::vector<std::vector<std::any>> songQueryPool;

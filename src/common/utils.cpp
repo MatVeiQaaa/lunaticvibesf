@@ -98,6 +98,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
 }
 
 bool isParentPath(Path parent, Path dir)
+try
 {
     parent = fs::absolute(parent);
     dir = fs::absolute(dir);
@@ -107,6 +108,11 @@ bool isParentPath(Path parent, Path dir)
 
     auto pair = std::mismatch(dir.begin(), dir.end(), parent.begin(), parent.end());
     return pair.second == parent.end();
+}
+catch (const std::filesystem::filesystem_error& e)
+{
+    LOG_DEBUG << "filesystem_error: " << e.what();
+    return false;
 }
 
 int toInt(std::string_view str, int defVal) noexcept

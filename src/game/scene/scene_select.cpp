@@ -2973,7 +2973,7 @@ Path getChartPath(const std::shared_ptr<EntryBase>& entry)
 
 static constexpr int STANDALONE_PREVIEW_SAMPLE_INDEX = 0;
 
-bool tryLoadStandalonePreview(ChartFormatBMS& bms)
+bool tryLoadDedicatedPreview(ChartFormatBMS& bms)
 {
     for (auto &[key, val] : bms.extraCommands)
     {
@@ -3010,9 +3010,9 @@ void SceneSelect::updatePreview()
     const EntryList& e = gSelectContext.entries;
     if (e.empty()) return;
 
-    const bool previewDedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
-    const bool previewDirect = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
-    if (!previewDedicated && !previewDirect)
+    const bool previewDedicatedEnabled = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
+    const bool previewDirectEnabled = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
+    if (!previewDedicatedEnabled && !previewDirectEnabled)
     {
         std::unique_lock l(previewMutex);
         previewState = PREVIEW_FINISH;
@@ -3088,16 +3088,15 @@ void SceneSelect::updatePreview()
         {
             auto bms = std::reinterpret_pointer_cast<ChartFormatBMS>(previewChartTmp);
 
-            if (previewDedicated)
-                previewStandalone = tryLoadStandalonePreview(*bms);
-
-            if (previewStandalone)
+            const bool loadedDedicatedPreview = previewDedicatedEnabled && tryLoadDedicatedPreview(*bms);
+            if (loadedDedicatedPreview)
             {
                 LOG_DEBUG << "[Select] Preview dedicated -> PREVIEW_READY";
                 std::unique_lock l(previewMutex);
                 previewState = PREVIEW_READY;
+                previewStandalone = true;
             }
-            else if (previewDirect)
+            else if (previewDirectEnabled)
             {
                 LOG_DEBUG << "[Select] Preview direct -> PREVIEW_LOADING_SAMPLES";
 
@@ -3170,7 +3169,9 @@ void SceneSelect::updatePreview()
             }
             else
             {
-                abort(); // unreachable
+                LOG_DEBUG << "[Select] Chart doesn't have a preview -> PREVIEW_FINISH";
+                std::unique_lock l(previewMutex);
+                previewState = PREVIEW_FINISH;
             }
             break;
         }

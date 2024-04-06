@@ -3121,51 +3121,56 @@ void SceneSelect::updatePreview()
 
                     const int wavTotal =
                         std::count_if(bms->wavFiles.begin(), bms->wavFiles.end(), std::not_fn(&std::string::empty));
-                    if (wavTotal != 0)
+                    if (wavTotal == 0)
                     {
-                        static const auto shouldDiscard = [](SceneSelect& s, const std::shared_ptr<ChartFormatBMS>& bms) {
-                            if (gAppIsExiting || gNextScene != SceneType::SELECT) return true;
-                            if (std::shared_lock l(s.previewMutex);
-                                s.previewChart != bms || s.previewState != PREVIEW_LOADING_SAMPLES)
-                                return true;
-                            return false;
-                        };
-
-                        boost::asio::thread_pool pool(std::max(1u, std::thread::hardware_concurrency() - 2));
-                        // TODO(C++20): use std::span.
-                        for (size_t i = 0; i < bms->wavFiles.size(); ++i)
-                        {
-                            const auto& wav = bms->wavFiles[i];
-                            if (wav.empty()) continue;
-
-                            boost::asio::post(pool, [&, i]() {
-                                if (shouldDiscard(*this, bms)) return;
-                                Path pWav = PathFromUTF8(wav);
-                                if (pWav.is_absolute())
-                                {
-                                    LOG_WARNING << "[Select] Absolute path to sample, this is forbidden";
-                                    return;
-                                }
-                                SoundMgr::loadNoteSample((chartDir / pWav), i);
-                            });
-                        }
-                        pool.wait();
-
-                        if (shouldDiscard(*this, bms))
-                        {
-                            LOG_DEBUG << "[Select] Scene or preview chart has changed, discarding";
-                            return;
-                        }
-
-                        gChartContext.isSampleLoaded = true;
-                        gChartContext.sampleLoadedHash = bms->fileHash;
-                        LOG_DEBUG << "[Select] Preview loading finished -> PREVIEW_READY";
+                        LOG_DEBUG << "[Select] Chart has no samples for direct preview -> PREVIEW_FINISH";
                         std::unique_lock l(previewMutex);
-                        previewChartObj = previewChartObjTmp;
-                        previewRuleset = previewRulesetTmp;
-                        previewState = PREVIEW_READY;
+                        previewState = PREVIEW_FINISH;
+                        return;
                     }
-                    });
+
+                    static const auto shouldDiscard = [](SceneSelect& s, const std::shared_ptr<ChartFormatBMS>& bms) {
+                        if (gAppIsExiting || gNextScene != SceneType::SELECT) return true;
+                        if (std::shared_lock l(s.previewMutex);
+                            s.previewChart != bms || s.previewState != PREVIEW_LOADING_SAMPLES)
+                            return true;
+                        return false;
+                    };
+
+                    boost::asio::thread_pool pool(std::max(1u, std::thread::hardware_concurrency() - 2));
+                    // TODO(C++20): use std::span.
+                    for (size_t i = 0; i < bms->wavFiles.size(); ++i)
+                    {
+                        const auto& wav = bms->wavFiles[i];
+                        if (wav.empty()) continue;
+
+                        boost::asio::post(pool, [&, i]() {
+                            if (shouldDiscard(*this, bms)) return;
+                            Path pWav = PathFromUTF8(wav);
+                            if (pWav.is_absolute())
+                            {
+                                LOG_WARNING << "[Select] Absolute path to sample, this is forbidden";
+                                return;
+                            }
+                            SoundMgr::loadNoteSample((chartDir / pWav), i);
+                        });
+                    }
+                    pool.wait();
+
+                    if (shouldDiscard(*this, bms))
+                    {
+                        LOG_DEBUG << "[Select] Scene or preview chart has changed, discarding";
+                        return;
+                    }
+
+                    gChartContext.isSampleLoaded = true;
+                    gChartContext.sampleLoadedHash = bms->fileHash;
+                    LOG_DEBUG << "[Select] Preview loading finished -> PREVIEW_READY";
+                    std::unique_lock l(previewMutex);
+                    previewChartObj = previewChartObjTmp;
+                    previewRuleset = previewRulesetTmp;
+                    previewState = PREVIEW_READY;
+                });
             }
             else
             {

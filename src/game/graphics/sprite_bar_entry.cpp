@@ -1,5 +1,7 @@
 #include "sprite_bar_entry.h"
 
+#include <shared_mutex>
+
 #include "common/chartformat/chartformat_bms.h"
 #include "common/entry/entry_types.h"
 #include "common/log.h"
@@ -170,7 +172,8 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
     for (auto& s: sRivalLampRival) if (s) s->setHideInternal(true);
     if (sFlash) sFlash->setHideInternal(true);
 
-    auto& list = gSelectContext.entries;
+    const std::shared_lock l(gSelectContext._mutex);
+    const auto& list = gSelectContext.entries;
     if (!list.empty())
     {
         size_t listidx = gSelectContext.selectedEntryIndex + index;
@@ -200,11 +203,9 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
         drawBodyOn = (index == gSelectContext.highlightBarIndex);
 
         // check new song
-        bool isNewEntry = false;
-        if (pEntry->type() == eEntryType::NEW_SONG_FOLDER)
-            isNewEntry = true;
-        else
-            isNewEntry = (pEntry->_addTime > static_cast<unsigned long long>(getFileTimeNow()) - State::get(IndexNumber::NEW_ENTRY_SECONDS));
+        const bool isNewEntry = pEntry->type() == eEntryType::NEW_SONG_FOLDER ||
+                                (pEntry->_addTime > static_cast<unsigned long long>(getFileTimeNow()) -
+                                                        State::get(IndexNumber::NEW_ENTRY_SECONDS));
 
         static const std::map<eEntryType, size_t> BAR_TYPE_MAP =
         {

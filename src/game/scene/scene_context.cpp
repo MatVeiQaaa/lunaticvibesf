@@ -1416,9 +1416,12 @@ void switchVersion(unsigned difficulty)
 
 void setDynamicTextures()
 {
-    gChartContext.texStagefile.setPath("");
-    gChartContext.texBackbmp.setPath("");
-    gChartContext.texBanner.setPath("");
+    // See comment for actual texture setting below.
+    pushMainThreadTask([]() {
+        gChartContext.texStagefile.setPath("");
+        gChartContext.texBackbmp.setPath("");
+        gChartContext.texBanner.setPath("");
+    });
 
     const EntryList& e = gSelectContext.entries;
     if (e.empty()) return;
@@ -1446,17 +1449,18 @@ void setDynamicTextures()
             pf = std::reinterpret_pointer_cast<ChartFormatBase>(ps->_file);
         }
 
-        // _BG
-        if (!pf->stagefile.empty())
-            gChartContext.texStagefile.setPath(pf->getDirectory() / PathFromUTF8(pf->stagefile));
-
-        // backbmp
-        if (!pf->backbmp.empty())
-            gChartContext.texBackbmp.setPath(pf->getDirectory() / PathFromUTF8(pf->backbmp));
-
-        // _banner
-        if (!pf->banner.empty())
-            gChartContext.texBanner.setPath(pf->getDirectory() / PathFromUTF8(pf->banner));
+        // This may be called from any thread gSelectContext._mutex write-locked, while main thread may be read-locked
+        // on it. Push to main thread to avoid dead-locking.
+        // Also see texture resetting in beginning of the function.
+        pushMainThreadTask([pf]() {
+            // TODO: discard result if a new chart was selected by the time this was loaded.
+            if (!pf->stagefile.empty())
+                gChartContext.texStagefile.setPath(pf->getDirectory() / PathFromUTF8(pf->stagefile));
+            if (!pf->backbmp.empty())
+                gChartContext.texBackbmp.setPath(pf->getDirectory() / PathFromUTF8(pf->backbmp));
+            if (!pf->banner.empty())
+                gChartContext.texBanner.setPath(pf->getDirectory() / PathFromUTF8(pf->banner));
+        });
     }
     break;
 

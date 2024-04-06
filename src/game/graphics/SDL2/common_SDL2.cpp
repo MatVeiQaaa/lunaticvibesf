@@ -197,7 +197,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _p
     }
 
     loaded = true;
-    //LOG_DEBUG << "[Image] Load image file finished. " << _path.c_str();
+    LOG_VERBOSE << "[Image] Load image file finished " << _path;
 }
 
 Image::~Image() 

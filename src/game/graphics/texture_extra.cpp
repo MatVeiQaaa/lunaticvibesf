@@ -1,5 +1,4 @@
 
-#include <execution>
 #include <algorithm>
 
 #include "game/chart/chart_bms.h"
@@ -500,6 +499,7 @@ void TextureBmsBga::setVideoSpeed()
 	setSpeed(poorSlot);
 }
 
+// TODO: remove this and use Texture directly.
 TextureDynamic::TextureDynamic() : Texture(nullptr, 0, 0)
 {
 }
@@ -513,6 +513,7 @@ void TextureDynamic::setPath(const Path& path)
 		return;
 	}
 
+	// TODO: use LRU cache instead? Right now this as good as leaks memory.
 	static std::map<Path, Texture> dynTexCache;
 	if (dynTexCache.find(path) == dynTexCache.end())
 	{

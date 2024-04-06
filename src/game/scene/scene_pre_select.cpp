@@ -146,18 +146,21 @@ void ScenePreSelect::updateLoadSongs()
 
             // NEW SONG
             LOG_INFO << "[List] Generating NEW SONG folder...";
-            auto newSongList = g_pSongDB->findChartFromTime(ROOT_FOLDER_HASH,
-                std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count() - State::get(IndexNumber::NEW_ENTRY_SECONDS));
-            if (!newSongList.empty())
+
+            if (auto newSongList = g_pSongDB->findChartFromTime(
+                    ROOT_FOLDER_HASH, getFileTimeNow() - State::get(IndexNumber::NEW_ENTRY_SECONDS));
+                !newSongList.empty())
             {
                 std::shared_ptr<EntryFolderNewSong> entry = std::make_shared<EntryFolderNewSong>("NEW SONGS");
-                for (auto& c : newSongList)
+                for (auto&& c : newSongList)
                 {
-                    entry->pushEntry(std::make_shared<EntryFolderSong>(c));
+                    entry->pushEntry(std::make_shared<EntryFolderSong>(std::move(c)));
                 }
                 rootFolderProp.dbBrowseEntries.insert(rootFolderProp.dbBrowseEntries.begin(), {entry, nullptr});
+                LOG_INFO << "[List] NEW SONG folder has " << newSongList.size() << " entries";
+            } else {
+                LOG_INFO << "[List] No NEW SONG entries";
             }
-            LOG_INFO << "[List] NEW SONG folder has " << newSongList.size() << " entries";
 
             // ARENA
             LOG_INFO << "[List] Generating ARENA folder...";

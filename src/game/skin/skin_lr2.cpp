@@ -4575,11 +4575,15 @@ void SkinLR2::update()
         });
 
     // update songlist bar
-    std::shared_lock<std::shared_mutex> u(gSelectContext._mutex, std::try_to_lock); // read lock
+    // TODO: check if this makes barSprites update twice, as sprites are usually also updates by SkinBase::update().
+    for (auto& s : barSprites)
+    {
+        // NOTE: It read-locks inside.
+        s->update(t);
+    }
+    std::shared_lock u(gSelectContext._mutex, std::try_to_lock);
     if (u.owns_lock())
     {
-        for (auto& s : barSprites) s->update(t);
-
         // update songlist position
         if (hasBarMotionInterpOrigin && gSelectContext.scrollDirection != 0 && !gSelectContext.entries.empty())
         {

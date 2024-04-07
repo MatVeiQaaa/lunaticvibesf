@@ -533,9 +533,16 @@ double normalizeLinearGrowth(double prev, double curr)
     return delta;
 }
 
+// Try to ignore UTF-8.
+// E.g. isspace(), tolower(), etc can only handle ASCII characters.
+static unsigned char limit_to_ascii(int c)
+{
+    if (c < 0 || c > 127) return 0u;
+    return static_cast<unsigned char>(c);
+}
+
 void lunaticvibes::trim_in_place(std::string& s) {
-    // FIXME: ignore UTF-8, that would fix debug assertions failing on Windows when running tests.
-    static auto not_space = [](int c) { return !std::isspace(c); };
+    static auto not_space = [](int c) { return !std::isspace(limit_to_ascii(c)); };
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_space));
     s.erase(std::find_if(s.rbegin(), s.rend(), not_space).base(), s.end());
 }

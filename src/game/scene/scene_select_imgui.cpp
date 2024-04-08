@@ -1023,6 +1023,12 @@ void SceneSelect::imguiPageAbout()
 Current programmer:
     chown2
 
+Contributors:
+   Vad1mCSO2
+
+Testers:
+   Vad1mCSO2
+
 Original cast:（敬称略）
 
 Leader:

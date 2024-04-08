@@ -819,11 +819,11 @@ std::string ChartFormatBMS::getError()
     {
     // TODO: i18n
     case err::OK: return "OK";
-    case bms::ErrorCode::FILE_ERROR: return "File error";
-    case bms::ErrorCode::ALREADY_INITIALIZED: return "Already initialized";
-    case bms::ErrorCode::VALUE_ERROR: return "Value error";
-    case bms::ErrorCode::TYPE_MISMATCH: return "Type mismatch";
-    case bms::ErrorCode::NOTE_LINE_ERROR: return "Note line error";
+    case err::FILE_ERROR: return "File error";
+    case err::ALREADY_INITIALIZED: return "Already initialized";
+    case err::VALUE_ERROR: return "Value error";
+    case err::TYPE_MISMATCH: return "Type mismatch";
+    case err::NOTE_LINE_ERROR: return "Note line error";
     }
     abort();
 }

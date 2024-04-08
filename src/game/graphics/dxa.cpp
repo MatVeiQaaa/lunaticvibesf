@@ -1,11 +1,14 @@
 #include "dxa.h"
 
+#include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <vector>
 #include <filesystem>
 
 #include <string.h>
+
+#include <common/log.h>
 
 // Codes are from DXArchive (DX Library -> Tool -> DXArchive -> Source) , with some modification
 // Original author: 山田 巧 (Takumi Yamada)
@@ -276,6 +279,11 @@ int Decompress(void* Src, void* Dest)
 			sp += 3;
 			srcsize -= 3;
 			break;
+
+		default:
+			LOG_ERROR << "[dxa] Invalid indexsize " << indexsize;
+			assert(false && "Invalid indexsize");
+			return 0;
 		}
 		index++;		// 保存時に－１しているので＋１する
 

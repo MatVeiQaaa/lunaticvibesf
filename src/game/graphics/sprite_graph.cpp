@@ -1,6 +1,8 @@
 #include "sprite_graph.h"
 #include "game/scene/scene_context.h"
 
+#include <shared_mutex>
+
 static constexpr size_t RT_GRAPH_THRESHOLD = 50;
 
 SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
@@ -200,16 +202,19 @@ void SpriteLine::updateRects()
     {
     case LineType::GAUGE_F:
     {
+        std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 <= h && val2 <= h); });
         break;
     }
     case LineType::GAUGE_C: {
+        std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
         pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 >= h && val2 >= h); });
         break;
     }
     case LineType::SCORE: {
+        std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[_player];
         pushRectsF(p.size(), p, 100.0);
         break;
@@ -217,12 +222,14 @@ void SpriteLine::updateRects()
     case LineType::SCORE_MYBEST: {
         if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST])
         {
+            std::shared_lock l(gPlayContext._mutex);
             const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
             pushRectsF(p.size(), p, 100.0);
         }
         break;
     }
     case LineType::SCORE_TARGET: {
+        std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
         pushRectsF(p.size(), p, 100.0);
         break;

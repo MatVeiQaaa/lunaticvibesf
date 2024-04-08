@@ -66,6 +66,8 @@ constexpr unsigned PLAYER_SLOT_TARGET = 1;
 constexpr unsigned PLAYER_SLOT_MYBEST = 2;
 struct PlayContextParams
 {
+    std::shared_mutex _mutex;
+
     SkinType mode = SkinType::PLAY7;
     bool canRetry = false;
 

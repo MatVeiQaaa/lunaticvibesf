@@ -128,6 +128,8 @@ void clearContextPlay()
 
 void pushGraphPoints()
 {
+    std::unique_lock l(gPlayContext._mutex);
+
     gPlayContext.graphGauge[PLAYER_SLOT_PLAYER].push_back(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().health * 100);
 
     gPlayContext.graphAcc[PLAYER_SLOT_PLAYER].push_back(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().total_acc);

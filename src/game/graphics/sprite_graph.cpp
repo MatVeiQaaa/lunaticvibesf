@@ -200,49 +200,33 @@ void SpriteLine::updateRects()
     {
     case LineType::GAUGE_F:
     {
-        auto p = gPlayContext.graphGauge[_player];
-        size_t s = p.size();
-        pushRects(s, p, 100.0, [h](int val1, int val2) {return (val1 <= h && val2 <= h); });
+        const auto& p = gPlayContext.graphGauge[_player];
+        pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 <= h && val2 <= h); });
         break;
     }
-
-    case LineType::GAUGE_C:
-    {
-        auto p = gPlayContext.graphGauge[_player];
-        size_t s = p.size();
-        pushRects(s, p, 100.0, [h](int val1, int val2) {return (val1 >= h && val2 >= h); });
+    case LineType::GAUGE_C: {
+        const auto& p = gPlayContext.graphGauge[_player];
+        pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 >= h && val2 >= h); });
         break;
     }
-
-    case LineType::SCORE:
-    {
-        auto p = gPlayContext.graphAcc[_player];
-        size_t s = p.size();
-        pushRectsF(s, p, 100.0);
+    case LineType::SCORE: {
+        const auto& p = gPlayContext.graphAcc[_player];
+        pushRectsF(p.size(), p, 100.0);
         break;
     }
-
-    case LineType::SCORE_MYBEST:
-    {
+    case LineType::SCORE_MYBEST: {
         if (gPlayContext.ruleset[PLAYER_SLOT_MYBEST])
         {
-            auto p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
-            size_t s = p.size();
-            pushRectsF(s, p, 100.0);
+            const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_MYBEST];
+            pushRectsF(p.size(), p, 100.0);
         }
         break;
     }
-
-    case LineType::SCORE_TARGET:
-    {
-        auto pt = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
-        size_t s = pt.size();
-        pushRectsF(s, pt, 100.0);
+    case LineType::SCORE_TARGET: {
+        const auto& p = gPlayContext.graphAcc[PLAYER_SLOT_TARGET];
+        pushRectsF(p.size(), p, 100.0);
         break;
     }
-
-    default:
-        break;
     }
 }
 

@@ -134,7 +134,6 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
             record.maxcombo, score.addtime, record.playcount, record.clearcount, record.exscore, (int)record.lamp,
             record.pgreat, record.great, record.good, record.bad, record.kpoor, record.miss, record.bp, record.combobreak, record.replayFileName,
             hashStr });
-        assert(ret == SQLITE_OK);
     }
     else
     {
@@ -146,7 +145,11 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
             score.notes, score.score, score.rate, score.fast, score.slow,
             score.maxcombo, score.addtime, score.playcount, score.clearcount, score.exscore, (int)score.lamp,
             score.pgreat, score.great, score.good, score.bad, score.kpoor, score.miss, score.bp, score.combobreak, score.replayFileName });
-        assert(ret == SQLITE_OK);
+    }
+    if (ret != SQLITE_OK)
+    {
+        LOG_ERROR << "[ScoreDB] Upserting legacy score failed: " << errmsg();
+        assert(false && "upserting legacy score failed");
     }
 
     char sqlbuf[96] = { 0 };
@@ -266,7 +269,11 @@ void ScoreDB::saveChartScoreBmsToHistory(const HashMD5& hash, const ScoreBMS& sc
                    {hash.hexdigest(), score.notes, score.score, score.fast, score.slow, score.maxcombo, score.addtime,
                     score.exscore, lamp, score.pgreat, score.great, score.good, score.bad, score.kpoor, score.miss,
                     score.bp, score.combobreak, play_time, score.replayFileName});
-    assert(ret == SQLITE_OK);
+    if (ret != SQLITE_OK)
+    {
+        LOG_ERROR << "[ScoreDB] Score saving failed: " << errmsg();
+        assert(false && "Score saving failed");
+    }
 }
 
 void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)

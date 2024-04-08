@@ -173,7 +173,6 @@ protected:
 
     std::map<JudgeType, double> _healthGain;
 
-    bool doJudge = true;
     bool _judgeScratch = true;
 
     bool showJudge = true;
@@ -240,8 +239,7 @@ public:
     void update(const lunaticvibes::Time& t) override;
 
 public:
-    //constexpr auto getJudge() const { return _count; }
-    void updateJudge(const lunaticvibes::Time& t, chart::NoteLaneIndex ch, JudgeArea judge, int slot, bool force = false);
+    void updateJudge(const lunaticvibes::Time& t, chart::NoteLaneIndex ch, JudgeArea judge, int slot);
 
 public:
     GaugeType getGaugeType() const { return _gauge; }

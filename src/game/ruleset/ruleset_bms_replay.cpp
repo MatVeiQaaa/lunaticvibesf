@@ -22,8 +22,6 @@ RulesetBMSReplay::RulesetBMSReplay(
     itReplayCommand = replay->commands.begin();
     showJudge = (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P);
 
-    doJudge = false;
-
     if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
     {
         if (gPlayContext.shift1PNotes5KFor7KSkin)
@@ -65,44 +63,6 @@ RulesetBMSReplay::RulesetBMSReplay(
     case RulesetBMS::PlaySide::NETWORK:
         assert(false);
         break;
-    }
-}
-
-static std::optional<std::pair<RulesetBMS::JudgeArea, unsigned>> command_to_judge(ReplayChart::Commands::Type cmd)
-{
-    using CmdType = ReplayChart::Commands::Type;
-    using JudgeArea = RulesetBMS::JudgeArea;
-    switch (cmd)
-    {
-    case CmdType::JUDGE_LEFT_EXACT_0: return {{JudgeArea::EXACT_PERFECT, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_0: return {{JudgeArea::EARLY_PERFECT, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_1: return {{JudgeArea::EARLY_GREAT, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_2: return {{JudgeArea::EARLY_GOOD, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_3: return {{JudgeArea::EARLY_BAD, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_4: return {{JudgeArea::MISS, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_EARLY_5: return {{JudgeArea::EARLY_KPOOR, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_0: return {{JudgeArea::LATE_PERFECT, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_1: return {{JudgeArea::LATE_GREAT, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_2: return {{JudgeArea::LATE_GOOD, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_3: return {{JudgeArea::LATE_BAD, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_4: return {{JudgeArea::MISS, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_LEFT_LATE_5: return {{JudgeArea::EARLY_KPOOR, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_RIGHT_EXACT_0: return {{JudgeArea::EXACT_PERFECT, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_0: return {{JudgeArea::EARLY_PERFECT, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_1: return {{JudgeArea::EARLY_GREAT, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_2: return {{JudgeArea::EARLY_GOOD, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_3: return {{JudgeArea::EARLY_BAD, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_4: return {{JudgeArea::MISS, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_EARLY_5: return {{JudgeArea::EARLY_KPOOR, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_0: return {{JudgeArea::LATE_PERFECT, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_1: return {{JudgeArea::LATE_GREAT, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_2: return {{JudgeArea::LATE_GOOD, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_3: return {{JudgeArea::LATE_BAD, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_4: return {{JudgeArea::MISS, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_RIGHT_LATE_5: return {{JudgeArea::EARLY_KPOOR, PLAYER_SLOT_TARGET}};
-    case CmdType::JUDGE_LEFT_LANDMINE: return {{JudgeArea::MINE_KPOOR, PLAYER_SLOT_PLAYER}};
-    case CmdType::JUDGE_RIGHT_LANDMINE: return {{JudgeArea::MINE_KPOOR, PLAYER_SLOT_TARGET}};
-    default: return {};
     }
 }
 
@@ -168,10 +128,10 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
     _basic.play_time = rt;
     using namespace chart;
 
+    const InputMask prevKeyPressing = keyPressing;
     while (itReplayCommand != replay->commands.end() && rt.norm() >= (long long)std::round(itReplayCommand->ms * playbackSpeed / gSelectContext.pitchSpeed))
     {
         auto cmd = itReplayCommand->type;
-        auto cmdTime = _startTime.norm() + itReplayCommand->ms;
 
         if (_side == PlaySide::AUTO_2P)
         {
@@ -218,19 +178,14 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
             }
         }
 
-        if (auto judge = command_to_judge(cmd); judge.has_value())
-            // TODO: pass lane index in here.
-            updateJudge(cmdTime, NoteLaneIndex::_, judge->first, judge->second, true);
-
         itReplayCommand++;
     }
 
     InputMask pressed, released;
     if (!skipToEnd)
     {
-        InputMask prev = keyPressing;
-        pressed = keyPressing & ~prev;
-        released = ~keyPressing & prev;
+        pressed = keyPressing & ~prevKeyPressing;
+        released = ~keyPressing & prevKeyPressing;
     }
     else
     {

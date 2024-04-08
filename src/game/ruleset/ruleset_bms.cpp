@@ -625,12 +625,18 @@ RulesetBMS::JudgeRes RulesetBMS::_judge(const Note& note, const lunaticvibes::Ti
     case JudgeArea::LATE_GREAT:    LOG_DEBUG << "LATE   GREAT   " << error; break;
     case JudgeArea::LATE_GOOD:     LOG_DEBUG << "LATE   GOOD    " << error; break;
     case JudgeArea::LATE_BAD:      LOG_DEBUG << "LATE   BAD     " << error; break;
+    case JudgeArea::NOTHING:
+    case JudgeArea::EXACT_PERFECT:
+    case JudgeArea::MISS:
+    case JudgeArea::LATE_KPOOR:
+    case JudgeArea::MINE_KPOOR: break;
     }
     */
 
     return { a, error };
 }
 
+// TODO: nuke this and JUDGE_* replay commands.
 static const std::map<RulesetBMS::JudgeArea, ReplayChart::Commands::Type> judgeAreaReplayCommandType[] =
 {
     {
@@ -773,7 +779,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
     }
 
     // push replay command
-    if (pushReplayCommand && doJudge && gChartContext.started && gPlayContext.replayNew)
+    if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
     {
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
@@ -820,10 +826,10 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 }
             }
 
-            _lastNoteJudge = { JudgeArea::MINE_KPOOR, t.norm() };
+            _lastNoteJudge = {{JudgeArea::MINE_KPOOR, t.norm()}};
 
             // push replay command
-            if (doJudge && gChartContext.started && gPlayContext.replayNew)
+            if (gChartContext.started && gPlayContext.replayNew)
             {
                 long long ms = t.norm() - _startTime.norm();
                 ReplayChart::Commands cmd;
@@ -856,7 +862,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 _lastNoteJudge[slot].time = 0;
 
                 // push replay command
-                if (doJudge && gChartContext.started && gPlayContext.replayNew)
+                if (gChartContext.started && gPlayContext.replayNew)
                 {
                     if (judgeAreaReplayCommandType[slot].find(_lnJudge[idx]) != judgeAreaReplayCommandType[slot].end())
                     {
@@ -945,7 +951,7 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
     }
 
     // push replay command
-    if (pushReplayCommand && doJudge && gChartContext.started && gPlayContext.replayNew)
+    if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
     {
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
@@ -1020,65 +1026,62 @@ void RulesetBMS::_updateHp(JudgeArea judge)
     _updateHp(_healthGain.at(JudgeAreaTypeMap.at(judge)));
 }
 
-void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch, const RulesetBMS::JudgeArea judge, const int slot, const bool force)
+void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch, const RulesetBMS::JudgeArea judge, const int slot)
 {
     if (isFailed()) return;
-    
-    if (doJudge || force)
+
+    for (auto& i : JudgeAreaIndexAccMap.at(judge))
     {
-        for (auto& i : JudgeAreaIndexAccMap.at(judge))
-        {
-            ++_basic.judge[i];
-        }
-
-        switch (judge)
-        {
-        case JudgeArea::EARLY_PERFECT:
-        case JudgeArea::EXACT_PERFECT:
-        case JudgeArea::LATE_PERFECT:
-            //moneyScore += 150000.0 / getNoteCount() +
-            //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
-            moneyScore += 1.0 * maxMoneyScore / getNoteCount();
-            exScore += 2;
-            ++_basic.combo;
-            break;
-
-        case JudgeArea::EARLY_GREAT:
-        case JudgeArea::LATE_GREAT:
-            //moneyScore += 100000.0 / getNoteCount() +
-            //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
-            moneyScore += 0.5 * maxMoneyScore / getNoteCount();
-            exScore += 1;
-            ++_basic.combo;
-            break;
-
-        case JudgeArea::EARLY_GOOD:
-        case JudgeArea::LATE_GOOD:
-            //moneyScore += 20000.0 / getNoteCount() +
-            //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
-            moneyScore += 0.25 * maxMoneyScore / getNoteCount();
-            ++_basic.combo;
-            break;
-
-        case JudgeArea::EARLY_BAD:
-        case JudgeArea::LATE_BAD:
-        case JudgeArea::MISS:
-            _basic.combo = 0;
-            _basic.comboDisplay = 0;
-            break;
-
-        default:
-            break;
-        }
-
-        _updateHp(judge);
-        if (_basic.combo > _basic.maxCombo)
-            _basic.maxCombo = _basic.combo;
-        if (_basic.combo + _basic.comboDisplay > _basic.maxComboDisplay)
-            _basic.maxComboDisplay = _basic.combo + _basic.comboDisplay;
-        if (_basic.judge[JUDGE_CB] == 0)
-            _basic.firstMaxCombo = _basic.combo;
+        ++_basic.judge[i];
     }
+
+    switch (judge)
+    {
+    case JudgeArea::EARLY_PERFECT:
+    case JudgeArea::EXACT_PERFECT:
+    case JudgeArea::LATE_PERFECT:
+        //moneyScore += 150000.0 / getNoteCount() +
+        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        moneyScore += 1.0 * maxMoneyScore / getNoteCount();
+        exScore += 2;
+        ++_basic.combo;
+        break;
+
+    case JudgeArea::EARLY_GREAT:
+    case JudgeArea::LATE_GREAT:
+        //moneyScore += 100000.0 / getNoteCount() +
+        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        moneyScore += 0.5 * maxMoneyScore / getNoteCount();
+        exScore += 1;
+        ++_basic.combo;
+        break;
+
+    case JudgeArea::EARLY_GOOD:
+    case JudgeArea::LATE_GOOD:
+        //moneyScore += 20000.0 / getNoteCount() +
+        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        moneyScore += 0.25 * maxMoneyScore / getNoteCount();
+        ++_basic.combo;
+        break;
+
+    case JudgeArea::EARLY_BAD:
+    case JudgeArea::LATE_BAD:
+    case JudgeArea::MISS:
+        _basic.combo = 0;
+        _basic.comboDisplay = 0;
+        break;
+
+    default:
+        break;
+    }
+
+    _updateHp(judge);
+    if (_basic.combo > _basic.maxCombo)
+        _basic.maxCombo = _basic.combo;
+    if (_basic.combo + _basic.comboDisplay > _basic.maxComboDisplay)
+        _basic.maxComboDisplay = _basic.combo + _basic.comboDisplay;
+    if (_basic.judge[JUDGE_CB] == 0)
+        _basic.firstMaxCombo = _basic.combo;
 
     unsigned max = getNoteCount() * 2;
     _basic.total_acc = 100.0 * exScore / max;
@@ -1334,16 +1337,17 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
     {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
-            bool scratch = false;
-            switch (k)
-            {
-            case Input::S1L:
-            case Input::S1R:
-            case Input::S2L:
-            case Input::S2R:
-                scratch = true;
-                break;
-            }
+            auto is_scratch_input = [](size_t k) {
+                switch (k)
+                {
+                case Input::S1L:
+                case Input::S1R:
+                case Input::S2L:
+                case Input::S2R: return true;
+                default: return false;
+                }
+            };
+            const bool scratch = is_scratch_input(k);
 
             NoteLaneIndex idx;
 
@@ -1353,16 +1357,17 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx);
                 while (!_chart->isLastNote(NoteLaneCategory::Note, idx, itNote) && !itNote->expired)
                 {
-                    lunaticvibes::Time hitTime = (!scratch || _judgeScratch) ? judgeTime[(size_t)_judgeDifficulty].BAD : 0;
-                    if (rt - itNote->time >= hitTime)
+                    const lunaticvibes::Time latePoorWindow =
+                        (!scratch || _judgeScratch) ? judgeTime[(size_t)_judgeDifficulty].BAD : 0;
+                    if (rt - itNote->time >= latePoorWindow)
                     {
                         itNote->expired = true;
 
-                        if (doJudge && (!scratch || _judgeScratch))
+                        if (!scratch || _judgeScratch)
                         {
                             updateJudge(t, idx, JudgeArea::MISS, slot);
                             _lastNoteJudge[slot].area = JudgeArea::MISS;
-                            _lastNoteJudge[slot].time = hitTime;
+                            _lastNoteJudge[slot].time = latePoorWindow;
 
                             // push replay command
                             if (gChartContext.started && gPlayContext.replayNew)
@@ -1410,7 +1415,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                     _lastNoteJudge[slot].time = hitTime;
 
                                     // push replay command
-                                    if (doJudge && gChartContext.started && gPlayContext.replayNew)
+                                    if (gChartContext.started && gPlayContext.replayNew)
                                     {
                                         long long ms = t.norm() - _startTime.norm();
                                         ReplayChart::Commands cmd;

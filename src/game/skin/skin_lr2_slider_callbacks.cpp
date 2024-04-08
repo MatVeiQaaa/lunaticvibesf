@@ -79,6 +79,38 @@ void bgm_volume(double p)
         SoundMgr::setVolume(SampleChannel::BGM, (float)p);
 }
 
+static SampleChannel get_sample_channel_for_target(unsigned int idx)
+{
+    switch (idx)
+    {
+    case 0: return SampleChannel::MASTER; break;
+    case 1: return SampleChannel::KEY; break;
+    case 2: return SampleChannel::BGM; break;
+    }
+    LOG_ERROR << "Invalid idx " << idx;
+    assert(false && "Invalid idx in get_sample_channel_for_target");
+    return {};
+};
+
+static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
+{
+    switch (idx)
+    {
+    case 0: return DSPType::OFF;
+    case 1: return DSPType::REVERB;
+    case 2: return DSPType::DELAY;
+    case 3: return DSPType::LOWPASS;
+    case 4: return DSPType::HIGHPASS;
+    case 5: return DSPType::FLANGER;
+    case 6: return DSPType::CHORUS;
+    case 7: return DSPType::DISTORTION;
+    }
+    LOG_ERROR << "Invalid idx " << idx;
+    assert(false && "Invalid idx in get_dsp_type_from_sound_fx");
+    return {};
+};
+
+
 void fx0(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX0_P1 : IndexSlider::FX0_P2, p);
@@ -89,24 +121,8 @@ void fx0(int idx, double p)
 
     if (State::get(IndexSwitch::SOUND_FX0))
     {
-        SampleChannel ch;
-        switch (State::get(IndexOption::SOUND_TARGET_FX0))
-        {
-        case 0: ch = SampleChannel::MASTER; break;
-        case 1: ch = SampleChannel::KEY; break;
-        case 2: ch = SampleChannel::BGM; break;
-        }
-        switch (State::get(IndexOption::SOUND_FX0))
-        {
-        case 0: SoundMgr::setDSP(DSPType::OFF, 0, ch, 0.f, 0.f); break;
-        case 1: SoundMgr::setDSP(DSPType::REVERB, 0, ch, p1, p2); break;
-        case 2: SoundMgr::setDSP(DSPType::DELAY, 0, ch, p1, p2); break;
-        case 3: SoundMgr::setDSP(DSPType::LOWPASS, 0, ch, p1, p2); break;
-        case 4: SoundMgr::setDSP(DSPType::HIGHPASS, 0, ch, p1, p2); break;
-        case 5: SoundMgr::setDSP(DSPType::FLANGER, 0, ch, p1, p2); break;
-        case 6: SoundMgr::setDSP(DSPType::CHORUS, 0, ch, p1, p2); break;
-        case 7: SoundMgr::setDSP(DSPType::DISTORTION, 0, ch, p1, p2); break;
-        }
+        const SampleChannel ch{get_sample_channel_for_target(State::get(IndexOption::SOUND_TARGET_FX0))};
+        SoundMgr::setDSP(get_dsp_type_from_sound_fx(State::get(IndexOption::SOUND_FX0)), 0, ch, p1, p2);
     }
 }
 
@@ -120,24 +136,8 @@ void fx1(int idx, double p)
 
     if (State::get(IndexSwitch::SOUND_FX1))
     {
-        SampleChannel ch;
-        switch (State::get(IndexOption::SOUND_TARGET_FX1))
-        {
-        case 0: ch = SampleChannel::MASTER; break;
-        case 1: ch = SampleChannel::KEY; break;
-        case 2: ch = SampleChannel::BGM; break;
-        }
-        switch (State::get(IndexOption::SOUND_FX1))
-        {
-        case 0: SoundMgr::setDSP(DSPType::OFF, 1, ch, 0.f, 0.f); break;
-        case 1: SoundMgr::setDSP(DSPType::REVERB, 1, ch, p1, p2); break;
-        case 2: SoundMgr::setDSP(DSPType::DELAY, 1, ch, p1, p2); break;
-        case 3: SoundMgr::setDSP(DSPType::LOWPASS, 1, ch, p1, p2); break;
-        case 4: SoundMgr::setDSP(DSPType::HIGHPASS, 1, ch, p1, p2); break;
-        case 5: SoundMgr::setDSP(DSPType::FLANGER, 1, ch, p1, p2); break;
-        case 6: SoundMgr::setDSP(DSPType::CHORUS, 1, ch, p1, p2); break;
-        case 7: SoundMgr::setDSP(DSPType::DISTORTION, 1, ch, p1, p2); break;
-        }
+        const SampleChannel ch{get_sample_channel_for_target(State::get(IndexOption::SOUND_TARGET_FX1))};
+        SoundMgr::setDSP(get_dsp_type_from_sound_fx(State::get(IndexOption::SOUND_FX1)), 0, ch, p1, p2);
     }
 }
 
@@ -151,24 +151,8 @@ void fx2(int idx, double p)
 
     if (State::get(IndexSwitch::SOUND_FX2))
     {
-        SampleChannel ch;
-        switch (State::get(IndexOption::SOUND_TARGET_FX2))
-        {
-        case 0: ch = SampleChannel::MASTER; break;
-        case 1: ch = SampleChannel::KEY; break;
-        case 2: ch = SampleChannel::BGM; break;
-        }
-        switch (State::get(IndexOption::SOUND_FX2))
-        {
-        case 0: SoundMgr::setDSP(DSPType::OFF, 2, ch, 0.f, 0.f); break;
-        case 1: SoundMgr::setDSP(DSPType::REVERB, 2, ch, p1, p2); break;
-        case 2: SoundMgr::setDSP(DSPType::DELAY, 2, ch, p1, p2); break;
-        case 3: SoundMgr::setDSP(DSPType::LOWPASS, 2, ch, p1, p2); break;
-        case 4: SoundMgr::setDSP(DSPType::HIGHPASS, 2, ch, p1, p2); break;
-        case 5: SoundMgr::setDSP(DSPType::FLANGER, 2, ch, p1, p2); break;
-        case 6: SoundMgr::setDSP(DSPType::CHORUS, 2, ch, p1, p2); break;
-        case 7: SoundMgr::setDSP(DSPType::DISTORTION, 2, ch, p1, p2); break;
-        }
+        const SampleChannel ch{get_sample_channel_for_target(State::get(IndexOption::SOUND_TARGET_FX2))};
+        SoundMgr::setDSP(get_dsp_type_from_sound_fx(State::get(IndexOption::SOUND_FX2)), 0, ch, p1, p2);
     }
 }
 

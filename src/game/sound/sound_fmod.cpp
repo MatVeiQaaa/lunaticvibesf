@@ -3,6 +3,7 @@
 #include "sound_fmod.h"
 #include "fmod_errors.h"
 #include <cstdlib>
+#include <type_traits>
 
 #include "common/log.h"
 #include "common/types.h"
@@ -1003,20 +1004,27 @@ void SoundDriverFMOD::setVolume(SampleChannel ch, float v)
     }
 }
 
+static FMOD_DSP_TYPE dsp_type_to_fmd(DSPType type)
+{
+    switch (type)
+    {
+    case DSPType::OFF: return FMOD_DSP_TYPE_UNKNOWN;
+    case DSPType::REVERB: return FMOD_DSP_TYPE_SFXREVERB; // The DSP type LR2 used (FMOD_DSP_TYPE_REVERB) is long gone
+    case DSPType::DELAY: return FMOD_DSP_TYPE_ECHO;
+    case DSPType::LOWPASS: return FMOD_DSP_TYPE_LOWPASS;
+    case DSPType::HIGHPASS: return FMOD_DSP_TYPE_HIGHPASS;
+    case DSPType::FLANGER: return FMOD_DSP_TYPE_FLANGE;
+    case DSPType::CHORUS: return FMOD_DSP_TYPE_CHORUS;
+    case DSPType::DISTORTION: return FMOD_DSP_TYPE_DISTORTION;
+    }
+    LOG_ERROR << "[FMOD] invalid DSPType " << static_cast<std::underlying_type_t<DSPType>>(type);
+    assert(false && "invalid DSPType in dsp_type_to_fmd");
+    return {};
+}
+
 void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float p1, float p2)
 {
-    FMOD_DSP_TYPE fmodType;
-    switch (type)
-	{
-    case DSPType::OFF:        fmodType = FMOD_DSP_TYPE_UNKNOWN; break;
-    case DSPType::REVERB:     fmodType = FMOD_DSP_TYPE_SFXREVERB; break; // The DSP type LR2 used (FMOD_DSP_TYPE_REVERB) is long gone
-	case DSPType::DELAY:      fmodType = FMOD_DSP_TYPE_ECHO; break;
-	case DSPType::LOWPASS:    fmodType = FMOD_DSP_TYPE_LOWPASS; break;
-	case DSPType::HIGHPASS:   fmodType = FMOD_DSP_TYPE_HIGHPASS; break;
-	case DSPType::FLANGER:    fmodType = FMOD_DSP_TYPE_FLANGE; break;
-	case DSPType::CHORUS:     fmodType = FMOD_DSP_TYPE_CHORUS; break;
-	case DSPType::DISTORTION: fmodType = FMOD_DSP_TYPE_DISTORTION; break;
-    }
+    const FMOD_DSP_TYPE fmodType{dsp_type_to_fmd(type)};
 
     if (fmodType == FMOD_DSP_TYPE_UNKNOWN)
     {

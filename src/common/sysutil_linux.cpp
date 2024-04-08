@@ -109,6 +109,7 @@ const char* safe_strerror(const int errnum, char* buffer, const size_t buffer_le
 bool lunaticvibes::open(const std::string& link)
 {
     const std::string s = (boost::format("xdg-open \"%s\"") % link).str();
+    // TODO: make it non-blocking.
     int rc = system(s.c_str());
     if (rc != 0)
     {

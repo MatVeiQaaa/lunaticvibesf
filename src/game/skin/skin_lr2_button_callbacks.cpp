@@ -1385,6 +1385,7 @@ static void open_ir_page()
     if (!lunaticvibes::open(link))
     {
         LOG_ERROR << "failed to open link";
+        return;
     }
 
     LOG_DEBUG << "opened the thingy";

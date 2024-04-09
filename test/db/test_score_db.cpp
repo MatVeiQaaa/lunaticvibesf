@@ -4,8 +4,6 @@
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
-// TODO: make these tests use some real-life data.
-
 TEST(ScoreDb, ChartScoreUpdating)
 {
     static const HashMD5 hash = md5("deadbeef");
@@ -17,28 +15,77 @@ TEST(ScoreDb, ChartScoreUpdating)
 
     {
         ScoreBMS score;
-        score.exscore = 1;
+        score.exscore = 16;
         score.lamp = ScoreBMS::Lamp::NOPLAY;
-        score.pgreat = 2;
+        score.pgreat = 5;
+        score.great = 12;
+        score.good = 32;
+        score.bad = 69;
+        score.kpoor = 84;
+        score.miss = 58;
+        score.bp = 1469;
+        score.combobreak = 1385;
         score.replayFileName = "score1";
         score_db.insertChartScoreBMS(hash, score);
-        EXPECT_EQ(score_db.getChartScoreBMS(hash)->exscore, 1);
-        EXPECT_EQ(score_db.getStats().pgreat, 0);
-        EXPECT_EQ(score_db.getStats().play_count, 0);
-        EXPECT_EQ(score_db.getStats().clear_count, 0);
+        const auto pb = score_db.getChartScoreBMS(hash);
+        ASSERT_NE(pb, nullptr);
+        EXPECT_EQ(pb->exscore, score.exscore);
+        EXPECT_EQ(pb->lamp, score.lamp);
+        EXPECT_EQ(pb->pgreat, score.pgreat);
+        EXPECT_EQ(pb->great, score.great);
+        EXPECT_EQ(pb->good, score.good);
+        EXPECT_EQ(pb->bad, score.bad);
+        EXPECT_EQ(pb->kpoor, score.kpoor);
+        EXPECT_EQ(pb->miss, score.miss);
+        EXPECT_EQ(pb->bp, score.bp);
+        EXPECT_EQ(pb->combobreak, score.combobreak);
+        EXPECT_EQ(pb->replayFileName, score.replayFileName);
+        const auto stats = score_db.getStats();
+        EXPECT_EQ(stats.pgreat, 0);
+        EXPECT_EQ(stats.play_count, 0);
+        EXPECT_EQ(stats.clear_count, 0);
     }
 
     {
         ScoreBMS score;
-        score.exscore = 2;
+        score.final_combo = 5;
+        score.play_time = lunaticvibes::Time{12340};
+        score.exscore = 17;
         score.lamp = ScoreBMS::Lamp::FAILED;
-        score.pgreat = 2;
+        score.pgreat = 6;
+        score.great = 11;
+        score.good = 32;
+        score.bad = 69;
+        score.kpoor = 84;
+        score.miss = 58;
+        score.bp = 1469;
+        score.combobreak = 1385;
         score.replayFileName = "score2";
         score_db.insertChartScoreBMS(hash, score);
-        EXPECT_EQ(score_db.getChartScoreBMS(hash)->exscore, 2);
-        EXPECT_EQ(score_db.getStats().pgreat, 2);
-        EXPECT_EQ(score_db.getStats().play_count, 1);
-        EXPECT_EQ(score_db.getStats().clear_count, 0);
+        const auto pb = score_db.getChartScoreBMS(hash);
+        ASSERT_NE(pb, nullptr);
+        EXPECT_EQ(pb->exscore, score.exscore);
+        EXPECT_EQ(pb->lamp, score.lamp);
+        EXPECT_EQ(pb->pgreat, score.pgreat);
+        EXPECT_EQ(pb->great, score.great);
+        EXPECT_EQ(pb->good, score.good);
+        EXPECT_EQ(pb->bad, score.bad);
+        EXPECT_EQ(pb->kpoor, score.kpoor);
+        EXPECT_EQ(pb->miss, score.miss);
+        EXPECT_EQ(pb->bp, score.bp);
+        EXPECT_EQ(pb->combobreak, score.combobreak);
+        EXPECT_EQ(pb->replayFileName, score.replayFileName);
+        const auto stats = score_db.getStats();
+        EXPECT_EQ(stats.pgreat, score.pgreat);
+        EXPECT_EQ(stats.great, score.great);
+        EXPECT_EQ(stats.good, score.good);
+        EXPECT_EQ(stats.bad, score.bad);
+        EXPECT_EQ(stats.poor, pb->kpoor + pb->miss);
+        EXPECT_EQ(stats.play_count, 1);
+        EXPECT_EQ(stats.clear_count, 0);
+        EXPECT_EQ(stats.running_combo, 5);
+        EXPECT_EQ(stats.max_running_combo, 5);
+        EXPECT_EQ(stats.playtime, 12340);
     }
 
     {
@@ -48,16 +95,22 @@ TEST(ScoreDb, ChartScoreUpdating)
         score.pgreat = 2;
         score.replayFileName = "score3";
         score_db.insertChartScoreBMS(hash, score);
-        EXPECT_EQ(score_db.getChartScoreBMS(hash)->exscore, 2);
-        EXPECT_EQ(score_db.getStats().pgreat, 4);
-        EXPECT_EQ(score_db.getStats().play_count, 2);
-        EXPECT_EQ(score_db.getStats().clear_count, 1);
+        const auto pb = score_db.getChartScoreBMS(hash);
+        ASSERT_NE(pb, nullptr);
+        EXPECT_EQ(pb->exscore, 17);
+        const auto stats = score_db.getStats();
+        EXPECT_EQ(stats.pgreat, 6 + 2);
+        EXPECT_EQ(stats.play_count, 2);
+        EXPECT_EQ(stats.clear_count, 1);
     }
 
     // Cache reloading works.
-    score_db.preloadScore();
-    ASSERT_NE(score_db.getChartScoreBMS(hash), nullptr);
-    EXPECT_EQ(score_db.getChartScoreBMS(hash)->exscore, 2);
+    {
+        score_db.preloadScore();
+        const auto pb = score_db.getChartScoreBMS(hash);
+        ASSERT_NE(pb, nullptr);
+        EXPECT_EQ(pb->exscore, 17);
+    }
 }
 
 TEST(ScoreDb, CourseScoreUpdating)

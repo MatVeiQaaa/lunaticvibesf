@@ -300,12 +300,12 @@ void SceneResult::updateFadeout()
             ).str();
         Path replayPath = ConfigMgr::Profile()->getPath() / "replay" / "chart" / gChartContext.hash.hexdigest() / replayFileName;
 
+        // FIXME: save BEFORE fadeout, e.g. on entrance.
         // save replay
         if (saveScore)
         {
             gPlayContext.replayNew->saveFile(replayPath);
         }
-
         // save score
         if (saveScore && !gChartContext.hash.empty())
         {
@@ -355,12 +355,11 @@ void SceneResult::updateFadeout()
                 }
 
                 g_pScoreDB->insertChartScoreBMS(gChartContext.hash, *score);
-                pScore = score;
+                pScore = std::move(score);
 
                 break;
             }
-            default:
-                break;
+            case eChartFormat::UNKNOWN: break;
             }
 
             // update entry list score

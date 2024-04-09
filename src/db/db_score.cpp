@@ -474,7 +474,6 @@ void ScoreDB::updateStats(const ScoreBMS& score)
     stats.pgreat += score.pgreat;
     stats.great += score.great;
     stats.good += score.good;
-    // FIXME: not sure about these.
     stats.bad += score.bad;
     stats.poor += score.kpoor + score.miss;
     const auto first_running_combo = stats.running_combo + score.first_max_combo;
@@ -485,7 +484,7 @@ void ScoreDB::updateStats(const ScoreBMS& score)
 
     ret = exec("UPDATE stats SET play_count=?, clear_count=?, pgreat=?, great=?, good=?, bad=?, poor=?, "
                "running_combo=?, max_running_combo=?, playtime=? WHERE id = 573",
-               {stats.play_count, stats.clear_count, stats.pgreat, stats.great, stats.good, stats.bad, stats.pgreat,
+               {stats.play_count, stats.clear_count, stats.pgreat, stats.great, stats.good, stats.bad, stats.poor,
                 stats.running_combo, stats.max_running_combo, stats.playtime});
     if (ret != SQLITE_OK)
     {

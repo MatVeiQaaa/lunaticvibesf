@@ -162,7 +162,11 @@ public:
         NETWORK,
     };
 
-    struct JudgeRes { JudgeArea area = JudgeArea::NOTHING; lunaticvibes::Time time; };
+    struct JudgeRes
+    {
+        JudgeArea area{JudgeArea::NOTHING};
+        lunaticvibes::Time time{0};
+    };
 
 protected:
     // members set on construction
@@ -188,7 +192,7 @@ protected:
 protected:
     // members change in game
     std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{ JudgeArea::NOTHING };
-    std::array<JudgeRes, 2> _lastNoteJudge;
+    std::array<JudgeRes, 2> _lastNoteJudge{};
 
     std::map<chart::NoteLane, ChartObjectBase::NoteIterator> _noteListIterators;
 
@@ -216,7 +220,7 @@ public:
     void initGaugeParams(PlayModifierGaugeType gauge);
 
 protected:
-    JudgeRes _judge(const Note& note, const lunaticvibes::Time& time);
+    JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
 private:
     void _judgePress(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot);
     void _judgeHold(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot);

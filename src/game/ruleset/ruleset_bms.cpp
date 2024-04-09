@@ -583,7 +583,7 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
     }
 }
 
-RulesetBMS::JudgeRes RulesetBMS::_judge(const Note& note, const lunaticvibes::Time& time)
+RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const
 {
     // spot judge area
     JudgeArea a = JudgeArea::NOTHING;
@@ -1071,7 +1071,10 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
         _basic.comboDisplay = 0;
         break;
 
-    default:
+    case JudgeArea::NOTHING:
+    case JudgeArea::EARLY_KPOOR:
+    case JudgeArea::LATE_KPOOR:
+    case JudgeArea::MINE_KPOOR:
         break;
     }
 
@@ -1142,12 +1145,12 @@ void RulesetBMS::judgeNotePress(Input::Pad k, const lunaticvibes::Time& t, const
     JudgeRes j;
     if (pNote1 && (pNote2 == nullptr || pNote1->time < pNote2->time) && !pNote1->expired)
     {
-        j = _judge(*pNote1, rt);
+        j = _calcJudgeByTimes(*pNote1, rt);
         _judgePress(NoteLaneCategory::Note, idx1, *pNote1, j, t, slot);
     }
     else if (pNote2 && !pNote2->expired)
     {
-        j = _judge(*pNote2, rt);
+        j = _calcJudgeByTimes(*pNote2, rt);
         _judgePress(NoteLaneCategory::LN, idx2, *pNote2, j, t, slot);
     }
 
@@ -1166,7 +1169,7 @@ void RulesetBMS::judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const 
     if (idx != _ && !_chart->isLastNote(NoteLaneCategory::Mine, idx))
     {
         auto& note = *_chart->incomingNote(NoteLaneCategory::Mine, idx);
-        auto j = _judge(note, rt);
+        auto j = _calcJudgeByTimes(note, rt);
         _judgeHold(NoteLaneCategory::Mine, idx, note, j, t, slot);
     }
 
@@ -1174,7 +1177,7 @@ void RulesetBMS::judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const 
     if (idx != _ && !_chart->isLastNote(NoteLaneCategory::LN, idx))
     {
         auto& note = *_chart->incomingNote(NoteLaneCategory::LN, idx);
-        auto j = _judge(note, rt);
+        auto j = _calcJudgeByTimes(note, rt);
         _judgeHold(NoteLaneCategory::LN, idx, note, j, t, slot);
     }
 }
@@ -1188,7 +1191,7 @@ void RulesetBMS::judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, con
         {
             if (!itNote->expired)
             {
-;                auto j = _judge(*itNote, rt);
+;                auto j = _calcJudgeByTimes(*itNote, rt);
                 _judgeRelease(NoteLaneCategory::LN, idx, *itNote, j, t, slot);
                 break;
             }

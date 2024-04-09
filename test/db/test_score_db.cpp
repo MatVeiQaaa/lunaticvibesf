@@ -109,8 +109,10 @@ TEST(ScoreDb, ChartScoreDeleting)
     ASSERT_NE(score_db.getChartScoreBMS(hash), nullptr);
     EXPECT_EQ(score_db.getChartScoreBMS(hash)->exscore, 1);
 
-    score_db.deleteChartScoreBMS(hash);
+    score_db.deleteAllChartScoresBMS(hash);
     EXPECT_EQ(score_db.getChartScoreBMS(hash), nullptr);
+    // Not just in-memory cache that was invalidated.
+    EXPECT_EQ(score_db.fetchCachedPbBMS(hash), nullptr);
 
     // Not just cache that was invalidated.
     score_db.rebuildBmsPbCache();
@@ -133,6 +135,8 @@ TEST(ScoreDb, CourseScoreDeleting)
 
     score_db.deleteCourseScoreBMS(hash);
     EXPECT_EQ(score_db.getCourseScoreBMS(hash), nullptr);
+    // Not just in-memory cache that was invalidated.
+    EXPECT_EQ(score_db.fetchCachedPbBMS(hash), nullptr);
 
     // Not just cache that was invalidated.
     score_db.rebuildBmsPbCache();

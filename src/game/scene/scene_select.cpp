@@ -2765,7 +2765,7 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
     switch (entryType)
     {
     case eEntryType::CHART:
-        score_db.deleteChartScoreBMS(entryHash);
+        score_db.deleteAllChartScoresBMS(entryHash);
         LOG_DEBUG << "deleted chart score";
         return DeleteScoreResult::Ok;
     case eEntryType::COURSE:

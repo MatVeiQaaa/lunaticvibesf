@@ -162,7 +162,7 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
     cache[tableName].insert_or_assign(hashStr, std::move(scoreRefetched));
 }
 
-void ScoreDB::deleteChartScoreBMS(const HashMD5& hash)
+void ScoreDB::deleteAllChartScoresBMS(const HashMD5& hash)
 {
     deleteLegacyScoreBMS("score_bms", hash);
 
@@ -170,8 +170,12 @@ void ScoreDB::deleteChartScoreBMS(const HashMD5& hash)
     int ret = exec("DELETE FROM score_history_bms WHERE md5=?", {hash_str});
     if (ret != SQLITE_OK)
     {
-        LOG_ERROR << "[ScoreDB] Failed to delete score: " << errmsg();
-        return;
+        LOG_ERROR << "[ScoreDB] Failed to delete score from score_history_bms: " << errmsg();
+    }
+    ret = exec("DELETE FROM score_cache_bms WHERE md5=?", {hash_str});
+    if (ret != SQLITE_OK)
+    {
+        LOG_ERROR << "[ScoreDB] Failed to delete score from score_cache_bms: " << errmsg();
     }
     cache["score_bms"].erase(hash_str);
 }

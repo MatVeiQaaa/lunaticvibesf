@@ -59,13 +59,13 @@ protected:
 
     [[nodiscard]] std::shared_ptr<ScoreBMS> getScoreBMS(const char* tableName, const HashMD5& hash) const;
 
-    [[nodiscard]] std::shared_ptr<ScoreBMS> fetchCachedPbBMS(const HashMD5& hash) const;
     void saveChartScoreBmsToHistory(const HashMD5& hash, const ScoreBMS& score);
     void updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score);
 
 public:
-    void deleteChartScoreBMS(const HashMD5& hash);
+    [[nodiscard]] std::shared_ptr<ScoreBMS> fetchCachedPbBMS(const HashMD5& hash) const;
     [[nodiscard]] std::shared_ptr<ScoreBMS> getChartScoreBMS(const HashMD5& hash) const;
+    void deleteAllChartScoresBMS(const HashMD5& hash);
     void insertChartScoreBMS(const HashMD5& hash, const ScoreBMS& score);
 
     void deleteCourseScoreBMS(const HashMD5& hash);

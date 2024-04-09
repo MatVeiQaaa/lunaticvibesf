@@ -1632,7 +1632,8 @@ void ScenePlay::updateAsyncGreenNumber(const lunaticvibes::Time& t)
 
 void ScenePlay::updateAsyncGaugeUpTimer(const lunaticvibes::Time& t)
 {
-    auto updateSide = [&](int slot)
+    // TODO: use an enum for 'slot'
+    auto updateSide = [&](unsigned slot)
     {
         IndexNumber indNum = IndexNumber::PLAY_1P_GROOVEGAUGE;
         IndexTimer indAdd = IndexTimer::PLAY_GAUGE_1P_ADD;
@@ -1643,10 +1644,10 @@ void ScenePlay::updateAsyncGaugeUpTimer(const lunaticvibes::Time& t)
             indAdd = IndexTimer::PLAY_GAUGE_2P_ADD;
             indMax = IndexTimer::PLAY_GAUGE_2P_MAX;
         }
-        int health = State::get(indNum);
+        const int health = State::get(indNum);
         if (playerState[slot].healthLastTick / 2 != health / 2)
         {
-            if (slot == 100)
+            if (health == 100)
             {
                 State::set(indAdd, TIMER_NEVER);
                 State::set(indMax, t.norm());

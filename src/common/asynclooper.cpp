@@ -8,12 +8,9 @@
 #endif
 
 #include <common/utils.h>
+#include <common/sysutil.h>
 #include "encoding.h"
 #include "log.h"
-
-#ifndef NDEBUG
-#include "common/sysutil.h"
-#endif
 
 AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsigned rate_per_sec, bool single_inst) : 
     _tag(tag), _loopFunc(std::move(func))
@@ -84,6 +81,7 @@ void AsyncLooper::loopStart()
 
             loopFuture = std::async(std::launch::async, [this]()
                 {
+                    SetDebugThreadName(_tag.c_str());
                     long long us = _rate > 0 ? 1000000 / _rate : 0;
                     long long reset_threshold = us * 4;
 
@@ -178,13 +176,15 @@ void AsyncLooper::loopEnd()
 #else // FALLBACK
 void AsyncLooper::_loopWithSleep()
 {
+    SetDebugThreadName(_tag.c_str());
+    LOG_DEBUG << "[Looper] " << _tag << ": Starting " << _rate << "/s";
     const auto sleep_duration = std::chrono::nanoseconds(std::nano::den / _rate).count();
-
     while (_running)
     {
         run();
         preciseSleep(sleep_duration);
     }
+    LOG_DEBUG << "[Looper] " << _tag << ": End " << _rate << "/s";
 }
 
 void AsyncLooper::loopStart()

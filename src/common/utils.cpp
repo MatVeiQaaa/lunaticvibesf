@@ -152,19 +152,24 @@ std::string bin2hex(const void* bin, size_t size)
     return res;
 }
 
-std::string hex2bin(std::string_view hex)
+// TODO(C++20): use std::span.
+// LANDMINE.
+void hex2bin(std::string_view hex, unsigned char* buf)
 {
-    std::string res;
-    res.resize(hex.length() / 2 + 1);
     for (size_t i = 0, j = 0; i < hex.length() - 1; i += 2, j++)
     {
-        unsigned char &c = ((unsigned char&)res[j]);
+        unsigned char &c = buf[j];
         unsigned char c1 = tolower(hex[i]);
         unsigned char c2 = tolower(hex[i + 1]);
         c += (c1 + ((c1 >= 'a') ? (10 - 'a') : (-'0'))) << 4;
         c += (c2 + ((c2 >= 'a') ? (10 - 'a') : (-'0')));
     }
-    res[res.length() - 1] = '\0';
+}
+std::string hex2bin(std::string_view hex)
+{
+    std::string res;
+    res.resize(hex.length() / 2);
+    hex2bin(hex, reinterpret_cast<unsigned char*>(res.data()));
     return res;
 }
 
@@ -188,7 +193,7 @@ HashMD5 md5(std::string_view s)
     CryptDestroyHash(hHash);
     CryptReleaseContext(hProv, 0);
 
-    return bin2hex(rgbHash, MD5_LEN);
+    return HashMD5{bin2hex(rgbHash, MD5_LEN)};
 }
 
 HashMD5 md5file(const Path& filePath)
@@ -224,7 +229,7 @@ HashMD5 md5file(const Path& filePath)
     CryptDestroyHash(hHash);
     CryptReleaseContext(hProv, 0);
 
-    return bin2hex(rgbHash, MD5_LEN);
+    return HashMD5{bin2hex(rgbHash, MD5_LEN)};
 }
 
 #else
@@ -240,7 +245,7 @@ static HashMD5 format_hash(const unsigned char* digest, size_t digest_size)
         ret += (high <= 9 ? ('0' + high) : ('A' - 10 + high));
         ret += (low  <= 9 ? ('0' + low)  : ('A' - 10 + low));
     }
-    return ret;
+    return HashMD5{ret};
 }
 
 template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)

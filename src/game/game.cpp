@@ -1,3 +1,4 @@
+#include "common/hash.h"
 #include "common/meta.h"
 #include "config/config_mgr.h"
 #include "game/graphics/graphics.h"
@@ -221,9 +222,9 @@ int main(int argc, char* argv[])
             nullptr,
 
             false,
-            HashMD5(),
+            HashMD5{},
             false,
-            HashMD5(),
+            HashMD5{},
             false,
 
             false,

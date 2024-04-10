@@ -10,6 +10,7 @@
 
 #include "common/encoding.h"
 #include "common/entry/entry_song.h"
+#include "common/hash.h"
 #include "common/log.h"
 #include "common/meta.h"
 
@@ -501,7 +502,7 @@ void DifficultyTableBMS::parseBody(const std::string& content)
 				if (!level.empty() && !md5.empty())
 				{
 					auto pEntry = std::make_shared<EntryChart>();
-					pEntry->md5 = md5;
+					pEntry->md5 = HashMD5{md5};
 					pEntry->_name = name;
 					entries[level].push_back(pEntry);
 				}

@@ -102,7 +102,7 @@ class EntryFolderNewSong : public EntryFolderRegular
 public:
     EntryFolderNewSong() = delete;
     EntryFolderNewSong(StringContentView name, StringContentView name2 = "") :
-        EntryFolderRegular(HashMD5(""), "", name, name2)
+        EntryFolderRegular(HashMD5{}, "", name, name2)
     {
         _type = eEntryType::NEW_SONG_FOLDER;
     }

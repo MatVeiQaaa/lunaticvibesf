@@ -392,7 +392,7 @@ void ScoreDB::rebuildBmsPbCache()
         auto score = std::make_shared<ScoreBMS>();
         const std::string md5 = ANY_STR(raw_score[0]);
         convert_score_bms(*score, raw_score);
-        updateCachedChartPbBms(md5, *score);
+        updateCachedChartPbBms(HashMD5{md5}, *score);
     }
     for (const auto& raw_score : query("SELECT "
                                        "md5,notes,score,fast,slow,maxcombo,addtime,exscore,lamp,pgreat,great,good,bad,"
@@ -403,7 +403,7 @@ void ScoreDB::rebuildBmsPbCache()
         auto score = std::make_shared<ScoreBMS>();
         const std::string md5 = ANY_STR(raw_score[0]);
         convertHistoryScoreBms(*score, raw_score);
-        updateCachedChartPbBms(md5, *score);
+        updateCachedChartPbBms(HashMD5{md5}, *score);
     }
     transactionStop();
     preloadScore();

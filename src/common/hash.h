@@ -15,38 +15,34 @@ private:
     unsigned char data[_Len] = { 0 };
     bool set = false;
 public:
-    Hash() = default;
-    Hash(const std::string& hex)
+    constexpr Hash() = default;
+    explicit Hash(const std::string_view hex)
     {
-        reset();
-        if (!hex.empty())
-        {
-            assert(hex.size() == _Len * 2);
-            set = true;
-            std::string bin = hex2bin(hex);
-            unsigned char* ubin = (unsigned char*)bin.data();
-            std::memcpy(data, ubin, _Len);
-        }
+        assert(hex.size() == _Len * 2);
+        set = true;
+        hex2bin(hex, data);
+    }
+    template<size_t HexLen>
+    explicit Hash(const char(&hex)[HexLen])
+    {
+        static_assert(HexLen - 1 == _Len * 2);
+        set = true;
+        hex2bin(hex, data);
     }
 
     constexpr size_t length() const { return _Len; }
-    bool empty() const { return !set; }
+    // TODO: remove this and use std::optional<Hash> where needed.
+    constexpr bool empty() const { return !set; }
     std::string hexdigest() const { return bin2hex(data, _Len); }
-    const unsigned char* hex() const { return data; }
+    constexpr const unsigned char* hex() const { return data; }
     void reset() { set = false; memset(data, 0, _Len); }
 
-    template <size_t _Len2>
-    bool operator<(const Hash<_Len2>& rhs) const { static_assert(_Len == _Len2); return memcmp(data, rhs.data, _Len) < 0; }
-    template <size_t _Len2>
-    bool operator>(const Hash<_Len2>& rhs) const { static_assert(_Len == _Len2); return memcmp(data, rhs.data, _Len) > 0; }
-    template <size_t _Len2>
-    bool operator<=(const Hash<_Len2>& rhs) const { static_assert(_Len == _Len2); return !(*this > rhs); }
-    template <size_t _Len2>
-    bool operator>=(const Hash<_Len2>& rhs) const { static_assert(_Len == _Len2); return !(*this > rhs); }
-    template <size_t _Len2>
-    bool operator==(const Hash<_Len2>& rhs) const { return _Len == _Len2 && memcmp(data, rhs.data, _Len) == 0; }
-    template <size_t _Len2>
-    bool operator!=(const Hash<_Len2>& rhs) const { return _Len != _Len2 || memcmp(data, rhs.data, _Len) != 0; }
+    bool operator<(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) < 0; }
+    bool operator>(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) > 0; }
+    bool operator<=(const Hash<_Len>& rhs) const { return !(*this > rhs); }
+    bool operator>=(const Hash<_Len>& rhs) const { return !(*this > rhs); }
+    bool operator==(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) == 0; }
+    bool operator!=(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) != 0; }
 
     friend struct std::hash<Hash<_Len>>;
 };
@@ -60,8 +56,7 @@ struct std::hash<Hash<_Len>>
     }
 };
 
-typedef Hash<16> HashMD5;
-typedef Hash<32> HashSHA1;
+using HashMD5 = Hash<16>;
 
 HashMD5 md5(std::string_view str);
 HashMD5 md5file(const Path& filePath);

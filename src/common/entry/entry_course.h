@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "common/hash.h"
 #include "common/types.h"
 #include "entry.h"
 #include "entry_folder.h"
@@ -11,7 +12,7 @@ class EntryFolderCourse : public EntryFolderBase
 public:
 	EntryFolderCourse() = delete;
 	EntryFolderCourse(StringContentView name = "", StringContentView name2 = "") :
-		EntryFolderBase(HashMD5(""), name, name2)
+		EntryFolderBase(HashMD5{}, name, name2)
 	{
 		_type = eEntryType::COURSE_FOLDER;
 	}

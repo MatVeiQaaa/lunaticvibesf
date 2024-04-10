@@ -59,6 +59,7 @@ namespace lunaticvibes {
 }
 
 [[nodiscard]] std::string bin2hex(const void* bin, size_t size);
+void hex2bin(std::string_view hex, unsigned char* buf);
 [[nodiscard]] std::string hex2bin(std::string_view hex);
 
 [[nodiscard]] std::string toLower(std::string_view s);

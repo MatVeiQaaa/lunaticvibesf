@@ -1,4 +1,5 @@
 #pragma once
+#include "common/hash.h"
 #include "common/types.h"
 #include "entry_folder.h"
 #include "entry_song.h"
@@ -8,7 +9,7 @@ class EntryFolderTable : public EntryFolderRegular
 public:
     EntryFolderTable() = delete;
     EntryFolderTable(StringContentView name, size_t index)
-        : EntryFolderRegular(HashMD5(""), "", name, "")
+        : EntryFolderRegular(HashMD5{}, "", name, "")
         , _index(index)
     {
         _type = eEntryType::CUSTOM_FOLDER;

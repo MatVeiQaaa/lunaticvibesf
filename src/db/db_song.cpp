@@ -1,11 +1,11 @@
 #include "db_song.h"
 
-#include <regex>
-#include <set>
+#include <algorithm>
 #include <thread>
 #include <vector>
 
 #include "common/chartformat/chartformat_types.h"
+#include "common/hash.h"
 #include "common/log.h"
 #include "common/sysutil.h"
 #include "common/utils.h"
@@ -139,8 +139,8 @@ bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::ve
     if (in.size() < 30) return false;
 
     song_all_params params(in);
-    chart->fileHash       = params.md5        ;
-    chart->folderHash     = params.parent     ;
+    chart->fileHash = HashMD5{params.md5};
+    chart->folderHash = HashMD5{params.parent};
     chart->fileName       = PathFromUTF8(params.file);
     //                        params.type       ;
     chart->title          = params.title      ;
@@ -260,8 +260,8 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
             { folder.hexdigest(), filename }); !result.empty() && !result[0].empty())
         {
             // check if file exists in db
-            HashMD5 dbmd5 = ANY_STR(result[0][0]);
-            HashMD5 filemd5 = md5file(path);
+            const HashMD5 dbmd5 {ANY_STR(result[0][0])};
+            const HashMD5 filemd5 = md5file(path);
             if (dbmd5 == filemd5)
             {
                 return false;
@@ -692,7 +692,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
     {
         LOG_VERBOSE << "[SongDB] Sub folder already exists (" << path << ")";
 
-        std::string folderMD5 = ANY_STR(q[0][0]);
+        HashMD5 folderMD5{ANY_STR(q[0][0])};
         std::string folderPath = ANY_STR(q[0][1]);
         FolderType folderType = (FolderType)ANY_INT(q[0][2]);
         long long folderModifyTimeDB = ANY_INT(q[0][3]);
@@ -1083,7 +1083,7 @@ HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
                 " (" << folder.hexdigest() << ")";
             return {};
         }
-        return ANY_STR(leaf[1]);
+        return HashMD5{ANY_STR(leaf[1])};
     }
     LOG_INFO << "[SongDB] Get folder parent fail: target " << folder.hexdigest() << " not found";
     return {};
@@ -1161,7 +1161,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
         for (const auto& index : folderQueryParentMap.at(root))
         {
             const auto& c = folderQueryPool[index];
-            auto md5 = ANY_STR(c[0]);
+            HashMD5 md5{ANY_STR(c[0])};
             auto parent = ANY_STR(c[1]);
             auto name = ANY_STR(c[2]);
             auto type = (FolderType)ANY_INT(c[3]);

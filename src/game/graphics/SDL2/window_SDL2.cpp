@@ -232,8 +232,7 @@ void graphics_flush()
         {
             ImGui_ImplSDLRenderer2_RenderDrawData(pData);
         }
-        SDL_RenderPresent(gFrameRenderer);
-
+        // Save screenshot before presenting per SDL_RenderReadPixels docs.
         if (!screenshotPath.empty())
         {
             int ret;
@@ -256,6 +255,7 @@ void graphics_flush()
             SDL_FreeSurface(sshot);
             screenshotPath.clear();
         }
+        SDL_RenderPresent(gFrameRenderer);
     }
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 

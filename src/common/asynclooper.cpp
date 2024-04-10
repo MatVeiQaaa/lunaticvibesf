@@ -2,14 +2,15 @@
 #include <numeric>
 #include <chrono>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#include "encoding.h"
+#else
 #include <ratio>
 #include <utility>
 #endif
 
 #include <common/utils.h>
 #include <common/sysutil.h>
-#include "encoding.h"
 #include "log.h"
 
 AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsigned rate_per_sec, bool single_inst) : 
@@ -178,11 +179,15 @@ void AsyncLooper::_loopWithSleep()
 {
     SetDebugThreadName(_tag.c_str());
     LOG_DEBUG << "[Looper] " << _tag << ": Starting " << _rate << "/s";
-    const auto sleep_duration = std::chrono::nanoseconds(std::nano::den / _rate).count();
+    std::chrono::high_resolution_clock::time_point frameTimestampPrev;
+    const auto desiredFrameTimeBetweenFrames = std::chrono::nanoseconds(std::nano::den / _rate);
     while (_running)
     {
         run();
+        const long long sleep_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            frameTimestampPrev + desiredFrameTimeBetweenFrames - std::chrono::high_resolution_clock::now()).count();
         preciseSleep(sleep_duration);
+        frameTimestampPrev = std::chrono::high_resolution_clock::now();
     }
     LOG_DEBUG << "[Looper] " << _tag << ": End " << _rate << "/s";
 }

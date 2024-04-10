@@ -1,6 +1,5 @@
 #include <cassert>
 #include <future>
-#include <set>
 #include <random>
 #include "scene_play.h"
 #include "scene_context.h"
@@ -10,7 +9,6 @@
 #include "game/ruleset/ruleset_bms_replay.h"
 #include "common/chartformat/chartformat_bms.h"
 #include "game/chart/chart_bms.h"
-#include "game/graphics/sprite_video.h"
 #include "config/config_mgr.h"
 #include "common/log.h"
 #include "common/sysutil.h"
@@ -2179,7 +2177,6 @@ void ScenePlay::updatePlaying()
         long long exScore1P = 0;
         long long exScore2P = 0;
         long long exScoreMybest = 0;
-        [[maybe_unused]] int missMybest = 0; // FIXME: set but not used
         if (auto pr = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); pr)
         {
             exScore1P = pr->getExScore();
@@ -2196,7 +2193,6 @@ void ScenePlay::updatePlaying()
             if (auto prpb = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_MYBEST]); prpb)
             {
                 exScoreMybest = prpb->getExScore();
-                missMybest = prpb->getJudgeCountEx(RulesetBMS::JUDGE_BP);
             }
         }
 

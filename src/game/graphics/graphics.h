@@ -71,4 +71,4 @@ void startTextInput(const RectF& textBox, const std::string& oldText, std::funct
 void stopTextInput();
 
 
-void graphics_screenshot(const Path& png);
+void graphics_screenshot(Path png);

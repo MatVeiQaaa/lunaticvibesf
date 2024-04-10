@@ -612,9 +612,9 @@ void funKeyDown(const SDL_KeyboardEvent& e)
 
 #endif
 
-void graphics_screenshot(const Path& png)
+void graphics_screenshot(Path png)
 {
     LOG_INFO << "Screenshot: " << png;
 
-    screenshotPath = png;
+    screenshotPath = std::move(png);
 }

@@ -253,7 +253,7 @@ void SceneBase::draw() const
             % State::get(IndexNumber::DATE_MIN)
             % State::get(IndexNumber::DATE_SEC)).str();
 
-        graphics_screenshot(p);
+        graphics_screenshot(std::move(p));
 
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_SCREENSHOT);
         queuedScreenshot = false;

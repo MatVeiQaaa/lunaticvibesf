@@ -236,10 +236,23 @@ void graphics_flush()
 
         if (!screenshotPath.empty())
         {
+            int ret;
             fs::create_directories(screenshotPath.parent_path());
             SDL_Surface* sshot = SDL_CreateRGBSurface(0, windowRect.w, windowRect.h, 32, 0, 0, 0, 0);
-            SDL_RenderReadPixels(gFrameRenderer, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-            IMG_SavePNG(sshot, screenshotPath.u8string().c_str());
+            if (sshot == nullptr)
+            {
+                LOG_ERROR << "[SDL2] SDL_CreateRGBSurface error: " << SDL_GetError();
+            }
+            ret = SDL_RenderReadPixels(gFrameRenderer, nullptr, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+            if (ret < 0)
+            {
+                LOG_ERROR << "[SDL2] SDL_RenderReadPixels error: " << SDL_GetError();
+            }
+            ret = IMG_SavePNG(sshot, screenshotPath.u8string().c_str());
+            if (ret < 0)
+            {
+                LOG_ERROR << "[SDL2] IMG_SavePNG error: " << IMG_GetError();
+            }
             SDL_FreeSurface(sshot);
             screenshotPath.clear();
         }

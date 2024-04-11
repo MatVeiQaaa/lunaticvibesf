@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "common/beat.h"
 #include "common/sysutil.h"
+#include "game/graphics/graphics.h"
 #include "game/runtime/state.h"
 #include "game/runtime/generic_info.h"
 #include "game/skin/skin_mgr.h"
@@ -249,7 +250,7 @@ void SceneBase::draw() const
             % State::get(IndexNumber::DATE_MIN)
             % State::get(IndexNumber::DATE_SEC)).str();
 
-        graphics_screenshot(std::move(p));
+        lunaticvibes::graphics::queue_screenshot(std::move(p));
 
         SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_SCREENSHOT);
         queuedScreenshot = false;

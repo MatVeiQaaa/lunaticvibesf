@@ -625,9 +625,8 @@ void funKeyDown(const SDL_KeyboardEvent& e)
 
 #endif
 
-void graphics_screenshot(Path png)
+void lunaticvibes::graphics::queue_screenshot(Path png)
 {
     LOG_INFO << "Screenshot: " << png;
-
     screenshotPath = std::move(png);
 }

@@ -464,7 +464,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 						else
 						{
 							ArenaMessageResponse resp(*pMsg);
-							resp.errorCode = 1;	// FIXME no enough slots
+							resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::NotEnoughSlots);
 							auto payload = resp.pack();
 							socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
 						}
@@ -472,7 +472,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 					else
 					{
 						ArenaMessageResponse resp(*pMsg);
-						resp.errorCode = 255;	// FIXME duplicate address
+						resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::DuplicateAddress);
 						auto payload = resp.pack();
 						socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
 					}
@@ -480,7 +480,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 				else
 				{
 					ArenaMessageResponse resp(*pMsg);
-					resp.errorCode = 2;	// FIXME host is playing
+					resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::HostIsPlaying);
 					auto payload = resp.pack();
 					socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
 				}
@@ -488,7 +488,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 			else
 			{
 				ArenaMessageResponse resp(*pMsg);
-				resp.errorCode = 254;	// FIXME version not match
+				resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::VersionMismatch);
 				auto payload = resp.pack();
 				socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
 			}
@@ -535,7 +535,8 @@ void ArenaHost::handleResponse(const std::string& clientKey, const std::shared_p
 
 	if (pMsg->errorCode != 0)
 	{
-		LOG_WARNING << "[Arena] Req type " << pMsg->reqType << " error with code " << pMsg->errorCode;
+		LOG_WARNING << "[ArenaHost] Req type " << static_cast<int>(pMsg->reqType) << " error: ["
+					<< static_cast<int>(pMsg->errorCode) << "] " << static_cast<ArenaErrorCode>(pMsg->errorCode);
 		return;
 	}
 

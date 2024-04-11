@@ -1,10 +1,13 @@
 #pragma once
-#include <vector>
+
 #include <memory>
-#include "cereal/cereal.hpp"
-#include "cereal/types/string.hpp"
-#include "cereal/types/vector.hpp"
-#include "cereal/types/map.hpp"
+#include <ostream>
+#include <vector>
+
+#include <cereal/cereal.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
 
 namespace Arena
 {
@@ -72,6 +75,16 @@ public:
 	static std::shared_ptr<ArenaMessage> unpack(const unsigned char* data, size_t len);
 
 };
+
+// Non-exhaustive enum.
+enum class ArenaErrorCode : uint8_t
+{
+    NotEnoughSlots = 1,
+    HostIsPlaying = 2,
+    VersionMismatch = 254,
+    DuplicateAddress = 255,
+};
+std::ostream& operator<<(std::ostream& os, const ArenaErrorCode&);
 
 class ArenaMessageResponse : public ArenaMessage
 {

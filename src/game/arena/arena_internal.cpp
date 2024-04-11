@@ -15,6 +15,17 @@ struct NetworkPayload
 
 };
 
+std::ostream& operator<<(std::ostream& os, const ArenaErrorCode& err)
+{
+	switch (err) {
+	case ArenaErrorCode::NotEnoughSlots: return os << "not enough slots";
+	case ArenaErrorCode::HostIsPlaying: return os << "host is playing";
+	case ArenaErrorCode::VersionMismatch: return os << "version mismatch";
+	case ArenaErrorCode::DuplicateAddress: return os << "duplicate address";
+	}
+	return os << "unknown error " << static_cast<uint8_t>(err);
+}
+
 std::shared_ptr<std::vector<unsigned char>> ArenaMessage::pack()
 {
 	std::stringstream ss;

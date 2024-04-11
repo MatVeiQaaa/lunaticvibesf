@@ -121,29 +121,35 @@ bool ArenaClient::joinLobby(const std::string& address)
 
 	gArenaData.online = true;
 	asyncRecv();
-	listen = std::async(std::launch::async, [&] { ioc.run(); });
+	listen = std::async(std::launch::async, [&] {
+		try {
+			ioc.run();
+		} catch (std::exception& e) {
+			LOG_ERROR << "[ArenaClient] Listener exception: " << e.what();
+			// FIXME: stop arena
+		}
+	});
 
 	// FIXME what is this code
 	for (int i = 0; i < 50; ++i)
 	{
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(100ms);
-
-		if (joinLobbyErrorCode >= 0)
+		if (joinLobbyErrorCode > 0)
 		{
-			if (joinLobbyErrorCode > 0)
+			switch (static_cast<ArenaErrorCode>(joinLobbyErrorCode))
 			{
-				switch (joinLobbyErrorCode)
-				{
-				case 1: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_FULL)); break;
-				case 2: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_IN_GAME)); break;
-				case 254: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_VERSION_ERROR)); break;
-				case 255: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_DUPLICATE_CLIENT)); break;
-				}
-				LOG_WARNING << "[Arena] Join failed: " << joinLobbyErrorCode; break;
-				return false;
+			case ArenaErrorCode::NotEnoughSlots: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_FULL)); break;
+			case ArenaErrorCode::HostIsPlaying: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_IN_GAME)); break;
+			case ArenaErrorCode::VersionMismatch: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_VERSION_ERROR)); break;
+			case ArenaErrorCode::DuplicateAddress: createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_DUPLICATE_CLIENT)); break;
 			}
-
+			LOG_WARNING << "[ArenaClient] Join failed: [" << joinLobbyErrorCode << "] "
+						<< static_cast<ArenaErrorCode>(joinLobbyErrorCode);
+			return false;
+		}
+		if (joinLobbyErrorCode == 0)
+		{
 			State::set(IndexText::ARENA_LOBBY_STATUS, "ARENA LOBBY");
 			return true;
 		}
@@ -324,7 +330,10 @@ void ArenaClient::handleResponse(const std::shared_ptr<ArenaMessage>& msg)
 
 	if (pMsg->errorCode != 0)
 	{
-		LOG_WARNING << "[Arena] Req type " << (int)pMsg->reqType << " error with code " << (int)pMsg->errorCode;
+		LOG_WARNING << "[ArenaClient] Req type " << static_cast<int>(pMsg->reqType) << " error: ["
+					<< static_cast<int>(pMsg->errorCode) << "] " << static_cast<ArenaErrorCode>(pMsg->errorCode);
+		if (pMsg->reqType == Arena::ArenaMessageType::JOIN_LOBBY)
+			joinLobbyErrorCode = pMsg->errorCode;
 		return;
 	}
 

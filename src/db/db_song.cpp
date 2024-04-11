@@ -158,7 +158,8 @@ bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::ve
     chart->stagefile      = params.stagefile  ;
     chart->banner         = params.bannerfile ;
     chart->gamemode       = params.gamemode   ;
-    chart->rank           = params.judgerank  ;
+    chart->raw_rank       = params.judgerank;
+    chart->rank           = lunaticvibes::parser_bms::parse_rank(params.judgerank);
     chart->total          = params.total      ;
     chart->playLevel      = params.playlevel  ;
     chart->difficulty     = params.difficulty ;
@@ -327,7 +328,7 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
                     c->stagefile,
                     c->banner,
                     bmsc->gamemode,
-                    bmsc->rank,
+                    bmsc->raw_rank,
 
                     bmsc->total,
                     bmsc->playLevel,

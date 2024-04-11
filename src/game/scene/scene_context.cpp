@@ -727,14 +727,13 @@ void setEntryInfo()
             param["keys"] = op_keys;
 
             // judge
-            unsigned op_judgerank = Option::JUDGE_NORMAL;
-            switch (bms->rank)
+            unsigned op_judgerank{0xDEADBEEF};
+            switch (bms->rank.value_or(RulesetBMS::LR2_DEFAULT_RANK))
             {
-            case 0: op_judgerank = Option::JUDGE_VHARD; break;
-            case 1: op_judgerank = Option::JUDGE_HARD; break;
-            case 2: op_judgerank = Option::JUDGE_NORMAL; break;
-            case 3: op_judgerank = Option::JUDGE_EASY; break;
-            default: break;
+            case RulesetBMS::JudgeDifficulty::VERYHARD: op_judgerank = Option::JUDGE_VHARD; break;
+            case RulesetBMS::JudgeDifficulty::HARD: op_judgerank = Option::JUDGE_HARD; break;
+            case RulesetBMS::JudgeDifficulty::NORMAL: op_judgerank = Option::JUDGE_NORMAL; break;
+            case RulesetBMS::JudgeDifficulty::EASY: op_judgerank = Option::JUDGE_EASY; break;
             }
             param["judgerank"] = op_judgerank;
 

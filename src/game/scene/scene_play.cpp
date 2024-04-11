@@ -779,27 +779,17 @@ bool ScenePlay::createRuleset()
     case RulesetType::BMS:
     {
         // set judge diff
-        RulesetBMS::JudgeDifficulty judgeDiff;
+        auto judgeDiff{RulesetBMS::LR2_DEFAULT_RANK};
         switch (gChartContext.chart->type())
         {
         case eChartFormat::BMS:
-            if (int rank = 0; gChartContext.chart->getExtendedProperty("RANK", &rank))
-            {
-                switch (rank)
-                {
-                case 1: judgeDiff = RulesetBMS::JudgeDifficulty::HARD; break;
-                case 2: judgeDiff = RulesetBMS::JudgeDifficulty::NORMAL; break;
-                case 3: judgeDiff = RulesetBMS::JudgeDifficulty::EASY; break;
-                case 4: judgeDiff = RulesetBMS::JudgeDifficulty::VERYEASY; break;
-                case 6: judgeDiff = RulesetBMS::JudgeDifficulty::WHAT; break;
-                case 0:
-                default:
-                    judgeDiff = RulesetBMS::JudgeDifficulty::VERYHARD; break;
-                }
-            }
+        {
+            auto bms = std::reinterpret_pointer_cast<ChartFormatBMS>(gChartContext.chart);
+            if (bms->rank.has_value()) judgeDiff = *bms->rank;
             break;
+        }
+        case eChartFormat::UNKNOWN:
         case eChartFormat::BMSON:
-        default:
             LOG_WARNING << "[Play] chart format not supported.";
             break;
         }

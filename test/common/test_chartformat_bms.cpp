@@ -1,4 +1,10 @@
+// NOTE: when working with BMS file hashes, make sure to check them out with CRLF endings.
+// =======================================================================================
+
 #include "gmock/gmock.h"
+
+#include <optional>
+
 #include "common/chartformat/chartformat_bms.h"
 #include "../../src/common/utils.h"
 
@@ -48,6 +54,28 @@ TEST(tBMS, meta_basic)
 	EXPECT_EQ(bms->haveNote, false);
 	EXPECT_EQ(bms->notes_total, 0);
 	EXPECT_EQ(bms->notes_key_ln, 0);
+	EXPECT_EQ(bms->raw_rank, -1);
+	EXPECT_EQ(bms->rank, std::nullopt);
+}
+
+TEST(tBMS, RankInvalidParsedCorrectly)
+{
+    std::shared_ptr<ChartFormatBMS> bms = nullptr;
+    ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/rank_veryeasy.bms"));
+    ASSERT_EQ(bms->isLoaded(), true);
+    EXPECT_EQ(bms->fileHash.hexdigest(), "333c659406a1cb4312e76b447f5ee0cc");
+    EXPECT_EQ(bms->raw_rank, 4);
+    EXPECT_EQ(bms->rank, std::nullopt);
+}
+
+TEST(tBMS, RankVeryHardParsedCorrectly)
+{
+    std::shared_ptr<ChartFormatBMS> bms = nullptr;
+    ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/rank_hard.bms"));
+    ASSERT_EQ(bms->isLoaded(), true);
+    EXPECT_EQ(bms->fileHash.hexdigest(), "180d007b193e1367838eda5d5d10dd4f");
+    EXPECT_EQ(bms->raw_rank, 1);
+    EXPECT_EQ(bms->rank, RulesetBMS::JudgeDifficulty::HARD);
 }
 
 TEST(tBMS, metre_change)

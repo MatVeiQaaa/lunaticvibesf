@@ -2,6 +2,7 @@
 #include "common/log.h"
 #include <iostream>
 #include <fstream>
+#include <optional>
 #include <set>
 #include <utility>
 #include <exception>
@@ -11,21 +12,30 @@
 
 #include "common/encoding.h"
 #include "common/utils.h"
-#include "db/db_song.h"
 #include "re2/re2.h"
 #include <boost/algorithm/string.hpp>
 
 class noteLineException : public std::exception {};
+
+// https://hitkey.nekokan.dyndns.info/cmds.htm#RANK
+std::optional<RulesetBMS::JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int value)
+{
+    switch (value)
+    {
+    case 0: return RulesetBMS::JudgeDifficulty::VERYHARD;
+    case 1: return RulesetBMS::JudgeDifficulty::HARD;
+    case 2: return RulesetBMS::JudgeDifficulty::NORMAL;
+    case 3: return RulesetBMS::JudgeDifficulty::EASY;
+    default: LOG_DEBUG << "[BMS] Invalid #RANK: " << value; return std::nullopt;
+    }
+    abort(); // unreachable.
+}
 
 bool ChartFormatBMS::getExtendedProperty(const std::string& key, void* ret)
 {
     if (lunaticvibes::iequals(key, "PLAYER"))
     {
         *(int*)ret = player;
-    }
-    else if (lunaticvibes::iequals(key, "RANK"))
-    {
-        *(int*)ret = rank;
     }
     else if (lunaticvibes::iequals(key, "TOTAL"))
     {
@@ -271,7 +281,10 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 if (lunaticvibes::iequals(key, "PLAYER"))
                     player = toInt(value);
                 else if (lunaticvibes::iequals(key, "RANK"))
-                    rank = toInt(value);
+                {
+                    raw_rank = toInt(value);
+                    rank = lunaticvibes::parser_bms::parse_rank(raw_rank);
+                }
                 else if (lunaticvibes::iequals(key, "TOTAL"))
                     total = toInt(value);
                 else if (lunaticvibes::iequals(key, "PLAYLEVEL"))

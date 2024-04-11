@@ -1,6 +1,8 @@
 #pragma once
 #include "ruleset.h"
 
+#include <stdint.h>
+
 class RulesetBMS : virtual public RulesetBase
 {
 public:
@@ -32,15 +34,13 @@ public:
         JUDGE_MINE_POOR,
     };
 
-    enum class JudgeDifficulty {
+    enum class JudgeDifficulty : uint8_t {
         VERYHARD = 0,
-        HARD,
-        NORMAL,
-        EASY,
-        VERYEASY,
-
-        WHAT = 6
+        HARD = 1,
+        NORMAL = 2,
+        EASY = 3,
     };
+    static constexpr auto LR2_DEFAULT_RANK{JudgeDifficulty::NORMAL};
 
     enum class JudgeType {
         PERFECT = 0,    // Option::JUDGE_0
@@ -88,8 +88,6 @@ public:
         {15, 32, 60, 200, 600},        // HARD
         {18, 40, 96, 200, 650},        // NORMAL
         {21, 60, 116, 200, 800},       // EASY
-        {},                            // VERY EASY??
-        {5, 5, 10, 200, 600}          // XD
     };
 
     // Judge area definitions.
@@ -172,7 +170,7 @@ protected:
     // members set on construction
     PlaySide _side = PlaySide::SINGLE;
     bool _k1P = false, _k2P = false;
-    JudgeDifficulty _judgeDifficulty = JudgeDifficulty::NORMAL;
+    JudgeDifficulty _judgeDifficulty = LR2_DEFAULT_RANK;
     GaugeType _gauge = GaugeType::GROOVE;
 
     std::map<JudgeType, double> _healthGain;
@@ -213,7 +211,7 @@ public:
         std::shared_ptr<ChartObjectBase> chart,
         PlayModifierGaugeType gauge,
         GameModeKeys keys,
-        JudgeDifficulty difficulty = JudgeDifficulty::NORMAL,
+        JudgeDifficulty difficulty = LR2_DEFAULT_RANK,
         double health = 1.0,
         PlaySide side = PlaySide::SINGLE);
 

@@ -1,14 +1,14 @@
 #pragma once
 #include <array>
-#include <string>
 #include <list>
 #include <map>
+#include <optional>
 #include <set>
-#include <regex>
+#include <string>
 
 #include "chartformat.h"
 #include "common/types.h"
-#include "common/utils.h"
+#include "game/ruleset/ruleset_bms.h"
 
 namespace bms
 {
@@ -53,6 +53,13 @@ namespace bms
 
 using namespace bms;
 
+namespace lunaticvibes::parser_bms {
+
+// Parse #RANK.
+[[nodiscard]] std::optional<RulesetBMS::JudgeDifficulty> parse_rank(int);
+
+} // namespace lunaticvibes::parser_bms
+
 class SceneSelect;
 class SongDB;
 
@@ -62,10 +69,11 @@ public:
     // File properties.
     // Header.
     int player = 0;                // 1: single, 2: couple, 3: double, 4: battle
-    int rank = 2;                 // judge, VHARD/HARD/NORMAL/EASY
+    int raw_rank = -1;
     int total = -1;
     double bpm = 130.0;
     std::map<std::string, StringContent> extraCommands;
+    std::optional<RulesetBMS::JudgeDifficulty> rank;
 
     // File assigned by the BMS file.
     // Ported to super class

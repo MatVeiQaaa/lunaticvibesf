@@ -1,2 +1,3 @@
 #pragma once
-#include "chart_bms.h"
+#include "chart.h" // IWYU pragma: export
+#include "chart_bms.h" // IWYU pragma: export

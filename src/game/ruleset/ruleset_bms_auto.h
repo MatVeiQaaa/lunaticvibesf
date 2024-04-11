@@ -11,7 +11,7 @@ public:
         const std::shared_ptr<ChartObjectBase>& chart,
         PlayModifierGaugeType gauge,
         GameModeKeys keys,
-        JudgeDifficulty difficulty = JudgeDifficulty::NORMAL,
+        JudgeDifficulty difficulty = LR2_DEFAULT_RANK,
         double health = 1.0,
         PlaySide side = PlaySide::AUTO);
 

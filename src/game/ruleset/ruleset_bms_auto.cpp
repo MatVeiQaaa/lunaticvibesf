@@ -156,7 +156,6 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                 break;
             }
 
-            JudgeRes j;
             NoteLaneIndex idx;
 
             idx = _chart->getLaneFromKey(NoteLaneCategory::Note, (Input::Pad)k);

@@ -36,9 +36,29 @@ bool IsMainThread()
     return s_main_thread == std::this_thread::get_id();
 }
 
+[[nodiscard]] static std::string ellipsize(const std::string_view s, const size_t len)
+{
+    std::string out;
+    out.reserve(len);
+    out += s.substr(0, len / 2);
+    out += '~';
+    out += s.substr(s.size() - len / 2);
+    assert(out.size() <= len);
+    return out;
+}
+
 void SetThreadName(const char* name)
 {
     // > The  name  can  be up to 16 bytes long, including the terminating null byte.
+    static constexpr size_t max_name_len{15};
+    std::string_view name_view{name};
+    if (name_view.size() > max_name_len)
+    {
+        const std::string name_ = ellipsize(name_view, max_name_len);
+        SetThreadName(name_.c_str());
+        return;
+    }
+    assert(name_view.size() <= max_name_len);
     int ret = prctl(PR_SET_NAME, name);
     if (ret != 0)
     {

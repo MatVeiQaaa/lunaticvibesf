@@ -1484,8 +1484,8 @@ void setDynamicTextures()
 }
 
 
-void createNotification(StringContentView text)
+void createNotification(StringContent text)
 {
     std::unique_lock lock(gOverlayContext._mutex);
-    gOverlayContext.notifications.emplace_back(lunaticvibes::Time(), StringContent(text));
+    gOverlayContext.notifications.emplace_back(lunaticvibes::Time(), std::move(text));
 }

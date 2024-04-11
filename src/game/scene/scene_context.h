@@ -253,7 +253,7 @@ struct OverlayContextParams
     std::list<std::pair<lunaticvibes::Time, StringContent>> notifications;
 };
 
-void createNotification(StringContentView text);
+void createNotification(StringContent text);
 
 ////////////////////////////////////////////////////////////////////////////////
 

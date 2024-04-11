@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cassert>
 #include <cstring>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -18,7 +18,8 @@ public:
     constexpr Hash() = default;
     explicit Hash(const std::string_view hex)
     {
-        assert(hex.size() == _Len * 2);
+        if (hex.size() != _Len * 2)
+            throw std::runtime_error("invalid 'hex' length");
         set = true;
         hex2bin(hex, data);
     }

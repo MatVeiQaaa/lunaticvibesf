@@ -3048,6 +3048,7 @@ void SceneSelect::updatePreview()
         if (_previewChartLoading.joinable())
             _previewChartLoading.join();
         _previewChartLoading = std::thread([&, previewChartPath, entryIndex]() {
+            SetDebugThreadName("PreviewChartLoad");
             std::shared_ptr<ChartFormatBase> previewChartTmp =
                 ChartFormatBase::createFromFile(previewChartPath, gPlayContext.randomSeed);
             if (std::shared_lock l{gSelectContext._mutex}; entryIndex != gSelectContext.selectedEntryIndex)
@@ -3111,6 +3112,7 @@ void SceneSelect::updatePreview()
                 if (_previewLoading.joinable())
                     _previewLoading.join();
                 _previewLoading = std::thread([&, bms] {
+                    SetDebugThreadName("PreviewSampleLoad");
                     auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);
                     auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(bms, previewChartObjTmp,
                         PlayModifierGaugeType::NORMAL, bms->gamemode, RulesetBMS::JudgeDifficulty::VERYHARD, 0.2, RulesetBMS::PlaySide::RIVAL);

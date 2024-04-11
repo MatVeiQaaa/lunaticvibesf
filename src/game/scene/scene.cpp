@@ -16,7 +16,7 @@
 
 // prototype
 SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput) :
-    AsyncLooper("Scene Update", std::bind(&SceneBase::_updateAsync1, this), rate),
+    AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate),
     _input(1000, backgroundInput)
 {
     unsigned inputPollingRate = ConfigMgr::get("P", cfg::P_INPUT_POLLING_RATE, 1000);

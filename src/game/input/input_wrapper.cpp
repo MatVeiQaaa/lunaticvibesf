@@ -11,7 +11,7 @@
 #include "game/runtime/state.h"
 
 InputWrapper::InputWrapper(unsigned rate, bool background) : 
-    AsyncLooper("Input loop", std::bind(&InputWrapper::_loop, this), rate),
+    AsyncLooper("InputLoop", std::bind(&InputWrapper::_loop, this), rate),
     _background(background)
 {
 }

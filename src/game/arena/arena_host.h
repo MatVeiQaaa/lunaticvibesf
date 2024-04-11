@@ -19,7 +19,7 @@ class ArenaHost: public AsyncLooper
 #endif
 
 public:
-	ArenaHost() : AsyncLooper("Arena Host", std::bind(&ArenaHost::update, this), 60) {}
+	ArenaHost() : AsyncLooper("ArenaHost", std::bind(&ArenaHost::update, this), 60) {}
 	~ArenaHost() override;
 
 private:

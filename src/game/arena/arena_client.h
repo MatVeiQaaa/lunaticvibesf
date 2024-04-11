@@ -32,7 +32,7 @@ class ArenaClient: public AsyncLooper
 #endif
 
 public:
-	ArenaClient() : AsyncLooper("Arena Client", std::bind(&ArenaClient::update, this), 60) {}
+	ArenaClient() : AsyncLooper("ArenaClient", std::bind(&ArenaClient::update, this), 60) {}
 	~ArenaClient() override;
 
 private:

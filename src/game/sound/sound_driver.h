@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <string>
+#include <utility>
 #include "common/asynclooper.h"
 #include "fmod.hpp"
 
@@ -53,7 +54,7 @@ class SoundDriver: public AsyncLooper
     friend class SoundMgr;
 
 public:
-    SoundDriver(std::function<void()> update) : AsyncLooper("Sound Driver", update, 1000, true) {}
+    SoundDriver(std::function<void()> update) : AsyncLooper("SoundDriver", std::move(update), 1000, true) {}
     ~SoundDriver() override = default;
 
 public:

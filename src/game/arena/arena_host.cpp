@@ -1,6 +1,7 @@
 #include "arena_host.h"
 
 #include "common/encoding.h"
+#include "common/hash.h"
 #include "common/log.h"
 #include "arena_data.h"
 #include "arena_internal.h"
@@ -655,7 +656,9 @@ void ArenaHost::handleRequestChart(const std::string& clientKey, const std::shar
 	Client& c = clients[clientKey];
 	ArenaMessageResponse resp(*pMsg);
 
-	HashMD5 reqChart(pMsg->chartHashMD5String);
+	HashMD5 reqChart;
+	if (!pMsg->chartHashMD5String.empty())
+		reqChart = HashMD5{pMsg->chartHashMD5String};
 	requestChart(reqChart, clientKey);
 
 	auto payload = resp.pack();

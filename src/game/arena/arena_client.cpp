@@ -541,10 +541,9 @@ void ArenaClient::handleHostRequestChart(const std::shared_ptr<ArenaMessage>& ms
 	auto payload = resp.pack();
 	socket->async_send_to(boost::asio::buffer(*payload), server, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
 
-	auto hash = HashMD5(pMsg->chartHashMD5String);
-
-	if (!hash.empty())
+	if (!pMsg->chartHashMD5String.empty())
 	{
+		HashMD5 hash{pMsg->chartHashMD5String};
 		// select chart
 		gSelectContext.remoteRequestedPlayer = pMsg->requestPlayerName;
 		gSelectContext.remoteRequestedChart = hash;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ctime>
 #include <future>
 #include <string>
 #include <functional>
@@ -103,5 +104,8 @@ namespace lunaticvibes {
 
 // Open link, file or a folder.
 bool open(const std::string& link);
+// buf MUST be at least 26 bytes.
+const char* safe_ctime(const std::time_t* timep, char* buf);
+const tm* safe_localtime(const std::time_t* timep, tm* result);
 
 } // namespace lunaticvibes

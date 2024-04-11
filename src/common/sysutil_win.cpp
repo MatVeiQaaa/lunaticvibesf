@@ -115,4 +115,18 @@ bool lunaticvibes::open(const std::string& link)
     return res > 32;
 }
 
+const char* lunaticvibes::safe_ctime(const std::time_t* timep, char* buf)
+{
+    errno_t err = ctime_s(buf, 26, timep);
+    if (err) return "";
+    return buf;
+};
+
+const tm* lunaticvibes::safe_localtime(const std::time_t* timep, tm* result)
+{
+    errno_t err = localtime_s(result, timep);
+    if (err) return nullptr;
+    return result;
+};
+
 #endif

@@ -1,17 +1,9 @@
 #pragma once
 #include <chrono>
+#include <ctime>
 #include "state.h"
 #include "common/asynclooper.h"
-
-#ifdef _MSC_VER
-inline tm gLocaltimeResult;
-inline char gCtimeResult[26];
-inline tm* localtime_(const std::time_t* t) { errno_t err = localtime_s(&gLocaltimeResult, t); return (err ? NULL : &gLocaltimeResult); };
-inline const char* ctime_(const std::time_t* t) { errno_t err = ctime_s(gCtimeResult, 26, t); return (err ? "" : gCtimeResult); };
-#else
-inline tm* localtime_(const std::time_t* t) { return localtime(t); };
-inline const char* ctime_(const std::time_t* t) { return ctime(t); };
-#endif
+#include "common/sysutil.h"
 
 inline unsigned gFrameCount[10]{ 0 };
 constexpr size_t FRAMECOUNT_IDX_FPS = 0;
@@ -38,7 +30,9 @@ private:
 		State::set(IndexNumber::INPUT_DETECT_FPS, State::get(IndexNumber::_PPS2));
 
 		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		auto d = localtime_(&t);
+		tm tt;
+		char ctime_buf[26];
+		auto d = lunaticvibes::safe_localtime(&t, &tt);
         if (d)
         {
             State::set(IndexNumber::DATE_YEAR, d->tm_year + 1900);
@@ -48,15 +42,10 @@ private:
             State::set(IndexNumber::DATE_MIN, d->tm_min);
             State::set(IndexNumber::DATE_SEC, d->tm_sec);
 
-            State::set(IndexText::_TEST1, ctime_(&t));
+            State::set(IndexText::_TEST1, lunaticvibes::safe_ctime(&t, ctime_buf));
         }
 
 		//createNotification(std::to_string(t));
 	}
 };
 //InputWrapper::InputWrapper(unsigned rate) : AsyncLooper(std::bind(&InputWrapper::_loop, this), rate)
-
-#ifdef _MSC_VER
-#undef localtime
-#undef ctime
-#endif

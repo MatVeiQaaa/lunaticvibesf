@@ -155,11 +155,14 @@ inline std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> gSprites{ null
 class SpriteGlobal: public SpriteBase
 {
 protected:
-    size_t globalSpriteIndex;
     std::shared_ptr<SpriteBase> pSpriteRef{ nullptr };
-
+private:
+    size_t globalSpriteIndex;
 public:
-    SpriteGlobal(size_t globalSpriteIndex, int srcLine = -1) : SpriteBase(SpriteTypes::GLOBAL, srcLine), globalSpriteIndex(globalSpriteIndex) {}
+    SpriteGlobal(size_t globalSpriteIndex, int srcLine = -1)
+        : SpriteBase(SpriteTypes::GLOBAL, srcLine), globalSpriteIndex(globalSpriteIndex)
+    {
+    }
     ~SpriteGlobal() override = default;
 
     size_t getMyGlobalSpriteIndex() {
@@ -167,15 +170,16 @@ public:
     }
 
     void setSpriteReference(std::shared_ptr<SpriteBase> p) {
-        pSpriteRef = p;
-        srcLine = p->srcLine;
+        pSpriteRef = std::move(p);
+        srcLine = pSpriteRef->srcLine;
     }
 
     bool update(const lunaticvibes::Time& time) override {
         SpriteBase::update(time);
-        if (getMyGlobalSpriteIndex()) 
-            setSpriteReference(gSprites[getMyGlobalSpriteIndex()]);
-        if (pSpriteRef) 
+        // FIXME: is this needed?
+        // if (globalSpriteIndex)
+        //     setSpriteReference(gSprites[getMyGlobalSpriteIndex()]);
+        if (pSpriteRef)
             return pSpriteRef->update(time);
         return false;
     }

@@ -2632,26 +2632,21 @@ bool SkinLR2::DST()
             return false;
         }
 
-        std::shared_ptr<SpriteGlobal> psGlobal = nullptr;
         SpriteTypes sType = e->type();
         if (sType == SpriteTypes::GLOBAL)
         {
             // unpack stacking references
             auto p = std::reinterpret_pointer_cast<SpriteGlobal>(e);
-            psGlobal = p;
-            decltype(e) enext = nullptr;
             do
             {
-                enext = gSprites[p->getMyGlobalSpriteIndex()];
-                p->setSpriteReference(enext);
-
+                auto enext = gSprites[p->getMyGlobalSpriteIndex()];
                 if (enext == nullptr)
                 {
                     LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid (Line: " << csvLineNumber << ")";
                     return false;
                 }
                 sType = enext->type();
-
+                p->setSpriteReference(enext);
             } while (sType == SpriteTypes::GLOBAL);
         }
 

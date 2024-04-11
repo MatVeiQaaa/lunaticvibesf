@@ -400,7 +400,7 @@ void mainLoop()
             }
             graphics_flush();
         }
-        ++gFrameCount[0];
+        ++gFrameCount[FRAMECOUNT_IDX_FPS];
     }
     if (scene)
     {

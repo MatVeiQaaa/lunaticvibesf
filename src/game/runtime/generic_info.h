@@ -14,12 +14,12 @@ constexpr size_t FRAMECOUNT_IDX_INPUT = 2;
 class GenericInfoUpdater : public AsyncLooper
 {
 public:
-	GenericInfoUpdater(unsigned rate = 1) : AsyncLooper("GenericInfoUpdater", std::bind(&GenericInfoUpdater::_loop, this), rate) {}
+	GenericInfoUpdater(unsigned rate) : AsyncLooper("GenericInfoUpdater", std::bind(&GenericInfoUpdater::_loop, this), rate) {}
 private:
 	void _loop()
 	{
 		State::set(IndexNumber::FPS, gFrameCount[0] / _rate);
-		gFrameCount[0] = 0;
+		gFrameCount[FRAMECOUNT_IDX_FPS] = 0;
 
 		for (unsigned i = 1; i < 10; ++i)
 		{
@@ -48,4 +48,3 @@ private:
 		//createNotification(std::to_string(t));
 	}
 };
-//InputWrapper::InputWrapper(unsigned rate) : AsyncLooper(std::bind(&InputWrapper::_loop, this), rate)

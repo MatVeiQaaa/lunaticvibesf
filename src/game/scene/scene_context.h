@@ -251,10 +251,6 @@ struct OverlayContextParams
 {
     std::shared_mutex _mutex;
     std::list<std::pair<lunaticvibes::Time, StringContent>> notifications;
-
-    std::vector<StringContent> popupList;
-    size_t popupListSel = 0;
-    bool popupListShow = false;
 };
 
 void createNotification(StringContentView text);

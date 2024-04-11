@@ -236,10 +236,6 @@ void SceneBase::draw() const
                 _sNotifications[i]->draw();
             }
         }
-        if (gOverlayContext.popupListShow && !gOverlayContext.popupList.empty())
-        {
-            // TODO draw list
-        }
     }
 
     if (queuedScreenshot)

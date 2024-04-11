@@ -83,7 +83,8 @@ namespace portable_strerror_r_detail {
 // Use the output of XSI-compliant (from POSIX.1-2001) strerror_r().
 static char* impl(int strerror_r_ret, char* buffer, const size_t buffer_length)
 {
-    if (strerror_r_ret != 0) {
+    if (strerror_r_ret != 0)
+    {
         // The message format follows what GNU's strerror_r() would
         // return in such case.
         snprintf(buffer, buffer_length, "Unknown error %d", strerror_r_ret);
@@ -108,12 +109,13 @@ const char* safe_strerror(const int errnum, char* buffer, const size_t buffer_le
 
 bool lunaticvibes::open(const std::string& link)
 {
+    // FIXME: escape quotes.
     const std::string s = (boost::format("xdg-open \"%s\"") % link).str();
     // TODO: make it non-blocking.
-    int rc = system(s.c_str());
-    if (rc != 0)
+    int ret = system(s.c_str());
+    if (ret != 0)
     {
-        LOG_ERROR << "xdg-open failed with rc=" << rc;
+        LOG_ERROR << "xdg-open failed with ret=" << ret;
         return false;
     }
     return true;

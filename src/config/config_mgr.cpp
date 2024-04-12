@@ -72,8 +72,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_BGA_TYPE, P_BGA_TYPE_ON);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::PLAY_BGA_TYPE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::PLAY_BGA_TYPE, it->second);
         else
             State::set(IndexOption::PLAY_BGA_TYPE, Option::BGA_OFF);
     }
@@ -85,8 +85,8 @@ void setOptions()
         };
 
         auto&& s = ConfigMgr::get<string>('P', P_BGA_SIZE, P_BGA_SIZE_NORMAL);
-        if (smap.find(s) != smap.end())
-            State::set(IndexOption::PLAY_BGA_SIZE, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexOption::PLAY_BGA_SIZE, it->second);
         else
             State::set(IndexOption::PLAY_BGA_SIZE, Option::BGA_NORMAL);
     }

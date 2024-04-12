@@ -2,12 +2,11 @@
 
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "common/sysutil.h"
 #include "game/runtime/state.h"
-#include "game/skin/skin_lr2.h"
-#include "game/skin/skin_mgr.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
 #include "game/scene/scene_context.h"
@@ -1391,31 +1390,11 @@ static void open_ir_page()
     LOG_DEBUG << "opened the thingy";
 }
 
-void help(int index_)
+static void requestOpenReadme(const int index)
 {
-    assert(index_ >= 0 && index_ < 10);
-    auto index = static_cast<unsigned>(index_);
-    lunaticvibes::Time now{};
-
-    std::shared_ptr<SkinLR2> s = std::dynamic_pointer_cast<SkinLR2>(SkinMgr::get(SkinType::MUSIC_SELECT));
-    const std::vector<std::string>& help_files = s->getHelpFiles();
-    if (index >= help_files.size())
-    {
-        LOG_WARNING << "skin references out of bounds help file";
-        return;
-    }
-
-    if (State::get(IndexTimer::README_START) != TIMER_NEVER)
-    {
-        LOG_WARNING << "FIXME: shouldn't be able to click through the screen.";
-        // TODO: scrolling.
-        // Both of these are likely gonna either a derivative of or a modification to SpriteImageText.
-        return;
-    }
-
-    State::set(IndexText::_MY_HELPFILE, help_files[index]);
-    State::set(IndexTimer::README_START, now.norm());
-    State::set(IndexTimer::README_END, TIMER_NEVER);
+    assert(index >= 0 && index < 10);
+    std::unique_lock l(gSelectContext._mutex);
+    gSelectContext.openReadmeRequest = index;
 }
 
 #pragma endregion
@@ -1665,7 +1644,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 207:
     case 208:
     case 209:
-        return std::bind(help, type - 200);
+        return std::bind(requestOpenReadme, type - 200);
 
     case 210:
         return [](auto) { open_ir_page(); };

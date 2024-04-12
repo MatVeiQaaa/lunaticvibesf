@@ -3,33 +3,27 @@
 #include <memory>
 #include <optional>
 
-#include "scene_select.h"
-#include "scene_mgr.h"
-#include "scene_context.h"
-#include "scene_pre_select.h"
-#include "scene_customize.h"
-
-#include "common/utils.h"
 #include "common/chartformat/chartformat_types.h"
 #include "common/entry/entry_types.h"
-
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-
+#include "common/utils.h"
 #include "config/config_mgr.h"
-
-#include "game/skin/skin_lr2_button_callbacks.h"
-#include "game/skin/skin_lr2_slider_callbacks.h"
-#include "game/scene/scene_mgr.h"
-
+#include "game/arena/arena_client.h"
+#include "game/arena/arena_data.h"
+#include "game/arena/arena_host.h"
 #include "game/chart/chart_bms.h"
 #include "game/ruleset/ruleset_bms_auto.h"
-
 #include "game/runtime/i18n.h"
-
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
+#include "game/scene/scene_context.h"
+#include "game/scene/scene_customize.h"
+#include "game/scene/scene_mgr.h"
+#include "game/scene/scene_pre_select.h"
+#include "game/scene/scene_select.h"
+#include "game/skin/skin_lr2.h"
+#include "game/skin/skin_lr2_button_callbacks.h"
+#include "game/skin/skin_lr2_slider_callbacks.h"
+#include "game/skin/skin_mgr.h"
+#include "game/sound/sound_mgr.h"
+#include "game/sound/sound_sample.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -539,6 +533,47 @@ SceneSelect::~SceneSelect()
     loopEnd();
 }
 
+void SceneSelect::closeReadme(const lunaticvibes::Time closing_time)
+{
+    LOG_DEBUG << "[Select] Readme close";
+    if (State::get(IndexTimer::README_START) == TIMER_NEVER)
+    {
+        LOG_ERROR << "[Select] Readme is already closed";
+        return;
+    }
+    pSkin->setHandleMouseEvents(true);
+    state = eSelectState::SELECT;
+    State::set(IndexTimer::README_START, TIMER_NEVER);
+    State::set(IndexTimer::README_END, closing_time.norm());
+}
+
+void SceneSelect::openReadme(const lunaticvibes::Time open_time, const size_t idx)
+{
+    LOG_DEBUG << "[Select] Readme open";
+    if (State::get(IndexTimer::README_START) != TIMER_NEVER)
+    {
+        LOG_ERROR << "[Select] Readme is already open";
+        return;
+    }
+    std::shared_ptr<SkinLR2> s = std::dynamic_pointer_cast<SkinLR2>(pSkin);
+    if (s == nullptr)
+    {
+        LOG_ERROR << "[Select] Skin error";
+        return;
+    }
+    const std::vector<std::string>& help_files = s->getHelpFiles();
+    if (idx >= help_files.size())
+    {
+        LOG_WARNING << "[Select] Trying to open out-of-bounds help file";
+        return;
+    }
+    pSkin->setHandleMouseEvents(false);
+    state = eSelectState::WATCHING_README;
+    State::set(IndexText::_MY_HELPFILE, help_files[idx]);
+    State::set(IndexTimer::README_START, open_time.norm());
+    State::set(IndexTimer::README_END, TIMER_NEVER);
+}
+
 void SceneSelect::_updateAsync()
 {
     if (gNextScene != SceneType::SELECT) return;
@@ -551,6 +586,12 @@ void SceneSelect::_updateAsync()
     }
 
     _updateCallback();
+
+    if (gSelectContext.openReadmeRequest != -1)
+    {
+        openReadme(t, gSelectContext.openReadmeRequest);
+        gSelectContext.openReadmeRequest = -1;
+    }
 
     if (gSelectContext.optionChangePending)
     {
@@ -1132,18 +1173,6 @@ void SceneSelect::update()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void closeReadme()
-{
-    if (State::get(IndexTimer::README_START) == TIMER_NEVER)
-    {
-        return;
-    }
-
-    lunaticvibes::Time now{};
-    State::set(IndexTimer::README_START, TIMER_NEVER);
-    State::set(IndexTimer::README_END, now.norm());
-}
-
 // CALLBACK
 void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
@@ -1170,7 +1199,8 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         }
         return;
     }
-    else if (imguiShow)
+
+    if (imguiShow)
     {
         if (m[Input::Pad::F9] || m[Input::Pad::ESC])
         {
@@ -1179,14 +1209,6 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             pSkin->setHandleMouseEvents(true);
         }
         return;
-    }
-    else
-    {
-        if (m[Input::Pad::F9] || m[Input::Pad::ESC])
-        {
-            imguiShow = !imguiShow;
-            pSkin->setHandleMouseEvents(!imguiShow);
-        }
     }
 
     //if (m[Input::Pad::ESC])
@@ -1220,22 +1242,16 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         {
             switch (state)
             {
-            case eSelectState::SELECT:
-                inputGamePressSelect(input, t);
-                break;
-
-            case eSelectState::FADEOUT:
-                break;
-
-            default:
-                break;
+            case eSelectState::PREPARE: break;
+            case eSelectState::SELECT: inputGamePressSelect(input, t); break;
+            case eSelectState::FADEOUT: break;
+            case eSelectState::WATCHING_README: inputGamePressReadme(input, t); return;
             }
         }
 
         if (input[Pad::M2])
         {
             closeAllPanels(t);
-            closeReadme();
         }
 
         // lights
@@ -1367,6 +1383,12 @@ void SceneSelect::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 
 void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Time& t)
 {
+    if (input[Input::Pad::F9] || input[Input::Pad::ESC])
+    {
+        imguiShow = !imguiShow;
+        pSkin->setHandleMouseEvents(!imguiShow);
+    }
+
     if (input[Input::Pad::F8])
     {
         // refresh folder
@@ -1863,6 +1885,16 @@ void SceneSelect::inputGameReleasePanel(InputMask& input, const lunaticvibes::Ti
     }
 }
 
+
+void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Time& t)
+{
+    if (input[Input::Pad::M2])
+    {
+        closeReadme(t);
+        return;
+    }
+    // TODO: scroll.
+}
 
 void SceneSelect::decide()
 {

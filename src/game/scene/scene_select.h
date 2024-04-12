@@ -17,8 +17,7 @@ enum class eSelectState
 {
     PREPARE,
     SELECT,
-    SEARCH,
-    PANEL1,     // play option
+    WATCHING_README,
     FADEOUT,
 };
 
@@ -95,6 +94,9 @@ public:
     SceneSelect();
     ~SceneSelect() override;
 
+    void openReadme(lunaticvibes::Time, size_t idx);
+    void closeReadme(lunaticvibes::Time);
+
 protected:
     // Looper callbacks
     void _updateAsync() override;
@@ -105,9 +107,6 @@ protected:
 
     void update() override;
     void updateImgui() override;
-
-protected:
-    // Inner-state updates
 
 protected:
     // Register to InputWrapper: judge / keysound
@@ -124,6 +123,8 @@ private:
     void inputGamePressPanel(InputMask&, const lunaticvibes::Time&);
     void inputGameHoldPanel(InputMask&, const lunaticvibes::Time&);
     void inputGameReleasePanel(InputMask&, const lunaticvibes::Time&);
+
+    void inputGamePressReadme(InputMask&, const lunaticvibes::Time&);
 
 private:
     void navigateUpBy1(const lunaticvibes::Time& t);

@@ -2,7 +2,6 @@
 #include <array>
 #include <memory>
 #include <string>
-#include <stack>
 #include <shared_mutex>
 #include "scene.h"
 #include "common/types.h"
@@ -180,8 +179,9 @@ struct SelectContextParams
     unsigned scrollTimeLength = 300; // 
     int scrollDirection = 0;    // -1: up / 1: down
 
-    int panel = 0;
     int lastLaneEffectType1P = 0;
+
+    int openReadmeRequest = -1;
 
     HashMD5 remoteRequestedChart;       // only valid when remote is requesting a new chart; reset after list change
     std::string remoteRequestedPlayer;  // only valid when remote is requesting a new chart; reset after list change

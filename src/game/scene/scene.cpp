@@ -275,8 +275,7 @@ void SceneBase::updateImgui()
 {
     assert(IsMainThread());
 
-    bool showTextOverlay = false;
-    if (showFPS) showTextOverlay = true;
+    bool showTextOverlay = showFPS;
     for (size_t i = 0; i < 4; ++i)
     {
         IndexText idx = IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i);

@@ -1,11 +1,12 @@
 #ifndef _WIN32
 #ifdef RENDER_SDL2
 
+#include "common/log.h"
 #include "game/graphics/SDL2/input.h"
 
 void initInput()
 {
-	// No-op.
+	LOG_WARNING << "[SDL2] Direct input isn't available, input precision is limited by draw FPS";
 }
 
 void refreshInputDevices()

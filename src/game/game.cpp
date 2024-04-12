@@ -11,18 +11,12 @@
 #include "common/sysutil.h"
 #include "game/scene/scene_context.h"
 #include "game/runtime/generic_info.h"
-
 #include "common/chartformat/chartformat_bms.h"
-
 #include "common/log.h"
-
 #include "game/runtime/i18n.h"
-
 #include "game/arena/arena_data.h"
 #include "game/arena/arena_client.h"
 #include "game/arena/arena_host.h"
-
-#include "imgui.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -34,8 +28,8 @@
 #endif //WIN32
 
 #include <boost/format.hpp>
-
 #include <curl/curl.h>
+#include <imgui.h>
 
 bool gEventQuit;
 GenericInfoUpdater gGenericInfo{ 1 };

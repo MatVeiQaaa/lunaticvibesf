@@ -25,30 +25,43 @@ void SpriteImageText::updateTextTexture(std::string&& text)
     // convert UTF-8 to UTF-32
     std::u32string u32Text = utf8_to_utf32(text);
 
-    // save characters
-    float x = 0;
-    float y = 0;
-    float w = 0;
+    const int first_line = State::get(_lrvLineIdx);
+    assert(first_line >= 0);
+
+    float draw_x = 0;
+    float draw_y = 0;
+    float this_line_width = 0;
+    float text_width = 0;
+    int line = 0;
     _drawListOrig.clear();
     for (auto c : u32Text)
     {
-        if (_chrList->find(c) != _chrList->end())
+        auto chrIt = _chrList->find(c);
+        if (chrIt == _chrList->end())
+            continue;
+
+        const auto& r = chrIt->second.textureRect;
+        if (c == U'\n')
         {
-            auto& r = _chrList->at(c).textureRect;
-            if (c == U'\n')
-            {
-                x = 0;
-                y += r.h;
-                continue;
-            }
-            if (_chrList->at(c).textureIdx < _textures.size())
-                _drawListOrig.push_back({ c, {x, y, (float)r.w, (float)r.h} });
-            w = x + r.w;
-            x += r.w + _margin;
+            line += 1;
+            draw_x = 0;
+            if (line > first_line)
+                draw_y += r.h;
+            else
+                draw_y = 0;
+            this_line_width = 0;
+            continue;
         }
+        if (line < first_line)
+            continue;
+        if (chrIt->second.textureIdx < _textures.size())
+            _drawListOrig.push_back({ c, {draw_x, draw_y, (float)r.w, (float)r.h} });
+        this_line_width = draw_x + r.w;
+        text_width = std::max(text_width, this_line_width);
+        draw_x += r.w + _margin;
     }
     //_drawList = _drawListOrig;
-    _drawRect = { 0, 0, (int)std::ceil(w), (int)textHeight};
+    _drawRect = { 0, 0, (int)std::ceil(text_width), (int)textHeight};
 }
 
 void SpriteImageText::updateTextRect()

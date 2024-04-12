@@ -387,6 +387,7 @@ SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)
     _type = SpriteTypes::TEXT;
     pFont = builder.font;
     textInd = builder.textInd;
+    _lrvLineIdx = builder.lrvLineIdx;
     align = builder.align;
     textHeight = builder.ptsize * 3 / 2;
     textColor = builder.color;

@@ -13,6 +13,7 @@
 #include "game/chart/chart_bms.h"
 #include "game/ruleset/ruleset_bms_auto.h"
 #include "game/runtime/i18n.h"
+#include "game/runtime/index/number.h"
 #include "game/scene/scene_context.h"
 #include "game/scene/scene_customize.h"
 #include "game/scene/scene_mgr.h"
@@ -569,6 +570,7 @@ void SceneSelect::openReadme(const lunaticvibes::Time open_time, const size_t id
     }
     pSkin->setHandleMouseEvents(false);
     state = eSelectState::WATCHING_README;
+    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
     State::set(IndexText::_MY_HELPFILE, help_files[idx]);
     State::set(IndexTimer::README_START, open_time.norm());
     State::set(IndexTimer::README_END, TIMER_NEVER);
@@ -1893,7 +1895,22 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
         closeReadme(t);
         return;
     }
-    // TODO: scroll.
+    if (input[Input::Pad::MWHEELUP])
+    {
+        const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
+        if (current_line > 0)
+            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line - 1);
+        return;
+    }
+    if (input[Input::Pad::MWHEELDOWN])
+    {
+        const auto helpfile = State::get(IndexText::_MY_HELPFILE);
+        const auto max_lines = static_cast<int>(std::count(helpfile.begin(), helpfile.end(), '\n'));
+        const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
+        if (current_line <= max_lines)
+            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line + 1);
+        return;
+    }
 }
 
 void SceneSelect::decide()

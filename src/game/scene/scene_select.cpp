@@ -2576,7 +2576,7 @@ void SceneSelect::navigateBack(const lunaticvibes::Time& t, bool sound)
 
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
 
-        if (gArenaData.isOnline())
+        if (gArenaData.isOnline() && !gArenaData.isExpired())
         {
             if (gArenaData.isClient())
                 g_pArenaClient->requestChart(HashMD5());

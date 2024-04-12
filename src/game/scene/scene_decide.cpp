@@ -52,8 +52,8 @@ void SceneDecide::_updateAsync()
 
 void SceneDecide::updateStart()
 {
-    auto t = lunaticvibes::Time();
-    auto rt = t - State::get(IndexTimer::SCENE_START);
+    const auto t = lunaticvibes::Time();
+    const auto rt = t - State::get(IndexTimer::SCENE_START);
 
     if (!gInCustomize && rt.norm() >= pSkin->info.timeDecideExpiry)
     {
@@ -63,8 +63,8 @@ void SceneDecide::updateStart()
 
 void SceneDecide::updateSkip()
 {
-    auto t = lunaticvibes::Time();
-    auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
+    const auto t = lunaticvibes::Time();
+    const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft.norm() >= pSkin->info.timeOutro)
     {
@@ -74,8 +74,8 @@ void SceneDecide::updateSkip()
 
 void SceneDecide::updateCancel()
 {
-    auto t = lunaticvibes::Time();
-    auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
+    const auto t = lunaticvibes::Time();
+    const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
     if (ft.norm() >= pSkin->info.timeOutro)
     {
@@ -91,10 +91,10 @@ void SceneDecide::updateCancel()
 // CALLBACK
 void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
-    unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
+    const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
     if (rt < pSkin->info.timeIntro) return;
 
-    auto k = _inputAvailable & m;
+    const auto k = _inputAvailable & m;
     if ((k & INPUT_MASK_DECIDE).any() && rt >= pSkin->info.timeDecideSkip)
     {
         switch (state)
@@ -105,9 +105,8 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             state = eDecideState::SKIP;
             LOG_DEBUG << "[Decide] State changed to SKIP";
             break;
-
-        default:
-            break;
+        case eDecideState::SKIP: break;
+        case eDecideState::CANCEL: break;
         }
     }
 
@@ -124,9 +123,8 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;
-
-            default:
-                break;
+            case eDecideState::SKIP: break;
+            case eDecideState::CANCEL: break;
             }
         }
     }
@@ -135,10 +133,10 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 // CALLBACK
 void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 {
-    unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
+    const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
     if (rt < pSkin->info.timeIntro) return;
 
-    auto k = _inputAvailable & m;
+    const auto k = _inputAvailable & m;
 
     if (!gArenaData.isOnline())
     {
@@ -153,9 +151,8 @@ void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;
-
-            default:
-                break;
+            case eDecideState::SKIP: break;
+            case eDecideState::CANCEL: break;
             }
         }
     }
@@ -164,6 +161,6 @@ void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 // CALLBACK
 void SceneDecide::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 {
-    unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
+    const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
     if (rt < pSkin->info.timeIntro) return;
 }

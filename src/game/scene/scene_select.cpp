@@ -2753,7 +2753,7 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
 
     if (select_context.entries.empty())
     {
-        LOG_DEBUG << "select entries list is empty";
+        LOG_DEBUG << "[Select] Select entries list is empty";
         return DeleteScoreResult::Error;
     }
 
@@ -2766,14 +2766,14 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
     {
     case eEntryType::CHART:
         score_db.deleteAllChartScoresBMS(entryHash);
-        LOG_DEBUG << "deleted chart score";
+        LOG_DEBUG << "[Select] Deleted chart score";
         return DeleteScoreResult::Ok;
     case eEntryType::COURSE:
         score_db.deleteCourseScoreBMS(entryHash);
-        LOG_DEBUG << "deleted course score";
+        LOG_DEBUG << "[Select] Deleted course score";
         return DeleteScoreResult::Ok;
     default:
-        LOG_DEBUG << "not a chart/course";
+        LOG_DEBUG << "[Select] Not a chart/course";
         return DeleteScoreResult::Error;
     }
     abort(); // unreachable
@@ -2790,7 +2790,7 @@ std::optional<HashResult> try_get_hash(const std::string_view query, const Selec
 
     if (select_context.entries.empty())
     {
-        LOG_DEBUG << "select entries list is empty";
+        LOG_DEBUG << "[Select] Select entries list is empty";
         return HashResult{std::nullopt};
     }
 
@@ -2801,11 +2801,13 @@ std::optional<HashResult> try_get_hash(const std::string_view query, const Selec
 
     if (entryType != eEntryType::CHART && entryType != eEntryType::RIVAL_CHART)
     {
-        LOG_DEBUG << "not a chart but " << static_cast<int>(entryType);
+        LOG_DEBUG << "[Select] Not a chart but " << static_cast<int>(entryType);
         return HashResult{std::nullopt};
     }
 
-    return HashResult{entryHash.hexdigest()};
+    HashResult out{entryHash.hexdigest()};
+    LOG_DEBUG << "[Select] /hash result: " << *out.hash;
+    return out;
 }
 
 std::optional<PathResult> try_get_path(const std::string_view query, const SelectContextParams& select_context)
@@ -2817,14 +2819,16 @@ std::optional<PathResult> try_get_path(const std::string_view query, const Selec
 
     if (select_context.entries.empty())
     {
-        LOG_DEBUG << "select entries list is empty";
+        LOG_DEBUG << "[Select] Select entries list is empty";
         return PathResult{};
     }
 
     const auto entryIndex = select_context.selectedEntryIndex;
     const auto& [entry, _score] = select_context.entries.at(entryIndex);
 
-    return PathResult{entry->getPath().u8string()};
+    auto out = PathResult{entry->getPath().u8string()};
+    LOG_DEBUG << "[Select] /path result: " << out.path;
+    return out;
 }
 
 [[nodiscard]] SearchQueryResult execute_search_query(SelectContextParams& select_context, SongDB& song_db,
@@ -2833,13 +2837,14 @@ std::optional<PathResult> try_get_path(const std::string_view query, const Selec
     const auto text_view = std::string_view{text};
     if (!text_view.empty() && text_view.front() == '/')
     {
-        LOG_DEBUG << "search query is a command";
+        LOG_DEBUG << "[Select] Search query is a command";
         if (auto res = try_delete_score(text, score_db, select_context); res.has_value())
             return *res;
         if (auto res = try_get_hash(text, select_context); res.has_value())
             return *res;
         if (auto res = try_get_path(text, select_context); res.has_value())
             return *res;
+        LOG_DEBUG << "[Select] Bad command";
         return BadCommand{};
     }
 

@@ -823,7 +823,7 @@ int SkinLR2::LR2FONT()
     if (loadMode >= 1)
     {
         std::string fontNameKey = std::to_string(LR2FontNameMap.size());
-        LR2FontNameMap[fontNameKey] = nullptr;
+        LR2FontNameMap.erase(fontNameKey);
         return 1;
     }
 
@@ -831,13 +831,13 @@ int SkinLR2::LR2FONT()
     {
         // create a blank texture if not exist
         std::string fontNameKey = std::to_string(LR2FontNameMap.size());
-        if (prevSkinLR2FontNameMap.find(fontNameKey) != prevSkinLR2FontNameMap.end())
+        if (auto it = prevSkinLR2FontNameMap.find(fontNameKey); it != prevSkinLR2FontNameMap.end())
         {
-            LR2FontNameMap[fontNameKey] = prevSkinLR2FontNameMap[fontNameKey];
+            LR2FontNameMap.insert_or_assign(fontNameKey, it->second);
         }
         else
         {
-            LR2FontNameMap[fontNameKey] = nullptr;
+            LR2FontNameMap.erase(fontNameKey);
         }
         return 1;
     }
@@ -849,7 +849,7 @@ int SkinLR2::LR2FONT()
 
         if (LR2FontCache.find(path) != LR2FontCache.end())
         {
-            LR2FontNameMap[fontNameKey] = LR2FontCache[path];
+            LR2FontNameMap.insert_or_assign(fontNameKey, LR2FontCache[path]);
             LR2SkinFontPathCache[fontNameKey] = path;
             return 1;
         }
@@ -858,7 +858,7 @@ int SkinLR2::LR2FONT()
 
         if (!fs::is_regular_file(path))
         {
-            LR2FontNameMap[fontNameKey] = nullptr;
+            LR2FontNameMap.erase(fontNameKey);
             LOG_DEBUG << "[Skin] " << csvLineNumber << ": LR2FONT file not found: " << path;
             return 1;
         }
@@ -960,9 +960,9 @@ int SkinLR2::LR2FONT()
             }
         }
 
-        LR2FontCache[path] = pf;
-        LR2FontNameMap[fontNameKey] = pf;
-        LR2SkinFontPathCache[fontNameKey] = path;
+        LR2FontCache.insert_or_assign(path, pf);
+        LR2FontNameMap.insert_or_assign(fontNameKey, pf);
+        LR2SkinFontPathCache.insert_or_assign(fontNameKey, path);
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added LR2FONT[" << fontNameKey << "]: " << path;
         return 1;
     }
@@ -1627,9 +1627,9 @@ ParseRet SkinLR2::SRC_README()
     builder.editable = false;
 
     std::string font = std::to_string(d.font);
-    if (LR2FontNameMap.find(font) != LR2FontNameMap.end() && LR2FontNameMap[font] != nullptr)
+    if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
     {
-        auto& pf = LR2FontNameMap[font];
+        auto& pf = it->second;
         builder.charTextures = pf->T_texture;
         builder.charMappingList = &pf->R;
         builder.height = pf->S;
@@ -1639,7 +1639,7 @@ ParseRet SkinLR2::SRC_README()
     else
     {
         SpriteText::SpriteTextBuilder& pBuilder = builder;
-        pBuilder.font = fontNameMap[std::to_string(d.font)];
+        pBuilder.font = fontNameMap[font];
         _sprites.push_back(pBuilder.build());
     }
 
@@ -1659,9 +1659,9 @@ ParseRet SkinLR2::SRC_TEXT()
     builder.editable = d.edit;
 
     std::string font = std::to_string(d.font);
-    if (LR2FontNameMap.find(font) != LR2FontNameMap.end() && LR2FontNameMap[font] != nullptr)
+    if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
     {
-        auto& pf = LR2FontNameMap[font];
+        auto& pf = it->second;
         builder.charTextures = pf->T_texture;
         builder.charMappingList = &pf->R;
         builder.height = pf->S;
@@ -1671,7 +1671,7 @@ ParseRet SkinLR2::SRC_TEXT()
     else
     {
         SpriteText::SpriteTextBuilder& pBuilder = builder;
-        pBuilder.font = fontNameMap[std::to_string(d.font)];
+        pBuilder.font = fontNameMap[font];
         _sprites.push_back(pBuilder.build());
     }
 
@@ -2451,9 +2451,9 @@ ParseRet SkinLR2::SRC_BAR_TITLE()
     for (auto& bar : barSprites)
     {
         auto font = std::to_string(d.font);
-        if (LR2FontNameMap.find(font) != LR2FontNameMap.end() && LR2FontNameMap[font] != nullptr)
+        if (auto it = LR2FontNameMap.find(font); it != LR2FontNameMap.end() && it->second != nullptr)
         {
-            auto& pf = LR2FontNameMap[font];
+            auto& pf = it->second;
             builder.charTextures = pf->T_texture;
             builder.charMappingList = &pf->R;
             builder.height = pf->S;
@@ -2463,7 +2463,7 @@ ParseRet SkinLR2::SRC_BAR_TITLE()
         else
         {
             builder.font = fontNameMap[font];
-            bar->setTitle(type, *(SpriteText::SpriteTextBuilder*)&builder);
+            bar->setTitle(type, *static_cast<SpriteText::SpriteTextBuilder*>(&builder));
         }
     }
 

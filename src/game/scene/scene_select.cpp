@@ -1895,12 +1895,11 @@ void SceneSelect::decide()
     if (State::get(IndexOption::SELECT_ENTRY_TYPE) == Option::ENTRY_COURSE && State::get(IndexSwitch::COURSE_NOT_PLAYABLE))
         return;
 
-    int bga = State::get(IndexOption::PLAY_BGA_TYPE);
+    const int bga = State::get(IndexOption::PLAY_BGA_TYPE);
     State::set(IndexSwitch::_LOAD_BGA,
         bga == Option::BGA_ON || (bga == Option::BGA_AUTOPLAY && (gPlayContext.isAuto || gPlayContext.isReplay)));
 
     auto& [entry, score] = gSelectContext.entries[gSelectContext.selectedEntryIndex];
-    //auto& chart = entry.charts[entry.chart_idx];
 
     clearContextPlay();
 

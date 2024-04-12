@@ -434,7 +434,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 			ArenaMessageResponse resp(*pMsg);
 			resp.errorCode = 0;
 			resp.payload.resize(length);
-			ss.read((char*)&resp.payload[0], length);
+			ss.read(reinterpret_cast<char*>(resp.payload.data()), length);
 
 			auto socket = addr.is_v4() ? v4 : v6;
 			auto payload = resp.pack();
@@ -599,7 +599,7 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
 		return;
 	}
 	resp.payload.resize(length);
-	ss.read((char*)&resp.payload[0], length);
+	ss.read(reinterpret_cast<char*>(resp.payload.data()), length);
 
 	auto payload = resp.pack();
 	c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
@@ -672,7 +672,7 @@ void ArenaHost::handleCheckChartExistResp(const std::string& clientKey, const st
 	Client& c = clients[clientKey];
 	ArenaCheckChartExistResp p;
 	std::stringstream ss;
-	ss.write((char*)&pMsg->payload[0], pMsg->payload.size());
+	ss.write(reinterpret_cast<char*>(pMsg->payload.data()), pMsg->payload.size());
 	try
 	{
 		cereal::PortableBinaryInputArchive ar(ss);

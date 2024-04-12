@@ -352,7 +352,7 @@ void ArenaClient::handleJoinLobbyResp(const std::shared_ptr<ArenaMessage>& msg)
 	{
 		ArenaJoinLobbyResp p;
 		std::stringstream ss;
-		ss.write((char*)&pMsg->payload[0], pMsg->payload.size());
+		ss.write(reinterpret_cast<char*>(pMsg->payload.data()), pMsg->payload.size());
 		try
 		{
 			cereal::PortableBinaryInputArchive ar(ss);
@@ -525,7 +525,7 @@ void ArenaClient::handleCheckChartExist(const std::shared_ptr<ArenaMessage>& msg
 		return;
 	}
 	resp.payload.resize(length);
-	ss.read((char*)&resp.payload[0], length);
+	ss.read(reinterpret_cast<char*>(resp.payload.data()), length);
 
 	auto payload = resp.pack();
 	socket->async_send_to(boost::asio::buffer(*payload), server, std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));

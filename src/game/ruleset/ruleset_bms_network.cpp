@@ -140,7 +140,7 @@ std::vector<unsigned char> RulesetBMSNetwork::packInit(const std::shared_ptr<Rul
 
     size_t length = ss.tellp();
     ret.resize(length);
-    ss.read((char*)&ret[0], length);
+    ss.read(reinterpret_cast<char*>(ret.data()), length);
 
     return ret;
 }
@@ -148,7 +148,7 @@ std::vector<unsigned char> RulesetBMSNetwork::packInit(const std::shared_ptr<Rul
 bool RulesetBMSNetwork::unpackInit(const std::vector<unsigned char>& payload)
 {
     std::stringstream ss;
-    ss.write((char*)&payload[0], payload.size());
+    ss.write(reinterpret_cast<const char*>(payload.data()), payload.size());
 
     PayloadInit p;
     try
@@ -206,7 +206,7 @@ std::vector<unsigned char> RulesetBMSNetwork::packFrame(const std::shared_ptr<Ru
 
     size_t length = ss.tellp();
     ret.resize(length);
-    ss.read((char*)&ret[0], length);
+    ss.read(reinterpret_cast<char*>(ret.data()), length);
 
     return ret;
 }
@@ -214,7 +214,7 @@ std::vector<unsigned char> RulesetBMSNetwork::packFrame(const std::shared_ptr<Ru
 bool RulesetBMSNetwork::unpackFrame(std::vector<unsigned char>& payload)
 {
     std::stringstream ss;
-    ss.write((char*)&payload[0], payload.size());
+    ss.write(reinterpret_cast<const char*>(payload.data()), payload.size());
 
     PayloadFrame p;
     try

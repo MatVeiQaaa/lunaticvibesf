@@ -1,11 +1,11 @@
 #include "ruleset_bms_network.h"
 
-#include <iostream>
 #include <sstream>
 
-#include "game/scene/scene_context.h"
+#include <cereal/archives/portable_binary.hpp>
 
-#include "cereal/archives/portable_binary.hpp"
+#include "common/log.h"
+#include "game/scene/scene_context.h"
 
 RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex) : 
     RulesetBase(nullptr, nullptr), RulesetBMS(nullptr, nullptr, PlayModifierGaugeType::NORMAL, keys, JudgeDifficulty::NORMAL, 1.0, PlaySide::NETWORK), playerIndex(playerIndex)
@@ -133,8 +133,9 @@ std::vector<unsigned char> RulesetBMSNetwork::packInit(const std::shared_ptr<Rul
         cereal::PortableBinaryOutputArchive ar(ss);
         ar(p);
     }
-    catch (...)
+    catch (const cereal::Exception& e)
     {
+        LOG_ERROR << "[RulesetBMSNetwork] cereal exception: " << e.what();
         return ret;
     }
 
@@ -156,8 +157,9 @@ bool RulesetBMSNetwork::unpackInit(const std::vector<unsigned char>& payload)
         cereal::PortableBinaryInputArchive ar(ss);
         ar(p);
     }
-    catch (...)
+    catch (const cereal::Exception& e)
     {
+        LOG_ERROR << "[RulesetBMSNetwork] cereal exception: " << e.what();
         return false;
     }
 
@@ -199,8 +201,9 @@ std::vector<unsigned char> RulesetBMSNetwork::packFrame(const std::shared_ptr<Ru
         cereal::PortableBinaryOutputArchive ar(ss);
         ar(p);
     }
-    catch (...)
+    catch (const cereal::Exception& e)
     {
+        LOG_ERROR << "[RulesetBMSNetwork] cereal exception: " << e.what();
         return ret;
     }
 
@@ -222,8 +225,9 @@ bool RulesetBMSNetwork::unpackFrame(std::vector<unsigned char>& payload)
         cereal::PortableBinaryInputArchive ar(ss);
         ar(p);
     }
-    catch (...)
+    catch (const cereal::Exception& e)
     {
+        LOG_ERROR << "[RulesetBMSNetwork] cereal exception: " << e.what();
         return false;
     }
 

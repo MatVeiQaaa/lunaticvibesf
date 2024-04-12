@@ -15,9 +15,9 @@ bool ReplayChart::loadFile(const Path& path)
 			cereal::PortableBinaryInputArchive ia(ifs);
 			ia(*this);
 		}
-		catch (...)
+		catch (const cereal::Exception& e)
 		{
-			LOG_DEBUG << "exception while loading replay file";
+			LOG_ERROR << "[ReplayChart] loadFile() cereal exception: " << e.what();
 			return false;
 		}
 		const bool valid = validate();
@@ -40,11 +40,11 @@ bool ReplayChart::saveFile(const Path& path)
 		try
 		{
 			cereal::PortableBinaryOutputArchive oa(ofs);
-			LOG_DEBUG << "exception while serializing replay file";
 			oa(*this);
 		}
-		catch (...)
+		catch (const cereal::Exception& e)
 		{
+			LOG_ERROR << "[ReplayChart] saveFile() cereal exception: " << e.what();
 			return false;
 		}
 		return true;
@@ -72,9 +72,9 @@ void ReplayChart::updateChecksum()
 		cereal::PortableBinaryOutputArchive oa(ss);
 		oa(*this);
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
-		LOG_DEBUG << "exception while serializing replay file for checksum";
+		LOG_ERROR << "[ReplayChart] updateChecksum() cereal exception: " << e.what();
 		return;
 	}
 

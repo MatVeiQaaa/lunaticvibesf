@@ -420,8 +420,9 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 				cereal::PortableBinaryOutputArchive ar(ss);
 				ar(subPayload);
 			}
-			catch (...)
+			catch (const cereal::Exception& e)
 			{
+				LOG_ERROR << "[ArenaHost] cereal exception: " << e.what();
 			}
 			size_t length = ss.tellp();
 			if (length == 0)
@@ -588,8 +589,9 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
 		cereal::PortableBinaryOutputArchive ar(ss);
 		ar(subPayload);
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
+		LOG_ERROR << "[ArenaHost] cereal exception: " << e.what();
 	}
 	size_t length = ss.tellp();
 	if (length == 0)
@@ -678,9 +680,9 @@ void ArenaHost::handleCheckChartExistResp(const std::string& clientKey, const st
 		cereal::PortableBinaryInputArchive ar(ss);
 		ar(p);
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
-		LOG_WARNING << "[Arena] Unpack CHECK_CHART_EXIST resp payload failed";
+		LOG_ERROR << "[ArenaHost] cereal exception: " << e.what();
 		return;
 	}
 	if (p.exist)

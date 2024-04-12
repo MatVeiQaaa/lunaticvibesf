@@ -63,8 +63,9 @@ std::shared_ptr<std::vector<unsigned char>> ArenaMessage::pack()
 		case HOST_FINISHED_RESULT:    ar(*static_cast<ArenaMessageHostFinishedResult*>(this)); break;
 		}
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
+		LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
 	}
 	if (ss.str().empty())
 	{
@@ -127,8 +128,9 @@ std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, si
 		case HOST_FINISHED_RESULT:    { auto m = std::make_shared<ArenaMessageHostFinishedResult>();    { cereal::PortableBinaryInputArchive ar(ss); ar(*m); } return m; }
 		}
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
+		LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
 	}
 	LOG_WARNING << "[Arena] Message parsing failed. Type: " << (int)data[0];
 	return nullptr;

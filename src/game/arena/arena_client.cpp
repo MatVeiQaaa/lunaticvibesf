@@ -1,14 +1,18 @@
 #include "arena_client.h"
+
 #include "arena_data.h"
 #include "arena_internal.h"
-#include "cereal/archives/portable_binary.hpp"
 #include "common/encoding.h"
 #include "common/hash.h"
 #include "common/log.h"
-#include "game/scene/scene_context.h"
 #include "game/runtime/i18n.h"
-#include "re2/re2.h"
+#include "game/scene/scene_context.h"
 #include "git_version.h"
+
+#include <exception>
+
+#include "cereal/archives/portable_binary.hpp"
+#include "re2/re2.h"
 
 std::shared_ptr<ArenaClient> g_pArenaClient = nullptr;
 
@@ -73,7 +77,7 @@ bool ArenaClient::joinLobby(const std::string& address)
 			return false;
 		}
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
 		createNotification(i18n::s(i18nText::ARENA_JOIN_FAILED_ADDRESS_ERROR));
 		LOG_WARNING << "[Arena] Address error";
@@ -358,9 +362,9 @@ void ArenaClient::handleJoinLobbyResp(const std::shared_ptr<ArenaMessage>& msg)
 			cereal::PortableBinaryInputArchive ar(ss);
 			ar(p);
 		}
-		catch (...)
+		catch (const cereal::Exception& e)
 		{
-			LOG_WARNING << "[Arena] Unpack JOIN_LOBBY resp payload failed";
+			LOG_ERROR << "[ArenaClient] cereal exception: " << e.what();
 			return;
 		}
 
@@ -515,8 +519,9 @@ void ArenaClient::handleCheckChartExist(const std::shared_ptr<ArenaMessage>& msg
 		cereal::PortableBinaryOutputArchive ar(ss);
 		ar(subPayload);
 	}
-	catch (...)
+	catch (const cereal::Exception& e)
 	{
+		LOG_ERROR << "[ArenaClient] cereal exception: " << e.what();
 	}
 	size_t length = ss.tellp();
 	if (length == 0)

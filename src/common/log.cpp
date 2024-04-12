@@ -2,14 +2,14 @@
 
 #include <memory>
 #include <ostream>
-#include <sstream>
+#include <vector>
+
+#include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Appenders/RollingFileAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Init.h>
 
 #include "common/utils.h"
-#include <plog/Init.h>
-#include <plog/Formatters/TxtFormatter.h>
-
-#include <plog/Appenders/ColorConsoleAppender.h>        // for command prompt log purpose
-#include <plog/Appenders/RollingFileAppender.h>
 
 namespace plog
 {
@@ -40,23 +40,17 @@ namespace plog
     };
 }
 
-std::shared_ptr<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>> pConsoleAppender;
-std::shared_ptr<plog::RollingFileAppender<plog::TxtFormatterFileLine>> pTxtAppender;
+static std::shared_ptr<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>> pConsoleAppender;
+static std::shared_ptr<plog::RollingFileAppender<plog::TxtFormatterFileLine>> pTxtAppender;
+
 int InitLogger()
 {
     pConsoleAppender = std::make_shared<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>>();
-    plog::init(plog::info, &*pConsoleAppender);
+    plog::init(plog::info, pConsoleAppender.get());
 
-    /*
-    char buf[128] = { 0 };
-    std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    strftime(buf, sizeof(buf), "%F", std::gmtime(&t));
-    std::stringstream logfile;
-    logfile << PROJECT_NAME << "-" << buf << ".log";
-    static auto txtAppender = plog::RollingFileAppender<plog::TxtFormatterImpl<false>>{ logfile.str().c_str(), 1000000, 5 };
-    */
-    pTxtAppender = std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>("LunaticVibesF.log", 1000000, 5);
-    plog::get()->addAppender(&*pTxtAppender);
+    pTxtAppender =
+        std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>("LunaticVibesF.log", 1000000, 5);
+    plog::get()->addAppender(pTxtAppender.get());
 
     return 0;
 }

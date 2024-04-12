@@ -2385,34 +2385,34 @@ void ScenePlay::updatePlaying()
 
 void ScenePlay::updateFadeout()
 {
-    auto t = lunaticvibes::Time();
-    auto rt = t - State::get(IndexTimer::PLAY_START);
-    auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
+    const auto t = lunaticvibes::Time();
+    const auto ft = t - State::get(IndexTimer::FADEOUT_BEGIN);
 
-    if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
+    if (const auto start_time = State::get(IndexTimer::PLAY_START); start_time != TIMER_NEVER && gChartContext.started)
     {
-        gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
-    }
-    if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
-    {
-        gPlayContext.chartObj[PLAYER_SLOT_TARGET]->update(rt);
-    }
-    if (gPlayContext.chartObj[PLAYER_SLOT_MYBEST] != nullptr)
-    {
-        gPlayContext.chartObj[PLAYER_SLOT_MYBEST]->update(rt);
-    }
+        const auto rt = t - start_time;
+        if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
+        {
+            gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
+        }
+        if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
+        {
+            gPlayContext.chartObj[PLAYER_SLOT_TARGET]->update(rt);
+        }
+        if (gPlayContext.chartObj[PLAYER_SLOT_MYBEST] != nullptr)
+        {
+            gPlayContext.chartObj[PLAYER_SLOT_MYBEST]->update(rt);
+        }
 
-    if (gChartContext.started)
-    {
-        State::set(IndexTimer::MUSIC_BEAT, int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
-
+        State::set(IndexTimer::MUSIC_BEAT,
+                   static_cast<int>(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) %
+                       1000);
         gPlayContext.bgaTexture->update(rt, false);
+        State::set(IndexNumber::PLAY_BPM,
+                   static_cast<int>(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
 
-        State::set(IndexNumber::PLAY_BPM, int(std::round(gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM())));
+        updatePlayTime(rt);
     }
-
-    // play time / remain time
-    updatePlayTime(rt);
 
     //
     spinTurntable(gChartContext.started);
@@ -2714,9 +2714,9 @@ void ScenePlay::updatePlayTime(const lunaticvibes::Time& rt)
 {
     if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
     {
-        auto totalTime = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm();
-        auto playtime_s = rt.norm() / 1000;
-        auto remaintime_s = totalTime / 1000 - playtime_s;
+        const auto totalTime = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength().norm();
+        const auto playtime_s = rt.norm() / 1000;
+        const auto remaintime_s = totalTime / 1000 - playtime_s;
         State::set(IndexNumber::PLAY_MIN, int(playtime_s / 60));
         State::set(IndexNumber::PLAY_SEC, int(playtime_s % 60));
         State::set(IndexNumber::PLAY_REMAIN_MIN, int(remaintime_s / 60));

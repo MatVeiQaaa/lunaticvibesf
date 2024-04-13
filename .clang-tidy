@@ -1,8 +1,13 @@
 ---
 Checks: |
     -*,
-    performance-*,
+    bugprone-*,
+    concurrency-*,
     modernize-raw-string-literal,
     modernize-use-emplace,
     modernize-use-override,
+    performance-*,
+    -bugprone-easily-swappable-parameters, # ?
+    -bugprone-narrowing-conversions, # FIXME
+    -bugprone-switch-missing-default-case, # FIXME
 ---

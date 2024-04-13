@@ -4298,7 +4298,7 @@ void SkinLR2::findAndExtractDXA(const Path& path)
             // extract dxa
             if (std::filesystem::is_regular_file(dxa))
             {
-                LOG_DEBUG << "[Skin] Extract dxa file: " << fs::absolute(dxa);
+                LOG_DEBUG << "[Skin] Extract dxa file: " << dxa;
                 extractDxaToFile(dxa);
                 break;
             }

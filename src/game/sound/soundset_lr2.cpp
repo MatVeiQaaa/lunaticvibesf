@@ -33,7 +33,7 @@ void SoundSetLR2::loadCSV(Path p)
     std::ifstream ifsFile(p, std::ios::binary);
     if (!ifsFile.is_open())
     {
-        LOG_ERROR << "[SoundSet] File Not Found: " << std::filesystem::absolute(p);
+        LOG_ERROR << "[SoundSet] File not found: " << p;
         csvLineNumber = srcLineNumberParent;
         return;
     }

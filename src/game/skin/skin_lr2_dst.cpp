@@ -485,6 +485,7 @@ void updateDstOpt()
 		// 181 判定hard
 		// 182 判定normal
 		// 183 判定easy
+		// 184 VERYEASY (beatoraja extension)
 		switch (State::get(IndexOption::CHART_JUDGE_TYPE))
 		{
 			using namespace Option;

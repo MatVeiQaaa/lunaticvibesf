@@ -60,5 +60,5 @@ std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& pat
 
 Path ChartFormatBase::getDirectory() const
 {
-    return (absolutePath / "..").lexically_normal();
+    return absolutePath.parent_path();
 }

@@ -74,16 +74,19 @@ std::vector<Path> findFiles(Path p, bool recursive)
 
         auto pathRegex = RE2(str);
         Path pathFolder(folder);
-        for (auto& f : fs::recursive_directory_iterator(pathFolder))
+        if (recursive)
         {
-            if (recursive)
+            for (auto& f : fs::recursive_directory_iterator(pathFolder))
             {
                 if (f.path().filename().u8string().substr(0, 2) != u8"._" && RE2::FullMatch(f.path().filename().u8string(), pathRegex))
                 {
                     res.push_back(f.path());
                 }
             }
-            else
+        }
+        else
+        {
+            for (auto& f : fs::directory_iterator(pathFolder))
             {
                 auto relativeFilePath = fs::relative(f, pathFolder);
                 if (relativeFilePath.u8string().substr(0, 2) != u8"._" && RE2::FullMatch(relativeFilePath.u8string(), pathRegex))

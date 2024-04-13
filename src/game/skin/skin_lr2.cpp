@@ -3333,7 +3333,8 @@ int SkinLR2::parseHeader(const Tokens& raw)
         info.name = title;
         info.maker = maker;
 
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded metadata: " << title << " | " << maker;
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded metadata: mode='" << info.mode << "' title='" << title
+                  << " maker='" << maker << "'";
 
         return 1;
     }

@@ -54,6 +54,7 @@ enum class SkinType {
 
     MODE_COUNT
 };
+std::ostream& operator<<(std::ostream& os, const SkinType& mode);
 
 enum class ePlayMode
 {

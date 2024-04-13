@@ -55,6 +55,7 @@ SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240)
     for (auto& p : skinFileList)
     {
         SkinLR2 s(p, 2);
+        LOG_DEBUG << "[Customize] Adding skin: mode='" << s.info.mode << "' p='" << p << "'";
         skinList[s.info.mode].push_back(fs::absolute(p));
 
         switch (s.info.mode)
@@ -226,6 +227,10 @@ void SceneCustomize::updateMain()
                     pSkin->setHandleMouseEvents(true);
                 }
             }
+            else
+            {
+                LOG_DEBUG << "[Customize] soundsetList.size() <= 1";
+            }
         }
         else if (!gInCustomize && selectedMode == SkinType::MUSIC_SELECT)
         {
@@ -263,6 +268,9 @@ void SceneCustomize::updateMain()
                         case SkinType::MUSIC_SELECT: return cfg::S_PATH_MUSIC_SELECT;
                         case SkinType::DECIDE: return cfg::S_PATH_DECIDE;
                         case SkinType::RESULT: return cfg::S_PATH_RESULT;
+                        case SkinType::COURSE_RESULT:
+                            // NOTE: LR2 has a bug that it can't save course result skin.
+                            return cfg::S_PATH_COURSE_RESULT;
                         case SkinType::KEY_CONFIG: return cfg::S_PATH_KEYCONFIG;
                         case SkinType::THEME_SELECT: return cfg::S_PATH_CUSTOMIZE;
                         case SkinType::PLAY5: return cfg::S_PATH_PLAY_5;
@@ -272,12 +280,28 @@ void SceneCustomize::updateMain()
                         case SkinType::PLAY9: return cfg::S_PATH_PLAY_9;
                         case SkinType::PLAY10: return cfg::S_PATH_PLAY_10;
                         case SkinType::PLAY14: return cfg::S_PATH_PLAY_14;
-                        default: return nullptr;
+
+                        case SkinType::EXIT:
+                        case SkinType::TITLE:
+                        case SkinType::SOUNDSET:
+                        case SkinType::PLAY9_2:
+                        case SkinType::RETRY_TRANS:
+                        case SkinType::COURSE_TRANS:
+                        case SkinType::EXIT_TRANS:
+                        case SkinType::PRE_SELECT:
+                        case SkinType::TMPL:
+                        case SkinType::TEST:
+                        case SkinType::MODE_COUNT: break;
                         }
+                        return nullptr;
                     };
                     if (const char* key = config_path_for_skin_type(selectedMode); key != nullptr)
                     {
                         ConfigMgr::set("S", key, p.u8string());
+                    }
+                    else
+                    {
+                        LOG_ERROR << "[Customize] config_path_for_skin_type(" << selectedMode << ") == nullptr";
                     }
 
                     pSkin->setHandleMouseEvents(false);
@@ -290,6 +314,10 @@ void SceneCustomize::updateMain()
 
                     reload_preview(selectedMode);
                 }
+            }
+            else
+            {
+                LOG_DEBUG << "[Customize] skinList[selectedMode].size() <= 1";
             }
         }
         gCustomizeContext.skinDir = 0;

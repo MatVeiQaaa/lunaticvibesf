@@ -7,6 +7,7 @@ add_library(common STATIC
     encoding.cpp
     fraction.cpp
     log.cpp
+    types.cpp
     utils.cpp
     keymap.cpp
     sysutil.cpp

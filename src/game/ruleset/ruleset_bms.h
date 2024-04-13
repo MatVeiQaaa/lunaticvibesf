@@ -83,11 +83,14 @@ public:
         lunaticvibes::Time BAD;
         lunaticvibes::Time KPOOR;
     };
+    // https://github.com/wcko87/lr2oraja/blob/readme/README.md
+    // https://iidx.org/misc/iidx_lr2_beatoraja_diff#timing-window
     inline static const JudgeTime judgeTime[] = {
-        { 8, 27, 40, 200, 600},        // VERY HARD
-        {15, 32, 60, 200, 600},        // HARD
-        {18, 40, 96, 200, 650},        // NORMAL
-        {21, 60, 116, 200, 800},       // EASY
+        {8, 24, 40, 200, 1000},   // VERY HARD
+        {15, 30, 60, 200, 1000},  // HARD
+        {18, 40, 100, 200, 1000}, // NORMAL
+        {21, 60, 120, 200, 1000}, // EASY
+        // TODO: VERY EASY? beatoraja uses EASY*1.25 windows, lr2oraja uses NORMAL.
     };
 
     // Judge area definitions.

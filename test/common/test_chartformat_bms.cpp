@@ -61,11 +61,21 @@ TEST(tBMS, meta_basic)
 TEST(tBMS, RankInvalidParsedCorrectly)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
+    ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/rank_invalid.bms"));
+    ASSERT_EQ(bms->isLoaded(), true);
+    EXPECT_EQ(bms->fileHash.hexdigest(), "7f119b50d038161cfc96767edeea76ec");
+    EXPECT_EQ(bms->raw_rank, 9);
+    EXPECT_EQ(bms->rank, std::nullopt);
+}
+
+TEST(tBMS, RankVeryEasyParsedCorrectly)
+{
+    std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/rank_veryeasy.bms"));
     ASSERT_EQ(bms->isLoaded(), true);
     EXPECT_EQ(bms->fileHash.hexdigest(), "333c659406a1cb4312e76b447f5ee0cc");
     EXPECT_EQ(bms->raw_rank, 4);
-    EXPECT_EQ(bms->rank, std::nullopt);
+    EXPECT_EQ(bms->rank, RulesetBMS::JudgeDifficulty::NORMAL);
 }
 
 TEST(tBMS, RankVeryHardParsedCorrectly)

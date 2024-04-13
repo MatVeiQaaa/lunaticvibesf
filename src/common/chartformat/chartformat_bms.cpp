@@ -26,6 +26,9 @@ std::optional<RulesetBMS::JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(
     case 1: return RulesetBMS::JudgeDifficulty::HARD;
     case 2: return RulesetBMS::JudgeDifficulty::NORMAL;
     case 3: return RulesetBMS::JudgeDifficulty::EASY;
+    // LR2 uses NORMAL as a fallback on invalid values, including 4, but lr2oraja uses NORMAL explicitly.
+    // https://github.com/wcko87/lr2oraja/blob/readme/README.md
+    case 4: LOG_DEBUG << "[BMS] #RANK 4, using 2 instead"; return RulesetBMS::JudgeDifficulty::NORMAL;
     default: LOG_DEBUG << "[BMS] Invalid #RANK: " << value; return std::nullopt;
     }
     abort(); // unreachable.

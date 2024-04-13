@@ -146,11 +146,11 @@ const char* lunaticvibes::safe_ctime(const std::time_t* timep, char* buf)
     const char* out = ctime_r(timep, buf);
     if (out == nullptr) return "";
     return out;
-};
+}
 
 const tm* lunaticvibes::safe_localtime(const std::time_t* timep, tm* result)
 {
     return localtime_r(timep, result);
-};
+}
 
 #endif // __linux__

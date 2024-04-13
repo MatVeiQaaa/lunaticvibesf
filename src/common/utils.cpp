@@ -111,7 +111,7 @@ try
 }
 catch (const std::filesystem::filesystem_error& e)
 {
-    LOG_DEBUG << "filesystem_error: " << e.what();
+    LOG_DEBUG << "[Utils] is_parent_path() filesystem_error: " << e.what();
     return false;
 }
 
@@ -263,17 +263,17 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
 
     if (!EVP_DigestInit_ex2(ctx.get(), EVP_md5(), NULL))
     {
-        LOG_ERROR << "EVP_DigestInit_ex2() failed";
+        LOG_ERROR << "[Utils] EVP_DigestInit_ex2() failed";
         return {};
     };
     if (!updater(ctx.get()))
     {
-        LOG_ERROR << "digest updating failed";
+        LOG_ERROR << "[Utils] Digest updating failed";
         return {};
     }
     if (!EVP_DigestFinal_ex(ctx.get(), digest, &digest_len))
     {
-        LOG_ERROR << "EVP_DigestFinal_ex() failed";
+        LOG_ERROR << "[Utils] EVP_DigestFinal_ex() failed";
         return {};
     };
 
@@ -290,7 +290,7 @@ HashMD5 md5file(const Path &filePath)
 {
     if (!fs::exists(filePath) || !fs::is_regular_file(filePath))
     {
-        LOG_WARNING << "path is not a file or does not exist";
+        LOG_WARNING << "[Utils] Path is not a file or does not exist";
         return {};
     }
     std::ifstream ifs{filePath, std::ios::binary};
@@ -444,7 +444,7 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
         return {};
     if (auto p = PathFromUTF8(raw); p.is_absolute())
     {
-        LOG_WARNING << "absolute path in an LR2 path, this is forbidden, raw=" << raw;
+        LOG_WARNING << "[Utils] Absolute LR2 paths are forbidden: " << raw;
         return {};
     }
 

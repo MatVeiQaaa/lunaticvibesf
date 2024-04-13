@@ -8,18 +8,18 @@
 
 #include "common/beat.h"
 
-typedef std::filesystem::path                   Path;
-typedef Path::string_type                       StringPath;
-typedef std::basic_string_view<Path::value_type> StringPathView;
-typedef std::string                             StringContent; // std::ifstream, std::getline
-typedef std::string_view                        StringContentView; // std::ifstream, std::getline
+using Path = std::filesystem::path;
+using StringContent = std::string;          // std::ifstream, std::getline
+using StringContentView = std::string_view; // std::ifstream, std::getline
+using StringPath = Path::string_type;
+using StringPathView = std::basic_string_view<Path::value_type>;
 using namespace std::string_literals;
 
 const size_t INDEX_INVALID	= ~0;
 
-[[nodiscard]] inline StringPath operator ""_p(const char* _Str, size_t _Len)
+[[nodiscard]] inline StringPath operator ""_p(const char* s, size_t len)
 {
-    return Path(std::string_view(_Str, _Len));
+    return Path(std::string_view(s, len));
 }
 
 enum class SkinType {

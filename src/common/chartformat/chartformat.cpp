@@ -1,6 +1,10 @@
 #include "chartformat.h"
-#include "chartformat_bms.h"
+
 #include <fstream>
+#include <utility>
+
+#include "chartformat_bms.h"
+#include "common/encoding.h"
 #include "common/log.h"
 
 eChartFormat analyzeChartType(const Path& p)
@@ -56,6 +60,51 @@ std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& pat
         return nullptr;
     }
 
+}
+
+std::string ChartFormatBase::formatReadmeText(const std::vector<std::pair<std::string, std::string>>& files)
+{
+    std::string out;
+    for (const auto& [file_name, text] : files)
+    {
+        out += file_name;
+        out += ":\n";
+        out += text;
+        out += '\n';
+    }
+    return out;
+}
+
+bool ChartFormatBase::checkHasReadme() const
+{
+    return !findFiles(getDirectory() / "*.txt").empty();
+}
+
+std::vector<std::pair<std::string, std::string>> ChartFormatBase::getReadmeFiles() const
+{
+    using Pair = std::pair<std::string, std::string>;
+    std::vector<Pair> out;
+    auto files = findFiles(getDirectory() / "*.txt");
+    out.reserve(files.size());
+    for (const auto& file : files)
+    {
+        std::ifstream ifs{file};
+        if (ifs.fail())
+        {
+            LOG_ERROR << "[Chart] Failed to open file " << file;
+            continue;
+        }
+        auto encoding = getFileEncoding(ifs);
+        std::string utf8_text;
+        for (std::string line_; std::getline(ifs, line_);)
+        {
+            utf8_text += to_utf8(line_, encoding);
+            utf8_text += '\n';
+        }
+        out.emplace_back(file.filename().u8string(), std::move(utf8_text));
+    }
+    std::sort(out.begin(), out.end(), [](const Pair& lhs, const Pair& rhs) { return lhs.first < rhs.first; });
+    return out;
 }
 
 Path ChartFormatBase::getDirectory() const

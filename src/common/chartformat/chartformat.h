@@ -4,6 +4,7 @@
 #include <memory>
 #include <numeric>
 #include <regex>
+#include <string>
 #include <vector>
 
 #include "common/beat.h"
@@ -65,9 +66,13 @@ public:
     StringContent backbmp;
     StringContent banner;
 
-    StringContent text1;
-    StringContent text2;
-    StringContent text3;
+    static std::string formatReadmeText(const std::vector<std::pair<std::string, std::string>>&);
+    // Are there readme files in chart directory.
+    // NOTE: expensive to call.
+    bool checkHasReadme() const;
+    // Pair of file names and their contents.
+    // NOTE: expensive to call.
+    std::vector<std::pair<std::string, std::string>> getReadmeFiles() const;
 
     BPM minBPM = INFINITY;
     BPM maxBPM = 0.0;

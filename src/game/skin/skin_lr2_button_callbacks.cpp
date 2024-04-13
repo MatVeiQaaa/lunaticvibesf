@@ -1374,11 +1374,17 @@ static void open_ir_page()
     LOG_DEBUG << "[SkinLR2] Opened IR page";
 }
 
-static void requestOpenReadme(const int index)
+static void requestOpenHelpFile(const int index)
 {
     assert(index >= 0 && index < 10);
     std::unique_lock l(gSelectContext._mutex);
-    gSelectContext.openReadmeRequest = index;
+    gSelectContext.readmeOpenRequest = HelpFileOpenRequest{static_cast<unsigned>(index)};
+}
+
+static void requestOpenChartReadme()
+{
+    std::unique_lock l(gSelectContext._mutex);
+    gSelectContext.readmeOpenRequest = ChartReadmeOpenRequest{};
 }
 
 #pragma endregion
@@ -1413,8 +1419,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 14: return std::bind(enter_skin_config);
     case 15: return createUnsupportedCb(u8"プレイ開始");
     case 16: return std::bind(autoplay);
-    // TODO: chart readme, https://github.com/chown2/lunaticvibesf/issues/49
-    case 17: return createUnsupportedCb(u8"テキストビュー開始");
+    case 17: return [](auto) { requestOpenChartReadme(); };
     case 18: return createUnsupportedCb(u8"タグのリセット");
     case 19: return std::bind(replay);
     case 20:
@@ -1529,7 +1534,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 206:
     case 207:
     case 208:
-    case 209: return std::bind(requestOpenReadme, type - 200);
+    case 209: return std::bind(requestOpenHelpFile, type - 200);
     case 210: return [](auto) { open_ir_page(); };
     case 220:
     case 221:

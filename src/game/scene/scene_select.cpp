@@ -2,8 +2,12 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <shared_mutex>
+#include <string_view>
+#include <variant>
 
 #include "common/chartformat/chartformat_types.h"
+#include "common/entry/entry_song.h"
 #include "common/entry/entry_types.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
@@ -534,7 +538,7 @@ SceneSelect::~SceneSelect()
     loopEnd();
 }
 
-void SceneSelect::closeReadme(const lunaticvibes::Time closing_time)
+void SceneSelect::closeReadme(const lunaticvibes::Time& closing_time)
 {
     LOG_DEBUG << "[Select] Readme close";
     if (State::get(IndexTimer::README_START) == TIMER_NEVER)
@@ -548,7 +552,7 @@ void SceneSelect::closeReadme(const lunaticvibes::Time closing_time)
     State::set(IndexTimer::README_END, closing_time.norm());
 }
 
-void SceneSelect::openReadme(const lunaticvibes::Time open_time, const size_t idx)
+void SceneSelect::openReadme(const lunaticvibes::Time& open_time, std::string_view text)
 {
     LOG_DEBUG << "[Select] Readme open";
     if (State::get(IndexTimer::README_START) != TIMER_NEVER)
@@ -556,6 +560,52 @@ void SceneSelect::openReadme(const lunaticvibes::Time open_time, const size_t id
         LOG_ERROR << "[Select] Readme is already open";
         return;
     }
+    pSkin->setHandleMouseEvents(false);
+    state = eSelectState::WATCHING_README;
+    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
+    State::set(IndexText::LRV_INTERNAL_README, text);
+    State::set(IndexTimer::README_START, open_time.norm());
+    State::set(IndexTimer::README_END, TIMER_NEVER);
+}
+
+void SceneSelect::openChartReadme(const lunaticvibes::Time& open_time)
+{
+    std::shared_ptr<EntryFolderSong> song;
+    {
+        std::shared_lock l(gSelectContext._mutex);
+        if (gSelectContext.entries.empty())
+        {
+            LOG_ERROR << "[Select] Entries list is empty";
+            return;
+        }
+        const auto& entry = gSelectContext.entries[gSelectContext.selectedEntryIndex].first;
+        switch (entry->type())
+        {
+        case eEntryType::SONG: song = std::reinterpret_pointer_cast<EntryFolderSong>(entry); break;
+        case eEntryType::CHART: song = std::reinterpret_pointer_cast<EntryChart>(entry)->getSongEntry(); break;
+        case eEntryType::UNKNOWN:
+        case eEntryType::NEW_SONG_FOLDER:
+        case eEntryType::FOLDER:
+        case eEntryType::CUSTOM_FOLDER:
+        case eEntryType::COURSE_FOLDER:
+        case eEntryType::RIVAL:
+        case eEntryType::RIVAL_SONG:
+        case eEntryType::RIVAL_CHART:
+        case eEntryType::NEW_COURSE:
+        case eEntryType::COURSE:
+        case eEntryType::RANDOM_COURSE:
+        case eEntryType::ARENA_FOLDER:
+        case eEntryType::ARENA_COMMAND:
+        case eEntryType::ARENA_LOBBY:
+        case eEntryType::CHART_LINK:
+        case eEntryType::REPLAY: break;
+        }
+    }
+    openReadme(open_time, ChartFormatBase::formatReadmeText(song->getCurrentChart()->getReadmeFiles()));
+}
+
+void SceneSelect::openHelpFile(const lunaticvibes::Time& open_time, size_t idx)
+{
     std::shared_ptr<SkinLR2> s = std::dynamic_pointer_cast<SkinLR2>(pSkin);
     if (s == nullptr)
     {
@@ -568,12 +618,7 @@ void SceneSelect::openReadme(const lunaticvibes::Time open_time, const size_t id
         LOG_WARNING << "[Select] Trying to open out-of-bounds help file";
         return;
     }
-    pSkin->setHandleMouseEvents(false);
-    state = eSelectState::WATCHING_README;
-    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
-    State::set(IndexText::_MY_HELPFILE, help_files[idx]);
-    State::set(IndexTimer::README_START, open_time.norm());
-    State::set(IndexTimer::README_END, TIMER_NEVER);
+    openReadme(open_time, help_files[idx]);
 }
 
 void SceneSelect::_updateAsync()
@@ -589,11 +634,18 @@ void SceneSelect::_updateAsync()
 
     _updateCallback();
 
-    if (gSelectContext.openReadmeRequest != -1)
-    {
-        openReadme(t, gSelectContext.openReadmeRequest);
-        gSelectContext.openReadmeRequest = -1;
-    }
+    auto visit_readme_open_request = overloaded{
+        [this, &t](const HelpFileOpenRequest r) {
+            openHelpFile(t, r.idx);
+            gSelectContext.readmeOpenRequest = std::monostate{};
+        },
+        [this, &t](const ChartReadmeOpenRequest /*r*/) {
+            openChartReadme(t);
+            gSelectContext.readmeOpenRequest = std::monostate{};
+        },
+        [](std::monostate) {},
+    };
+    std::visit(visit_readme_open_request, gSelectContext.readmeOpenRequest);
 
     if (gSelectContext.optionChangePending)
     {
@@ -1904,7 +1956,7 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     }
     if (input[Input::Pad::MWHEELDOWN])
     {
-        const auto helpfile = State::get(IndexText::_MY_HELPFILE);
+        const auto helpfile = State::get(IndexText::LRV_INTERNAL_README);
         const auto max_lines = static_cast<int>(std::count(helpfile.begin(), helpfile.end(), '\n'));
         const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
         if (current_line <= max_lines)

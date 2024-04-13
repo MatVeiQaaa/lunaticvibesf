@@ -1622,7 +1622,7 @@ ParseRet SkinLR2::SRC_README()
 
     SpriteImageText::SpriteImageTextBuilder builder;
     builder.srcLine = csvLineNumber;
-    builder.textInd = IndexText::_MY_HELPFILE;
+    builder.textInd = IndexText::LRV_INTERNAL_README;
     builder.lrvLineIdx = IndexNumber::LRV_INTERNAL_README_LINE;
     builder.align = TextAlign::TEXT_ALIGN_LEFT;
     builder.editable = false;

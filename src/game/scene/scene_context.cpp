@@ -663,7 +663,7 @@ void setEntryInfo()
         auto ps = std::reinterpret_pointer_cast<EntryChart>(e[idx].first);
         auto pf = std::reinterpret_pointer_cast<ChartFormatBase>(ps->_file);
 
-        param["havereadme"] = !(pf->text1.empty() && pf->text2.empty() && pf->text3.empty());
+        param["havereadme"] = pf->checkHasReadme();
         param["havebanner"] = !pf->banner.empty();
         param["havestagefile"] = !pf->stagefile.empty();
 

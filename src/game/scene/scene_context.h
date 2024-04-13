@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <shared_mutex>
+#include <variant>
 #include "scene.h"
 #include "common/types.h"
 #include "common/chartformat/chartformat.h"
@@ -154,6 +155,16 @@ enum class SongListSortType
     TYPE_COUNT,
 };
 
+struct HelpFileOpenRequest
+{
+    // 0-10.
+    unsigned idx;
+};
+struct ChartReadmeOpenRequest
+{
+};
+using ReadmeOpenRequest = std::variant<std::monostate, HelpFileOpenRequest, ChartReadmeOpenRequest>;
+
 struct SelectContextParams
 {
     std::shared_mutex _mutex;
@@ -181,7 +192,7 @@ struct SelectContextParams
 
     int lastLaneEffectType1P = 0;
 
-    int openReadmeRequest = -1;
+    ReadmeOpenRequest readmeOpenRequest;
 
     HashMD5 remoteRequestedChart;       // only valid when remote is requesting a new chart; reset after list change
     std::string remoteRequestedPlayer;  // only valid when remote is requesting a new chart; reset after list change

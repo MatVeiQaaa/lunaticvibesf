@@ -4,6 +4,9 @@
 #include "gmock/gmock.h"
 
 #include <optional>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #include "common/chartformat/chartformat_bms.h"
 #include "../../src/common/utils.h"
@@ -56,6 +59,31 @@ TEST(tBMS, meta_basic)
 	EXPECT_EQ(bms->notes_key_ln, 0);
 	EXPECT_EQ(bms->raw_rank, -1);
 	EXPECT_EQ(bms->rank, std::nullopt);
+
+	{
+		EXPECT_TRUE(bms->checkHasReadme());
+		static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
+			{"readme_euckr.txt", u8"안녕\n불고기\n"},
+			{"readme_sjis.txt", u8"桃太郎は桃を食べた。\nと少年が思った、\n"},
+			{"readme_utf8.txt", u8"Матрёшка.\nВодка.\n"},
+		};
+		std::vector<std::pair<std::string, std::string>> files;
+		EXPECT_EQ((files = bms->getReadmeFiles()), expected_readme_files);
+		static constexpr std::string_view expected_readme_text = R"(readme_euckr.txt:
+안녕
+불고기
+
+readme_sjis.txt:
+桃太郎は桃を食べた。
+と少年が思った、
+
+readme_utf8.txt:
+Матрёшка.
+Водка.
+
+)";
+		EXPECT_EQ(ChartFormatBase::formatReadmeText(files), expected_readme_text);
+	}
 }
 
 TEST(tBMS, RankInvalidParsedCorrectly)

@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 #include <array>
@@ -94,8 +95,9 @@ public:
     SceneSelect();
     ~SceneSelect() override;
 
-    void openReadme(lunaticvibes::Time, size_t idx);
-    void closeReadme(lunaticvibes::Time);
+    void closeReadme(const lunaticvibes::Time&);
+    void openChartReadme(const lunaticvibes::Time&);
+    void openHelpFile(const lunaticvibes::Time&, size_t idx);
 
 protected:
     // Looper callbacks
@@ -115,6 +117,8 @@ protected:
     void inputGameRelease(InputMask&, const lunaticvibes::Time&);
 
 private:
+    void openReadme(const lunaticvibes::Time&, std::string_view text);
+
     void inputGamePressSelect(InputMask&, const lunaticvibes::Time&);
     void inputGameHoldSelect(InputMask&, const lunaticvibes::Time&);
     void inputGameReleaseSelect(InputMask&, const lunaticvibes::Time&);

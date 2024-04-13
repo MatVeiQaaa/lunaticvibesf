@@ -1,5 +1,6 @@
 #include "soundset_lr2.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "common/encoding.h"
@@ -369,6 +370,7 @@ SkinBase::CustomizeOption SoundSetLR2::getCustomizeOptionInfo(size_t idx) const
     ret.displayName = op.title;
     for (size_t i = 0; i < op.pathList.size(); ++i)
         ret.entries.push_back(op.pathList[i].filename().stem().u8string());
+    std::sort(ret.entries.begin(), ret.entries.end());
     ret.defaultEntry = op.defIdx;
 
     return ret;

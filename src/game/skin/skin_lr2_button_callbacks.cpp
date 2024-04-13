@@ -4,17 +4,17 @@
 #include <memory>
 #include <mutex>
 #include <string>
-
-#include "common/sysutil.h"
-#include "game/runtime/state.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-#include "game/scene/scene_context.h"
-#include "game/arena/arena_data.h"
-
-#include "config/config_mgr.h"
+#include <string_view>
 
 #include <boost/algorithm/string.hpp>
+
+#include "common/sysutil.h"
+#include "config/config_mgr.h"
+#include "game/arena/arena_data.h"
+#include "game/runtime/state.h"
+#include "game/scene/scene_context.h"
+#include "game/sound/sound_mgr.h"
+#include "game/sound/sound_sample.h"
 
 namespace lr2skin::button
 {
@@ -76,32 +76,15 @@ void update_fx(int type, int index, SampleChannel ch, float p1, float p2)
 {
     switch (type)
     {
-    case 0: // OFF
-        SoundMgr::setDSP(DSPType::OFF, index, ch, 0.f, 0.f);
-        break;
-    case 1: // REVERB
-        SoundMgr::setDSP(DSPType::REVERB, index, ch, p1, p2);
-        break;
-    case 2: // DELAY
-        SoundMgr::setDSP(DSPType::DELAY, index, ch, p1, p2);
-        break;
-    case 3: // LOWPASS
-        SoundMgr::setDSP(DSPType::LOWPASS, index, ch, p1, p2);
-        break;
-    case 4: // HIGHPASS
-        SoundMgr::setDSP(DSPType::HIGHPASS, index, ch, p1, p2);
-        break;
-    case 5: // FLANGER
-        SoundMgr::setDSP(DSPType::FLANGER, index, ch, p1, p2);
-        break;
-    case 6: // CHORUS
-        SoundMgr::setDSP(DSPType::CHORUS, index, ch, p1, p2);
-        break;
-    case 7: // DISTORTION
-        SoundMgr::setDSP(DSPType::DISTORTION, index, ch, p1, p2);
-        break;
-    default:
-        break;
+    case 0: SoundMgr::setDSP(DSPType::OFF, index, ch, 0.f, 0.f); break;
+    case 1: SoundMgr::setDSP(DSPType::REVERB, index, ch, p1, p2); break;
+    case 2: SoundMgr::setDSP(DSPType::DELAY, index, ch, p1, p2); break;
+    case 3: SoundMgr::setDSP(DSPType::LOWPASS, index, ch, p1, p2); break;
+    case 4: SoundMgr::setDSP(DSPType::HIGHPASS, index, ch, p1, p2); break;
+    case 5: SoundMgr::setDSP(DSPType::FLANGER, index, ch, p1, p2); break;
+    case 6: SoundMgr::setDSP(DSPType::CHORUS, index, ch, p1, p2); break;
+    case 7: SoundMgr::setDSP(DSPType::DISTORTION, index, ch, p1, p2); break;
+    default: break;
     }
 }
 
@@ -1307,6 +1290,7 @@ void key_config_slot(int slot)
 
 void skinselect_mode(int mode)
 {
+    assert(mode >= 0 && mode <= 15);
     State::set(IndexSwitch::SKINSELECT_7KEYS, false);
     State::set(IndexSwitch::SKINSELECT_5KEYS, false);
     State::set(IndexSwitch::SKINSELECT_14KEYS, false);
@@ -1383,11 +1367,11 @@ static void open_ir_page()
                                   .str();
     if (!lunaticvibes::open(link))
     {
-        LOG_ERROR << "failed to open link";
+        LOG_ERROR << "[SkinLR2] Failed to open IR page link";
         return;
     }
 
-    LOG_DEBUG << "opened the thingy";
+    LOG_DEBUG << "[SkinLR2] Opened IR page";
 }
 
 static void requestOpenReadme(const int index)
@@ -1401,6 +1385,14 @@ static void requestOpenReadme(const int index)
 
 std::function<void(int)> getButtonCallback(int type)
 {
+    auto createUnsupportedCb = [type](const std::string_view description) {
+        LOG_DEBUG << "[SkinLR2] Creating unsupported button [" << type << "] '" << description << "'";
+        return [type, description](int value) {
+            LOG_DEBUG << "[SkinLR2] Unsupported button [" << type << "] '" << description
+                      << "' pressed, value=" << value;
+        };
+    };
+
     using namespace lr2skin::button;
     using namespace std::placeholders;
     switch (type)
@@ -1413,141 +1405,65 @@ std::function<void(int)> getButtonCallback(int type)
     case 6:
     case 7:
     case 8:
-    case 9:
-        return std::bind(panel_switch, type, _1);
-
-    case 10:
-        return std::bind(select_difficulty_filter, _1, 0);
-    case 11:
-        return std::bind(select_keys_filter, _1, 0);
-    case 12:
-        return std::bind(select_sort_type, _1);
-
-    case 13:
-        return std::bind(enter_key_config);
-
-    case 14:
-        return std::bind(enter_skin_config);
-
-    case 16:
-        return std::bind(autoplay);
-
-    case 19:
-        return std::bind(replay);
-
+    case 9: return std::bind(panel_switch, type, _1);
+    case 10: return std::bind(select_difficulty_filter, _1, 0);
+    case 11: return std::bind(select_keys_filter, _1, 0);
+    case 12: return std::bind(select_sort_type, _1);
+    case 13: return std::bind(enter_key_config);
+    case 14: return std::bind(enter_skin_config);
+    case 15: return createUnsupportedCb(u8"プレイ開始");
+    case 16: return std::bind(autoplay);
+    // TODO: chart readme, https://github.com/chown2/lunaticvibesf/issues/49
+    case 17: return createUnsupportedCb(u8"テキストビュー開始");
+    case 18: return createUnsupportedCb(u8"タグのリセット");
+    case 19: return std::bind(replay);
     case 20:
     case 21:
-    case 22:
-        return std::bind(fx_type, type - 20, _1);
-
+    case 22: return std::bind(fx_type, type - 20, _1);
     case 23:
     case 24:
-    case 25:
-        return std::bind(fx_switch, type - 23, _1);
-
+    case 25: return std::bind(fx_switch, type - 23, _1);
     case 26:
     case 27:
-    case 28:
-        return std::bind(fx_target, type - 26, _1);
-
-    case 29:
-        return std::bind(eq_switch, _1);
-
-    case 31:
-        return std::bind(vol_switch, _1);
-
-    case 32:
-        return std::bind(pitch_switch, _1);
-
-    case 33:
-        return std::bind(pitch_type, _1);
-
-    case 40:
-        return std::bind(gauge_type, 0, _1);
-    case 41:
-        return std::bind(gauge_type, 1, _1);
-
-    case 42:
-        return std::bind(random_type, 0, _1);
-    case 43:
-        return std::bind(random_type, 1, _1);
-
-    case 44:
-        return std::bind(autoscr, 0, _1);
-    case 45:
-        return std::bind(autoscr, 1, _1);
-
-    case 46:
-        return std::bind(shutter, _1);
-
-    case 47:
-        return std::bind(lock_speed_value, 0, _1);
-    case 48:
-        return std::bind(lock_speed_value, 1, _1);
-
-    case 50:
-        return std::bind(lane_effect, 0, _1);
-    case 51:
-        return std::bind(lane_effect, 1, _1);
-
-    case 54:
-        return std::bind(flip, _1);
-
-    case 55: 
-        return std::bind(hs_fix, _1);
-
-    case 56:
-        return std::bind(battle, _1);
-
-    case 57:
-        return std::bind(hs, 0, _1);
-    case 58:
-        return std::bind(hs, 1, _1);
-
-    case 70:
-        return std::bind(score_graph, _1);
-
-    case 71:
-        return std::bind(ghost_type, _1);
-
-    case 72:
-        return std::bind(bga, _1);
-
-    case 73:
-        return std::bind(bga_size, _1);
-
-    case 74:
-        return std::bind(number_change_clamp, IndexNumber::TIMING_ADJUST_VISUAL, -99, 99, _1);
-
-    case 75:
-        return std::bind(judge_auto_adjust, _1);
-
-    case 76:
-        return std::bind(default_target_rate, _1);
-
-    case 77:
-        return std::bind(target_type, _1);
-
-    case 80:
-        return std::bind(window_mode, _1);
-
-    case 82:
-        return std::bind(vsync, _1);
-
-    case 83:
-        return std::bind(save_replay_type, _1);
-
-    case 90:
-        return std::bind(favorite_ignore, _1);
-
+    case 28: return std::bind(fx_target, type - 26, _1);
+    case 29: return std::bind(eq_switch, _1);
+    case 31: return std::bind(vol_switch, _1);
+    case 32: return std::bind(pitch_switch, _1);
+    case 33: return std::bind(pitch_type, _1);
+    case 40: return std::bind(gauge_type, 0, _1);
+    case 41: return std::bind(gauge_type, 1, _1);
+    case 42: return std::bind(random_type, 0, _1);
+    case 43: return std::bind(random_type, 1, _1);
+    case 44: return std::bind(autoscr, 0, _1);
+    case 45: return std::bind(autoscr, 1, _1);
+    case 46: return std::bind(shutter, _1);
+    case 47: return std::bind(lock_speed_value, 0, _1);
+    case 48: return std::bind(lock_speed_value, 1, _1);
+    case 50: return std::bind(lane_effect, 0, _1);
+    case 51: return std::bind(lane_effect, 1, _1);
+    case 54: return std::bind(flip, _1);
+    case 55: return std::bind(hs_fix, _1);
+    case 56: return std::bind(battle, _1);
+    case 57: return std::bind(hs, 0, _1);
+    case 58: return std::bind(hs, 1, _1);
+    case 70: return std::bind(score_graph, _1);
+    case 71: return std::bind(ghost_type, _1);
+    case 72: return std::bind(bga, _1);
+    case 73: return std::bind(bga_size, _1);
+    case 74: return std::bind(number_change_clamp, IndexNumber::TIMING_ADJUST_VISUAL, -99, 99, _1);
+    case 75: return std::bind(judge_auto_adjust, _1);
+    case 76: return std::bind(default_target_rate, _1);
+    case 77: return std::bind(target_type, _1);
+    case 80: return std::bind(window_mode, _1);
+    case 82: return std::bind(vsync, _1);
+    case 83: return std::bind(save_replay_type, _1);
+    case 90: return std::bind(favorite_ignore, _1);
     case 91:
     case 92:
     case 93:
     case 94:
     case 95:
-    case 96:
-        return std::bind(difficulty, type - 91, _1);
-
+    case 96: return std::bind(difficulty, type - 91, _1);
     case 101:
     case 102:
     case 103:
@@ -1556,23 +1472,12 @@ std::function<void(int)> getButtonCallback(int type)
     case 106:
     case 107:
     case 108:
-    case 109:
-        return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K11) + type - 101), false);
-
-    case 110:
-        return std::bind(key_config_pad, Input::Pad::S1L, false);
-    case 111:
-        return std::bind(key_config_pad, Input::Pad::S1R, false);
-    case 112:
-        return std::bind(key_config_pad, Input::Pad::K1START, false);
-    case 113:
-        return std::bind(key_config_pad, Input::Pad::K1SELECT, false);
-    case 114:
-    case 115:
-        break;
-    case 116:
-        return std::bind(key_config_pad, Input::Pad::S1A, false);
-
+    case 109: return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K11) + type - 101), false);
+    case 110: return std::bind(key_config_pad, Input::Pad::S1L, false);
+    case 111: return std::bind(key_config_pad, Input::Pad::S1R, false);
+    case 112: return std::bind(key_config_pad, Input::Pad::K1START, false);
+    case 113: return std::bind(key_config_pad, Input::Pad::K1SELECT, false);
+    case 116: return std::bind(key_config_pad, Input::Pad::S1A, false);
     case 121:
     case 122:
     case 123:
@@ -1581,26 +1486,13 @@ std::function<void(int)> getButtonCallback(int type)
     case 126:
     case 127:
     case 128:
-    case 129:
-        return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K21) + type - 121), false);
-
-    case 130:
-        return std::bind(key_config_pad, Input::Pad::S2L, false);
-    case 131:
-        return std::bind(key_config_pad, Input::Pad::S2R, false);
-    case 132:
-        return std::bind(key_config_pad, Input::Pad::K2START, false);
-    case 133:
-        return std::bind(key_config_pad, Input::Pad::K2SELECT, false);
-    case 134:
-    case 135:
-        break;
-    case 136:
-        return std::bind(key_config_pad, Input::Pad::S2A, false);
-
-    case 143:
-        return std::bind(key_config_mode_rotate);
-
+    case 129: return std::bind(key_config_pad, Input::Pad(unsigned(Input::Pad::K21) + type - 121), false);
+    case 130: return std::bind(key_config_pad, Input::Pad::S2L, false);
+    case 131: return std::bind(key_config_pad, Input::Pad::S2R, false);
+    case 132: return std::bind(key_config_pad, Input::Pad::K2START, false);
+    case 133: return std::bind(key_config_pad, Input::Pad::K2SELECT, false);
+    case 136: return std::bind(key_config_pad, Input::Pad::S2A, false);
+    case 143: return std::bind(key_config_mode_rotate);
     case 150:
     case 151:
     case 152:
@@ -1610,9 +1502,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 156:
     case 157:
     case 158:
-    case 159:
-        return std::bind(key_config_slot, type - 150);
-
+    case 159: return std::bind(key_config_slot, type - 150);
     case 170:
     case 171:
     case 172:
@@ -1628,12 +1518,8 @@ std::function<void(int)> getButtonCallback(int type)
     case 182:
     case 183:
     case 184:
-    case 185:
-        return std::bind(skinselect_mode, type - 170);
-
-    case 190:
-        return std::bind(skinselect_skin, _1);
-
+    case 185: return std::bind(skinselect_mode, type - 170);
+    case 190: return std::bind(skinselect_skin, _1);
     case 200:
     case 201:
     case 202:
@@ -1643,12 +1529,8 @@ std::function<void(int)> getButtonCallback(int type)
     case 206:
     case 207:
     case 208:
-    case 209:
-        return std::bind(requestOpenReadme, type - 200);
-
-    case 210:
-        return [](auto) { open_ir_page(); };
-
+    case 209: return std::bind(requestOpenReadme, type - 200);
+    case 210: return [](auto) { open_ir_page(); };
     case 220:
     case 221:
     case 222:
@@ -1658,11 +1540,37 @@ std::function<void(int)> getButtonCallback(int type)
     case 226:
     case 227:
     case 228:
-    case 229:
-        return std::bind(skinselect_option, type - 220, _1);
-
+    case 229: return std::bind(skinselect_option, type - 220, _1);
+    case 230: return createUnsupportedCb(u8"コースセレクト　決定");
+    case 231: return createUnsupportedCb(u8"コースセレクト　キャンセル");
+    case 232: return createUnsupportedCb(u8"コースビュー　コース編集開始");
+    case 233: return createUnsupportedCb(u8"コースビュー　コース削除");
+    case 240:
+    case 241:
+    case 242:
+    case 243:
+    case 244:
+    case 245:
+    case 246:
+    case 247:
+    case 248:
+    case 249: return createUnsupportedCb(u8"コースオプション　つなぎタイプstage1-2変更");
+    case 250: return createUnsupportedCb(u8"コースオプション　ソフランの有無変更");
+    case 251: return createUnsupportedCb(u8"コースオプション　コースゲージの変更");
+    case 252: return createUnsupportedCb(u8"コースオプション　オプション有効・無効の変更");
+    case 253: return createUnsupportedCb(u8"コースオプション IR有効・無効の変更");
+    case 260: return createUnsupportedCb(u8"ランダムコースオプション　最適レベル変更");
+    case 261: return createUnsupportedCb(u8"ランダムコースオプション　レベル上限の変更");
+    case 262: return createUnsupportedCb(u8"ランダムコースオプション　レベル下限の変更");
+    case 263: return createUnsupportedCb(u8"ランダムコースオプション　bpm変動幅の変更");
+    case 264: return createUnsupportedCb(u8"ランダムコースオプション　bpm上限の変更");
+    case 265: return createUnsupportedCb(u8"ランダムコースオプション　bpm下限の変更");
+    case 266: return createUnsupportedCb(u8"ランダムコースオプション　ステージ数の変更");
+    case 267: return createUnsupportedCb(u8"(empty)");
+    case 268: return createUnsupportedCb(u8"全体コースオプション　デフォルトつなぎタイプの変更");
+    case 269: return createUnsupportedCb(u8"全体コースオプション　デフォルトゲージの変更");
     }
-    return [](bool) {};
+    return createUnsupportedCb("(undocumented)");
 }
 
 

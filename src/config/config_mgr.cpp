@@ -10,8 +10,6 @@
 #include "common/utils.h"
 #include "game/runtime/state.h"
 
-namespace fs = std::filesystem;
-
 void setNumbers()
 {
     using namespace cfg;

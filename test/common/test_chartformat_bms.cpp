@@ -69,21 +69,36 @@ TEST(tBMS, meta_basic)
 		};
 		std::vector<std::pair<std::string, std::string>> files;
 		EXPECT_EQ((files = bms->getReadmeFiles()), expected_readme_files);
-		static constexpr std::string_view expected_readme_text = R"(readme_euckr.txt:
+		static constexpr std::string_view expected_readme_text = R"(1/3 readme_euckr.txt
+
 안녕
 불고기
 
-readme_sjis.txt:
+2/3 readme_sjis.txt
+
 桃太郎は桃を食べた。
 と少年が思った、
 
-readme_utf8.txt:
+3/3 readme_utf8.txt
+
 Матрёшка.
 Водка.
 
 )";
 		EXPECT_EQ(ChartFormatBase::formatReadmeText(files), expected_readme_text);
 	}
+
+    {
+		static const std::vector<std::pair<std::string, std::string>> files{
+			{"important.txt", u8"sobaudonramen"},
+		};
+
+        static constexpr std::string_view expected_readme_text = R"(important.txt
+
+sobaudonramen
+)";
+        EXPECT_EQ(ChartFormatBase::formatReadmeText(files), expected_readme_text);
+    }
 }
 
 TEST(tBMS, MetaNoFile)

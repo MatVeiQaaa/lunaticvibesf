@@ -1,6 +1,7 @@
 #include "chartformat.h"
 
 #include <fstream>
+#include <string>
 #include <utility>
 
 #include "chartformat_bms.h"
@@ -66,12 +67,23 @@ std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& pat
 std::string ChartFormatBase::formatReadmeText(const std::vector<std::pair<std::string, std::string>>& files)
 {
     std::string out;
+    // 1-indexed.
+    size_t file_index{1};
     for (const auto& [file_name, text] : files)
     {
+        if (files.size() > 1)
+        {
+            out += std::to_string(file_index);
+            out += '/';
+            out += std::to_string(files.size());
+            out += ' ';
+        }
+        // NOTE: LR2 only shows file name if there are more than one file. We don't. :)
         out += file_name;
-        out += ":\n";
+        out += "\n\n";
         out += text;
         out += '\n';
+        ++file_index;
     }
     return out;
 }

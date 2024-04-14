@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <future>
 #include <string_view>
+#include <utility>
 
 #include <boost/format.hpp>
 #include <imgui.h>
@@ -96,8 +97,7 @@ void ScenePreSelect::updateLoadSongs()
 
 
         // load files
-        loadSongEnd = std::async(std::launch::async, [&]() {
-
+        loadSongEnd = std::async(std::launch::async, [this]() {
             textHint = i18n::s(i18nText::CHECKING_FOLDERS);
 
             loadSongTimer = std::chrono::system_clock::now();
@@ -141,7 +141,7 @@ void ScenePreSelect::updateLoadSongs()
                     if (!deleted)
                     {
                         g_pSongDB->browse(entry->md5, true);
-                        rootFolderProp.dbBrowseEntries.emplace_back(entry, nullptr);
+                        rootFolderProp.dbBrowseEntries.emplace_back(std::move(entry), nullptr);
                     }
                 }
             }
@@ -173,7 +173,7 @@ void ScenePreSelect::updateLoadSongs()
             LOG_INFO << "[List] Generating ARENA folder...";
             if (!rootFolderProp.dbBrowseEntries.empty())
             {
-                std::shared_ptr<EntryFolderArena> entry = std::make_shared<EntryFolderArena>(i18n::s(i18nText::ARENA_FOLDER_TITLE), i18n::s(i18nText::ARENA_FOLDER_SUBTITLE));
+                auto entry = std::make_shared<EntryFolderArena>(i18n::s(i18nText::ARENA_FOLDER_TITLE), i18n::s(i18nText::ARENA_FOLDER_SUBTITLE));
 
                 entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::HOST_LOBBY, i18n::s(i18nText::ARENA_HOST), i18n::s(i18nText::ARENA_HOST_DESCRIPTION)));
                 entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::JOIN_LOBBY, i18n::s(i18nText::ARENA_JOIN), i18n::s(i18nText::ARENA_JOIN_DESCRIPTION)));
@@ -181,7 +181,7 @@ void ScenePreSelect::updateLoadSongs()
 
                 // TODO load lobby list from file
 
-                rootFolderProp.dbBrowseEntries.emplace_back(entry, nullptr);
+                rootFolderProp.dbBrowseEntries.emplace_back(std::move(entry), nullptr);
             }
             LOG_INFO << "[List] ARENA has " << 0 << " known hosts (placeholder)";
 
@@ -240,8 +240,7 @@ void ScenePreSelect::updateLoadTables()
         startedLoadTable = true;
         LOG_INFO << "[List] Start loading tables...";
 
-        loadTableEnd = std::async(std::launch::async, [&]() {
-
+        loadTableEnd = std::async(std::launch::async, [this]() {
             textHint = i18n::s(i18nText::CHECKING_TABLES);
 
             // initialize table list
@@ -259,12 +258,11 @@ void ScenePreSelect::updateLoadTables()
 
                 auto convertTable = [&](DifficultyTableBMS& t)
                 {
-                    std::shared_ptr<EntryFolderTable> tbl = std::make_shared<EntryFolderTable>(t.getName(), tableIndex);
+                    auto tbl = std::make_shared<EntryFolderTable>(t.getName(), tableIndex);
                     size_t levelIndex = 0;
                     for (const auto& lv : t.getLevelList())
                     {
-                        std::string folderName = (boost::format("%s%s") % t.getSymbol() % lv).str();
-                        std::shared_ptr<EntryFolderTable> tblLevel = std::make_shared<EntryFolderTable>(folderName, levelIndex);
+                        auto tblLevel = std::make_shared<EntryFolderTable>(t.getSymbol() + lv, levelIndex);
                         for (const auto& r : t.getEntryList(lv))
                         {
                             if (gAppIsExiting) break;
@@ -278,7 +276,7 @@ void ScenePreSelect::updateLoadTables()
                                 }
                             }
                         }
-                        tbl->pushEntry(tblLevel);
+                        tbl->pushEntry(std::move(tblLevel));
                         levelIndex += 1;
                     }
                     return tbl;
@@ -334,8 +332,7 @@ void ScenePreSelect::updateLoadCourses()
         startedLoadCourse = true;
         LOG_INFO << "[List] Start loading courses...";
 
-        loadCourseEnd = std::async(std::launch::async, [&]() {
-
+        loadCourseEnd = std::async(std::launch::async, [this]() {
             textHint = i18n::s(i18nText::LOADING_COURSES);
 
             std::map<EntryCourse::CourseType, std::vector<std::shared_ptr<EntryCourse>>> courses;
@@ -359,9 +356,9 @@ void ScenePreSelect::updateLoadCourses()
                 CourseLr2crs lr2crs(coursePath);
                 for (auto& c : lr2crs.courses)
                 {
-                    std::shared_ptr<EntryCourse> entry = std::make_shared<EntryCourse>(c, lr2crs.addTime);
+                    auto entry = std::make_shared<EntryCourse>(c, lr2crs.addTime);
                     if (entry->courseType != EntryCourse::UNDEFINED)
-                        courses[entry->courseType].push_back(entry);
+                        courses[entry->courseType].push_back(std::move(entry));
                 }
             }
             LOG_INFO << "[List] *.lr2crs loading complete.";
@@ -372,11 +369,14 @@ void ScenePreSelect::updateLoadCourses()
             {
                 if (courses.empty()) continue;
 
-                std::string folderTitle = i18n::s(i18nText::COURSE_TITLE);
-                std::string folderTitle2 = i18n::s(i18nText::COURSE_SUBTITLE);
+                std::string folderTitle;
+                std::string folderTitle2;
                 switch (type)
                 {
-                case EntryCourse::CourseType::UNDEFINED: break;
+                case EntryCourse::CourseType::UNDEFINED:
+                    folderTitle = i18n::s(i18nText::COURSE_TITLE);
+                    folderTitle2 = i18n::s(i18nText::COURSE_SUBTITLE);
+                    break;
                 case EntryCourse::CourseType::GRADE:
                     folderTitle = i18n::s(i18nText::CLASS_TITLE);
                     folderTitle2 = i18n::s(i18nText::CLASS_SUBTITLE);
@@ -389,7 +389,7 @@ void ScenePreSelect::updateLoadCourses()
                     LOG_INFO << "[List] Add course: " << c->_name;
                     folder->pushEntry(c);
                 }
-                rootFolderProp.dbBrowseEntries.emplace_back(folder, nullptr);
+                rootFolderProp.dbBrowseEntries.emplace_back(std::move(folder), nullptr);
             }
 
             });
@@ -409,8 +409,7 @@ void ScenePreSelect::loadFinished()
 {
     if (!loadingFinished)
     {
-        while (!gSelectContext.backtrace.empty())
-            gSelectContext.backtrace.pop_front();
+        gSelectContext.backtrace.clear();
         gSelectContext.backtrace.push_front(rootFolderProp);
 
         if (rootFolderProp.dbBrowseEntries.empty())

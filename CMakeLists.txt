@@ -24,8 +24,6 @@ configure_file(
     "${PROJECT_BINARY_DIR}/cmake_config.h"
 )
 
-include_directories("${PROJECT_BINARY_DIR}")
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 if (MSVC)
@@ -61,6 +59,7 @@ add_subdirectory(ext)
 # SOURCE
 
 set(PROJECT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src CACHE INTERNAL "include directory")
+list(APPEND PROJECT_INCLUDE_DIR ${PROJECT_BINARY_DIR})
 add_subdirectory(src)
 
 #########################################################################

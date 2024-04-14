@@ -77,6 +77,7 @@ std::string ChartFormatBase::formatReadmeText(const std::vector<std::pair<std::s
 }
 
 bool ChartFormatBase::checkHasReadme() const
+try
 {
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
@@ -85,8 +86,14 @@ bool ChartFormatBase::checkHasReadme() const
     }
     return false;
 }
+catch (const fs::filesystem_error& e)
+{
+    LOG_ERROR << "[Chart] checkHasReadme() Filesystem error: " << e.what();
+    return false;
+}
 
 std::vector<std::pair<std::string, std::string>> ChartFormatBase::getReadmeFiles() const
+try
 {
     using Pair = std::pair<std::string, std::string>;
     std::vector<Pair> out;
@@ -112,6 +119,11 @@ std::vector<std::pair<std::string, std::string>> ChartFormatBase::getReadmeFiles
     }
     std::sort(out.begin(), out.end(), [](const Pair& lhs, const Pair& rhs) { return lhs.first < rhs.first; });
     return out;
+}
+catch (const fs::filesystem_error& e)
+{
+    LOG_ERROR << "[Chart] getReadmeFiles() Filesystem error: " << e.what();
+    return {};
 }
 
 Path ChartFormatBase::getDirectory() const

@@ -86,6 +86,16 @@ readme_utf8.txt:
 	}
 }
 
+TEST(tBMS, MetaNoFile)
+{
+    ChartFormatBMSMeta bms;
+    bms.fileName = "bms.bms";
+    bms.absolutePath = "/does/not/exist";
+
+    EXPECT_FALSE(bms.checkHasReadme());
+    EXPECT_TRUE(bms.getReadmeFiles().empty());
+}
+
 TEST(tBMS, RankInvalidParsedCorrectly)
 {
     std::shared_ptr<ChartFormatBMS> bms = nullptr;

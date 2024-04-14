@@ -154,13 +154,13 @@ void ScenePreSelect::updateLoadSongs()
                     ROOT_FOLDER_HASH, getFileTimeNow() - State::get(IndexNumber::NEW_ENTRY_SECONDS));
                 !newSongList.empty())
             {
-                std::shared_ptr<EntryFolderNewSong> entry = std::make_shared<EntryFolderNewSong>("NEW SONGS");
+                LOG_INFO << "[List] Adding " << newSongList.size() << " entries to NEW SONGS";
+                auto entry = std::make_shared<EntryFolderNewSong>("NEW SONGS");
                 for (auto&& c : newSongList)
                 {
                     entry->pushEntry(std::make_shared<EntryFolderSong>(std::move(c)));
                 }
                 rootFolderProp.dbBrowseEntries.insert(rootFolderProp.dbBrowseEntries.begin(), {entry, nullptr});
-                LOG_INFO << "[List] NEW SONG folder has " << newSongList.size() << " entries";
             } else {
                 LOG_INFO << "[List] No NEW SONG entries";
             }

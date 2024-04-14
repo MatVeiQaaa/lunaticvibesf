@@ -664,7 +664,7 @@ void setEntryInfo()
         auto ps = std::reinterpret_pointer_cast<EntryChart>(e[idx].first);
         auto pf = std::reinterpret_pointer_cast<ChartFormatBase>(ps->_file);
 
-        param["havereadme"] = pf->checkHasReadme();
+        param["havereadme"] = true; // TODO: store readme availability in the db. pf->checkHasReadme() is too slow.
         param["havebanner"] = !pf->banner.empty();
         param["havestagefile"] = !pf->stagefile.empty();
 

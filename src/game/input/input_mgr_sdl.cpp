@@ -1,9 +1,8 @@
-#include <algorithm>
 #ifndef _WIN32
 #ifdef RENDER_SDL2
 
+#include <algorithm>
 #include <array>
-#include <type_traits>
 
 #include <SDL.h>
 

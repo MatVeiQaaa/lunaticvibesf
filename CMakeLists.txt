@@ -32,8 +32,6 @@ if (MSVC)
     add_compile_options("/utf-8")
     add_compile_options("/bigobj")
     add_definitions(-D_WIN32_WINNT=0x0601) # Target Windows 7
-    include_directories("${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
-    link_directories("${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib")
 endif()
 
 if (WIN32)

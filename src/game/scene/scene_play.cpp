@@ -1,3 +1,4 @@
+#include <array>
 #include <cassert>
 #include <future>
 #include <random>
@@ -2796,65 +2797,48 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
 {
     static constexpr lunaticvibes::Time MIN_REMAP_INTERVAL{ 1000 };
 
-    auto changeKeySample = [this, &rt](Input::Pad k, int slot)
-    {
-        chart::NoteLaneIndex idx[3] = { chart::NoteLaneIndex::_, chart::NoteLaneIndex::_, chart::NoteLaneIndex::_ };
-        HitableNote* pNote[3] = { nullptr, nullptr, nullptr };
-        long long time[3] = { TIMER_NEVER, TIMER_NEVER, TIMER_NEVER };
+    auto changeKeySample = [this, &rt](Input::Pad k, int slot) {
+        using NotePair = std::pair<const HitableNote*, long long>;
+        std::array<NotePair, 3> notes {
+            std::pair{nullptr, TIMER_NEVER}, {nullptr, TIMER_NEVER}, {nullptr, TIMER_NEVER}};
 
-        idx[0] = gPlayContext.chartObj[slot]->getLaneFromKey(chart::NoteLaneCategory::Note, k);
-        if (idx[0] != chart::NoteLaneIndex::_)
+        const auto& chart = gPlayContext.chartObj[slot];
+
+        if (auto idx = chart->getLaneFromKey(chart::NoteLaneCategory::Note, k); idx != chart::NoteLaneIndex::_)
         {
-            pNote[0] = &*gPlayContext.chartObj[slot]->incomingNote(chart::NoteLaneCategory::Note, idx[0]);
-            time[0] = pNote[0]->time.hres();
+            const auto* note = &*chart->incomingNote(chart::NoteLaneCategory::Note, idx);
+            notes[0] = {note, note->time.hres()};
         }
-
-        idx[1] = gPlayContext.chartObj[slot]->getLaneFromKey(chart::NoteLaneCategory::LN, k);
-        if (idx[1] != chart::NoteLaneIndex::_)
+        if (auto idx = chart->getLaneFromKey(chart::NoteLaneCategory::LN, k); idx != chart::NoteLaneIndex::_)
         {
-            auto itLNNote = gPlayContext.chartObj[slot]->incomingNote(chart::NoteLaneCategory::LN, idx[1]);
-            while (!gPlayContext.chartObj[slot]->isLastNote(chart::NoteLaneCategory::LN, idx[1], itLNNote))
+            auto itLNNote = chart->incomingNote(chart::NoteLaneCategory::LN, idx);
+            while (!chart->isLastNote(chart::NoteLaneCategory::LN, idx, itLNNote))
             {
                 if (!(itLNNote->flags & Note::Flags::LN_TAIL))
                 {
-                    pNote[1] = &*itLNNote;
-                    time[1] = pNote[1]->time.hres();
+                    notes[1] = {&*itLNNote, itLNNote->time.hres()};
                     break;
                 }
                 itLNNote++;
             }
         }
-
-        idx[2] = gPlayContext.chartObj[slot]->getLaneFromKey(chart::NoteLaneCategory::Invs, k);
-        if (idx[2] != chart::NoteLaneIndex::_)
+        if (auto idx = chart->getLaneFromKey(chart::NoteLaneCategory::Invs, k); idx != chart::NoteLaneIndex::_)
         {
-            pNote[2] = &*gPlayContext.chartObj[slot]->incomingNote(chart::NoteLaneCategory::Invs, idx[2]);
-            time[2] = pNote[2]->time.hres();
+            const auto* note = &*chart->incomingNote(chart::NoteLaneCategory::Invs, idx);
+            notes[2] = {note, note->time.hres()};
         }
 
-        HitableNote* pNoteKey = nullptr;
-        std::vector<std::pair<long long, size_t>> sortTmp;
-        for (size_t i = 0; i < 3; ++i)
-        {
-            sortTmp.emplace_back(time[i], i);
-        }
-        std::sort(sortTmp.begin(), sortTmp.end());
-        for (size_t i = 0; i < 3; ++i)
-        {
-            size_t idxNoteKey = sortTmp[i].second;
-            if (pNote[idxNoteKey])
-            {
-                pNoteKey = pNote[idxNoteKey];
-                break;
-            }
-        }
+        const HitableNote* soonest_note =
+            std::min_element(notes.begin(), notes.end(), [](const NotePair& lhs, const NotePair& rhs) {
+                return lhs.second < rhs.second;
+            })->first;
 
-        if (pNoteKey && (rt == USE_FIRST_KEYSOUNDS || pNoteKey->time - rt <= MIN_REMAP_INTERVAL))
+        if (soonest_note && (rt == USE_FIRST_KEYSOUNDS || soonest_note->time - rt <= MIN_REMAP_INTERVAL))
         {
-            keySampleIndex[(size_t)k] = (size_t)pNoteKey->dvalue;
+            keySampleIndex[(size_t)k] = (size_t)soonest_note->dvalue;
 
-            if (k == Input::S1L) keySampleIndex[Input::S1R] = (size_t)pNoteKey->dvalue;
-            if (k == Input::S2L) keySampleIndex[Input::S2R] = (size_t)pNoteKey->dvalue;
+            if (k == Input::S1L) keySampleIndex[Input::S1R] = (size_t)soonest_note->dvalue;
+            if (k == Input::S2L) keySampleIndex[Input::S2R] = (size_t)soonest_note->dvalue;
         }
     };
 

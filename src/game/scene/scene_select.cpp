@@ -1934,6 +1934,7 @@ void SceneSelect::inputGameReleasePanel(InputMask& input, const lunaticvibes::Ti
 
 void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Time& t)
 {
+    static constexpr int lines_per_scroll = 3;
     if (input[Input::Pad::M2])
     {
         closeReadme(t);
@@ -1942,8 +1943,10 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     if (input[Input::Pad::MWHEELUP])
     {
         const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
-        if (current_line > 0)
-            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line - 1);
+        if (current_line < lines_per_scroll)
+            State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
+        else
+            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line - lines_per_scroll);
         return;
     }
     if (input[Input::Pad::MWHEELDOWN])
@@ -1952,7 +1955,7 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
         const auto max_lines = static_cast<int>(std::count(helpfile.begin(), helpfile.end(), '\n'));
         const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
         if (current_line <= max_lines)
-            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line + 1);
+            State::set(IndexNumber::LRV_INTERNAL_README_LINE, std::min(current_line + lines_per_scroll, max_lines));
         return;
     }
 }

@@ -657,6 +657,7 @@ void setEntryInfo()
 
     gPlayContext.courseStageReplayPath.clear();
 
+    // FIXME: only hold select context mutex (locked outside the function) while actually updating things.
     // chart parameters
     if (e[idx].first->type() == eEntryType::CHART || e[idx].first->type() == eEntryType::RIVAL_CHART)
     {

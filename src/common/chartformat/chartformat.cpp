@@ -6,6 +6,7 @@
 #include "chartformat_bms.h"
 #include "common/encoding.h"
 #include "common/log.h"
+#include "common/utils.h"
 
 eChartFormat analyzeChartType(const Path& p)
 {
@@ -77,17 +78,23 @@ std::string ChartFormatBase::formatReadmeText(const std::vector<std::pair<std::s
 
 bool ChartFormatBase::checkHasReadme() const
 {
-    return !findFiles(getDirectory() / "*.txt").empty();
+    for (const auto& entry : fs::directory_iterator(getDirectory()))
+    {
+        if (lunaticvibes::iequals(entry.path().extension().u8string(), ".txt"))
+            return true;
+    }
+    return false;
 }
 
 std::vector<std::pair<std::string, std::string>> ChartFormatBase::getReadmeFiles() const
 {
     using Pair = std::pair<std::string, std::string>;
     std::vector<Pair> out;
-    auto files = findFiles(getDirectory() / "*.txt");
-    out.reserve(files.size());
-    for (const auto& file : files)
+    for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
+        const auto& file = entry.path();
+        if (!lunaticvibes::iequals(file.extension().u8string(), ".txt"))
+            continue;
         std::ifstream ifs{file};
         if (ifs.fail())
         {

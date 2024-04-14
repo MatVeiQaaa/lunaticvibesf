@@ -14,6 +14,7 @@ namespace fs = std::filesystem;
 inline Path executablePath;
 
 // path may include wildcard (*, ?)
+// Very expensive, use fs::directory_iterator or fs::recursive_directory_iterator when possible.
 [[nodiscard]] std::vector<Path> findFiles(Path path, bool recursive = false);
 
 bool isParentPath(Path parent, Path dir);

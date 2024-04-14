@@ -125,11 +125,13 @@ void ScenePreSelect::updateLoadSongs()
             {
                 for (size_t i = 0; i < top->getContentsCount(); ++i)
                 {
+                    if (gAppIsExiting) break;
                     auto entry = top->getEntry(i);
 
                     bool deleted = true;
                     for (auto& f : folderList)
                     {
+                        if (gAppIsExiting) break;
                         if (fs::exists(f) && fs::exists(entry->getPath()) && fs::equivalent(f, entry->getPath()))
                         {
                             deleted = false;
@@ -143,6 +145,7 @@ void ScenePreSelect::updateLoadSongs()
                     }
                 }
             }
+            if (gAppIsExiting) return;
             LOG_INFO << "[List] Added " << rootFolderProp.dbBrowseEntries.size() << " root folders";
 
             g_pSongDB->optimize();
@@ -158,6 +161,7 @@ void ScenePreSelect::updateLoadSongs()
                 auto entry = std::make_shared<EntryFolderNewSong>("NEW SONGS");
                 for (auto&& c : newSongList)
                 {
+                    if (gAppIsExiting) break;
                     entry->pushEntry(std::make_shared<EntryFolderSong>(std::move(c)));
                 }
                 rootFolderProp.dbBrowseEntries.insert(rootFolderProp.dbBrowseEntries.begin(), {entry, nullptr});
@@ -245,6 +249,7 @@ void ScenePreSelect::updateLoadTables()
             size_t tableIndex = 0;
             for (auto& tableUrl : tableList)
             {
+                if (gAppIsExiting) break;
                 LOG_INFO << "[List] Add table " << tableUrl;
                 textHint2 = tableUrl;
 
@@ -262,6 +267,7 @@ void ScenePreSelect::updateLoadTables()
                         std::shared_ptr<EntryFolderTable> tblLevel = std::make_shared<EntryFolderTable>(folderName, levelIndex);
                         for (const auto& r : t.getEntryList(lv))
                         {
+                            if (gAppIsExiting) break;
                             auto charts = g_pSongDB->findChartByHash(r->md5, false);
                             for (auto& c : charts)
                             {

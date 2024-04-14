@@ -510,6 +510,37 @@ void event_handle()
         case SDL_MOUSEWHEEL:
             sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y);
             break;
+
+        case SDL_JOYBUTTONDOWN:
+        {
+            assert(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
+            auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
+            if (e.jbutton.button < buttons.size())
+            {
+                buttons[e.jbutton.button] = true;
+            }
+            else
+            {
+                LOG_WARNING << "[SDL2] Joystick button is out of range";
+            }
+            break;
+        }
+
+        case SDL_JOYBUTTONUP:
+        {
+            assert(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
+            auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
+            if (e.jbutton.button < buttons.size())
+            {
+                buttons[e.jbutton.button] = false;
+            }
+            else
+            {
+                LOG_WARNING << "[SDL2] Joystick button is out of range";
+            }
+            break;
+        }
+
         default:
             break;
         }

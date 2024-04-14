@@ -72,6 +72,7 @@ public:
     [[nodiscard]] std::shared_ptr<ScoreBMS> getCourseScoreBMS(const HashMD5& hash) const;
     void updateCourseScoreBMS(const HashMD5& hash, const ScoreBMS& score);
 
+    bool isBmsPbCacheEmpty();
     void rebuildBmsPbCache();
     void preloadScore();
 

@@ -16,6 +16,7 @@ protected:
     void updateLoadSongs();
     void updateLoadTables();
     void updateLoadCourses();
+    void updateUpdateScoreCache();
     void loadFinished();
 
     void updateImgui() override;
@@ -26,10 +27,12 @@ protected:
     bool startedLoadSong = false;
     bool startedLoadTable = false;
     bool startedLoadCourse = false;
+    bool startedUpdateScoreCache = false;
     std::chrono::system_clock::time_point loadSongTimer;
     std::future<void> loadSongEnd;
     std::future<void> loadTableEnd;
     std::future<void> loadCourseEnd;
+    std::future<void> updateScoreCacheEnd;
     int prevChartLoaded = 0;
     std::string textHint;
     std::string textHint2;

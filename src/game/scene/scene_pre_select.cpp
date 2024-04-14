@@ -401,6 +401,32 @@ void ScenePreSelect::updateLoadCourses()
         LOG_INFO << "[List] Loading courses complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
 
+        _updateCallback = std::bind(&ScenePreSelect::updateUpdateScoreCache, this);
+    }
+}
+
+void ScenePreSelect::updateUpdateScoreCache()
+{
+    if (!startedUpdateScoreCache)
+    {
+        startedUpdateScoreCache = true;
+        LOG_INFO << "[List] Start updating score cache...";
+
+        updateScoreCacheEnd = std::async(std::launch::async, [this]() {
+            // TODO: i18n
+            textHint = "Updating score cache...";
+            textHint2.clear();
+            if (g_pScoreDB->isBmsPbCacheEmpty())
+                g_pScoreDB->rebuildBmsPbCache();
+        });
+    }
+
+    if (updateScoreCacheEnd.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+    {
+        updateScoreCacheEnd.get();
+        LOG_INFO << "[List] Finished updating score cache";
+        LOG_INFO << "[List] ------------------------------------------------------------";
+
         _updateCallback = std::bind(&ScenePreSelect::loadFinished, this);
     }
 }

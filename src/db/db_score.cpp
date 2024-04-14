@@ -50,13 +50,6 @@ bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
 ScoreDB::ScoreDB(const char* path): SQLite(path, "SCORE")
 {
     initTables();
-
-    {
-        const auto resp = query("SELECT count(*) FROM score_cache_bms");
-        assert(resp.size() == 1);
-        if (ANY_INT(resp[0][0]) == 0)
-            rebuildBmsPbCache();
-    }
 }
 
 void ScoreDB::deleteLegacyScoreBMS(const char* tableName, const HashMD5& hash)
@@ -380,6 +373,13 @@ catch (const std::exception& e)
 {
     LOG_ERROR << e.what();
     return false;
+}
+
+bool ScoreDB::isBmsPbCacheEmpty()
+{
+    const auto resp = query("SELECT EXISTS (SELECT 1 FROM score_cache_bms)");
+    assert(resp.size() == 1);
+    return ANY_INT(resp[0][0]) == 0;
 }
 
 void ScoreDB::rebuildBmsPbCache()

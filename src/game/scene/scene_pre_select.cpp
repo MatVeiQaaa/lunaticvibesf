@@ -59,9 +59,12 @@ ScenePreSelect::ScenePreSelect(): SceneBase(SkinType::PRE_SELECT, 240)
 
 ScenePreSelect::~ScenePreSelect()
 {
-    if (startedLoadSong && loadSongEnd.valid())
-    {
-    }
+    if (loadSongEnd.valid())
+        loadSongEnd.get();
+    if (loadTableEnd.valid())
+        loadTableEnd.get();
+    if (loadCourseEnd.valid())
+        loadCourseEnd.get();
 }
 
 void ScenePreSelect::_updateAsync()

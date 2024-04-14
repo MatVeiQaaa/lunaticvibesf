@@ -786,18 +786,10 @@ void SceneSelect::_updateAsync()
 
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
         gSelectContext.selectedEntryIndex = 0;
+        State::set(IndexSlider::SELECT_LIST, 0.0);
         setBarInfo();
         setEntryInfo();
         setDynamicTextures();
-
-        if (!gSelectContext.entries.empty())
-        {
-            State::set(IndexSlider::SELECT_LIST, (double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size());
-        }
-        else
-        {
-            State::set(IndexSlider::SELECT_LIST, 0.0);
-        }
 
         resetJukeboxText();
 
@@ -2641,19 +2633,11 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
 
         sortSongList();
         gSelectContext.selectedEntryIndex = 0;
+        State::set(IndexSlider::SELECT_LIST, 0.0);
 
         setBarInfo();
         setEntryInfo();
         setDynamicTextures();
-
-        if (!gSelectContext.entries.empty())
-        {
-            State::set(IndexSlider::SELECT_LIST, (double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size());
-        }
-        else
-        {
-            State::set(IndexSlider::SELECT_LIST, 0.0);
-        }
 
         resetJukeboxText();
 
@@ -3031,18 +3015,10 @@ void SceneSelect::searchSong(const std::string& text)
     postStartPreview();
 
     gSelectContext.selectedEntryIndex = 0;
+    State::set(IndexSlider::SELECT_LIST, 0.0);
     setBarInfo();
     setEntryInfo();
     setDynamicTextures();
-
-    if (!gSelectContext.entries.empty())
-    {
-        State::set(IndexSlider::SELECT_LIST, (double)gSelectContext.selectedEntryIndex / gSelectContext.entries.size());
-    }
-    else
-    {
-        State::set(IndexSlider::SELECT_LIST, 0.0);
-    }
 
     resetJukeboxText();
 

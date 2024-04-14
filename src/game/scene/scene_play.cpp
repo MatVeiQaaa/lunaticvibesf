@@ -19,6 +19,8 @@
 #include "game/arena/arena_client.h"
 #include "game/arena/arena_host.h"
 
+static constexpr lunaticvibes::Time USE_FIRST_KEYSOUNDS{-1234};
+
 bool ScenePlay::isPlaymodeDP() const
 {
     return gPlayContext.mode == SkinType::PLAY10 || gPlayContext.mode == SkinType::PLAY14;
@@ -1974,12 +1976,12 @@ void ScenePlay::updateLoading()
 
 void ScenePlay::updateLoadEnd()
 {
-	auto t = lunaticvibes::Time();
-    auto rt = t - State::get(IndexTimer::PLAY_READY);
+    const auto t = lunaticvibes::Time();
+    const auto rt = t - State::get(IndexTimer::PLAY_READY);
     spinTurntable(false);
     if (rt > pSkin->info.timeGetReady)
     {
-        changeKeySampleMapping(0);
+        changeKeySampleMapping(USE_FIRST_KEYSOUNDS);
 		State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_PLAYING);
         State::set(IndexTimer::PLAY_START, t.norm());
         setInputJudgeCallback();
@@ -2790,11 +2792,11 @@ void ScenePlay::procCommonNotes()
     }
 }
 
-void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& t)
+void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
 {
     static constexpr lunaticvibes::Time MIN_REMAP_INTERVAL{ 1000 };
 
-    auto changeKeySample = [&](Input::Pad k, int slot)
+    auto changeKeySample = [this, &rt](Input::Pad k, int slot)
     {
         chart::NoteLaneIndex idx[3] = { chart::NoteLaneIndex::_, chart::NoteLaneIndex::_, chart::NoteLaneIndex::_ };
         HitableNote* pNote[3] = { nullptr, nullptr, nullptr };
@@ -2847,7 +2849,7 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& t)
             }
         }
 
-        if (pNoteKey && pNoteKey->time - t <= MIN_REMAP_INTERVAL)
+        if (pNoteKey && (rt == USE_FIRST_KEYSOUNDS || pNoteKey->time - rt <= MIN_REMAP_INTERVAL))
         {
             keySampleIndex[(size_t)k] = (size_t)pNoteKey->dvalue;
 

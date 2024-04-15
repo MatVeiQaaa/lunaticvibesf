@@ -149,12 +149,14 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
 void SpriteImageText::draw() const
 {
     if (isHidden()) return;
-
+    // OPTIMIZATION: avoid drawing invisible text.
+    // Do this in draw() instead of update() as we may want isDraw() && !isHidden() (e.g. empty jukebox text).
+    if (_current.color.a == 0) return;
     if (_draw)
     {
-        for (auto [c, r] : _drawList)
+        for (const auto& [c, r] : _drawList)
         {
-            auto& [idx, rect] = _chrList->at(c);
+            const auto& [idx, rect] = _chrList->at(c);
             _textures[idx]->draw(rect, r, _current.color, _current.blend, _current.filter, _current.angle);
         }
     }

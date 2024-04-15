@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "common/log.h"
 #include "common/utils.h"
 
 std::string KeyMap::toString() const
@@ -12,8 +13,9 @@ std::string KeyMap::toString() const
     case DeviceType::KEYBOARD: return toStringK();
     case DeviceType::JOYSTICK: return toStringJ();
     case DeviceType::MOUSE:    return toStringM();
-    default: break;
     }
+    LOG_ERROR << "[Keymap] Invalid KeyMap";
+    assert(false && "invalid KeyMap");
     return "";
 }
 

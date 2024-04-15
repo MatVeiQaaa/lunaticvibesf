@@ -3,6 +3,7 @@
 #include "config/config_mgr.h"
 #include "game/sound/sound_mgr.h"
 #include "game/runtime/i18n.h"
+#include <string_view>
 
 SceneKeyConfig::SceneKeyConfig() : SceneBase(SkinType::KEY_CONFIG, 240)
 {
@@ -64,7 +65,6 @@ SceneKeyConfig::SceneKeyConfig() : SceneBase(SkinType::KEY_CONFIG, 240)
     State::set(IndexOption::KEY_CONFIG_KEY5, 1);
     State::set(IndexOption::KEY_CONFIG_KEY7, 1);
     State::set(IndexOption::KEY_CONFIG_KEY9, 1);
-    setInputBindingText(gKeyconfigContext.keys, gKeyconfigContext.selecting.first);
 
     State::set(IndexText::KEYCONFIG_HINT_KEY, i18n::s(i18nText::KEYCONFIG_HINT_KEY));
     State::set(IndexText::KEYCONFIG_HINT_BIND, i18n::s(i18nText::KEYCONFIG_HINT_BIND));
@@ -467,12 +467,18 @@ void SceneKeyConfig::inputGameAbsoluteAxis(JoystickAxis& axis, size_t device, co
 
 void SceneKeyConfig::setInputBindingText(GameModeKeys keys, Input::Pad pad)
 {
-    auto bindings = ConfigMgr::Input(keys)->getBindings(pad);
+    const auto bindings = ConfigMgr::Input(keys)->getBindings(pad);
     State::set(IndexText::KEYCONFIG_SLOT1, bindings.toString());
-    for (size_t i = 1; i < 10; ++i)
-    {
-        State::set(IndexText(unsigned(IndexText::KEYCONFIG_SLOT1) + i), "-");
-    }
+    static const std::string_view placeholder = "-";
+    State::set(IndexText::KEYCONFIG_SLOT2, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT3, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT4, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT5, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT6, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT7, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT8, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT9, placeholder);
+    State::set(IndexText::KEYCONFIG_SLOT10, placeholder);
 }
 
 void SceneKeyConfig::updateForceBargraphs()
@@ -617,7 +623,6 @@ void SceneKeyConfig::updateInfo(KeyMap k, int slot)
     case Option::KEYCFG_5: keys = 5; break;
     case Option::KEYCFG_7: keys = 7; break;
     case Option::KEYCFG_9: keys = 9; break;
-    default: return;
     }
     if (keys != 0)
     {

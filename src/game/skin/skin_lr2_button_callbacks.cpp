@@ -13,6 +13,7 @@
 #include "game/arena/arena_data.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
+#include "game/scene/scene_keyconfig.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
 
@@ -1222,12 +1223,7 @@ void key_config_pad(Input::Pad pad, bool force)
 
         sel.first = pad;
 
-        auto bindings = ConfigMgr::Input(gKeyconfigContext.keys)->getBindings(pad);
-        State::set(IndexText::KEYCONFIG_SLOT1, bindings.toString());
-        for (size_t i = 1; i < 10; ++i)
-        {
-            State::set(IndexText(unsigned(IndexText::KEYCONFIG_SLOT1) + i), "-");
-        }
+        SceneKeyConfig::setInputBindingText(gKeyconfigContext.keys, pad);
     }
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }
@@ -1257,32 +1253,34 @@ void key_config_mode_rotate()
 }
 
 // 150 - 159
-void key_config_slot(int slot)
+void key_config_slot(const int slot)
 {
-    auto& sel = gKeyconfigContext.selecting;
-    auto old = sel.second;
+    assert(slot >= 0 && slot <= 9);
+    auto& sel = gKeyconfigContext.selecting.second;
+    const auto old = sel;
     if (old != slot)
     {
-        auto setSwitch = [](int slot, bool sw)
-        {
+        auto getSwitch = [](const int slot) -> IndexSwitch {
             switch (slot)
             {
-            case 0:      State::set(IndexSwitch::KEY_CONFIG_SLOT0, sw); break;
-            case 1:      State::set(IndexSwitch::KEY_CONFIG_SLOT1, sw); break;
-            case 2:      State::set(IndexSwitch::KEY_CONFIG_SLOT2, sw); break;
-            case 3:      State::set(IndexSwitch::KEY_CONFIG_SLOT3, sw); break;
-            case 4:      State::set(IndexSwitch::KEY_CONFIG_SLOT4, sw); break;
-            case 5:      State::set(IndexSwitch::KEY_CONFIG_SLOT5, sw); break;
-            case 6:      State::set(IndexSwitch::KEY_CONFIG_SLOT6, sw); break;
-            case 7:      State::set(IndexSwitch::KEY_CONFIG_SLOT7, sw); break;
-            case 8:      State::set(IndexSwitch::KEY_CONFIG_SLOT8, sw); break;
-            case 9:      State::set(IndexSwitch::KEY_CONFIG_SLOT9, sw); break;
-            default: break;
+            case 0: return IndexSwitch::KEY_CONFIG_SLOT0;
+            case 1: return IndexSwitch::KEY_CONFIG_SLOT1;
+            case 2: return IndexSwitch::KEY_CONFIG_SLOT2;
+            case 3: return IndexSwitch::KEY_CONFIG_SLOT3;
+            case 4: return IndexSwitch::KEY_CONFIG_SLOT4;
+            case 5: return IndexSwitch::KEY_CONFIG_SLOT5;
+            case 6: return IndexSwitch::KEY_CONFIG_SLOT6;
+            case 7: return IndexSwitch::KEY_CONFIG_SLOT7;
+            case 8: return IndexSwitch::KEY_CONFIG_SLOT8;
+            case 9: return IndexSwitch::KEY_CONFIG_SLOT9;
             }
+            LOG_ERROR << "[SkinLR2] Invalid 'slot'";
+            assert(false && "Invalid 'slot'");
+            return {};
         };
-        setSwitch(old, false);
-        setSwitch(slot, true);
-        sel.second = slot;
+        State::set(getSwitch(old), false);
+        State::set(getSwitch(slot), true);
+        sel = slot;
     }
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
 }

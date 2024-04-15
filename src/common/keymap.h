@@ -233,7 +233,7 @@ enum class Keyboard : unsigned
 };
 inline constexpr size_t keyboardKeyCount = static_cast<size_t>(Keyboard::K_COUNT);
 
-inline const char* keyboardNameMap[0xFF]
+inline const char* keyboardNameMap[keyboardKeyCount]
 {
     "",             // ERROR
 

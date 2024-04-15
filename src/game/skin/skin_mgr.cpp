@@ -84,7 +84,17 @@ void SkinMgr::load(SkinType e, bool simple)
         skinFilePathStr = ConfigMgr::get("S", cfg::S_PATH_PLAY_14, cfg::S_DEFAULT_PATH_PLAY_14);
         break;
 
-    default:
+    case SkinType::EXIT:
+    case SkinType::TITLE:
+    case SkinType::SOUNDSET:
+    case SkinType::PLAY9_2:
+    case SkinType::RETRY_TRANS:
+    case SkinType::COURSE_TRANS:
+    case SkinType::EXIT_TRANS:
+    case SkinType::PRE_SELECT:
+    case SkinType::TMPL:
+    case SkinType::TEST:
+    case SkinType::MODE_COUNT:
         version = SkinVersion::UNDEF;
         break;
     }

@@ -548,6 +548,8 @@ void SceneSelect::closeReadme(const lunaticvibes::Time& closing_time)
     }
     pSkin->setHandleMouseEvents(true);
     state = eSelectState::SELECT;
+    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
+    State::set(IndexText::LRV_INTERNAL_README, {});
     State::set(IndexTimer::README_START, TIMER_NEVER);
     State::set(IndexTimer::README_END, closing_time.norm());
 }

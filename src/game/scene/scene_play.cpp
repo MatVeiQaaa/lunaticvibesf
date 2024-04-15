@@ -293,7 +293,6 @@ ScenePlay::ScenePlay(): SceneBase(gPlayContext.mode, 1000, true)
 
     auto initDisplayGaugeType = [&](int slot)
     {
-        using namespace std::string_literals;
         GaugeDisplayType tmp = GaugeDisplayType::GROOVE;
         switch (gPlayContext.mods[slot].gauge)
         {
@@ -312,11 +311,11 @@ ScenePlay::ScenePlay(): SceneBase(gPlayContext.mode, 1000, true)
         }
         if (slot == PLAYER_SLOT_PLAYER)
         {
-            pSkin->setExtendedProperty("GAUGETYPE_1P"s, (void*)&tmp);
+            pSkin->setExtendedProperty("GAUGETYPE_1P", &tmp);
         }
         else
         {
-            pSkin->setExtendedProperty("GAUGETYPE_2P"s, (void*)&tmp);
+            pSkin->setExtendedProperty("GAUGETYPE_2P", &tmp);
         }
     };
     initDisplayGaugeType(PLAYER_SLOT_PLAYER);

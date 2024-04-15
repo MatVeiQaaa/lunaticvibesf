@@ -477,8 +477,9 @@ std::map<Path, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontCache;
 std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::prevSkinLR2FontNameMap;
 std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontNameMap;
 
-int SkinLR2::setExtendedProperty(std::string&& key, void* value)
+int SkinLR2::setExtendedProperty(const std::string_view key, void* value)
 {
+    assert(value != nullptr);
     if (key == "GAUGETYPE_1P")
     {
         if (gSprites[GLOBAL_SPRITE_IDX_1PGAUGE] != nullptr)

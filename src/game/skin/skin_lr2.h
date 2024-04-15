@@ -1333,7 +1333,7 @@ struct setDst { dst_option dst; bool set; };
 class SkinLR2: public SkinBase
 {
 public:
-    int setExtendedProperty(std::string&& key, void* value) override;
+    int setExtendedProperty(std::string_view key, void* value) override;
 
 private:
     static std::map<std::string, Path> LR2SkinFontPathCache;

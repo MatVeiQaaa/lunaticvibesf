@@ -3,6 +3,7 @@
 #include "game/graphics/video.h"
 #include "common/types.h"
 #include <list>
+#include <string_view>
 #include <vector>
 #include <map>
 #include <string>
@@ -34,7 +35,8 @@ protected:
     bool loaded = false;
 public:
     constexpr bool isLoaded() { return loaded; }
-    virtual int setExtendedProperty(std::string&& key, void* value) = 0;
+    // FIXME: add getters/setters for those properties instead
+    virtual int setExtendedProperty(std::string_view key, void* value) = 0;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Images

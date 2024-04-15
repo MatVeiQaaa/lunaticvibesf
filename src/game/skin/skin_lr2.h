@@ -1335,9 +1335,6 @@ class SkinLR2: public SkinBase
 public:
     int setExtendedProperty(std::string&& key, void* value) override;
 
-protected:
-    static bool customizeDst[100];  // temporary workaround
-
 private:
     static std::map<std::string, Path> LR2SkinFontPathCache;
     std::map<std::string, std::shared_ptr<Texture>> prevSkinTextureNameMap;

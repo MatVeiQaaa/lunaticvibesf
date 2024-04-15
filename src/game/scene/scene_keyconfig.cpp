@@ -102,7 +102,8 @@ SceneKeyConfig::SceneKeyConfig() : SceneBase(SkinType::KEY_CONFIG, 240)
     State::set(IndexText::KEYCONFIG_2P_SCRATCH_R, "2P SC-R");
     State::set(IndexText::KEYCONFIG_2P_SCRATCH_ABS, "2P SC ABS");
 
-    updateInfo(KeyMap(), 0);
+    updateInfo(ConfigMgr::Input(gKeyconfigContext.keys)->getBindings(gKeyconfigContext.selecting.first),
+               gKeyconfigContext.selecting.second);
 
     LOG_DEBUG << "[KeyConfig] Start";
 }
@@ -129,7 +130,8 @@ void SceneKeyConfig::_updateAsync()
     if (gKeyconfigContext.modeChanged)
     {
         gKeyconfigContext.modeChanged = false;
-        updateInfo(KeyMap(), 0);
+        updateInfo(ConfigMgr::Input(gKeyconfigContext.keys)->getBindings(gKeyconfigContext.selecting.first),
+                   gKeyconfigContext.selecting.second);
     }
 
     State::set(IndexNumber::_ANGLE_TT_1P, int(playerTurntableAngleAdd[0]) % 360);

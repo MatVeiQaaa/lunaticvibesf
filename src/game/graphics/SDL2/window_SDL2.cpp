@@ -221,10 +221,7 @@ void graphics_flush()
         ssRect.h *= ssLevel;
 
         // render internal canvas texture
-        SDL_RenderCopyEx(
-            gFrameRenderer, gInternalRenderTarget,
-            &ssRect, &windowRect,
-            0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &ssRect, &windowRect);
 
         // render imgui
         auto pData = ImGui::GetDrawData();
@@ -301,7 +298,7 @@ void graphics_copy_screen_texture(Texture& texture)
     SDL_SetRenderTarget(gFrameRenderer, (SDL_Texture*)texture.raw());
     SDL_RenderClear(gFrameRenderer);
     SDL_Rect rect{ 0, 0, canvasRect.w * graphics_get_supersample_level(), canvasRect.h * graphics_get_supersample_level() };
-    SDL_RenderCopyEx(gFrameRenderer, gInternalRenderTarget, &rect, &canvasRect, 0, NULL, SDL_FLIP_NONE);
+    SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &rect, &canvasRect);
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 }
 

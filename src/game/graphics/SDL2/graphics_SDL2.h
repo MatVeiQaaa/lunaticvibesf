@@ -211,7 +211,7 @@ public:
 	Texture(const SDL_Surface* pSurface);
 	Texture(const SDL_Texture* pTexture, int w, int h);
 	Texture(int w, int h, PixelFormat fmt, bool target);
-	virtual ~Texture();
+	virtual ~Texture() = default;
 public:
     void* raw() { return (void*)_pTexture.get(); }
 	Rect getRect() const { return textureRect; }

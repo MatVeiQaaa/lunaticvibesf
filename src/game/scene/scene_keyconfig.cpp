@@ -248,8 +248,8 @@ static const std::map<Input::Pad, IndexBargraph> forceBargraphMap =
 void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvibes::Time& t)
 {
     // update bindings
-    auto [pad, slot] = gKeyconfigContext.selecting;
-    GameModeKeys keys = gKeyconfigContext.keys;
+    const auto [pad, slot] = gKeyconfigContext.selecting;
+    const GameModeKeys keys = gKeyconfigContext.keys;
 
     if (pad != Input::Pad::INVALID)
     {
@@ -320,11 +320,11 @@ void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvib
 void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, const lunaticvibes::Time& t)
 {
     // update bindings
-    auto [pad, slot] = gKeyconfigContext.selecting;
+    const auto [pad, slot] = gKeyconfigContext.selecting;
     if (pad == Input::Pad::S1A || pad == Input::Pad::S2A)
         return;
 
-    GameModeKeys keys = gKeyconfigContext.keys;
+    const GameModeKeys keys = gKeyconfigContext.keys;
 
     if (pad != Input::Pad::INVALID)
     {
@@ -441,7 +441,7 @@ void SceneKeyConfig::inputGameAbsoluteAxis(JoystickAxis& axis, size_t device, co
 
     std::unique_lock l(_mutex);
 
-    GameModeKeys keys = gKeyconfigContext.keys;
+    const GameModeKeys keys = gKeyconfigContext.keys;
 
     for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_AXIS_COUNT; ++index)
     {
@@ -479,14 +479,13 @@ void SceneKeyConfig::updateForceBargraphs()
 {
     std::shared_lock l(_mutex);
 
-    GameModeKeys keys = gKeyconfigContext.keys;
+    const GameModeKeys keys = gKeyconfigContext.keys;
     const auto input = ConfigMgr::Input(keys);
-    lunaticvibes::Time t;
+    const lunaticvibes::Time t;
 
     // update keyboard force bargraph
     for (Input::Keyboard k = Input::Keyboard::K_1; k != Input::Keyboard::K_COUNT; ++ * (unsigned*)&k)
     {
-        const auto input = ConfigMgr::Input(keys);
         for (const auto& [p, bar] : forceBargraphMap)
         {
             const auto binding = input->getBindings(p);

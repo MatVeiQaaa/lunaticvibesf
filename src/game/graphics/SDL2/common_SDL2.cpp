@@ -91,44 +91,20 @@ bool Color::operator!=(const Color& rhs) const
 ////////////////////////////////////////////////////////////////////////////////
 // Image
 
-bool isTGA(const char* filePath)
+static bool isTGA(const std::string_view filePath)
 {
-    std::size_t len = strlen(filePath);
-    if (len < 4) return false;
-
-    char ext[4];
-    strcpy(ext, &filePath[len - 3]);
-    if (ext[0] > 'Z') ext[0] -= ('a' - 'A');
-    if (ext[1] > 'Z') ext[1] -= ('a' - 'A');
-    if (ext[2] > 'Z') ext[2] -= ('a' - 'A');
-
-    return strcmp("TGA", ext) == 0;
+    if (filePath.length() < 4) return false;
+    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "tga");
 }
-bool isPNG(const char* filePath)
+static bool isPNG(const std::string_view filePath)
 {
-    std::size_t len = strlen(filePath);
-    if (len < 4) return false;
-
-    char ext[4];
-    strcpy(ext, &filePath[len - 3]);
-    if (ext[0] > 'Z') ext[0] -= ('a' - 'A');
-    if (ext[1] > 'Z') ext[1] -= ('a' - 'A');
-    if (ext[2] > 'Z') ext[2] -= ('a' - 'A');
-
-    return strcmp("PNG", ext) == 0;
+    if (filePath.length() < 4) return false;
+    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "png");
 }
-bool isGIF(const char* filePath)
+static bool isGIF(const std::string_view filePath)
 {
-    std::size_t len = strlen(filePath);
-    if (len < 4) return false;
-
-    char ext[4];
-    strcpy(ext, &filePath[len - 3]);
-    if (ext[0] > 'Z') ext[0] -= ('a' - 'A');
-    if (ext[1] > 'Z') ext[1] -= ('a' - 'A');
-    if (ext[2] > 'Z') ext[2] -= ('a' - 'A');
-
-    return strcmp("GIF", ext) == 0;
+    if (filePath.length() < 4) return false;
+    return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "gif");
 }
 
 Image::Image(const std::filesystem::path& path) : Image(path.u8string().c_str()) {}
@@ -156,19 +132,20 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _p
     if (_path.empty())
         return;
     assert(_pRWop);
-    if (isTGA(path))
+    const std::string_view pathView{path};
+    if (isTGA(pathView))
     {
         _pSurface = std::shared_ptr<SDL_Surface>(
             pushAndWaitMainThreadTask<SDL_Surface*>(std::bind(IMG_LoadTGA_RW, &*_pRWop)),
             std::bind(pushAndWaitMainThreadTask<void, SDL_Surface*>, SDL_FreeSurface, _1));
     }
-    else if (isPNG(path))
+    else if (isPNG(pathView))
     {
         _pSurface = std::shared_ptr<SDL_Surface>(
             pushAndWaitMainThreadTask<SDL_Surface*>(std::bind(IMG_LoadPNG_RW, &*_pRWop)),
             std::bind(pushAndWaitMainThreadTask<void, SDL_Surface*>, SDL_FreeSurface, _1));
     }
-    else if (isGIF(path))
+    else if (isGIF(pathView))
     {
         _pSurface = std::shared_ptr<SDL_Surface>(
             pushAndWaitMainThreadTask<SDL_Surface*>(std::bind(IMG_LoadGIF_RW, &*_pRWop)),
@@ -187,15 +164,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _p
         return;
     }
 
-    if (_pSurface->format->Amask == 0 || isTGA(path))
-    {
-        _haveAlphaLayer = false;
-    }
-    else
-    {
-        _haveAlphaLayer = true;
-    }
-
+    _haveAlphaLayer = !(_pSurface->format->Amask == 0 || isTGA(pathView));
     loaded = true;
     LOG_VERBOSE << "[Image] Load image file finished " << _path;
 }

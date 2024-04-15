@@ -413,7 +413,7 @@ class KeyMap
 {
 public:
     KeyMap() = default;
-    KeyMap(const std::string_view & name) { loadFromString(name); }
+    KeyMap(const std::string_view name) { loadFromString(name); }
     KeyMap(const Input::Keyboard& kb) { setKeyboard(kb); }
     KeyMap(size_t device, Input::Joystick::Type type, size_t index) { setJoystick(device, type, index); }
     ~KeyMap() = default;
@@ -448,10 +448,10 @@ public:
     void setJoystick(size_t device, Input::Joystick::Type jtype, size_t index);
 
 private:
-    void loadFromString(const std::string_view& name);
-    void loadFromStringK(const std::string_view& name);
-    void loadFromStringJ(const std::string_view& name);
-    void loadFromStringM(const std::string_view& name);
+    void loadFromString(std::string_view name);
+    void loadFromStringK(std::string_view name);
+    void loadFromStringJ(std::string_view name);
+    void loadFromStringM(std::string_view name);
     std::string toStringK() const;
     std::string toStringJ() const;
     std::string toStringM() const;

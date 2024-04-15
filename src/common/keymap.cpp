@@ -33,7 +33,7 @@ void KeyMap::setJoystick(size_t device, Input::Joystick::Type jtype, size_t inde
     joystick.index = index;
 }
 
-void KeyMap::loadFromString(const std::string_view& name)
+void KeyMap::loadFromString(const std::string_view name)
 {
     type = DeviceType::UNDEF;
     if (name.empty()) return;
@@ -47,7 +47,7 @@ void KeyMap::loadFromString(const std::string_view& name)
     }
 }
 
-void KeyMap::loadFromStringK(const std::string_view& name)
+void KeyMap::loadFromStringK(const std::string_view name)
 {
     if (name.length() < 3) return;
     if (name.substr(0, 2) != "K_") return;
@@ -66,7 +66,7 @@ void KeyMap::loadFromStringK(const std::string_view& name)
     keyboard = Input::Keyboard::K_ERROR;
 }
 
-void KeyMap::loadFromStringJ(const std::string_view& name)
+void KeyMap::loadFromStringJ(const std::string_view name)
 {
     if (name.length() < 8) return;
     if (name[0] != 'J' || name[2] != '_') return;
@@ -149,7 +149,7 @@ void KeyMap::loadFromStringJ(const std::string_view& name)
     
 }
 
-void KeyMap::loadFromStringM(const std::string_view& name)
+void KeyMap::loadFromStringM(const std::string_view name)
 {
     if (name.substr(0, 2) != "M_") return;
     type = DeviceType::MOUSE;

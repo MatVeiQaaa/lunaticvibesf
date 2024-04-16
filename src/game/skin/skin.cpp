@@ -1,11 +1,11 @@
 #include "skin.h"
-#include "game/graphics/sprite_lane.h"
+
 #include "game/graphics/sprite_video.h"
 #include "game/scene/scene_context.h"
 #include <execution>
 #include <algorithm>
-#include "common/utils.h"
 
+// FIXME: get rid of preDefinedTextures.
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::textureNameMap;
 
@@ -214,4 +214,9 @@ void SkinBase::stopTextEdit(bool modify)
 std::shared_ptr<Texture> SkinBase::getTextureCustomizeThumbnail()
 {
     return textureNameMap["THUMBNAIL"];
+}
+
+void SkinBase::setThumbnailTextureSize(int w, int h)
+{
+    *textureNameMap["THUMBNAIL"] = Texture{w, h, Texture::PixelFormat::RGB24, true};
 }

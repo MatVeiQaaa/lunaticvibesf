@@ -519,6 +519,17 @@ void SceneCustomize::load(SkinType mode)
             }
 
             configFilePath = ps->getFilePath();
+
+            switch (ps->info.resolution)
+            {
+            default:
+                LOG_ERROR << "[Customize] Bad skin resolution";
+                assert(false && "Bad skin resolution");
+                [[fallthrough]];
+            case 0: pSkin->setThumbnailTextureSize(640, 480); break;
+            case 1: pSkin->setThumbnailTextureSize(1280, 720); break;
+            case 2: pSkin->setThumbnailTextureSize(1920, 1080); break;
+            }
         }
         else
         {

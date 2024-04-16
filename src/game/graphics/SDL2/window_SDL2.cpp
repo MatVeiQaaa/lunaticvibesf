@@ -295,9 +295,11 @@ void graphics_copy_screen_texture(Texture& texture)
 {
     assert(IsMainThread());
 
-    SDL_SetRenderTarget(gFrameRenderer, (SDL_Texture*)texture.raw());
+    SDL_SetRenderTarget(gFrameRenderer, reinterpret_cast<SDL_Texture*>(texture.raw()));
     SDL_RenderClear(gFrameRenderer);
-    SDL_Rect rect{ 0, 0, canvasRect.w * graphics_get_supersample_level(), canvasRect.h * graphics_get_supersample_level() };
+    const SDL_Rect origRect = texture.getRect();
+    const SDL_Rect rect{0, 0, origRect.w * graphics_get_supersample_level(),
+                        origRect.h * graphics_get_supersample_level()};
     SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &rect, &canvasRect);
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
 }

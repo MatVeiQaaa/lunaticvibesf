@@ -534,17 +534,6 @@ SpriteNumber::SpriteNumber(const SpriteNumberBuilder& builder): SpriteAnimated(b
 
     digitNumber.resize(maxDigits);
     digitOutRect.resize(maxDigits);
-
-    switch (numberType)
-    {
-    case NUM_TYPE_NORMAL:
-    case NUM_TYPE_BLANKZERO:
-        break;
-        //case NUM_SYMBOL:
-    case NUM_TYPE_FULL:
-        break;
-    default: return;
-    }
 }
 
 bool SpriteNumber::update(const lunaticvibes::Time& t)
@@ -601,13 +590,9 @@ void SpriteNumber::updateNumber(int n)
     switch (numberType)
     {
     case NUM_TYPE_NORMAL:
-        /* for (unsigned i = digitCount; i < maxDigits; ++i)
-        {
-            _digit[i] = 0;
-        }
-        digitCount = maxDigits; */
-        break;
+        // Handled above.
     case NUM_TYPE_BLANKZERO:
+        // ?
         break;
 	/*
     case NUM_SYMBOL:

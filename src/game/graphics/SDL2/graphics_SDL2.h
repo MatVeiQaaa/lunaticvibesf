@@ -9,9 +9,7 @@
 #include <filesystem>
 #include <limits>
 #include <memory>
-#include <shared_mutex>
 #include <string>
-#include <vector>
 
 #include "common/types.h"
 
@@ -144,7 +142,6 @@ public:
 	Image(const std::filesystem::path& path);
     Image(const char* filePath);
     Image(const char* format, void* bmp, size_t size);
-    ~Image();
     void setTransparentColorRGB(Color c);
     bool hasAlphaLayer() const { return _haveAlphaLayer; }
 public:
@@ -209,7 +206,7 @@ public:
 public:
 	Texture(const Image& srcImage);
 	Texture(const SDL_Surface* pSurface);
-	Texture(const SDL_Texture* pTexture, int w, int h);
+	Texture(SDL_Texture* pTexture, int w, int h);
 	Texture(int w, int h, PixelFormat fmt, bool target);
 	virtual ~Texture() = default;
 public:
@@ -232,7 +229,7 @@ public:
     TextureFull(const Color& srcColor);
     TextureFull(const Image& srcImage);
     TextureFull(const SDL_Surface* pSurface);
-    TextureFull(const SDL_Texture* pTexture, int w, int h);
+    TextureFull(SDL_Texture* pTexture, int w, int h);
     ~TextureFull() override;
 };
 

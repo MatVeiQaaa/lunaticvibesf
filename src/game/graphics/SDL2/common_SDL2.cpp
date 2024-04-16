@@ -169,10 +169,6 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _p
     LOG_VERBOSE << "[Image] Load image file finished " << _path;
 }
 
-Image::~Image() 
-{
-}
-
 void Image::setTransparentColorRGB(Color c)
 {
     if (_pSurface)
@@ -216,12 +212,12 @@ Texture::Texture(const Image& srcImage)
 
     if (!loaded)
     {
-        LOG_WARNING << "[Texture] Build texture object error! " << srcImage._path.c_str();
+        LOG_WARNING << "[Texture] Build texture object error! " << srcImage._path;
         LOG_WARNING << "[Texture] ^ " << SDL_GetError();
     }
     else
     {
-        LOG_VERBOSE << "[Texture] Build texture object finished. " << srcImage._path.c_str();
+        LOG_VERBOSE << "[Texture] Build texture object finished. " << srcImage._path;
     }
 }
 
@@ -235,11 +231,10 @@ Texture::Texture(const SDL_Surface* pSurface)
     loaded = true;
 }
 
-Texture::Texture(const SDL_Texture* pTexture, int w, int h)
+Texture::Texture(SDL_Texture* pTexture, int w, int h)
 {
     _pTexture = std::shared_ptr<SDL_Texture>(
-        const_cast<SDL_Texture*>(pTexture), 
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+        pTexture, std::bind(pushAndWaitMainThreadTask<void, SDL_Texture *>, SDL_DestroyTexture, _1));
     if (!pTexture) return;
     textureRect = {0, 0, w, h};
     loaded = true;
@@ -461,7 +456,7 @@ TextureFull::TextureFull(const Image& srcImage) : Texture(srcImage) {}
 
 TextureFull::TextureFull(const SDL_Surface* pSurface): Texture(pSurface) {}
 
-TextureFull::TextureFull(const SDL_Texture* pTexture, int w, int h): Texture(pTexture, w, h) {}
+TextureFull::TextureFull(SDL_Texture* pTexture, int w, int h): Texture(pTexture, w, h) {}
 
 TextureFull::~TextureFull() {}
 

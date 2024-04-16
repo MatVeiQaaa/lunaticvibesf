@@ -53,6 +53,15 @@ void SceneSelect::imguiInit()
 
     imgui_video_ssLevel = ConfigMgr::get("V", cfg::V_RES_SUPERSAMPLE, 1);
 
+    auto winMode = ConfigMgr::get("V", cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
+    if (winMode == cfg::V_WINMODE_FULL)
+        imgui_video_mode = 1;
+    else if (winMode == cfg::V_WINMODE_BORDERLESS)
+        imgui_video_mode = 2;
+    else
+        imgui_video_mode = 0;
+    old_video_mode = imgui_video_mode;
+
     imguiRefreshVideoDisplayResolutionList();
     auto windowX = ConfigMgr::get("V", cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
     auto windowY = ConfigMgr::get("V", cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
@@ -70,15 +79,6 @@ void SceneSelect::imguiInit()
         imgui_video_display_resolution_index = 0;
     }
     old_video_display_resolution_index = imgui_video_display_resolution_index;
-
-    auto winMode = ConfigMgr::get("V", cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
-    if (winMode == cfg::V_WINMODE_FULL)
-        imgui_video_mode = 1;
-    else if (winMode == cfg::V_WINMODE_BORDERLESS)
-        imgui_video_mode = 2;
-    else
-        imgui_video_mode = 0;
-    old_video_mode = imgui_video_mode;
 
     imgui_video_vsync_index = ConfigMgr::get("V", cfg::V_VSYNC, 0);
 #ifdef _WIN32

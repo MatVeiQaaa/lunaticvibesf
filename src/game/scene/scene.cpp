@@ -16,9 +16,9 @@
 #include "game/sound/sound_sample.h"
 
 // prototype
-SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput) :
-    AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate),
-    _input(1000, backgroundInput)
+SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
+    : AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
+      _input(1000, backgroundInput)
 {
     unsigned inputPollingRate = ConfigMgr::get("P", cfg::P_INPUT_POLLING_RATE, 1000);
     if (inputPollingRate != 1000)

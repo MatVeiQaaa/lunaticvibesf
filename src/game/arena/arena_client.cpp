@@ -116,7 +116,7 @@ bool ArenaClient::joinLobby(const std::string& address)
 
 	auto n = std::make_shared<ArenaMessageJoinLobby>();
 	n->messageIndex = ++sendMessageIndex;
-	n->version = (boost::format("%s %s") % GIT_BRANCH % GIT_COMMIT).str();
+	n->version = GIT_REVISION;
 	n->playerName = State::get(IndexText::PLAYER_NAME);
 
 	auto payload = n->pack();

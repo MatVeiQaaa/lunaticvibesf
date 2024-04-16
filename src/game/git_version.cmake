@@ -1,22 +1,17 @@
 
 find_package(Git)
 if(GIT_EXECUTABLE)
-    execute_process(COMMAND ${GIT_EXECUTABLE} branch --show-current
-        OUTPUT_VARIABLE GIT_BRANCH)
-    execute_process(COMMAND ${GIT_EXECUTABLE} log -n 1 --pretty=%h
-        OUTPUT_VARIABLE GIT_COMMIT)
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe
+        OUTPUT_VARIABLE GIT_REVISION)
 
-    string(STRIP "${GIT_BRANCH}" GIT_BRANCH)
-    string(STRIP "${GIT_COMMIT}" GIT_COMMIT)
+    string(STRIP "${GIT_REVISION}" GIT_REVISION)
 endif()
 
 set (GIT_VERSION_HEADER "#pragma once
-extern const char* GIT_BRANCH\;
-extern const char* GIT_COMMIT\;
+extern const char* GIT_REVISION\;
 ")
 set (GIT_VERSION "#include \"git_version.h\"
-const char* GIT_BRANCH = \"${GIT_BRANCH}\"\;
-const char* GIT_COMMIT = \"${GIT_COMMIT}\"\;
+const char* GIT_REVISION = \"${GIT_REVISION}\"\;
 ")
 
 if (EXISTS "git_version.h")

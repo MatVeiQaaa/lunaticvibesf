@@ -450,7 +450,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 			auto socket = addr.is_v4() ? v4 : v6;
 
 			auto pJoinLobbyMsg = std::static_pointer_cast<ArenaMessageJoinLobby>(pMsg);
-			if (pJoinLobbyMsg->version == (boost::format("%s %s") % GIT_BRANCH % GIT_COMMIT).str())
+			if (pJoinLobbyMsg->version == GIT_REVISION)
 			{
 				if (!gArenaData.playing)
 				{

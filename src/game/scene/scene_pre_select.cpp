@@ -447,14 +447,14 @@ void ScenePreSelect::loadFinished()
         }
         if (gNextScene == SceneType::PRE_SELECT)
         {
-            textHint = (boost::format("%s %s %s (%s %s)")
+            textHint = (boost::format("%s %s %s (%s)")
                 % PROJECT_NAME % PROJECT_VERSION
 #ifndef NDEBUG
                 % "Debug"
 #else
                 % ""
 #endif
-                % GIT_BRANCH % GIT_COMMIT
+                % GIT_REVISION
                 ).str();
             textHint2 = i18n::s(i18nText::PLEASE_WAIT);
         }

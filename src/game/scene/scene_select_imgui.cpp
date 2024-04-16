@@ -1006,14 +1006,14 @@ void SceneSelect::imguiPageAbout()
         if (ImGui::BeginChild("##pagesub21"))
         {
             ImGui::TextUnformatted("\"Lunatic Vibes F\" 2017-2024");
-            ImGui::TextUnformatted((boost::format("Version: %s %s (%s %s)")
+            ImGui::TextUnformatted((boost::format("Version: %s %s (%s)")
                 % PROJECT_VERSION
 #ifndef NDEBUG
                 % "Debug" 
 #else
                 % "Release"
 #endif
-                % GIT_BRANCH % GIT_COMMIT
+                % GIT_REVISION
                 ).str().c_str());
                 
             ImGui::TextUnformatted("https://github.com/chown2/lunaticvibesf");

@@ -354,6 +354,8 @@ SoundDriverFMOD::~SoundDriverFMOD()
     if (tLoadSampleThread.joinable())
         tLoadSampleThread.join();
 
+    // FIXME: free FMOD::DSP*, valgrind complains.
+
     // release before system release
     freeNoteSamples();
     freeSysSamples();

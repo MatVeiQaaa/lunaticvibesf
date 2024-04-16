@@ -27,8 +27,9 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
     }
 
     // Disable skin caching for now. dst options are changing all the time
+    const bool simple_skin = gInCustomize && skinType != SkinType::THEME_SELECT;
     SkinMgr::unload(skinType);
-    SkinMgr::load(skinType, gInCustomize && skinType != SkinType::THEME_SELECT);
+    SkinMgr::load(skinType, gInCustomize && simple_skin);
     pSkin = SkinMgr::get(skinType);
 
     int notificationPosY = 480;
@@ -49,42 +50,45 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
         notificationWidth = x;
     }
 
-    int faceIndex;
-    Path fontPath = getSysMonoFontPath(NULL, &faceIndex, i18n::getCurrentLanguage());
-    const int textHeight = 24;
-    _fNotifications = std::make_shared<TTFFont>(fontPath, int(textHeight * 1.5), faceIndex);
-    _texNotificationsBG = std::make_shared<TextureFull>(0x000000ff);
-    for (size_t i = 0; i < _sNotifications.size(); ++i)
+    if (!simple_skin)
     {
-        SpriteText::SpriteTextBuilder textBuilder;
-        textBuilder.font = _fNotifications;
-        textBuilder.textInd = IndexText(size_t(IndexText::_OVERLAY_NOTIFICATION_0) + i);
-        textBuilder.align = TextAlign::TEXT_ALIGN_LEFT;
-        textBuilder.ptsize = textHeight;
-        _sNotifications[i] = textBuilder.build();
-        _sNotifications[i]->setMotionLoopTo(0);
+        int faceIndex;
+        const Path fontPath = getSysMonoFontPath(NULL, &faceIndex, i18n::getCurrentLanguage());
+        const int textHeight = 24;
+        _fNotifications = std::make_shared<TTFFont>(fontPath, int(textHeight * 1.5), faceIndex);
+        _texNotificationsBG = std::make_shared<TextureFull>(0x000000ff);
+        for (size_t i = 0; i < _sNotifications.size(); ++i)
+        {
+            SpriteText::SpriteTextBuilder textBuilder;
+            textBuilder.font = _fNotifications;
+            textBuilder.textInd = IndexText(size_t(IndexText::_OVERLAY_NOTIFICATION_0) + i);
+            textBuilder.align = TextAlign::TEXT_ALIGN_LEFT;
+            textBuilder.ptsize = textHeight;
+            _sNotifications[i] = textBuilder.build();
+            _sNotifications[i]->setMotionLoopTo(0);
 
-        SpriteStatic::SpriteStaticBuilder bgBuilder;
-        bgBuilder.texture = _texNotificationsBG;
-        _sNotificationsBG[i] = bgBuilder.build();
-        _sNotificationsBG[i]->setMotionLoopTo(0);
+            SpriteStatic::SpriteStaticBuilder bgBuilder;
+            bgBuilder.texture = _texNotificationsBG;
+            _sNotificationsBG[i] = bgBuilder.build();
+            _sNotificationsBG[i]->setMotionLoopTo(0);
 
-        notificationPosY -= notificationHeight;
-        MotionKeyFrame f;
-        f.time = 0;
-        f.param.rect = Rect(0, notificationPosY, notificationWidth, notificationHeight);
-        f.param.accel = MotionKeyFrameParams::CONSTANT;
-        f.param.blend = BlendMode::ALPHA;
-        f.param.filter = true;
-        f.param.angle = 0;
-        f.param.center = Point(0, 0);
-        f.param.color = 0xffffff80;
-        _sNotificationsBG[i]->appendMotionKeyFrame(f);
+            notificationPosY -= notificationHeight;
+            MotionKeyFrame f;
+            f.time = 0;
+            f.param.rect = Rect(0, notificationPosY, notificationWidth, notificationHeight);
+            f.param.accel = MotionKeyFrameParams::CONSTANT;
+            f.param.blend = BlendMode::ALPHA;
+            f.param.filter = true;
+            f.param.angle = 0;
+            f.param.center = Point(0, 0);
+            f.param.color = 0xffffff80;
+            _sNotificationsBG[i]->appendMotionKeyFrame(f);
 
-        f.param.rect.y += (notificationHeight - textHeight) / 2;
-        f.param.rect.h = textHeight;
-        f.param.color = 0xffffffff;
-        _sNotifications[i]->appendMotionKeyFrame(f);
+            f.param.rect.y += (notificationHeight - textHeight) / 2;
+            f.param.rect.h = textHeight;
+            f.param.color = 0xffffffff;
+            _sNotifications[i]->appendMotionKeyFrame(f);
+        }
     }
 
     _input.register_p("DEBUG_TOGGLE", std::bind(&SceneBase::DebugToggle, this, std::placeholders::_1, std::placeholders::_2));
@@ -163,11 +167,15 @@ void SceneBase::update()
         }
 
         // update top-left texts
-        for (size_t i = 0; i < _sNotifications.size(); ++i)
+        for (auto& bg : _sNotificationsBG)
         {
-            _sNotifications[i]->update(t);
-            _sNotificationsBG[i]->update(t);
-
+            if (bg != nullptr)
+                bg->update(t);
+        }
+        for (auto& notification : _sNotifications)
+        {
+            if (notification != nullptr)
+                notification->update(t);
         }
 
         // update videos
@@ -232,9 +240,15 @@ void SceneBase::draw() const
             // draw notifications at the bottom. One string per line
             for (size_t i = 0; i < gOverlayContext.notifications.size() && i < _sNotifications.size(); ++i)
             {
-                _sNotificationsBG[i]->draw();
-                _sNotifications[i]->updateText();
-                _sNotifications[i]->draw();
+                if (_sNotificationsBG[i] != nullptr)
+                {
+                    _sNotificationsBG[i]->draw();
+                }
+                if (_sNotifications[i] != nullptr)
+                {
+                    _sNotifications[i]->updateText();
+                    _sNotifications[i]->draw();
+                }
             }
         }
     }

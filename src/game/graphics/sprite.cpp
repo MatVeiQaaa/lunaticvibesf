@@ -1032,7 +1032,7 @@ void SpriteOption::updateValByInd()
 
 bool SpriteOption::update(const lunaticvibes::Time& t)
 {
-	if (SpriteSelection::update(t))
+	if (SpriteAnimated::update(t))
 	{
 		updateValByInd();
 		return true;
@@ -1248,11 +1248,7 @@ SpriteOnMouse::SpriteOnMouse(const SpriteOnMouseBuilder& builder) : SpriteAnimat
 bool SpriteOnMouse::update(const lunaticvibes::Time& t)
 {
     if (!checkPanel(visibleOnPanel)) return false;
-    if (SpriteSelection::update(t))
-    {
-        return true;
-    }
-    return false;
+    return SpriteAnimated::update(t);
 }
 
 void SpriteOnMouse::OnMouseMove(int x, int y)
@@ -1276,11 +1272,7 @@ SpriteCursor::SpriteCursor(const SpriteCursorBuilder& builder) : SpriteAnimated(
 
 bool SpriteCursor::update(const lunaticvibes::Time& t)
 {
-    if (SpriteSelection::update(t))
-    {
-        return true;
-    }
-    return false;
+    return SpriteAnimated::update(t);
 }
 
 void SpriteCursor::OnMouseMove(int x, int y)

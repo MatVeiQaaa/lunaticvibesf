@@ -36,7 +36,8 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
     int notificationWidth = 640;
     const int notificationHeight = 20;
 
-    if (pSkin && !gInCustomize && skinType != SkinType::THEME_SELECT)
+    if (pSkin &&
+        ((!gInCustomize && skinType != SkinType::THEME_SELECT) || (gInCustomize && skinType == SkinType::THEME_SELECT)))
     {
         int x, y;
         switch (pSkin->info.resolution)

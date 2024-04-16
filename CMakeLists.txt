@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.29.2)
 
 if (WIN32)
     set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")

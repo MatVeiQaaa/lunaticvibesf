@@ -56,7 +56,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         if: startsWith(matrix.os, 'windows')
 
-      - uses: lukka/get-cmake@v3.28.3
+      - uses: lukka/get-cmake@v3.29.2
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11

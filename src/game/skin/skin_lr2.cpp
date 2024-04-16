@@ -4353,28 +4353,25 @@ void SkinLR2::update()
     // 6-11:  NOWCOMBO 1P
     // 12-17: NOWJUDGE 2P
     // 18-23: NOWCOMBO 2P
-    for (size_t i = 0; i < 6; ++i)
-    {
-        // 1P judge
+    auto shift_combo = [](const bool noshiftJudge, const int alignNowCombo, size_t i) {
         if (gSprites[i] && gSprites[i + 6])
         {
-            std::shared_ptr<SpriteAnimated> judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i]);
-            std::shared_ptr<SpriteNumber> combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 6]);
+            auto judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i]);
+            auto combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 6]);
             if (judge->isDraw() && !judge->isHidden())
             {
                 combo->setHideExternal(false);
 
-                RectF base = judge->_current.rect;
-                double shiftUnit = 0.5 * combo->_current.rect.w;
+                const RectF base = judge->_current.rect;
+                const float shiftUnit = 0.5f * combo->_current.rect.w;
 
-                int judgeShiftWidth = noshiftJudge1P[i] ? 0 : int(std::floor(shiftUnit * combo->digitCount));
+                const int judgeShiftWidth = noshiftJudge ? 0 : int(shiftUnit * static_cast<float>(combo->digitCount));
                 judge->_current.rect.x -= judgeShiftWidth;
 
                 for (auto& d : combo->digitOutRect)
                 {
-                    int comboShiftUnitCount = noshiftJudge1P[i] ? 0 : -1;
-
-                    switch (alignNowCombo1P[i])
+                    int comboShiftUnitCount = noshiftJudge ? 0 : -1;
+                    switch (alignNowCombo)
                     {
                     case 0:
                         comboShiftUnitCount += (combo->maxDigits - combo->digitCount) * 2 - combo->digitCount + 1;
@@ -4386,7 +4383,8 @@ void SkinLR2::update()
                         comboShiftUnitCount += (-combo->maxDigits - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
                         break;
                     }
-                    d.x += base.x + shiftUnit * comboShiftUnitCount;
+                    // NOTE: std ceil - magic for off-by-one errors, fixes odd/uneven combos with Remi-S.
+                    d.x += base.x + std::ceil(shiftUnit * static_cast<float>(comboShiftUnitCount));
                     d.y += base.y;
                 }
             }
@@ -4395,46 +4393,11 @@ void SkinLR2::update()
                 combo->setHideExternal(true);
             }
         }
-        // 2P judge
-        if (gSprites[i + 12] && gSprites[i + 18])
-        {
-            std::shared_ptr<SpriteAnimated> judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i + 12]);
-            std::shared_ptr<SpriteNumber> combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 18]);
-            if (judge->isDraw() && !judge->isHidden())
-            {
-                combo->setHideExternal(false);
-
-                RectF base = judge->_current.rect;
-                double shiftUnit = 0.5 * combo->_current.rect.w;
-
-                int judgeShiftWidth = noshiftJudge2P[i] ? 0 : int(std::floor(shiftUnit * combo->digitCount));
-                judge->_current.rect.x -= judgeShiftWidth;
-
-                for (auto& d : combo->digitOutRect)
-                {
-                    int comboShiftUnitCount = noshiftJudge2P[i] ? 0 : -1;
-
-                    switch (alignNowCombo2P[i])
-                    {
-                    case 0:
-                        comboShiftUnitCount += (combo->maxDigits - combo->digitCount) * 2 - combo->digitCount + 1;
-                        break;
-                    case 1:
-                        comboShiftUnitCount -= combo->digitCount - 1;
-                        break;
-                    case 2:
-                        comboShiftUnitCount += (-combo->maxDigits - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
-                        break;
-                    }
-                    d.x += base.x + shiftUnit * comboShiftUnitCount;
-                    d.y += base.y;
-                }
-            }
-            else
-            {
-                combo->setHideExternal(true);
-            }
-        }
+    };
+    for (size_t i = 0; i < 6; ++i)
+    {
+        shift_combo(noshiftJudge1P[i], alignNowCombo1P[i], i);
+        shift_combo(noshiftJudge2P[i], alignNowCombo2P[i], i + 12);
     }
 
     // LIFT: move judgeline, nowjudge, nowcombo

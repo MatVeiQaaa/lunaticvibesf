@@ -1937,8 +1937,7 @@ void ScenePlay::updateLoading()
     State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_SYS, int(chartObjLoaded) * 0.5 + int(rulesetLoaded) * 0.5);
     State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_WAV, getWavLoadProgress());
     State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_BGA, getBgaLoadProgress());
-    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS, int(
-        getWavLoadProgress() + getBgaLoadProgress()) / 2.0);
+    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS, (getWavLoadProgress() + getBgaLoadProgress()) / 2.0);
 
     if (chartObjLoaded && 
         rulesetLoaded &&

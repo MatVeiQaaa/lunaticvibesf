@@ -31,6 +31,8 @@
 #include <curl/curl.h>
 #include <imgui.h>
 
+static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
+
 bool gEventQuit;
 GenericInfoUpdater gGenericInfo{ 1 };
 
@@ -205,6 +207,9 @@ int main(int argc, char* argv[])
     // arg parsing
     if (argc >= 2)
     {
+        g_pScoreDB = std::make_shared<ScoreDB>(IN_MEMORY_DB_PATH);
+        g_pSongDB = std::make_shared<SongDB>(IN_MEMORY_DB_PATH);
+
         gNextScene = SceneType::PLAY;
         gQuitOnFinish = true;
 

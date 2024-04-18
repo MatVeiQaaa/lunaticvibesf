@@ -271,7 +271,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             {
                 for (unsigned i = 0; i < 10; i++)
                 {
-                    auto ch = objBms.getLane(code, i, m);
+                    const auto& ch = objBms.getLane(code, i, m);
                     unsigned index = i;
                     if (area != 0)
                     {
@@ -288,7 +288,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             {
                 for (unsigned i = 0; i < 10; i++)
                 {
-                    auto ch = objBms.getLane(code, i, m);
+                    const auto& ch = objBms.getLane(code, i, m);
                     unsigned index = i;
                     if (area != 0)
                     {
@@ -372,7 +372,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             // BGM
             for (unsigned i = 0; i < objBms.bgmLayersCount[m]; i++)
             {
-                auto ch = objBms.getLane(LaneCode::BGM, i, m);
+                const auto& ch = objBms.getLane(LaneCode::BGM, i, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                       val     } }
                     notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGM, i }, n.value } });
@@ -382,19 +382,19 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             if (State::get(IndexSwitch::_LOAD_BGA))
             {
                 {
-                    auto ch = objBms.getLane(LaneCode::BGABASE, 0, m);
+                    const auto& ch = objBms.getLane(LaneCode::BGABASE, 0, m);
                     for (const auto& n : ch.notes)
                         //              { metre,                               { { lane,                        val     } }
                         notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGABASE, 0 }, n.value } });
                 }
                 {
-                    auto ch = objBms.getLane(LaneCode::BGALAYER, 0, m);
+                    const auto& ch = objBms.getLane(LaneCode::BGALAYER, 0, m);
                     for (const auto& n : ch.notes)
                         //              { metre,                               { { lane,                        val     } }
                         notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGALAYER, 0 }, n.value } });
                 }
                 {
-                    auto ch = objBms.getLane(LaneCode::BGAPOOR, 0, m);
+                    const auto& ch = objBms.getLane(LaneCode::BGAPOOR, 0, m);
                     for (const auto& n : ch.notes)
                         //              { metre,                               { { lane,                        val     } }
                         notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGAPOOR, 0 }, n.value } });
@@ -403,7 +403,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
             // BPM Change
             {
-                auto ch = objBms.getLane(LaneCode::BPM, 0, m);
+                const auto& ch = objBms.getLane(LaneCode::BPM, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
                     notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BPM, 0 }, n.value } });
@@ -411,7 +411,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
             // EX BPM
             {
-                auto ch = objBms.getLane(LaneCode::EXBPM, 0, m);
+                const auto& ch = objBms.getLane(LaneCode::EXBPM, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
                     notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::EXBPM, 0 }, n.value } });
@@ -419,7 +419,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
             // Stop
             {
-                auto ch = objBms.getLane(LaneCode::STOP, 0, m);
+                const auto& ch = objBms.getLane(LaneCode::STOP, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
                     notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::STOP, 0 }, n.value } });

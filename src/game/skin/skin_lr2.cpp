@@ -4379,6 +4379,7 @@ void SkinLR2::update()
                         comboShiftUnitCount -= combo->digitCount - 1;
                         break;
                     case 2:
+                        // FIXME: MSVC 'unary minus operator applied to unsigned type, result still unsigned'
                         comboShiftUnitCount += (-combo->maxDigits - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
                         break;
                     }

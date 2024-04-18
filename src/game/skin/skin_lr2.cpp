@@ -4319,33 +4319,32 @@ void SkinLR2::update()
 
     lunaticvibes::Time t;
 
-    // update turntables
     {
-        int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);
-        int ttAngle2P = State::get(IndexNumber::_ANGLE_TT_2P);
+        const int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);
+        const int ttAngle2P = State::get(IndexNumber::_ANGLE_TT_2P);
+        auto update_tt = [ttAngle1P, ttAngle2P](element &e) {
+            const bool hide = [&e]() {
+                if (!(getDstOpt(e.op1) && getDstOpt(e.op2) && getDstOpt(e.op3))) return true;
 
-        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), [ttAngle1P, ttAngle2P](element& e)
-            {
-                bool hide = false;
-                if (!(getDstOpt(e.op1) && getDstOpt(e.op2) && getDstOpt(e.op3)))
-                    hide = true;
                 for (auto op : e.opEx)
                 {
                     if (!getDstOpt(op))
                     {
-                        hide = true;
-                        break;
+                        return true;
                     }
                 }
-                e.ps->setHideExternal(hide);
+                return false;
+            }();
+            e.ps->setHideExternal(hide);
 
-                switch (e.op4)
-                {
-                case 1: e.ps->_current.angle += ttAngle1P; break;
-                case 2: e.ps->_current.angle += ttAngle2P; break;
-                default: break;
-                }
-            });
+            switch (e.op4)
+            {
+            case 1: e.ps->_current.angle += ttAngle1P; break;
+            case 2: e.ps->_current.angle += ttAngle2P; break;
+            default: break;
+            }
+        };
+        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), update_tt);
     }
 
     // update nowjudge/nowcombo

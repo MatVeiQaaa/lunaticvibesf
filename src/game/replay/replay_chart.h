@@ -145,6 +145,8 @@ public:
         } type = Type::UNDEF;
         double value = 0.0;
 
+        static Type leftSideCmdToRightSide(Type);
+
         template<class Archive>
         void serialize(Archive& ar)
         {

@@ -3,6 +3,8 @@
 #include "config/config_mgr.h"
 
 #include <cereal/archives/portable_binary.hpp>
+
+#include <cstdlib>
 #include <sstream>
 
 bool ReplayChart::loadFile(const Path& path)
@@ -554,3 +556,51 @@ const std::map<ReplayChart::Commands::Type, Input::Pad> REPLAY_CMD_INPUT_UP_MAP_
     },
 };
 
+ReplayChart::Commands::Type ReplayChart::Commands::leftSideCmdToRightSide(const ReplayChart::Commands::Type cmd)
+{
+    using CmdType = ReplayChart::Commands::Type;
+    switch (cmd)
+    {
+    case CmdType::S1L_DOWN: return CmdType::S2L_DOWN;
+    case CmdType::S1R_DOWN: return CmdType::S2R_DOWN;
+    case CmdType::K11_DOWN: return CmdType::K21_DOWN;
+    case CmdType::K12_DOWN: return CmdType::K22_DOWN;
+    case CmdType::K13_DOWN: return CmdType::K23_DOWN;
+    case CmdType::K14_DOWN: return CmdType::K24_DOWN;
+    case CmdType::K15_DOWN: return CmdType::K25_DOWN;
+    case CmdType::K16_DOWN: return CmdType::K26_DOWN;
+    case CmdType::K17_DOWN: return CmdType::K27_DOWN;
+    case CmdType::K18_DOWN: return CmdType::K28_DOWN;
+    case CmdType::K19_DOWN: return CmdType::K29_DOWN;
+    case CmdType::S1L_UP: return CmdType::S2L_UP;
+    case CmdType::S1R_UP: return CmdType::S2R_UP;
+    case CmdType::K11_UP: return CmdType::K21_UP;
+    case CmdType::K12_UP: return CmdType::K22_UP;
+    case CmdType::K13_UP: return CmdType::K23_UP;
+    case CmdType::K14_UP: return CmdType::K24_UP;
+    case CmdType::K15_UP: return CmdType::K25_UP;
+    case CmdType::K16_UP: return CmdType::K26_UP;
+    case CmdType::K17_UP: return CmdType::K27_UP;
+    case CmdType::K18_UP: return CmdType::K28_UP;
+    case CmdType::K19_UP: return CmdType::K29_UP;
+    case CmdType::S1A_PLUS: return CmdType::S2A_PLUS;
+    case CmdType::S1A_MINUS: return CmdType::S2A_MINUS;
+    case CmdType::S1A_STOP: return CmdType::S2A_STOP;
+    case CmdType::JUDGE_LEFT_EXACT_0: return CmdType::JUDGE_RIGHT_EXACT_0;
+    case CmdType::JUDGE_LEFT_EARLY_0: return CmdType::JUDGE_RIGHT_EARLY_0;
+    case CmdType::JUDGE_LEFT_EARLY_1: return CmdType::JUDGE_RIGHT_EARLY_1;
+    case CmdType::JUDGE_LEFT_EARLY_2: return CmdType::JUDGE_RIGHT_EARLY_2;
+    case CmdType::JUDGE_LEFT_EARLY_3: return CmdType::JUDGE_RIGHT_EARLY_3;
+    case CmdType::JUDGE_LEFT_EARLY_4: return CmdType::JUDGE_RIGHT_EARLY_4;
+    case CmdType::JUDGE_LEFT_EARLY_5: return CmdType::JUDGE_RIGHT_EARLY_5;
+    case CmdType::JUDGE_LEFT_LATE_0: return CmdType::JUDGE_RIGHT_LATE_0;
+    case CmdType::JUDGE_LEFT_LATE_1: return CmdType::JUDGE_RIGHT_LATE_1;
+    case CmdType::JUDGE_LEFT_LATE_2: return CmdType::JUDGE_RIGHT_LATE_2;
+    case CmdType::JUDGE_LEFT_LATE_3: return CmdType::JUDGE_RIGHT_LATE_3;
+    case CmdType::JUDGE_LEFT_LATE_4: return CmdType::JUDGE_RIGHT_LATE_4;
+    case CmdType::JUDGE_LEFT_LATE_5: return CmdType::JUDGE_RIGHT_LATE_5;
+    case CmdType::JUDGE_LEFT_LANDMINE: return CmdType::JUDGE_RIGHT_LANDMINE;
+    default: return cmd;
+    }
+    std::abort(); // unreachable
+}

@@ -1,7 +1,7 @@
 
 find_package(Git)
 if(GIT_EXECUTABLE)
-    execute_process(COMMAND ${GIT_EXECUTABLE} describe
+    execute_process(COMMAND ${GIT_EXECUTABLE} describe --always
         OUTPUT_VARIABLE GIT_REVISION)
 
     string(STRIP "${GIT_REVISION}" GIT_REVISION)

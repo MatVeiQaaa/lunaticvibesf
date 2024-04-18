@@ -4536,12 +4536,7 @@ void SkinLR2::update()
         });
 
     // update songlist bar
-    // TODO: check if this makes barSprites update twice, as sprites are usually also updates by SkinBase::update().
-    for (auto& s : barSprites)
-    {
-        // NOTE: It read-locks inside.
-        s->update(t);
-    }
+    // NOTE: barSprites have been already updated by SkinBase::update.
     std::shared_lock u(gSelectContext._mutex, std::try_to_lock);
     if (u.owns_lock())
     {

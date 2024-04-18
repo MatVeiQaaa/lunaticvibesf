@@ -15,7 +15,7 @@ protected:
 public:
 	Metre() : fraction() {}
 	Metre(long long division_level, long long multiple_level) : fraction(division_level, multiple_level, false) {}
-	Metre(double value) : fraction(static_cast<long long>(value * 1e12), 1e12, true) {}
+	Metre(double value) : fraction(static_cast<long long>(value * 1e12), 1'000'000'000'000, true) {}
 	~Metre() override {}
 
 	double toDouble() const { return operator double(); }
@@ -64,13 +64,13 @@ public:
 	[[nodiscard]] static constexpr Time singleBeatLengthFromBPM(BPM bpm)
 	{
 		using namespace std::chrono;
-		return Time(6e4 / bpm * duration_cast<timeHighRes>(1ms).count(), true);
+		return {static_cast<long long>(6e4 / bpm * duration_cast<timeHighRes>(1ms).count()), true};
 	}
 
-	constexpr Time operator- () const { return Time(-_highres, true); }
+	constexpr Time operator- () const { return {-_highres, true}; }
 	constexpr Time operator+ (const Time& rhs) const { return {_highres + rhs._highres, true}; }
 	constexpr Time operator- (const Time& rhs) const { return {_highres - rhs._highres, true}; }
-	constexpr Time operator* (const double rhs) const { return {static_cast<long>(_highres * rhs), true}; }
+	constexpr Time operator* (const double rhs) const { return {static_cast<long long>(_highres * rhs), true}; }
 	constexpr Time& operator+= (const Time& rhs) { _highres += rhs._highres; _regular = _highres / 1000000; return *this; }
 	constexpr Time& operator-= (const Time& rhs) { _highres -= rhs._highres; _regular = _highres / 1000000; return *this; }
 	constexpr bool operator< (const Time& rhs) const { return _highres < rhs._highres; }

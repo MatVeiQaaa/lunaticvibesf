@@ -377,12 +377,7 @@ void lunaticvibes::graphics::save_new_window_size(int width, int height)
 void graphics_change_vsync(int mode)
 {
     LOG_WARNING << "Setting vsync mode to " << mode;
-#ifdef _WIN32
     SDL_RenderSetVSync(gFrameRenderer, mode);
-#else
-    // codes below should work since we are explicitly indicated to use OpenGL backend
-    SDL_GL_SetSwapInterval(mode == 2 ? -1 : mode);
-#endif
 }
 
 static int superSampleLevel = 1;

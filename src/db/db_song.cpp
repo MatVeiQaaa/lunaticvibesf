@@ -626,7 +626,7 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
     transactionStart();
     sessionFuture = std::async(std::launch::async, [&]()
         {
-            SetDebugThreadName("SongFolderInit");
+            SetThreadName("SongFolderInit");
             while (inAddFolderSession)
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));

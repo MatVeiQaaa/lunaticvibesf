@@ -1149,7 +1149,7 @@ void ScenePlay::loadChart()
     if ((!gChartContext.isSampleLoaded || gChartContext.hash != gChartContext.sampleLoadedHash) && !sceneEnding)
     {
         auto dtor = std::async(std::launch::async, [&]() {
-            SetDebugThreadName("ChartSampleLoad");
+            SetThreadName("ChartSampleLoad");
             SoundMgr::freeNoteSamples();
 
             auto _pChart = gChartContext.chart;
@@ -1213,7 +1213,7 @@ void ScenePlay::loadChart()
         if (!gChartContext.isBgaLoaded)
         {
             auto dtor = std::async(std::launch::async, [&]() {
-                SetDebugThreadName("ChartBgaLoad");
+                SetThreadName("ChartBgaLoad");
                 gPlayContext.bgaTexture->clear();
 
                 auto _pChart = gChartContext.chart;

@@ -22,12 +22,6 @@ void getWindowHandle(void* handle);
 bool IsWindowForeground();
 void SetWindowForeground(bool foreground);
 
-#ifndef NDEBUG
-#define SetDebugThreadName(x) SetThreadName(x)
-#else
-#define SetDebugThreadName(x) do {} while(0)
-#endif
-
 void pushMainThreadTask(std::function<void()> f);
 void doMainThreadTask();
 void StopHandleMainThreadTask();

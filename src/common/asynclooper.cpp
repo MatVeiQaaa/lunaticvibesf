@@ -82,7 +82,7 @@ void AsyncLooper::loopStart()
 
             loopFuture = std::async(std::launch::async, [this]()
                 {
-                    SetDebugThreadName(_tag.c_str());
+                    SetThreadName(_tag.c_str());
                     long long us = _rate > 0 ? 1000000 / _rate : 0;
                     long long reset_threshold = us * 4;
 
@@ -177,7 +177,7 @@ void AsyncLooper::loopEnd()
 #else // FALLBACK
 void AsyncLooper::_loopWithSleep()
 {
-    SetDebugThreadName(_tag.c_str());
+    SetThreadName(_tag.c_str());
     LOG_DEBUG << "[Looper] " << _tag << ": Starting " << _rate << "/s";
     std::chrono::high_resolution_clock::time_point frameTimestampPrev;
     const auto desiredFrameTimeBetweenFrames = std::chrono::nanoseconds(std::nano::den / _rate);

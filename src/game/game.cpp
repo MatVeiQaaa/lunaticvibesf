@@ -41,7 +41,7 @@ void mainLoop();
 // SDL_main
 int main(int argc, char* argv[])
 {
-    SetDebugThreadName("LunaticVibesF");
+    SetThreadName("LunaticVibesF");
     SetThreadAsMainThread();
 
     executablePath = GetExecutablePath();

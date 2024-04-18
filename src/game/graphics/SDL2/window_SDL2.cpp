@@ -101,7 +101,7 @@ int graphics_init()
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);
 
-        if (ConfigMgr::get("V", cfg::V_VSYNC, false))
+        if (ConfigMgr::get("V", cfg::V_VSYNC, 0))
         {
             gFrameRenderer = SDL_CreateRenderer(
                 gFrameWindow, -1,

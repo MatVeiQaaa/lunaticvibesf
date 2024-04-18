@@ -836,8 +836,8 @@ void setText()
         };
 
         auto&& s = ConfigMgr::get<int>('V', V_VSYNC, 0);
-        if (smap.find(s) != smap.end())
-            State::set(IndexText::VSYNC, smap.at(s));
+        if (auto it = smap.find(s); it != smap.end())
+            State::set(IndexText::VSYNC, it->second);
         else
             State::set(IndexText::VSYNC, Option::s_vsync_mode[Option::VSYNC_OFF]);
     }

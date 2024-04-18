@@ -81,17 +81,14 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
     lunaticvibes::Time time;
 
     // Check if timer is valid
-    if (State::get(motionStartTimer) < 0 || State::get(motionStartTimer) == TIMER_NEVER)
+    const auto motionStartTime = State::get(motionStartTimer);
+    if (motionStartTime < 0 || motionStartTime == TIMER_NEVER)
         return false;
 
 	// Check if timer is 140
-    if (motionStartTimer == IndexTimer::MUSIC_BEAT)
+    if (motionStartTimer != IndexTimer::MUSIC_BEAT)
     {
-        time = State::get(IndexTimer::MUSIC_BEAT);
-    }
-    else
-    {
-        time = rawTime - lunaticvibes::Time(State::get(motionStartTimer), false);
+        time = rawTime - lunaticvibes::Time(motionStartTime, false);
     }
 
     // Check if the sprite is not visible yet

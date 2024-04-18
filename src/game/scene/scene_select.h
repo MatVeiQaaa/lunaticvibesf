@@ -102,7 +102,6 @@ public:
 protected:
     // Looper callbacks
     void _updateAsync() override;
-    std::function<void()> _updateCallback;
     void updatePrepare();
     void updateSelect();
     void updateFadeout();

@@ -474,7 +474,6 @@ SceneSelect::SceneSelect() : SceneBase(SkinType::MUSIC_SELECT, 250)
     }
 
     state = eSelectState::PREPARE;
-    _updateCallback = std::bind(&SceneSelect::updatePrepare, this);
 
     // update random options
     loadLR2Sound();
@@ -634,7 +633,13 @@ void SceneSelect::_updateAsync()
         gNextScene = SceneType::EXIT_TRANS;
     }
 
-    _updateCallback();
+    switch (state)
+    {
+    case eSelectState::PREPARE: updatePrepare(); break;
+    case eSelectState::SELECT: updateSelect(); break;
+    case eSelectState::WATCHING_README: break;
+    case eSelectState::FADEOUT: updateFadeout(); break;
+    }
 
     auto visit_readme_open_request = overloaded{
         [this, &t](const HelpFileOpenRequest r) {
@@ -940,7 +945,6 @@ void SceneSelect::updatePrepare()
     if (rt.norm() >= pSkin->info.timeIntro)
     {
         state = eSelectState::SELECT;
-        _updateCallback = std::bind(&SceneSelect::updateSelect, this);
 
         using namespace std::placeholders;
         _input.register_p("SCENE_PRESS", std::bind(&SceneSelect::inputGamePress, this, _1, _2));
@@ -1134,7 +1138,6 @@ void SceneSelect::updateSelect()
         if (!gInCustomize) SoundMgr::setSysVolume(0.0, 500);
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
         state = eSelectState::FADEOUT;
-        _updateCallback = std::bind(&SceneSelect::updateFadeout, this);
     }
     else if (gSelectContext.isGoingToAutoPlay)
     {

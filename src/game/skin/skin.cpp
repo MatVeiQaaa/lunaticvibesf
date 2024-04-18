@@ -51,20 +51,15 @@ void SkinBase::update()
     {
         // reset
         s->_draw = false;
-
 		s->update(gUpdateContext.updateTime);
-    };
 
-    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(), updateSpriteLambda);
-
-    for (auto& s : _sprites)
-    {
         if (auto pText = std::dynamic_pointer_cast<SpriteText>(s); pText != nullptr)
         {
             pText->updateText();
         }
-    }
+    };
 
+    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(), updateSpriteLambda);
 }
 
 void SkinBase::update_mouse(int x, int y)

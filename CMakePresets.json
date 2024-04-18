@@ -29,7 +29,7 @@
             "inherits": "windows-vcpkg-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS_INIT": "/fsanitize=address /permissive-"
+                "CMAKE_CXX_FLAGS_INIT": "/fsanitize=address /permissive- /W1"
             }
         },
         {

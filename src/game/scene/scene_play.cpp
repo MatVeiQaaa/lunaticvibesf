@@ -1184,9 +1184,9 @@ void ScenePlay::loadChart()
                     if (pWav.is_absolute())
                     {
                         LOG_WARNING << "[Play] Absolute path to sample, this is forbidden";
-                        return;
+                    } else {
+                        SoundMgr::loadNoteSample((chartDir / pWav), i);
                     }
-                    SoundMgr::loadNoteSample((chartDir / pWav), i);
                     ++wavLoaded;
                 });
             }

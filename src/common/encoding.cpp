@@ -295,7 +295,7 @@ struct IcdDeleter {
         }
     }
 };
-using IcdPtr = std::unique_ptr<std::remove_pointer<iconv_t>::type, IcdDeleter>;
+using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
 static std::string convert(const std::string& input, eFileEncoding from, eFileEncoding to)
 {

@@ -429,7 +429,8 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
             break;
         }
     }
-    if (total < 0)
+    // NOTE: LR2 handles #TOTAL 0 as if total was not set.
+    if (total <= 0)
     {
         switch (_gauge)
         {

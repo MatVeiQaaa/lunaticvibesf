@@ -109,13 +109,32 @@ static bool isGIF(const std::string_view filePath)
 
 Image::Image(const std::filesystem::path& path) : Image(path.u8string().c_str()) {}
 
+// SDL2 leaks memory on non-main threads otherwise:
+// SDL_GetErrBuf
+// SDL_SetError_REAL
+// SDL_RWFromFile_REAL
+// SDL_RWFromFile
+void ensure_tls_cleanup()
+{
+    static thread_local struct TlsCleanup{
+        ~TlsCleanup() { SDL_TLSCleanup(); };
+    } tls_cleanup;
+}
+
+void close_rwops(SDL_RWops* s)
+{
+    if (s) s->close(s);
+    ensure_tls_cleanup();
+}
+
 Image::Image(const char* filePath) : 
-    Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), [](SDL_RWops* s) { if (s) s->close(s); }))
+
+    Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
 {
 }
 
 Image::Image(const char* format, void* data, size_t size): 
-    Image(format, std::shared_ptr<SDL_RWops>(SDL_RWFromMem(data, size), [](SDL_RWops* s) { if (s) s->close(s); }))
+    Image(format, std::shared_ptr<SDL_RWops>(SDL_RWFromMem(data, size), close_rwops))
 {
 }
 

@@ -48,12 +48,12 @@ struct AVFrameDeleter
 {
     void operator()(AVFrame *avp);
 };
-using AVFramePtr = std::unique_ptr<std::remove_pointer_t<AVFrame>, AVFrameDeleter>;
+using AVFramePtr = std::unique_ptr<AVFrame, AVFrameDeleter>;
 struct AVPacketDeleter
 {
     void operator()(AVPacket *avp);
 };
-using AVPacketPtr = std::unique_ptr<std::remove_pointer_t<AVPacket>, AVPacketDeleter>;
+using AVPacketPtr = std::unique_ptr<AVPacket, AVPacketDeleter>;
 } // namespace lunaticvibes
 
 // libav decoder wrap

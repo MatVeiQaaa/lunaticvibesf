@@ -3243,7 +3243,11 @@ void SceneSelect::updatePreview()
                                 LOG_WARNING << "[Select] Absolute path to sample, this is forbidden";
                                 return;
                             }
-                            SoundMgr::loadNoteSample((chartDir / pWav), i);
+                            fs::path p{chartDir / pWav};
+#ifndef _WIN32
+                            p = PathFromUTF8(lunaticvibes::resolve_windows_path(p.u8string()));
+#endif // _WIN32
+                            SoundMgr::loadNoteSample(p, i);
                         });
                     }
                     pool.wait();

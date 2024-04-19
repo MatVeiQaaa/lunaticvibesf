@@ -76,7 +76,7 @@ bool State::get(IndexSwitch ind)
 
 bool State::set(IndexText ind, std::string_view val)
 {
-	return _inst.gTexts.set(ind, std::string(val));
+	return _inst.gTexts.set(ind, val);
 }
 
 std::string State::get(IndexText ind)

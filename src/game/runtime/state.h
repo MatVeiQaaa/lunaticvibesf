@@ -14,6 +14,8 @@
 #include <shared_mutex>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 
 // Global state value manager
 class State
@@ -30,7 +32,10 @@ protected:
 		using ValType = Value;
 
 	public:
-		StateContainer() : _data{ Value() }, _dataDefault{ Value() } { static_assert(_size > 0); }
+		StateContainer() : _data{{}}, _dataDefault{{}}
+		{
+			static_assert(_size > 0);
+		}
 		StateContainer(Value defVal) : StateContainer()
 		{
 			_data.fill(defVal);
@@ -50,10 +55,23 @@ protected:
 				std::shared_lock l{_mutex};
 				return _data.data()[idx];
 			}
-			return Value();
+			return {};
 		}
 
-		bool set(Key n, Value value)
+		bool set(Key n, const Value& value)
+		{
+			size_t idx = static_cast<size_t>(n);
+			if (idx < _size)
+			{
+				std::unique_lock l{_mutex};
+				_data[idx] = value;
+				return true;
+			}
+			return false;
+		}
+
+		template <typename = typename std::enable_if<std::is_same_v<Value, std::string>>>
+		bool set(Key n, std::string_view value)
 		{
 			size_t idx = (size_t)n;
 			if (idx < _size)
@@ -70,7 +88,7 @@ protected:
 			size_t idx = (size_t)n;
 			if (idx < _size)
 			{
-				_dataDefault[idx] = value;
+				_dataDefault[idx] = std::move(value);
 				return true;
 			}
 			return false;

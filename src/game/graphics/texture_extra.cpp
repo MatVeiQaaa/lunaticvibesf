@@ -1,6 +1,7 @@
 
 #include <algorithm>
 
+#include "common/sysutil.h"
 #include "game/chart/chart_bms.h"
 #include "texture_extra.h"
 #include "game/scene/scene_context.h"
@@ -186,7 +187,6 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
 			Image layerImg(pBmp);
 			layerImg.setTransparentColorRGB(Color(0, 0, 0, 255));
 			objs_layer[idx].pt = std::make_shared<Texture>(layerImg);
-
 			LOG_DEBUG << "[TextureBmsBga] added pic: " << pBmp;
 			return true;
 		}
@@ -194,9 +194,7 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
 	else
 	{
 		objs[idx].type = obj::Ty::EMPTY;
-
 		objs_layer[idx].type = obj::Ty::EMPTY;
-
 		LOG_DEBUG << "[TextureBmsBga] file not found, added dummy: " << pBmp;
 	}
 	return false;

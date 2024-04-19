@@ -1233,33 +1233,28 @@ void ScenePlay::loadChart()
                     return;
                 }
 
-                std::list<std::pair<size_t, Path>> mapBgaFiles;
-                auto loadBgaFiles = [&]() {
-                    if (shouldDiscard(*this)) return;
-                    for (auto& [i, pBmp] : mapBgaFiles)
-                    {
-                        if (pBmp.is_absolute())
-                            gPlayContext.bgaTexture->addBmp(i, pBmp);
-                        else
-                            gPlayContext.bgaTexture->addBmp(i, chartDir / pBmp);
-                        ++bmpLoaded;
-                    }
-                };
+                const auto thread_count = std::thread::hardware_concurrency();
+                boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
                 for (size_t i = 0; i < _pChart->bgaFiles.size(); ++i)
                 {
                     if (shouldDiscard(*this)) return;
                     const auto& bmp = _pChart->bgaFiles[i];
                     if (bmp.empty()) continue;
-
-                    mapBgaFiles.emplace_back(i, PathFromUTF8(bmp));
-
-                    // load 8 bmps each frame
-                    if (mapBgaFiles.size() >= 8)
-                    {
-                        pushAndWaitMainThreadTask<void>(loadBgaFiles);
-                        mapBgaFiles.clear();
-                    }
+                    boost::asio::post(pool, [&bmp, this, i, &chartDir]() {
+                        if (shouldDiscard(*this)) return;
+                        const auto pBmp = PathFromUTF8(bmp);
+                        if (pBmp.is_absolute())
+                        {
+                            LOG_WARNING << "[Play] Absolute path to BGA picture, this is forbidden";
+                        }
+                        else
+                        {
+                            gPlayContext.bgaTexture->addBmp(i, chartDir / pBmp);
+                        }
+                        ++bmpLoaded;
+                    });
                 }
+                pool.wait();
 
                 if (shouldDiscard(*this))
                 {
@@ -1268,8 +1263,6 @@ void ScenePlay::loadChart()
                 }
 
                 LOG_DEBUG << "[Play] BGA loaded";
-                loadBgaFiles();
-                mapBgaFiles.clear();
                 if (bmpLoaded > 0)
                 {
                     gPlayContext.bgaTexture->setLoaded();

@@ -16,23 +16,22 @@ SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder) : Sprite
     _margin = builder.margin;
 }
 
-void SpriteImageText::updateTextTexture(std::string&& text)
+void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_line)
 {
     // NOTE: we need to draw empty text too, to keep empty input fields selectable.
 
+    if (_text == text && _firstLine == first_line) return;
+
     _text = text;
+    _firstLine = first_line;
 
-    // convert UTF-8 to UTF-32
     std::u32string u32Text = utf8_to_utf32(text);
-
-    const int first_line = State::get(_lrvLineIdx);
-    assert(first_line >= 0);
 
     float draw_x = 0;
     float draw_y = 0;
     float this_line_width = 0;
     float text_width = 0;
-    int line = 0;
+    unsigned line = 0;
     _drawListOrig.clear();
     for (auto c : u32Text)
     {
@@ -147,7 +146,7 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
     _draw = updateMotion(t);
     if (_draw)
     {
-        updateTextTexture(State::get(textInd));
+        updateTextTexture(State::get(textInd), State::get(_lrvLineIdx));
         if (_draw) updateTextRect();
     }
     return _draw;

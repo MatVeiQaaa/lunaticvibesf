@@ -343,7 +343,7 @@ public:
     ~SpriteText() override = default;
 
 public:
-    virtual void updateText();
+    void updateText();
     virtual void updateTextRect();
 private:
     void updateTextTexture(std::string&& text, const Color& c);

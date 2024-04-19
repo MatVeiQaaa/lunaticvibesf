@@ -17,6 +17,7 @@ protected:
     std::vector<std::shared_ptr<Texture>> _textures;
     CharMappingList* _chrList;
     unsigned textHeight;
+    unsigned _firstLine;
     int _margin;
 
 private:
@@ -45,5 +46,5 @@ public:
     void draw() const override;
 
 private:
-    void updateTextTexture(std::string&& text);
+    void updateTextTexture(const std::string& text, unsigned first_line);
 };

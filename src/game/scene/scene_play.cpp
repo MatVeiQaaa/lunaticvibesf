@@ -560,7 +560,7 @@ ScenePlay::ScenePlay(): SceneBase(gPlayContext.mode, 1000, true)
     if (adjustLanecoverWithMousewheel)
         _inputAvailable |= INPUT_MASK_MOUSE;
 
-    poorBgaDuration = ConfigMgr::get("P", cfg::P_MISSBGA_LENGTH, 500);
+    poorBgaDuration = ConfigMgr::get('P', cfg::P_MISSBGA_LENGTH, 500);
 
     //////////////////////////////////////////////////////////////////////////////////////////
 

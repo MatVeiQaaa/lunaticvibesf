@@ -137,19 +137,13 @@ public:
 
     template<class Ty_v>
     static Ty_v get(char type, const std::string& key, const Ty_v& fallback) { return getInst()._get(type, key, fallback); }
-    template<class Ty_v>
-    static Ty_v get(const std::string& type, const std::string& key, const Ty_v& fallback) { return getInst()._get(type[0], key, fallback); }
 
     static std::string get(char type, const std::string& key, const std::string& fallback) { return get<std::string>(type, key, fallback); }
-    static std::string get(const std::string& type, const std::string& key, const std::string& fallback) { return get<std::string>(type[0], key, fallback); }
 
     template<class Ty_v>
     static void set(char type, const std::string& key, const Ty_v& value) noexcept { return getInst()._set(type, key, value); }
-    template<class Ty_v>
-    static void set(const std::string& type, const std::string& key, const Ty_v& value) noexcept { return getInst()._set(type[0], key, value); }
 
     static void set(char type, const std::string& key, const std::string& value) noexcept { return set<std::string>(type, key, value); }
-    static void set(const std::string& type, const std::string& key, const std::string& value) noexcept { return set<std::string>(type[0], key, value); }
 
 public:
 };

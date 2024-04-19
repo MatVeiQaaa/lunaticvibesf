@@ -177,11 +177,11 @@ void loadSongList()
         // apply filter
         auto checkFilterKeys = [](unsigned keys)
         {
-            if ((keys == 10 || keys == 14) && ConfigMgr::get("P", cfg::P_IGNORE_DP_CHARTS, false))
+            if ((keys == 10 || keys == 14) && ConfigMgr::get('P', cfg::P_IGNORE_DP_CHARTS, false))
             {
                 return false;
             }
-            if (keys == 9 && ConfigMgr::get("P", cfg::P_IGNORE_9KEYS_CHARTS, false))
+            if (keys == 9 && ConfigMgr::get('P', cfg::P_IGNORE_9KEYS_CHARTS, false))
             {
                 return false;
             }
@@ -230,7 +230,7 @@ void loadSongList()
 
             bool have7k = false;
             bool have14k = false;
-            if (ConfigMgr::get("P", cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
+            if (ConfigMgr::get('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
             {
                 for (size_t idx = 0; idx < f->getContentsCount() && !skip; ++idx)
                 {
@@ -244,7 +244,7 @@ void loadSongList()
             {
                 auto pBase = f->getChart(idx);
 
-                if (ConfigMgr::get("P", cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
+                if (ConfigMgr::get('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false))
                 {
                     if (pBase->gamemode == 5 && have7k) continue;
                     if (pBase->gamemode == 10 && have14k) continue;

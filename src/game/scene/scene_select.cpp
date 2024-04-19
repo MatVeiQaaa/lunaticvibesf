@@ -879,7 +879,7 @@ void SceneSelect::_updateAsync()
                 gSelectContext.scrollDirection = 0;
                 pSkin->reset_bar_animation();
                 State::set(IndexTimer::LIST_MOVE_STOP, t.norm());
-                gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
             }
         }
         else if(gSelectContext.scrollDirection != 0 || scrollAccumulatorAddUnit < -0.003 || scrollAccumulatorAddUnit > 0.003)
@@ -1661,7 +1661,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         {
             if (scrollAccumulator != 0.0)
             {
-                gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
             }
             scrollAccumulator -= 1.0;
             scrollButtonTimestamp = t;
@@ -1671,7 +1671,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         {
             if (scrollAccumulator != 0.0)
             {
-                gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
             }
             scrollAccumulator += 1.0;
             scrollButtonTimestamp = t;
@@ -1690,14 +1690,14 @@ void SceneSelect::inputGameHoldSelect(InputMask& input, const lunaticvibes::Time
     // navigate
     if (isHoldingUp && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
         scrollButtonTimestamp = t;
         scrollAccumulator -= 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());
     }
     if (isHoldingDown && (t - scrollButtonTimestamp).norm() >= gSelectContext.scrollTimeLength)
     {
-        gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+        gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
         scrollButtonTimestamp = t;
         scrollAccumulator += 1.0;
         scrollAccumulatorAddUnit = scrollAccumulator / gSelectContext.scrollTimeLength * (1000.0 / getRate());

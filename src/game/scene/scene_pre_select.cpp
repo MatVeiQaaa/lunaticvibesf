@@ -465,7 +465,7 @@ void ScenePreSelect::loadFinished()
         // wait for another frame
         pushAndWaitMainThreadTask<void>([] {});
 
-        int maxFPS = ConfigMgr::get("V", cfg::V_MAXFPS, 480);
+        int maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 480);
         if (maxFPS < 30 && maxFPS != 0)
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);

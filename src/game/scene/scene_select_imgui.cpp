@@ -46,14 +46,14 @@ void SceneSelect::imguiInit()
     imguiRefreshLanguageList();
     old_language_index = imgui_language_index;
 
-    imgui_log_level = ConfigMgr::get("E", cfg::E_LOG_LEVEL, 1);
+    imgui_log_level = ConfigMgr::get('E', cfg::E_LOG_LEVEL, 1);
 
     imguiRefreshFolderList();
     imguiRefreshTableList();
 
-    imgui_video_ssLevel = ConfigMgr::get("V", cfg::V_RES_SUPERSAMPLE, 1);
+    imgui_video_ssLevel = ConfigMgr::get('V', cfg::V_RES_SUPERSAMPLE, 1);
 
-    auto winMode = ConfigMgr::get("V", cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
+    auto winMode = ConfigMgr::get('V', cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
     if (winMode == cfg::V_WINMODE_FULL)
         imgui_video_mode = 1;
     else if (winMode == cfg::V_WINMODE_BORDERLESS)
@@ -63,8 +63,8 @@ void SceneSelect::imguiInit()
     old_video_mode = imgui_video_mode;
 
     imguiRefreshVideoDisplayResolutionList();
-    auto windowX = ConfigMgr::get("V", cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
-    auto windowY = ConfigMgr::get("V", cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
+    auto windowX = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_HEIGHT);
+    auto windowY = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
     imgui_video_display_resolution_index = -1;
     for (int i = 0; i < (int)imgui_video_display_resolution_size.size(); ++i)
     {
@@ -80,13 +80,13 @@ void SceneSelect::imguiInit()
     }
     old_video_display_resolution_index = imgui_video_display_resolution_index;
 
-    imgui_video_vsync_index = ConfigMgr::get("V", cfg::V_VSYNC, 0);
+    imgui_video_vsync_index = ConfigMgr::get('V', cfg::V_VSYNC, 0);
 #ifdef _WIN32
     if (imgui_video_vsync_index >= 2)
         imgui_video_vsync_index = 1;
 #endif
 
-    imgui_video_maxFPS = ConfigMgr::get("V", cfg::V_MAXFPS, 240);
+    imgui_video_maxFPS = ConfigMgr::get('V', cfg::V_MAXFPS, 240);
 
     auto [count, size] = SoundMgr::getDSPBufferSize();
     imgui_audio_bufferCount = count;
@@ -94,14 +94,14 @@ void SceneSelect::imguiInit()
     imguiRefreshAudioDevices();
     old_audio_device_index = imgui_audio_device_index;
 
-    imgui_adv_scrollSpeed[0] = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
-    imgui_adv_scrollSpeed[1] = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150);
-    imgui_adv_missBGATime = ConfigMgr::get("P", cfg::P_MISSBGA_LENGTH, 500);
-    imgui_adv_minInputInterval = ConfigMgr::get("P", cfg::P_MIN_INPUT_INTERVAL, 16);
-    imgui_adv_newSongDuration = ConfigMgr::get("P", cfg::P_NEW_SONG_DURATION, 24);
+    imgui_adv_scrollSpeed[0] = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    imgui_adv_scrollSpeed[1] = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150);
+    imgui_adv_missBGATime = ConfigMgr::get('P', cfg::P_MISSBGA_LENGTH, 500);
+    imgui_adv_minInputInterval = ConfigMgr::get('P', cfg::P_MIN_INPUT_INTERVAL, 16);
+    imgui_adv_newSongDuration = ConfigMgr::get('P', cfg::P_NEW_SONG_DURATION, 24);
 
     imgui_play_inputPollingRate = 0;
-    switch (ConfigMgr::get("P", cfg::P_INPUT_POLLING_RATE, 1000))
+    switch (ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000))
     {
     case 1000: imgui_play_inputPollingRate = 0; break;
     case 2000: imgui_play_inputPollingRate = 1; break;
@@ -109,8 +109,8 @@ void SceneSelect::imguiInit()
     case 8000: imgui_play_inputPollingRate = 3; break;
     }
 
-    imgui_adv_previewDedicated = ConfigMgr::get("P", cfg::P_PREVIEW_DEDICATED, true);
-    imgui_adv_previewDirect = ConfigMgr::get("P", cfg::P_PREVIEW_DIRECT, true);
+    imgui_adv_previewDedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, true);
+    imgui_adv_previewDirect = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, true);
 
     imgui_adv_selectKeyBindings = old_adv_selectKeyBindings = 0;
     static const char* imgui_select_keybindings_str[] =
@@ -128,18 +128,18 @@ void SceneSelect::imguiInit()
         }
     }
 
-    imgui_adv_enableNewRandom = ConfigMgr::get("P", cfg::P_ENABLE_NEW_RANDOM, false);
-    imgui_adv_enableNewGauge = ConfigMgr::get("P", cfg::P_ENABLE_NEW_GAUGE, false);
-    imgui_adv_enableNewLaneOption = ConfigMgr::get("P", cfg::P_ENABLE_NEW_LANE_OPTION, false);
+    imgui_adv_enableNewRandom = ConfigMgr::get('P', cfg::P_ENABLE_NEW_RANDOM, false);
+    imgui_adv_enableNewGauge = ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false);
+    imgui_adv_enableNewLaneOption = ConfigMgr::get('P', cfg::P_ENABLE_NEW_LANE_OPTION, false);
 
-    imgui_sel_onlyDisplayMainTitleOnBars = ConfigMgr::get("P", cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
-    imgui_sel_disablePlaymodeAll = ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_ALL, false);
-    imgui_sel_disableDifficultyAll = ConfigMgr::get("P", cfg::P_DISABLE_DIFFICULTY_ALL, false);
-    imgui_sel_disablePlaymodeSingle = ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_SINGLE, false);
-    imgui_sel_disablePlaymodeDouble = ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_DOUBLE, false);
-    imgui_sel_ignoreDPCharts = ConfigMgr::get("P", cfg::P_IGNORE_DP_CHARTS, false);
-    imgui_sel_ignore9keys = ConfigMgr::get("P", cfg::P_IGNORE_9KEYS_CHARTS, false);
-    imgui_sel_ignore5keysif7keysexist = ConfigMgr::get("P", cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false);
+    imgui_sel_onlyDisplayMainTitleOnBars = ConfigMgr::get('P', cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, false);
+    imgui_sel_disablePlaymodeAll = ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_ALL, false);
+    imgui_sel_disableDifficultyAll = ConfigMgr::get('P', cfg::P_DISABLE_DIFFICULTY_ALL, false);
+    imgui_sel_disablePlaymodeSingle = ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_SINGLE, false);
+    imgui_sel_disablePlaymodeDouble = ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_DOUBLE, false);
+    imgui_sel_ignoreDPCharts = ConfigMgr::get('P', cfg::P_IGNORE_DP_CHARTS, false);
+    imgui_sel_ignore9keys = ConfigMgr::get('P', cfg::P_IGNORE_9KEYS_CHARTS, false);
+    imgui_sel_ignore5keysif7keysexist = ConfigMgr::get('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, false);
 
     imgui_play_adjustHispeedWithUpDown = ConfigMgr::get('P', cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, false);
     imgui_play_adjustHispeedWithSelect = ConfigMgr::get('P', cfg::P_ADJUST_HISPEED_WITH_SELECT, false);
@@ -728,9 +728,9 @@ void SceneSelect::imguiPageOptionsVideo()
             {
                 imgui_video_maxFPS = 30;
             }
-            if (imgui_video_maxFPS != ConfigMgr::get("V", cfg::V_MAXFPS, infoRowWidth))
+            if (imgui_video_maxFPS != ConfigMgr::get('V', cfg::V_MAXFPS, infoRowWidth))
             {
-                ConfigMgr::set("V", cfg::V_MAXFPS, imgui_video_maxFPS);
+                ConfigMgr::set('V', cfg::V_MAXFPS, imgui_video_maxFPS);
                 graphics_set_maxfps(imgui_video_maxFPS);
             }
         }
@@ -808,11 +808,11 @@ void SceneSelect::imguiPageOptionsPlay()
         {
             switch (imgui_play_inputPollingRate)
             {
-            case 0: ConfigMgr::set("P", cfg::P_INPUT_POLLING_RATE, 1000); _input.setRate(1000); break;
-            case 1: ConfigMgr::set("P", cfg::P_INPUT_POLLING_RATE, 2000); _input.setRate(2000); break;
-            case 2: ConfigMgr::set("P", cfg::P_INPUT_POLLING_RATE, 4000); _input.setRate(4000); break;
-            case 3: ConfigMgr::set("P", cfg::P_INPUT_POLLING_RATE, 8000); _input.setRate(8000); break;
-            case 4: ConfigMgr::set("P", cfg::P_INPUT_POLLING_RATE, 0); _input.setRate(0); break;
+            case 0: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 1000); _input.setRate(1000); break;
+            case 1: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 2000); _input.setRate(2000); break;
+            case 2: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 4000); _input.setRate(4000); break;
+            case 3: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 8000); _input.setRate(8000); break;
+            case 4: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 0); _input.setRate(0); break;
             }
         }
 #ifdef _WIN32
@@ -961,35 +961,35 @@ void SceneSelect::imguiPageOptionsSelect()
 
         if (ImGui::Checkbox(i18n::c(ONLY_DISPLAY_MAIN_TITLE_ON_BARS), &imgui_sel_onlyDisplayMainTitleOnBars))
         {
-            ConfigMgr::set("P", cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, imgui_sel_onlyDisplayMainTitleOnBars);
+            ConfigMgr::set('P', cfg::P_ONLY_DISPLAY_MAIN_TITLE_ON_BARS, imgui_sel_onlyDisplayMainTitleOnBars);
         }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_ALL), &imgui_sel_disablePlaymodeAll))
         {
-            ConfigMgr::set("P", cfg::P_DISABLE_PLAYMODE_ALL, imgui_sel_disablePlaymodeAll);
+            ConfigMgr::set('P', cfg::P_DISABLE_PLAYMODE_ALL, imgui_sel_disablePlaymodeAll);
         }
         if (ImGui::Checkbox(i18n::c(DISABLE_DIFFICULTY_ALL), &imgui_sel_disableDifficultyAll))
         {
-            ConfigMgr::set("P", cfg::P_DISABLE_DIFFICULTY_ALL, imgui_sel_disableDifficultyAll);
+            ConfigMgr::set('P', cfg::P_DISABLE_DIFFICULTY_ALL, imgui_sel_disableDifficultyAll);
         }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_SINGLE), &imgui_sel_disablePlaymodeSingle))
         {
-            ConfigMgr::set("P", cfg::P_DISABLE_PLAYMODE_SINGLE, imgui_sel_disablePlaymodeSingle);
+            ConfigMgr::set('P', cfg::P_DISABLE_PLAYMODE_SINGLE, imgui_sel_disablePlaymodeSingle);
         }
         if (ImGui::Checkbox(i18n::c(DISABLE_PLAYMODE_DOUBLE), &imgui_sel_disablePlaymodeDouble))
         {
-            ConfigMgr::set("P", cfg::P_DISABLE_PLAYMODE_DOUBLE, imgui_sel_disablePlaymodeDouble);
+            ConfigMgr::set('P', cfg::P_DISABLE_PLAYMODE_DOUBLE, imgui_sel_disablePlaymodeDouble);
         }
         if (ImGui::Checkbox(i18n::c(IGNORE_DP_CHARTS), &imgui_sel_ignoreDPCharts))
         {
-            ConfigMgr::set("P", cfg::P_IGNORE_DP_CHARTS, imgui_sel_ignoreDPCharts);
+            ConfigMgr::set('P', cfg::P_IGNORE_DP_CHARTS, imgui_sel_ignoreDPCharts);
         }
         if (ImGui::Checkbox(i18n::c(IGNORE_9K_CHARTS), &imgui_sel_ignore9keys))
         {
-            ConfigMgr::set("P", cfg::P_IGNORE_9KEYS_CHARTS, imgui_sel_ignore9keys);
+            ConfigMgr::set('P', cfg::P_IGNORE_9KEYS_CHARTS, imgui_sel_ignore9keys);
         }
         if (ImGui::Checkbox(i18n::c(IGNORE_5K_IF_7K_EXISTS), &imgui_sel_ignore5keysif7keysexist))
         {
-            ConfigMgr::set("P", cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, imgui_sel_ignore5keysif7keysexist);
+            ConfigMgr::set('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, imgui_sel_ignore5keysif7keysexist);
         }
 
         ImGui::EndChild();
@@ -1296,7 +1296,7 @@ void SceneSelect::imguiCheckSettings()
     if (imgui_language_index != old_language_index)
     {
         old_language_index = imgui_language_index;
-        ConfigMgr::set("P", cfg::P_LANGUAGE, imgui_languages_display[imgui_language_index]);
+        ConfigMgr::set('P', cfg::P_LANGUAGE, imgui_languages_display[imgui_language_index]);
         i18n::setLanguage(imgui_language_index);
         reboot = true;
     }
@@ -1310,36 +1310,36 @@ void SceneSelect::imguiCheckSettings()
         }
     }
 
-    if (imgui_adv_scrollSpeed[0] != ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_INITIAL, 300))
+    if (imgui_adv_scrollSpeed[0] != ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300))
     {
-        ConfigMgr::set("P", cfg::P_LIST_SCROLL_TIME_INITIAL, imgui_adv_scrollSpeed[0]);
+        ConfigMgr::set('P', cfg::P_LIST_SCROLL_TIME_INITIAL, imgui_adv_scrollSpeed[0]);
     }
-    if (imgui_adv_scrollSpeed[1] != ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_HOLD, 150))
+    if (imgui_adv_scrollSpeed[1] != ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150))
     {
-        ConfigMgr::set("P", cfg::P_LIST_SCROLL_TIME_HOLD, imgui_adv_scrollSpeed[1]);
+        ConfigMgr::set('P', cfg::P_LIST_SCROLL_TIME_HOLD, imgui_adv_scrollSpeed[1]);
     }
-    if (imgui_adv_missBGATime != ConfigMgr::get("P", cfg::P_MISSBGA_LENGTH, 500))
+    if (imgui_adv_missBGATime != ConfigMgr::get('P', cfg::P_MISSBGA_LENGTH, 500))
     {
-        ConfigMgr::set("P", cfg::P_MISSBGA_LENGTH, imgui_adv_missBGATime);
+        ConfigMgr::set('P', cfg::P_MISSBGA_LENGTH, imgui_adv_missBGATime);
     }
-    if (imgui_adv_minInputInterval != ConfigMgr::get("P", cfg::P_MIN_INPUT_INTERVAL, 16))
+    if (imgui_adv_minInputInterval != ConfigMgr::get('P', cfg::P_MIN_INPUT_INTERVAL, 16))
     {
-        ConfigMgr::set("P", cfg::P_MIN_INPUT_INTERVAL, imgui_adv_minInputInterval);
+        ConfigMgr::set('P', cfg::P_MIN_INPUT_INTERVAL, imgui_adv_minInputInterval);
         InputMgr::setDebounceTime(imgui_adv_minInputInterval);
     }
-    if (imgui_adv_newSongDuration != ConfigMgr::get("P", cfg::P_NEW_SONG_DURATION, 24))
+    if (imgui_adv_newSongDuration != ConfigMgr::get('P', cfg::P_NEW_SONG_DURATION, 24))
     {
-        ConfigMgr::set("P", cfg::P_NEW_SONG_DURATION, imgui_adv_newSongDuration);
+        ConfigMgr::set('P', cfg::P_NEW_SONG_DURATION, imgui_adv_newSongDuration);
         State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::get('P', cfg::P_NEW_SONG_DURATION, 0) * 60 * 60);
     }
 
-    if (imgui_adv_previewDedicated != ConfigMgr::get("P", cfg::P_PREVIEW_DEDICATED, true))
+    if (imgui_adv_previewDedicated != ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, true))
     {
-        ConfigMgr::set("P", cfg::P_PREVIEW_DEDICATED, imgui_adv_previewDedicated);
+        ConfigMgr::set('P', cfg::P_PREVIEW_DEDICATED, imgui_adv_previewDedicated);
     }
-    if (imgui_adv_previewDirect != ConfigMgr::get("P", cfg::P_PREVIEW_DIRECT, true))
+    if (imgui_adv_previewDirect != ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, true))
     {
-        ConfigMgr::set("P", cfg::P_PREVIEW_DIRECT, imgui_adv_previewDirect);
+        ConfigMgr::set('P', cfg::P_PREVIEW_DIRECT, imgui_adv_previewDirect);
     }
     if (imgui_adv_selectKeyBindings != old_adv_selectKeyBindings)
     {
@@ -1351,21 +1351,21 @@ void SceneSelect::imguiCheckSettings()
         };
         const auto& [keys, cfgstr] = imgui_select_keybindings_str[imgui_adv_selectKeyBindings];
         old_adv_selectKeyBindings = imgui_adv_selectKeyBindings;
-        ConfigMgr::set("P", cfg::P_SELECT_KEYBINDINGS, cfgstr);
+        ConfigMgr::set('P', cfg::P_SELECT_KEYBINDINGS, cfgstr);
         bindings9K = (keys == 9);
         InputMgr::updateBindings(keys);
     }
-    if (imgui_adv_enableNewRandom != ConfigMgr::get("P", cfg::P_ENABLE_NEW_RANDOM, false))
+    if (imgui_adv_enableNewRandom != ConfigMgr::get('P', cfg::P_ENABLE_NEW_RANDOM, false))
     {
-        ConfigMgr::set("P", cfg::P_ENABLE_NEW_RANDOM, imgui_adv_enableNewRandom);
+        ConfigMgr::set('P', cfg::P_ENABLE_NEW_RANDOM, imgui_adv_enableNewRandom);
     }
-    if (imgui_adv_enableNewGauge != ConfigMgr::get("P", cfg::P_ENABLE_NEW_GAUGE, false))
+    if (imgui_adv_enableNewGauge != ConfigMgr::get('P', cfg::P_ENABLE_NEW_GAUGE, false))
     {
-        ConfigMgr::set("P", cfg::P_ENABLE_NEW_GAUGE, imgui_adv_enableNewGauge);
+        ConfigMgr::set('P', cfg::P_ENABLE_NEW_GAUGE, imgui_adv_enableNewGauge);
     }
-    if (imgui_adv_enableNewLaneOption != ConfigMgr::get("P", cfg::P_ENABLE_NEW_LANE_OPTION, false))
+    if (imgui_adv_enableNewLaneOption != ConfigMgr::get('P', cfg::P_ENABLE_NEW_LANE_OPTION, false))
     {
-        ConfigMgr::set("P", cfg::P_ENABLE_NEW_LANE_OPTION, imgui_adv_enableNewLaneOption);
+        ConfigMgr::set('P', cfg::P_ENABLE_NEW_LANE_OPTION, imgui_adv_enableNewLaneOption);
     }
 
     if (reboot)
@@ -1533,10 +1533,10 @@ bool SceneSelect::imguiApplyResolution()
         case 1: windowMode = cfg::V_WINMODE_FULL;       break;
         case 2: windowMode = cfg::V_WINMODE_BORDERLESS; break;
         }
-        ConfigMgr::set("V", cfg::V_WINMODE, windowMode);
+        ConfigMgr::set('V', cfg::V_WINMODE, windowMode);
     }
-    ConfigMgr::set("V", cfg::V_RES_SUPERSAMPLE, imgui_video_ssLevel);
-    ConfigMgr::set("V", cfg::V_VSYNC, imgui_video_vsync_index);
+    ConfigMgr::set('V', cfg::V_RES_SUPERSAMPLE, imgui_video_ssLevel);
+    ConfigMgr::set('V', cfg::V_VSYNC, imgui_video_vsync_index);
 
     // windowed
     {
@@ -1619,8 +1619,8 @@ bool SceneSelect::imguiRefreshAudioDevices()
 bool SceneSelect::imguiApplyAudioSettings()
 {
     bool ret;
-    ConfigMgr::set("A", cfg::A_BUFCOUNT, imgui_audio_bufferCount);
-    ConfigMgr::set("A", cfg::A_BUFLEN, imgui_audio_bufferSize);
+    ConfigMgr::set('A', cfg::A_BUFCOUNT, imgui_audio_bufferCount);
+    ConfigMgr::set('A', cfg::A_BUFLEN, imgui_audio_bufferSize);
     if (SoundMgr::setDevice(imgui_audio_device_index) == 0)
     {
         const auto mode = std::next(imgui_audio_devices.begin(), imgui_audio_device_index);
@@ -1638,8 +1638,8 @@ bool SceneSelect::imguiApplyAudioSettings()
     }
 
     auto [count, size] = SoundMgr::getDSPBufferSize();
-    ConfigMgr::set("A", cfg::A_BUFCOUNT, count);
-    ConfigMgr::set("A", cfg::A_BUFLEN, size);
+    ConfigMgr::set('A', cfg::A_BUFCOUNT, count);
+    ConfigMgr::set('A', cfg::A_BUFLEN, size);
     imgui_audio_bufferCount = count;
     imgui_audio_bufferSize = size;
 

@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
     ConfigMgr::init();
     ConfigMgr::load();
     ConfigMgr::selectProfile(ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT));
-    lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(ConfigMgr::get("E", cfg::E_LOG_LEVEL, 1)));
+    lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(ConfigMgr::get('E', cfg::E_LOG_LEVEL, 1)));
 
     Path lr2path = Path(PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/")));
     if (!fs::is_directory(lr2path))
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    gSelectContext.scrollTimeLength = ConfigMgr::get("P", cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
 
     // load songs / tables at ScenePreSelect
 

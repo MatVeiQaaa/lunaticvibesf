@@ -179,7 +179,7 @@ void select_difficulty_filter(int plus, int iterateCount)
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 6)
     {
         int val = (State::get(IndexOption::SELECT_FILTER_DIFF) + 6 + plus) % 6;
-        if (val == Option::DIFF_ANY && ConfigMgr::get("P", cfg::P_DISABLE_DIFFICULTY_ALL, false))
+        if (val == Option::DIFF_ANY && ConfigMgr::get('P', cfg::P_DISABLE_DIFFICULTY_ALL, false))
         {
             val++;
             iterateCount++;
@@ -211,17 +211,17 @@ void select_keys_filter(int plus, int iterateCount)
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 8)
     {
         int val = (State::get(IndexOption::SELECT_FILTER_KEYS) + 8 + plus) % 8;
-        if (val == Option::FILTER_KEYS_ALL && ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_ALL, false))
+        if (val == Option::FILTER_KEYS_ALL && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_ALL, false))
         {
             val++;
             iterateCount++;
         }
-        if (val == Option::FILTER_KEYS_SINGLE && ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_SINGLE, false))
+        if (val == Option::FILTER_KEYS_SINGLE && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_SINGLE, false))
         {
             val++;
             iterateCount++;
         }
-        if (val == Option::FILTER_KEYS_DOUBLE && ConfigMgr::get("P", cfg::P_DISABLE_PLAYMODE_DOUBLE, false))
+        if (val == Option::FILTER_KEYS_DOUBLE && ConfigMgr::get('P', cfg::P_DISABLE_PLAYMODE_DOUBLE, false))
         {
             val++;
             iterateCount++;

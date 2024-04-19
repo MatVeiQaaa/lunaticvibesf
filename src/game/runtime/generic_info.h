@@ -31,7 +31,6 @@ private:
 
 		std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		tm tt;
-		char ctime_buf[26];
 		auto d = lunaticvibes::safe_localtime(&t, &tt);
         if (d)
         {
@@ -41,8 +40,6 @@ private:
             State::set(IndexNumber::DATE_HOUR, d->tm_hour);
             State::set(IndexNumber::DATE_MIN, d->tm_min);
             State::set(IndexNumber::DATE_SEC, d->tm_sec);
-
-            State::set(IndexText::_TEST1, lunaticvibes::safe_ctime(&t, ctime_buf));
         }
 
 		//createNotification(std::to_string(t));

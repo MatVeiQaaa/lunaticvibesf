@@ -2,7 +2,6 @@
 
 #include <array>
 #include <string>
-#include <thread>
 #include "common/beat.h"
 #include "sound_driver.h"
 #include "fmod.hpp"
@@ -64,11 +63,6 @@ public:
 	std::pair<int, int> getDSPBufferSize() override;
 private:
 	int findDriver(const std::string& name, int driverIDUnknown);
-
-private:
-    bool bLoading = false;
-    std::thread tLoadSampleThread;
-    void loadSampleThread();
 
 public:
     int setAsyncIO(bool async = true);

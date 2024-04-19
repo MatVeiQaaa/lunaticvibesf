@@ -350,10 +350,6 @@ void SoundDriverFMOD::createChannelGroups()
 
 SoundDriverFMOD::~SoundDriverFMOD()
 {
-    bLoading = false;
-    if (tLoadSampleThread.joinable())
-        tLoadSampleThread.join();
-
     // FIXME: free FMOD::DSP*, valgrind complains.
 
     // release before system release
@@ -521,11 +517,6 @@ int SoundDriverFMOD::setDevice(size_t index)
     FMOD::System* pOldSystem = fmodSystem;
     fmodSystem = nullptr;
 
-    // release old system
-    bLoading = false;
-    if (tLoadSampleThread.joinable())
-        tLoadSampleThread.join();
-
     freeNoteSamples();
     freeSysSamples();
     channelGroup.clear();
@@ -686,44 +677,6 @@ int SoundDriverFMOD::setAsyncIO(bool async)
         fmodSystem->setFileSystem(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, -1);
     }
     return 0;
-}
-
-/*
-FMOD_ASYNCREADINFO parameters: 
-    void *      handle;     R
-    unsigned    offset;     R
-    unsigned    sizebytes;  R
-    int         priority;   R
-    void *      buffer;     RW
-    unsigned    bytesread;  RW
-    FMOD_RESULT result;     RW
-    void *      userdata;
-*/
-void SoundDriverFMOD::loadSampleThread()
-{
-    while (bLoading)
-    {
-        if (!asyncSampleLoadQueue.empty())
-        {
-            LOCK_QUEUE;
-            auto& info = asyncSampleLoadQueue.front();
-            asyncSampleLoadQueue.pop();
-
-            FILE* pFile = (FILE*)info->handle;
-            info->buffer = std::malloc(info->bytesread * sizeof(char));
-            if (info->buffer == NULL) return;
-            size_t sizeread = fread((void*)info->buffer, sizeof(char), (unsigned)info->bytesread, pFile);
-            if (sizeread < info->bytesread)
-            {
-                info->bytesread = (unsigned)sizeread;
-                info->done(info, FMOD_ERR_FILE_EOF);
-            }
-            else
-            {
-                info->done(info, FMOD_OK);
-            }
-        }
-    }
 }
 
 static const std::list<std::string> wavExtensionList =

@@ -1169,7 +1169,8 @@ void ScenePlay::loadChart()
                 return;
             }
 
-            boost::asio::thread_pool pool(std::max(1u, std::thread::hardware_concurrency() - 2));
+            const auto thread_count = std::thread::hardware_concurrency();
+            boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
             for (size_t i = 0; i < _pChart->wavFiles.size(); ++i)
             {
                 if (shouldDiscard(*this)) break;

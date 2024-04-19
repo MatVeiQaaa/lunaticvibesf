@@ -40,10 +40,10 @@ void TTFFont::setStyle(TTFStyle style)
 
     switch (style)
     {
-    case TTFStyle::Normal:    pushMainThreadTask(std::bind(TTF_SetFontStyle, _pFont, TTF_STYLE_NORMAL)); break;
-    case TTFStyle::Bold:      pushMainThreadTask(std::bind(TTF_SetFontStyle, _pFont, TTF_STYLE_BOLD));   break;
-    case TTFStyle::Italic:    pushMainThreadTask(std::bind(TTF_SetFontStyle, _pFont, TTF_STYLE_ITALIC)); break;
-    case TTFStyle::_BI:       pushMainThreadTask(std::bind(TTF_SetFontStyle, _pFont, TTF_STYLE_BOLD | TTF_STYLE_ITALIC)); break;
+    case TTFStyle::Normal: TTF_SetFontStyle(_pFont, TTF_STYLE_NORMAL); break;
+    case TTFStyle::Bold: TTF_SetFontStyle(_pFont, TTF_STYLE_BOLD); break;
+    case TTFStyle::Italic: TTF_SetFontStyle(_pFont, TTF_STYLE_ITALIC); break;
+    case TTFStyle::_BI: TTF_SetFontStyle(_pFont, TTF_STYLE_BOLD | TTF_STYLE_ITALIC); break;
     }
 }
 void TTFFont::setOutline(int width, const Color& c)
@@ -55,22 +55,18 @@ void TTFFont::setOutline(int width, const Color& c)
     {
         if (_pFontOutline != NULL)
         {
-            pushAndWaitMainThreadTask<void>(std::bind(TTF_CloseFont, _pFontOutline));
-            _pFontOutline = NULL;
+            TTF_CloseFont(_pFontOutline);
         }
     }
     else
     {
         if (_pFontOutline == NULL)
         {
-            pushAndWaitMainThreadTask<void>([&]() 
-                { 
-                    if (_faceIndex >= 0)
-                        _pFontOutline = TTF_OpenFontIndex(_filePath.c_str(), _ptsize, _faceIndex);
-                    else
-                        _pFontOutline = TTF_OpenFont(_filePath.c_str(), _ptsize);
-                    TTF_SetFontOutline(_pFontOutline, width);
-                });
+            if (_faceIndex >= 0)
+                _pFontOutline = TTF_OpenFontIndex(_filePath.c_str(), _ptsize, _faceIndex);
+            else
+                _pFontOutline = TTF_OpenFont(_filePath.c_str(), _ptsize);
+            TTF_SetFontOutline(_pFontOutline, width);
         }
     }
     _outlineWidth = width;
@@ -94,7 +90,7 @@ void TTFFont::setKerning(bool enabled)
     assert(IsMainThread());
     if (!loaded) return;
 
-    pushMainThreadTask(std::bind(TTF_SetFontKerning, _pFont, enabled));
+    TTF_SetFontKerning(_pFont, enabled);
 }
 
 std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)

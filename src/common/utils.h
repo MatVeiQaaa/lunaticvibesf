@@ -97,4 +97,19 @@ namespace lunaticvibes {
 
 void trim_in_place(std::string& s);
 
+// Fix path separators and resolve case-insensitive paths on case-sensitive file systems.
+// This does IO.
+// Preserves non-existing paths. Does not trim redundant `./`.
+// Length out of the returned string is the same as of the input string.
+//
+// This function assumes paths without drive letter assignments and
+// operates on strings directly.
+// In addition, directories must be separated by forward slashes.
+//
+// Example:
+// On your system there is a `/tmp/AFileWithUpperCaseInIt`.
+// `resolvePathCaseInsensitively("/tmp/afilewithuppercaseinit")` =
+// `"/tmp/AFileWithUpperCaseInIt"`
+std::string resolve_windows_path(std::string);
+
 } // lunaticvibes

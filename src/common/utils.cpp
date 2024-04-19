@@ -331,21 +331,10 @@ std::string toUpper(std::string_view s)
 
 #ifndef _WIN32
 
-// Resolve case-insensitive path on case-sensitive file systems.
-// This does IO.
-// Preserves non-existing paths. Does not trim redundant `./`.
-// Length out of the returned string is the same as of the input string.
-//
-// This function assumes paths without drive letter assignments and
-// operates on strings directly.
-// In addition, directories must be separated by forward slashes.
-//
-// Example:
-// On your system there is a `/tmp/AFileWithUpperCaseInIt`.
-// `resolvePathCaseInsensitively("/tmp/afilewithuppercaseinit")` =
-// `"/tmp/AFileWithUpperCaseInIt"`
-static std::string resolveCaseInsensitivePath(std::string input)
+std::string lunaticvibes::resolve_windows_path(std::string input)
 {
+    std::replace(input.begin(), input.end(), '\\', '/');
+
     if (input == "/" || input == "." || input.empty()) {
         return input;
     }
@@ -473,8 +462,7 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
     }
 
 #ifndef _WIN32
-    std::replace(out_path.begin(), out_path.end(), '\\', '/');
-    out_path = resolveCaseInsensitivePath(out_path);
+    out_path = lunaticvibes::resolve_windows_path(std::move(out_path));
 #endif // _WIN32
 
     return out_path;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <utility>
 
 #include "common/beat.h"
 #include "video.h"
@@ -72,7 +73,9 @@ protected:
 		lunaticvibes::Time playStartTime = 0;	// video
 
 		obj() = default;
-		obj(Ty t, std::shared_ptr<Texture> pt) :type(t), pt(pt) {}
+		obj(Ty t, std::shared_ptr<Texture> pt) : type(t), pt(std::move(pt))
+		{
+		}
 	};
 
 protected:

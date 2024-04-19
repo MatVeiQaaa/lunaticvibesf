@@ -46,9 +46,16 @@ void SpriteImageText::updateTextTexture(std::string&& text)
             line += 1;
             draw_x = 0;
             if (line > first_line)
+            {
                 draw_y += r.h;
+                // TODO: unhardcode max possible rect height. That would especially help with 480p skins.
+                static constexpr decltype(draw_y) max_height{1080};
+                if (draw_y > max_height) break;
+            }
             else
+            {
                 draw_y = 0;
+            }
             this_line_width = 0;
             continue;
         }

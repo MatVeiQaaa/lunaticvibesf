@@ -455,7 +455,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
 
 std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const HashMD5& target, bool checksum) const
 {
-    LOG_DEBUG << "[SongDB] Search for song " << target.hexdigest();
+    LOG_VERBOSE << "[SongDB] Search for song " << target.hexdigest();
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
 
@@ -520,7 +520,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
         }
     }
 
-    LOG_DEBUG << "[SongDB] found " << ret.size() << " songs";
+    LOG_VERBOSE << "[SongDB] Found " << ret.size() << " songs";
     return ret;
 }
 

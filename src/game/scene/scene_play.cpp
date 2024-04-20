@@ -1237,14 +1237,16 @@ void ScenePlay::loadChart()
                     return;
                 }
 
-                const auto thread_count = std::thread::hardware_concurrency();
-                boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
+                // TODO: make addBmp thread-safe and use the thread pool here.
+                // const auto thread_count = std::thread::hardware_concurrency();
+                // boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
                 for (size_t i = 0; i < _pChart->bgaFiles.size(); ++i)
                 {
                     if (shouldDiscard(*this)) return;
                     const auto& bmp = _pChart->bgaFiles[i];
                     if (bmp.empty()) continue;
-                    boost::asio::post(pool, [&bmp, this, i, &chartDir]() {
+                    // boost::asio::post(pool, [&bmp, this, i, &chartDir]() {
+                     {
                         if (shouldDiscard(*this)) return;
                         const auto pBmp = PathFromUTF8(bmp);
                         if (pBmp.is_absolute())
@@ -1260,9 +1262,10 @@ void ScenePlay::loadChart()
                             gPlayContext.bgaTexture->addBmp(i, p);
                         }
                         ++bmpLoaded;
-                    });
+                    }
+                    // });
                 }
-                pool.wait();
+                // pool.wait();
 
                 if (shouldDiscard(*this))
                 {

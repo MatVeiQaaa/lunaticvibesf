@@ -3428,7 +3428,14 @@ int SkinLR2::parseHeader(const Tokens& raw)
     {
         while (parseParamBuf.size() < 1) parseParamBuf.emplace_back("");
 
-        info.resolution = toInt(parseParamBuf[0]);
+        switch(toInt(parseParamBuf[0], -1))
+        {
+        case 0: info.resolution = {640, 480}; break;
+        case 1: info.resolution = {1280, 720}; break;
+        case 2: info.resolution = {1920, 1080}; break;
+        case 3: LOG_WARNING << "[SkinLR2] #RESOLUTION 3 is not supported"; break; // TODO: 2560p support
+        default: LOG_WARNING << "[SkinLR2] Invalid #RESOLUTION value '" << parseParamBuf[0] << "'"; break;
+        }
     }
 
     else if (matchToken(parseKeyBuf, "#ENDOFHEADER"))
@@ -4224,9 +4231,9 @@ void SkinLR2::postLoad()
     }
 
     // try to detect resolution
-    if (info.resolution < 0)
+    if (info.resolution.first == -1 || info.resolution.second == -1)
     {
-        info.resolution = 0;
+        info.resolution = {640, 480};
         size_t count = 0;
         size_t countSD = 0;
         size_t countHD = 0;
@@ -4239,6 +4246,7 @@ void SkinLR2::postLoad()
             if (rc.x > 1920 || rc.y > 1080 || rc.x + rc.w > 1920 || rc.y + rc.h > 1080)
             {
                 // just skip this lol
+                // TODO: 2560p
                 continue;
             }
             if (rc.x > 1280 || rc.y > 720 || rc.x + rc.w > 1280 || rc.y + rc.h > 720)
@@ -4279,14 +4287,15 @@ void SkinLR2::postLoad()
         {
             if ((double)countFHD / count > 0.5)
             {
-                info.resolution = 2;
+                info.resolution = {1920, 1080};
             }
             else if ((double)countHD / count > 0.35)
             {
-                info.resolution = 1;
+                info.resolution = {1280, 720};
             }
         }
-        LOG_INFO << "[Skin] Resolution detect: " << info.resolution << " (" << countSD << "/" << countHD << "/" << countFHD << ")";
+        LOG_INFO << "[Skin] Resolution detect: " << info.resolution.first << "x" << info.resolution.second << " ("
+                 << countSD << "/" << countHD << "/" << countFHD << ")";
     }
 }
 

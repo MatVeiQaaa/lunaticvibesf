@@ -39,13 +39,8 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
     if (pSkin &&
         ((!gInCustomize && skinType != SkinType::THEME_SELECT) || (gInCustomize && skinType == SkinType::THEME_SELECT)))
     {
-        int x, y;
-        switch (pSkin->info.resolution)
-        {
-        case 1: x = 1280; y = 720; break;
-        case 2: x = 1920; y = 1080; break;
-        default: x = 640; y = 480; break;
-        }
+        const int x = pSkin->info.resolution.first;
+        const int y = pSkin->info.resolution.second;
         graphics_resize_canvas(x, y);
         notificationPosY = y;
         notificationWidth = x;

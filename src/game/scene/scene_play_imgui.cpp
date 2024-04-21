@@ -2,6 +2,7 @@
 #include "game/runtime/i18n.h"
 #include "imgui.h"
 #include "game/skin/skin_lr2.h"
+#include <tuple>
 
 void ScenePlay::updateImgui()
 {
@@ -13,11 +14,14 @@ void ScenePlay::updateImgui()
 
 void ScenePlay::imguiInit()
 {
-    switch (pSkin->info.resolution)
+    std::tie(imguiAdjustBorderX, imguiAdjustBorderY) = pSkin->info.resolution;
+    switch (pSkin->info.resolution.first)
     {
-    case 0: imguiAdjustBorderX = 640; imguiAdjustBorderY = 480; imguiAdjustBorderSize = 50; break;
-    case 1: imguiAdjustBorderX = 1280; imguiAdjustBorderY = 720; imguiAdjustBorderSize = 75; break;
-    case 2: imguiAdjustBorderX = 1920; imguiAdjustBorderY = 1080; imguiAdjustBorderSize = 100; break;
+    // TODO: handle this better.
+    default:
+    case 640: imguiAdjustBorderSize = 50; break;
+    case 1280: imguiAdjustBorderSize = 75; break;
+    case 1920: imguiAdjustBorderSize = 100; break;
     }
 
     switch (pSkin->info.mode)

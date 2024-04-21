@@ -4,6 +4,7 @@
 #include "common/types.h"
 #include <list>
 #include <string_view>
+#include <utility>
 #include <vector>
 #include <map>
 #include <string>
@@ -90,7 +91,7 @@ public:
         SkinType mode = SkinType::PLAY7;
         std::string name;
         std::string maker;
-        int resolution = -1;     // #RESOLUTION | 0:480p / 1:720p / 2:1080p
+        std::pair<int, int> resolution = {-1, -1};
 
         bool hasTransparentColor = false;
         Color transparentColor;

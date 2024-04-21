@@ -8,12 +8,10 @@
 #include "game/sound/sound_mgr.h"
 #include "game/sound/soundset_lr2.h"
 #include "scene_context.h"
-#include "scene_decide.h"
 
-SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240)
+SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240), _state(lunaticvibes::CustomizeState::Start)
 {
     _type = SceneType::CUSTOMIZE;
-    _updateCallback = std::bind(&SceneCustomize::updateStart, this);
 
     gCustomizeContext.skinDir = 0;
     gCustomizeContext.optionUpdate = 0;
@@ -104,7 +102,12 @@ void SceneCustomize::_updateAsync()
         gExitingCustomize = true;
     }
 
-    _updateCallback();
+    switch (_state)
+    {
+    case lunaticvibes::CustomizeState::Start: updateStart(); break;
+    case lunaticvibes::CustomizeState::Main: updateMain(); break;
+    case lunaticvibes::CustomizeState::Fadeout: updateFadeout(); break;
+    }
 }
 
 void SceneCustomize::updateStart()
@@ -113,7 +116,7 @@ void SceneCustomize::updateStart()
     lunaticvibes::Time rt = t - State::get(IndexTimer::_SCENE_CUSTOMIZE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
-        _updateCallback = std::bind(&SceneCustomize::updateMain, this);
+        _state = lunaticvibes::CustomizeState::Main;
 
         if (gInCustomize)
         {
@@ -374,7 +377,7 @@ void SceneCustomize::updateMain()
     {
         State::set(IndexTimer::_SCENE_CUSTOMIZE_FADEOUT, t.norm());
         SoundMgr::setSysVolume(0.0, 1000);
-        _updateCallback = std::bind(&SceneCustomize::updateFadeout, this);
+        _state = lunaticvibes::CustomizeState::Fadeout;
         using namespace std::placeholders;
         _input.unregister_p("SCENE_PRESS_CUSTOMIZE");
         LOG_DEBUG << "[Customize] State changed to Fadeout";

@@ -1,9 +1,22 @@
 #pragma once
 #include "scene.h"
 
+namespace lunaticvibes
+{
+
+enum class CustomizeState
+{
+    Start,
+    Main,
+    Fadeout,
+};
+
+} // namespace lunaticvibes
+
 class SceneCustomize : public SceneBase
 {
 private:
+    lunaticvibes::CustomizeState _state;
     bool exiting = false;
     std::shared_ptr<Texture> graphics_get_screen_texture;
 
@@ -31,7 +44,6 @@ protected:
 protected:
     // Looper callbacks
     void _updateAsync() override;
-    std::function<void()> _updateCallback;
     void updateStart();
     void updateMain();
     void updateFadeout();

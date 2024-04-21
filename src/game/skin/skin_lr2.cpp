@@ -25,6 +25,18 @@
 
 using namespace std::placeholders;
 
+static MotionKeyFrameParams::accelType parseAccelType(const int value)
+{
+    using accelType = MotionKeyFrameParams::accelType;
+    switch (value) {
+    case 0: return accelType::CONSTANT;
+    case 1: return accelType::ACCEL;
+    case 2: return accelType::DECEL;
+    case 3: return accelType::DISCONTINOUS;
+    }
+    LOG_WARNING << "[SkinLR2] Invalid accelType '" << value << "'";
+    return accelType::CONSTANT;
+}
 
 enum sprite_type
 {
@@ -2775,7 +2787,7 @@ bool SkinLR2::DST()
             e->setMotionStartTimer((IndexTimer)d.timer);
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
         //e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
         //LOG_DEBUG << "[Skin] " << raw << ": Set sprite Keyframe (time: " << d.time << ")";
@@ -2817,7 +2829,7 @@ ParseRet SkinLR2::DST_NOTE()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
         }
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     };
 
@@ -2884,12 +2896,12 @@ ParseRet SkinLR2::DST_LINE()
     }
 
     p->pNote->clearMotionKeyFrames();
-    p->pNote->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+    p->pNote->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
 
     // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
     drawQueue.push_back({ e, dst_option(d.op[0]), dst_option(d.op[1]), dst_option(d.op[2]), dst_option(d.op[3]), {} });
-    e->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+    e->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     e->setMotionLoopTo(0);
     //e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
@@ -2947,7 +2959,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -2981,7 +2993,7 @@ ParseRet SkinLR2::DST_BAR_FLASH()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3023,7 +3035,7 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3066,7 +3078,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3107,7 +3119,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3149,7 +3161,7 @@ ParseRet SkinLR2::DST_BAR_LAMP()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3191,7 +3203,7 @@ ParseRet SkinLR2::DST_BAR_TITLE()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3233,7 +3245,7 @@ ParseRet SkinLR2::DST_BAR_RANK()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 
@@ -3275,7 +3287,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
             drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), (RenderParams::accelType)d.acc, Color(d.r, d.g, d.b, d.a),
+        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
             lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     }
 

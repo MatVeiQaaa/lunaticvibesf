@@ -16,6 +16,8 @@ class SpriteImageText : public SpriteText
 protected:
     std::vector<std::shared_ptr<Texture>> _textures;
     CharMappingList* _chrList;
+    // Screen height, for readmes/helpfiles.
+    float _maxHeight;
     unsigned textHeight;
     unsigned _firstLine;
     int _margin;
@@ -39,6 +41,12 @@ public:
     SpriteImageText() = delete;
     SpriteImageText(const SpriteImageTextBuilder& builder);
     ~SpriteImageText() override = default;
+
+    // Inject after construction.
+    void setMaxHeight(float maxHeight)
+    {
+        _maxHeight = maxHeight;
+    };
 
 public:
     void updateTextRect() override;

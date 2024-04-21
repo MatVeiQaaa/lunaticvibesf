@@ -3947,6 +3947,74 @@ bool SkinLR2::loadCSV(Path p)
 
 void SkinLR2::postLoad()
 {
+    // try to detect resolution
+    if (info.resolution.first == -1 || info.resolution.second == -1)
+    {
+        info.resolution = {640, 480};
+        size_t count = 0;
+        size_t countSD = 0;
+        size_t countHD = 0;
+        size_t countFHD = 0;
+        for (auto& s : _sprites)
+        {
+            if (s->isMotionKeyFramesEmpty()) continue;
+
+            const Rect& rc = s->motionKeyFrames.rbegin()->param.rect;
+            if (rc.x > 1920 || rc.y > 1080 || rc.x + rc.w > 1920 || rc.y + rc.h > 1080)
+            {
+                // just skip this lol
+                // TODO: 2560p
+                continue;
+            }
+            if (rc.x > 1280 || rc.y > 720 || rc.x + rc.w > 1280 || rc.y + rc.h > 720)
+            {
+                countFHD++;
+                count++;
+            }
+            else if (rc.x > 640 || rc.y > 480 || rc.x + rc.w > 640 || rc.y + rc.h > 480)
+            {
+                if (rc.x == 0 && rc.y == 0 && rc.w == 1280 && rc.h == 720)
+                {
+                    // this is very likely a full-screen image
+                    countHD += 20;
+                    count += 20;
+                }
+                else
+                {
+                    countHD++;
+                    count++;
+                }
+            }
+            else if (rc.x >= 0 || rc.y >= 0)
+            {
+                if (rc.x == 0 && rc.y == 0 && rc.w == 640 && rc.h == 480)
+                {
+                    // this is very likely a full-screen image
+                    countSD += 20;
+                    count += 20;
+                }
+                else
+                {
+                    countSD++;
+                    count++;
+                }
+            }
+        }
+        if (count > 0)
+        {
+            if ((double)countFHD / count > 0.5)
+            {
+                info.resolution = {1920, 1080};
+            }
+            else if ((double)countHD / count > 0.35)
+            {
+                info.resolution = {1280, 720};
+            }
+        }
+        LOG_INFO << "[Skin] Resolution detect: " << info.resolution.first << "x" << info.resolution.second << " ("
+                 << countSD << "/" << countHD << "/" << countFHD << ")";
+    }
+
     // set barcenter
     if (barCenter < barSprites.size())
     {
@@ -3959,26 +4027,25 @@ void SkinLR2::postLoad()
         }
     }
 
-    // set bar available
     for (auto& s : _sprites)
     {
-        auto pS = std::dynamic_pointer_cast<SpriteBarEntry>(s);
-        if (pS != nullptr)
+        // set bar available
+        if (auto pS = std::dynamic_pointer_cast<SpriteBarEntry>(s); pS != nullptr)
         {
             if (barClickableFrom <= pS->index && pS->index <= barClickableTo)
             {
                 pS->setAvailable(true);
             }
         }
-    }
-
-    // set note area height
-    for (auto& s : _sprites)
-    {
-        auto pS = std::dynamic_pointer_cast<SpriteLaneVertical>(s);
-        if (pS != nullptr)
+        // TODO: is this needed with setLaneHeight below?
+        // set note area height
+        else if (auto pS = std::dynamic_pointer_cast<SpriteLaneVertical>(s); pS != nullptr)
         {
             pS->setHeight(500);
+        }
+        else if (auto pS = std::dynamic_pointer_cast<SpriteImageText>(s); pS != nullptr)
+        {
+            pS->setMaxHeight(static_cast<float>(info.resolution.second));
         }
     }
 
@@ -4228,74 +4295,6 @@ void SkinLR2::postLoad()
                     p->motionStartTimer = IndexTimer::_SCENE_CUSTOMIZE_FADEOUT;
             }
         }
-    }
-
-    // try to detect resolution
-    if (info.resolution.first == -1 || info.resolution.second == -1)
-    {
-        info.resolution = {640, 480};
-        size_t count = 0;
-        size_t countSD = 0;
-        size_t countHD = 0;
-        size_t countFHD = 0;
-        for (auto& s : _sprites)
-        {
-            if (s->isMotionKeyFramesEmpty()) continue;
-
-            const Rect& rc = s->motionKeyFrames.rbegin()->param.rect;
-            if (rc.x > 1920 || rc.y > 1080 || rc.x + rc.w > 1920 || rc.y + rc.h > 1080)
-            {
-                // just skip this lol
-                // TODO: 2560p
-                continue;
-            }
-            if (rc.x > 1280 || rc.y > 720 || rc.x + rc.w > 1280 || rc.y + rc.h > 720)
-            {
-                countFHD++;
-                count++;
-            }
-            else if (rc.x > 640 || rc.y > 480 || rc.x + rc.w > 640 || rc.y + rc.h > 480)
-            {
-                if (rc.x == 0 && rc.y == 0 && rc.w == 1280 && rc.h == 720)
-                {
-                    // this is very likely a full-screen image
-                    countHD += 20;
-                    count += 20;
-                }
-                else
-                {
-                    countHD++;
-                    count++;
-                }
-            }
-            else if (rc.x >= 0 || rc.y >= 0)
-            {
-                if (rc.x == 0 && rc.y == 0 && rc.w == 640 && rc.h == 480)
-                {
-                    // this is very likely a full-screen image
-                    countSD += 20;
-                    count += 20;
-                }
-                else
-                {
-                    countSD++;
-                    count++;
-                }
-            }
-        }
-        if (count > 0)
-        {
-            if ((double)countFHD / count > 0.5)
-            {
-                info.resolution = {1920, 1080};
-            }
-            else if ((double)countHD / count > 0.35)
-            {
-                info.resolution = {1280, 720};
-            }
-        }
-        LOG_INFO << "[Skin] Resolution detect: " << info.resolution.first << "x" << info.resolution.second << " ("
-                 << countSD << "/" << countHD << "/" << countFHD << ")";
     }
 }
 

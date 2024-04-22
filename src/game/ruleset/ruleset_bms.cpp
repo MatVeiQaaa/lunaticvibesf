@@ -52,8 +52,9 @@ void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
 }
 
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
-    PlayModifierGaugeType gauge, GameModeKeys keys, RulesetBMS::JudgeDifficulty difficulty, double health, RulesetBMS::PlaySide side) :
-    RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty)
+                       PlayModifiers mods, GameModeKeys keys, RulesetBMS::JudgeDifficulty difficulty, double health,
+                       RulesetBMS::PlaySide side, const int fiveKeyMapIndex)
+    : RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty)
 {
 
     static const NoteLaneTimerMap bombTimer5k[] = {
@@ -239,23 +240,20 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     switch (keys)
     {
     case 5:
-    case 10: 
-    {
-        size_t mapIndex = 0;
-        if (gPlayContext.shift1PNotes5KFor7KSkin)
-        {
-            mapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 3 : 2;
-        }
-        else
-        {
-            mapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 1 : 0;
-        }
-        _bombTimerMap = &bombTimer5k[mapIndex];  _bombLNTimerMap = &bombTimer5kLN[mapIndex];
+    case 10: {
+        _bombTimerMap = &bombTimer5k[fiveKeyMapIndex];
+        _bombLNTimerMap = &bombTimer5kLN[fiveKeyMapIndex];
         break;
     }
-    case 7:  
-    case 14: _bombTimerMap = &bombTimer7k;  _bombLNTimerMap = &bombTimer7kLN; break;
-    case 9:  _bombTimerMap = &bombTimer9k;  _bombLNTimerMap = &bombTimer9kLN; break;
+    case 7:
+    case 14:
+        _bombTimerMap = &bombTimer7k;
+        _bombLNTimerMap = &bombTimer7kLN;
+        break;
+    case 9:
+        _bombTimerMap = &bombTimer9k;
+        _bombLNTimerMap = &bombTimer9kLN;
+        break;
     default: break;
     }
 
@@ -277,35 +275,31 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     using namespace std::string_literals;
 
     _basic.health = health;
-    initGaugeParams(gauge);
+    initGaugeParams(mods.gauge);
 
     _side = side;
+    _judgeScratch = !(mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
 	switch (side)
 	{
 	case RulesetBMS::PlaySide::SINGLE:
         _k1P = true;
         _k2P = false;
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
         break;
 	case RulesetBMS::PlaySide::DOUBLE:
 		_k1P = true;
 		_k2P = true;
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
 		break;
 	case RulesetBMS::PlaySide::BATTLE_1P:
 		_k1P = true;
 		_k2P = false;
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
 		break;
 	case RulesetBMS::PlaySide::BATTLE_2P:
 		_k1P = false;
 		_k2P = true;
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
 		break;
     default:
         _k1P = true;
         _k2P = true;
-        _judgeScratch = false;
         break;
 	}
 

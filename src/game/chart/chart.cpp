@@ -116,14 +116,7 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
                 Sc2, Sc2, _, _, N21, N22, N23, N24, N25, _, _, _, _, _, _,
             },
         };
-        if (gPlayContext.shift1PNotes5KFor7KSkin)
-        {
-            return gPlayContext.shift2PNotes5KFor7KSkin ? lane[3][pad] : lane[2][pad];
-        }
-        else
-        {
-            return gPlayContext.shift2PNotes5KFor7KSkin ? lane[1][pad] : lane[0][pad];
-        }
+        return lane[gPlayContext.shiftFiveKeyForSevenKeyIndex(true)][pad];
     }
     case 7:
     case 14:

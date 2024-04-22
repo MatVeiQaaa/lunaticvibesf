@@ -1,68 +1,36 @@
 #include "ruleset_bms_replay.h"
-#include "game/scene/scene.h"
-#include "game/scene/scene_context.h"
 
 #include <cassert>
-#include <optional>
 #include <utility>
 
-RulesetBMSReplay::RulesetBMSReplay(
-    std::shared_ptr<ChartFormatBase> format_,
-    std::shared_ptr<ChartObjectBase> chart_,
-    std::shared_ptr<ReplayChart> replay_,
-    PlayModifierGaugeType gauge,
-    GameModeKeys keys,
-    JudgeDifficulty difficulty,
-    double health,
-    PlaySide side)
-    : RulesetBase(format_, chart_)
-    , RulesetBMS(std::move(format_), std::move(chart_), gauge, keys, difficulty, health, side)
-    , replay(std::move(replay_))
+RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,
+                                   std::shared_ptr<ReplayChart> replay_, const PlayModifiers mods, GameModeKeys keys,
+                                   JudgeDifficulty difficulty, double health, PlaySide side, const int fiveKeyMapIndex,
+                                   const double pitchSpeed)
+    : RulesetBase(format_, chart_),
+      RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex),
+      replay(std::move(replay_))
 {
+    assert(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL || side == PlaySide::MYBEST);
+
+    if (fiveKeyMapIndex == -1)
+    {
+        _inputDownMap = &REPLAY_CMD_INPUT_DOWN_MAP;
+        _inputUpMap = &REPLAY_CMD_INPUT_UP_MAP;
+    }
+    else
+    {
+        _inputDownMap = &REPLAY_CMD_INPUT_DOWN_MAP_5K[fiveKeyMapIndex];
+        _inputUpMap = &REPLAY_CMD_INPUT_UP_MAP_5K[fiveKeyMapIndex];
+    }
+
     itReplayCommand = replay->commands.begin();
     showJudge = (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P);
-
-    if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
-    {
-        if (gPlayContext.shift1PNotes5KFor7KSkin)
-        {
-            replayCmdMapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 3 : 2;
-        }
-        else
-        {
-            replayCmdMapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 1 : 0;
-        }
-    }
 
     if (replay->pitchValue != 0)
     {
         static const double tick = std::pow(2, 1.0 / 12);
-        playbackSpeed = std::pow(tick, replay->pitchValue);
-    }
-
-    switch (side)
-    {
-    case RulesetBMS::PlaySide::AUTO:
-    case RulesetBMS::PlaySide::AUTO_DOUBLE:
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-        break;
-
-    case RulesetBMS::PlaySide::AUTO_2P:
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-        break;
-
-    case RulesetBMS::PlaySide::MYBEST:
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-        break;
-
-    case RulesetBMS::PlaySide::SINGLE:
-    case RulesetBMS::PlaySide::DOUBLE:
-    case RulesetBMS::PlaySide::BATTLE_1P:
-    case RulesetBMS::PlaySide::BATTLE_2P:
-    case RulesetBMS::PlaySide::RIVAL:
-    case RulesetBMS::PlaySide::NETWORK:
-        assert(false);
-        break;
+        replayTimestampMultiplier = std::pow(tick, replay->pitchValue) / pitchSpeed;
     }
 }
 
@@ -77,13 +45,11 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
 
     auto rt = t - _startTime.norm();
     _basic.play_time = rt;
-    using namespace chart;
 
     const InputMask prevKeyPressing = keyPressing;
-    while (itReplayCommand != replay->commands.end() && rt.norm() >= (long long)std::round(itReplayCommand->ms * playbackSpeed / gSelectContext.pitchSpeed))
+    while (itReplayCommand != replay->commands.end() && rt.norm() >= (long long)std::round(itReplayCommand->ms * replayTimestampMultiplier))
     {
         auto cmd = itReplayCommand->type;
-
         if (_side == PlaySide::AUTO_2P)
         {
             cmd = ReplayChart::Commands::leftSideCmdToRightSide(cmd);
@@ -91,28 +57,13 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
 
         if (!skipToEnd)
         {
-            if (gPlayContext.mode == SkinType::PLAY5 || gPlayContext.mode == SkinType::PLAY5_2)
+            if (auto it = _inputDownMap->find(cmd); it != _inputDownMap->end())
             {
-                if (auto it = REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].find(cmd);
-                    it != REPLAY_CMD_INPUT_DOWN_MAP_5K[replayCmdMapIndex].end())
-                {
-                    keyPressing[it->second] = true;
-                }
-                else if (REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].find(cmd) != REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].end())
-                {
-                    keyPressing[REPLAY_CMD_INPUT_UP_MAP_5K[replayCmdMapIndex].at(cmd)] = false;
-                }
+                keyPressing[it->second] = true;
             }
-            else
+            else if (auto it = _inputUpMap->find(cmd); it != _inputUpMap->end())
             {
-                if (auto it = REPLAY_CMD_INPUT_DOWN_MAP.find(cmd); it != REPLAY_CMD_INPUT_DOWN_MAP.end())
-                {
-                    keyPressing[it->second] = true;
-                }
-                else if (REPLAY_CMD_INPUT_UP_MAP.find(cmd) != REPLAY_CMD_INPUT_UP_MAP.end())
-                {
-                    keyPressing[REPLAY_CMD_INPUT_UP_MAP.at(cmd)] = false;
-                }
+                keyPressing[it->second] = false;
             }
 
             switch (cmd)

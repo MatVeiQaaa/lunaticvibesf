@@ -119,6 +119,12 @@ struct PlayContextParams
 
     bool shift1PNotes5KFor7KSkin = false;
     bool shift2PNotes5KFor7KSkin = false;
+    constexpr int shiftFiveKeyForSevenKeyIndex(const bool isFiveKey)
+    {
+        if (!isFiveKey) return -1;
+        if (shift1PNotes5KFor7KSkin) return shift2PNotes5KFor7KSkin ? 3 : 2;
+        return shift2PNotes5KFor7KSkin ? 1 : 0;
+    }
 };
 
 // byGauge - ignore full combo+ and limit lamp type by gauge.

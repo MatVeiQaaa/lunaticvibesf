@@ -6,14 +6,10 @@
 class RulesetBMSAuto : public RulesetBMS
 {
 public:
-    RulesetBMSAuto(
-        const std::shared_ptr<ChartFormatBase>& format,
-        const std::shared_ptr<ChartObjectBase>& chart,
-        PlayModifierGaugeType gauge,
-        GameModeKeys keys,
-        JudgeDifficulty difficulty = LR2_DEFAULT_RANK,
-        double health = 1.0,
-        PlaySide side = PlaySide::AUTO);
+    // fiveKeyMapIndex - if not 5k, set to -1.
+    RulesetBMSAuto(const std::shared_ptr<ChartFormatBase> &format, const std::shared_ptr<ChartObjectBase> &chart,
+                   PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side,
+                   int fiveKeyMapIndex);
 
 protected:
 	double targetRate = 100.0;

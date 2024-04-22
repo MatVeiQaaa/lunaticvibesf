@@ -899,24 +899,29 @@ bool ScenePlay::createRuleset()
 
             switch (objType)
             {
-            case BASE: 
+            case BASE:
                 return std::make_shared<RulesetBMS>(
-                gChartContext.chart, gPlayContext.chartObj[slot],
-                gPlayContext.mods[slot].gauge, keys, judgeDiff,
-                gPlayContext.initialHealth[slot], playSide);
+                    gChartContext.chart, gPlayContext.chartObj[slot], gPlayContext.mods[slot], keys, judgeDiff,
+                    gPlayContext.initialHealth[slot], playSide,
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
+                                                              gPlayContext.mode == SkinType::PLAY5_2));
 
             case AUTO:
                 return std::make_shared<RulesetBMSAuto>(
-                    gChartContext.chart, gPlayContext.chartObj[slot],
-                    gPlayContext.mods[slot].gauge, keys, judgeDiff,
-                    gPlayContext.initialHealth[slot], playSide);
+                    gChartContext.chart, gPlayContext.chartObj[slot], gPlayContext.mods[slot], keys, judgeDiff,
+                    gPlayContext.initialHealth[slot], playSide,
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
+                                                              gPlayContext.mode == SkinType::PLAY5_2));
 
             case REPLAY:
                 assert(gPlayContext.replayMybest != nullptr);
+                gPlayContext.mods[slot].gauge = gPlayContext.replayMybest->gaugeType;
                 return std::make_shared<RulesetBMSReplay>(
                     gChartContext.chartMybest, gPlayContext.chartObj[slot], gPlayContext.replayMybest,
-                    gPlayContext.replayMybest->gaugeType, keys, judgeDiff,
-                    gPlayContext.initialHealth[slot], playSide);
+                    gPlayContext.mods[slot], keys, judgeDiff, gPlayContext.initialHealth[slot], playSide,
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
+                                                              gPlayContext.mode == SkinType::PLAY5_2),
+                    gSelectContext.pitchSpeed);
 
             default:
                 return nullptr;

@@ -3203,8 +3203,9 @@ void SceneSelect::updatePreview()
                 _previewLoading = std::thread([&, bms] {
                     SetThreadName("PreviewSampleLoad");
                     auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);
-                    auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(bms, previewChartObjTmp,
-                        PlayModifierGaugeType::NORMAL, bms->gamemode, RulesetBMS::JudgeDifficulty::VERYHARD, 0.2, RulesetBMS::PlaySide::RIVAL);
+                    auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(
+                        bms, previewChartObjTmp, PlayModifiers{}, bms->gamemode, RulesetBMS::JudgeDifficulty::VERYHARD,
+                        0.2, RulesetBMS::PlaySide::RIVAL, -1);
 
                     // load samples
                     SoundMgr::freeNoteSamples();

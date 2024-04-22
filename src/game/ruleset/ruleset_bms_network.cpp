@@ -7,8 +7,10 @@
 #include "common/log.h"
 #include "game/scene/scene_context.h"
 
-RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex) : 
-    RulesetBase(nullptr, nullptr), RulesetBMS(nullptr, nullptr, PlayModifierGaugeType::NORMAL, keys, JudgeDifficulty::NORMAL, 1.0, PlaySide::NETWORK), playerIndex(playerIndex)
+RulesetBMSNetwork::RulesetBMSNetwork(GameModeKeys keys, unsigned playerIndex)
+    : RulesetBase(nullptr, nullptr),
+      RulesetBMS(nullptr, nullptr, PlayModifiers{}, keys, JudgeDifficulty::NORMAL, 1.0, PlaySide::NETWORK, -1),
+      playerIndex(playerIndex)
 {
     showJudge = false;
     _judgeScratch = false;

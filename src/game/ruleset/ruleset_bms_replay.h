@@ -6,24 +6,20 @@
 class RulesetBMSReplay : public RulesetBMS
 {
 public:
-    RulesetBMSReplay(
-        std::shared_ptr<ChartFormatBase> format,
-        std::shared_ptr<ChartObjectBase> chart,
-        std::shared_ptr<ReplayChart> replay,
-        PlayModifierGaugeType gauge,
-        GameModeKeys keys,
-        JudgeDifficulty difficulty = JudgeDifficulty::NORMAL,
-        double health = 1.0,
-        PlaySide side = PlaySide::AUTO);
+    // fiveKeyMapIndex - if not 5k, set to -1.
+    RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
+                     std::shared_ptr<ReplayChart> replay, PlayModifiers mods, GameModeKeys keys,
+                     JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex, double pitchSpeed);
 
 public:
-    double playbackSpeed = 1.0;
+    double replayTimestampMultiplier = 1.0;
 
 protected:
     std::shared_ptr<ReplayChart> replay;
     std::vector<ReplayChart::Commands>::iterator itReplayCommand;
     InputMask keyPressing;
-    unsigned replayCmdMapIndex = 0;
+    const std::map<ReplayChart::Commands::Type, Input::Pad>* _inputDownMap;
+    const std::map<ReplayChart::Commands::Type, Input::Pad>* _inputUpMap;
 
 public:
 

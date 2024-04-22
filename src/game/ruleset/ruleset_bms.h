@@ -209,14 +209,9 @@ protected:
 
 
 public:
-    RulesetBMS(
-        std::shared_ptr<ChartFormatBase> format,
-        std::shared_ptr<ChartObjectBase> chart,
-        PlayModifierGaugeType gauge,
-        GameModeKeys keys,
-        JudgeDifficulty difficulty = LR2_DEFAULT_RANK,
-        double health = 1.0,
-        PlaySide side = PlaySide::SINGLE);
+    // fiveKeyMapIndex - if not 5k, set to -1.
+    RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart, PlayModifiers mods,
+               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex);
 
     void initGaugeParams(PlayModifierGaugeType gauge);
 

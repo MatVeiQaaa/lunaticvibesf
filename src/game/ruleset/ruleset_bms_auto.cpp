@@ -6,42 +6,15 @@
 #include "game/scene/scene_context.h"
 #include "game/chart/chart_types.h"
 
-RulesetBMSAuto::RulesetBMSAuto(
-    const std::shared_ptr<ChartFormatBase>& format,
-    const std::shared_ptr<ChartObjectBase>& chart,
-    PlayModifierGaugeType gauge,
-    GameModeKeys keys,
-    JudgeDifficulty difficulty,
-    double health,
-    PlaySide side) : RulesetBase(format, chart), RulesetBMS(format, chart, gauge, keys, difficulty, health, side)
+RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
+                               const std::shared_ptr<ChartObjectBase>& chart, const PlayModifiers mods,
+                               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side,
+                               const int fiveKeyMapIndex)
+    : RulesetBase(format, chart), RulesetBMS(format, chart, mods, keys, difficulty, health, side, fiveKeyMapIndex)
 {
     assert(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL);
-
     showJudge = (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P);
-
     isPressingLN.fill(false);
-
-    switch (side)
-    {
-    case RulesetBMS::PlaySide::AUTO:
-    case RulesetBMS::PlaySide::AUTO_DOUBLE:
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-        break;
-
-    case RulesetBMS::PlaySide::AUTO_2P:
-    case RulesetBMS::PlaySide::RIVAL:
-        _judgeScratch = !(gPlayContext.mods[PLAYER_SLOT_TARGET].assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-        break;
-
-    case RulesetBMS::PlaySide::SINGLE:
-    case RulesetBMS::PlaySide::DOUBLE:
-    case RulesetBMS::PlaySide::BATTLE_1P:
-    case RulesetBMS::PlaySide::BATTLE_2P:
-    case RulesetBMS::PlaySide::MYBEST:
-    case RulesetBMS::PlaySide::NETWORK:
-        assert(false);
-    }
-
     setTargetRate(1.0);
 }
 

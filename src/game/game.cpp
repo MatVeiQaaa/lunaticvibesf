@@ -18,6 +18,8 @@
 #include "game/arena/arena_client.h"
 #include "game/arena/arena_host.h"
 
+#include <string_view>
+
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -207,16 +209,21 @@ int main(int argc, char* argv[])
     // arg parsing
     if (argc >= 2)
     {
+        const Path bmsFile{argc >= 3 ? argv[2] : argv[1]};
+        gPlayContext.isAuto = argc >= 3 && std::string_view{argv[1]} == "-a";
+        State::set(IndexSwitch::SYSTEM_AUTOPLAY, gPlayContext.isAuto);
+        LOG_INFO << "[Main] isAuto=" << gPlayContext.isAuto;
+
         g_pScoreDB = std::make_shared<ScoreDB>(IN_MEMORY_DB_PATH);
         g_pSongDB = std::make_shared<SongDB>(IN_MEMORY_DB_PATH);
 
         gNextScene = SceneType::PLAY;
         gQuitOnFinish = true;
 
-        std::shared_ptr<ChartFormatBMS> bms = std::make_shared<ChartFormatBMS>(argv[1], std::time(NULL));
+        std::shared_ptr<ChartFormatBMS> bms = std::make_shared<ChartFormatBMS>(bmsFile, std::time(NULL));
         gChartContext = ChartContextParams{
-            argv[1],
-            md5file(argv[1]),
+            bmsFile,
+            md5file(bmsFile),
             bms,
             nullptr,
 

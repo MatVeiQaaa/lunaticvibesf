@@ -392,13 +392,7 @@ void SceneResult::updateFadeout()
                         gPlayContext.replayMybest = std::make_shared<ReplayChart>();
                         if (gPlayContext.replayMybest->loadFile(replayFilePath))
                         {
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].randomLeft = gPlayContext.replayMybest->randomTypeLeft;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].randomRight = gPlayContext.replayMybest->randomTypeRight;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].gauge = gPlayContext.replayMybest->gaugeType;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect = (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
+                            gPlayContext.mods[PLAYER_SLOT_MYBEST] = gPlayContext.replayMybest->getMods();
                         }
                         else
                         {

@@ -226,6 +226,7 @@ public:
 
     static Path getReplayPath(const HashMD5& chartMD5);
     Path getReplayPath();
+    PlayModifiers getMods() const;
 };
 
 CEREAL_CLASS_VERSION(ReplayChart, 2);

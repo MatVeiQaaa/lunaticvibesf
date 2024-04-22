@@ -1,4 +1,5 @@
 #include "replay_chart.h"
+#include "common/types.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
 
@@ -103,7 +104,18 @@ Path ReplayChart::getReplayPath()
 	return getReplayPath(chartHash);
 }
 
-
+PlayModifiers ReplayChart::getMods() const
+{
+    PlayModifiers out;
+    out.randomLeft = randomTypeLeft;
+    out.randomRight = randomTypeRight;
+    out.gauge = gaugeType;
+    out.assist_mask = assistMask;
+    out.hispeedFix = hispeedFix;
+    out.laneEffect = (PlayModifierLaneEffectType)laneEffectType;
+    out.DPFlip = DPFlip;
+    return out;
+}
 
 const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_DOWN_CMD_MAP =
 {

@@ -3434,11 +3434,14 @@ int SkinLR2::parseHeader(const Tokens& raw)
         case 0: info.resolution = {640, 480}; break;
         case 1: info.resolution = {1280, 720}; break;
         case 2: info.resolution = {1920, 1080}; break;
-        case 3: LOG_WARNING << "[SkinLR2] #RESOLUTION 3 is not supported"; break; // TODO: 2560p support
-        default: LOG_WARNING << "[SkinLR2] Invalid #RESOLUTION value '" << parseParamBuf[0] << "'"; break;
+        case 3:
+            // Beatoraja extension as there is no such public mod for LR2.
+            // (not that #RESOLUTION by itself isn't an extension).
+            info.resolution = {3840, 2160};
+            break;
+        default: LOG_WARNING << "[SkinLR2] Invalid #RESOLUTION value '" << parseParamBuf[0] << "' ignored"; break;
         }
     }
-
     else if (matchToken(parseKeyBuf, "#ENDOFHEADER"))
     {
         return -1;
@@ -3953,8 +3956,7 @@ void SkinLR2::postLoad()
             const Rect& rc = s->motionKeyFrames.rbegin()->param.rect;
             if (rc.x > 1920 || rc.y > 1080 || rc.x + rc.w > 1920 || rc.y + rc.h > 1080)
             {
-                // just skip this lol
-                // TODO: 2560p
+                // This might be a 2160p/4k skin, but those would likely explicitly use #RESOLUTION, so ignore.
                 continue;
             }
             if (rc.x > 1280 || rc.y > 720 || rc.x + rc.w > 1280 || rc.y + rc.h > 720)

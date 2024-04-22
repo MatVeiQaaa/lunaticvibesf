@@ -15,14 +15,13 @@ void ScenePlay::updateImgui()
 void ScenePlay::imguiInit()
 {
     std::tie(imguiAdjustBorderX, imguiAdjustBorderY) = pSkin->info.resolution;
-    switch (pSkin->info.resolution.first)
-    {
-    // TODO: handle this better.
-    default:
-    case 640: imguiAdjustBorderSize = 50; break;
-    case 1280: imguiAdjustBorderSize = 75; break;
-    case 1920: imguiAdjustBorderSize = 100; break;
-    }
+    // Arbitrary sane-looking value.
+    // floor(640/19)=33px
+    // floor(1280/19)=67px
+    // floor(1920/19)=101px
+    // floor(3840/19)=202px
+    static constexpr int noteWidthAdjustmentFactor{19};
+    imguiAdjustBorderSize = imguiAdjustBorderX / noteWidthAdjustmentFactor;
 
     switch (pSkin->info.mode)
     {

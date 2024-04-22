@@ -5,10 +5,7 @@ Lunatic Vibes F (LVF) is a BMS client - a rhythm game that plays community-made 
 The project is still in development stage. Please do not expect a bug-free experience. Feel free to open issues.
 
 It is a fork of [Lunatic Vibes](https://github.com/yaasdf/lunaticvibes), a clone of Lunatic Rave 2 (beta3 100201).
-Scores set in LVF will not show up in Lunatic Vibes.
-This is because LVF saves every single score, which requires a different database format
-(also see https://github.com/chown2/lunaticvibesf/issues/5).
-Otherwise currently they are completely compatible (backups are still recommended), although this may change very soon.
+After using LVF, profiles will not be compatible with Lunatic Vibes anymore, so make sure to have backups before moving.
 
 ## Features
 

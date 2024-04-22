@@ -76,7 +76,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
     fileName = filePath.filename();
     absolutePath = std::filesystem::absolute(filePath);
-    std::ifstream ifsFile(absolutePath.c_str());
+    std::ifstream ifsFile{absolutePath};
     if (ifsFile.fail())
     {
         errorCode = err::FILE_ERROR;

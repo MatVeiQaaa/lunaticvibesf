@@ -40,7 +40,7 @@ eChartFormat analyzeChartType(const Path& p)
 std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& path, uint64_t randomSeed)
 {
     Path filePath = fs::absolute(path);
-    std::ifstream fs(filePath.c_str());
+    std::ifstream fs{filePath};
     if (fs.fail())
     {
         LOG_WARNING << "[Chart] File invalid: " << filePath;

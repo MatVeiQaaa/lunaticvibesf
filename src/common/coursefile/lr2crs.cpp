@@ -58,13 +58,14 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 			Course& c = courses.back();
 			for (auto& [name, value] : course.second)
 			{
-				if (lunaticvibes::iequals(name, "title"))
+				// NOTE: LR2 parses fields case-sensitively.
+				if (name == "title")
 					c.title = value.data();
-				else if (lunaticvibes::iequals(name, "line"))
+				else if (name == "line")
 					c.line = toInt(value.data());
-				else if (lunaticvibes::iequals(name, "type"))
+				else if ("type")
 					c.type = decltype(c.type)(toInt(value.data()));
-				else if (lunaticvibes::iequals(name, "hash"))
+				else if ("hash")
 				{
 					// first 32 characters are course metadata, of which we didn't make use; the 10th char is course type, the last 4 are assumed to be uploader ID
 					// after that, each 32 chars indicates a chart MD5

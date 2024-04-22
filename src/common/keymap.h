@@ -91,6 +91,7 @@ enum Pad
 };
 
 // Ingame key definitions, mostly based on scancodes.
+// Iterated on using underlying value.
 enum class Keyboard : unsigned
 {
     K_ERROR = 0,

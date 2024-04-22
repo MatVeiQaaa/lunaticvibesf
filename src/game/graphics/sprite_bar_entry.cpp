@@ -1,5 +1,6 @@
 #include "sprite_bar_entry.h"
 
+#include <map>
 #include <shared_mutex>
 
 #include "common/chartformat/chartformat_bms.h"

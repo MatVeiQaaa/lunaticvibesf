@@ -1,5 +1,6 @@
 #include "skin_lr2.h"
 
+#include <cstdint>
 #include <execution>
 #include <fstream>
 #include <optional>
@@ -23,6 +24,7 @@
 #include "skin_lr2_converters.h"
 #include "skin_lr2_slider_callbacks.h"
 
+using uint8_t = std::uint8_t;
 using namespace std::placeholders;
 
 static MotionKeyFrameParams::accelType parseAccelType(const int value)
@@ -2930,8 +2932,9 @@ ParseRet SkinLR2::DST_BAR_BODY()
     
     unsigned idx = unsigned(d._null);
 
-    for (BarType type = BarType(0); type != BarType::TYPE_COUNT; ++*(unsigned*)&type)
+    for (uint8_t i = 0; i != static_cast<uint8_t>(BarType::TYPE_COUNT); ++i)
     {
+        const auto type = static_cast<BarType>(i);
         auto e = bodyOn ? barSprites[idx]->getSpriteBodyOn(type) : barSprites[idx]->getSpriteBodyOff(type);
         if (e == nullptr)
         {

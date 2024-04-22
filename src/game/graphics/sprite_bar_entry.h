@@ -1,13 +1,17 @@
 #pragma once
+#include <cstdint>
 #include <memory>
 #include <array>
 #include <list>
 #include <utility>
-#include <map>
 #include "sprite.h"
 #include "sprite_imagetext.h"
 
-enum class BarType
+using uint8_t = std::uint8_t;
+
+// Exhaustive.
+// Iterated on using underlying value.
+enum class BarType : uint8_t
 {
     SONG,
     NEW_SONG,
@@ -23,7 +27,7 @@ enum class BarType
     TYPE_COUNT
 };
 
-enum class BarLevelType
+enum class BarLevelType : uint8_t
 {
     UNDEF,      // WHITE
     BEGINNER,   // GREEN
@@ -35,7 +39,7 @@ enum class BarLevelType
     LEVEL_TYPE_COUNT
 };
 
-enum class BarLampType
+enum class BarLampType : uint8_t
 {
     NOPLAY,
     FAILED,
@@ -50,7 +54,7 @@ enum class BarLampType
     LAMP_TYPE_COUNT
 };
 
-enum class BarRankType
+enum class BarRankType : uint8_t
 {
     NONE,
     F,
@@ -65,7 +69,7 @@ enum class BarRankType
     RANK_TYPE_COUNT
 };
 
-enum class BarRivalType
+enum class BarRivalType : uint8_t
 {
     WIN,
     LOSE,
@@ -74,7 +78,7 @@ enum class BarRivalType
     RIVAL_TYPE_COUNT
 };
 
-enum class BarPartsType
+enum class BarPartsType : uint8_t
 {
     BODY_OFF,
     BODY_ON,
@@ -89,7 +93,7 @@ enum class BarPartsType
     PARTS_TYPE_COUNT
 };
 
-enum class BarTitleType
+enum class BarTitleType : uint8_t
 {
     NORMAL,
     NEW_SONG,

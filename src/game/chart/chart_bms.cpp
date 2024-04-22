@@ -540,8 +540,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         {
                             constexpr int threshold_ms = 50;
                             std::vector<NoteLaneIndex> placable;
-                            for (NoteLaneIndex i = NoteLaneIndex(laneMin); i != NoteLaneIndex(laneMax + 1); ++*(size_t*)&i)
+                            for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
                             {
+                                const auto i = static_cast<NoteLaneIndex>(ii);
                                 if (laneOccupiedByLN[i])
                                 {
                                     continue;
@@ -567,8 +568,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         {
                             constexpr int threshold_ms = 250;
                             std::vector<NoteLaneIndex> placable;
-                            for (NoteLaneIndex i = NoteLaneIndex(laneMin); i != NoteLaneIndex(laneMax + 1); ++ * (size_t*)&i)
+                            for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
                             {
+                                const auto i = static_cast<NoteLaneIndex>(ii);
                                 if (laneOccupiedByLN[i])
                                 {
                                     continue;
@@ -591,8 +593,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                             {
                                 using noteTimePair = std::pair<long long, NoteLaneIndex>;
                                 std::vector<noteTimePair> placableMin;
-                                for (NoteLaneIndex i = NoteLaneIndex(laneMin); i != NoteLaneIndex(laneMax + 1); ++ * (size_t*)&i)
+                                for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
                                 {
+                                    const auto i = static_cast<NoteLaneIndex>(ii);
                                     if (laneOccupiedByLN[i])
                                     {
                                         continue;
@@ -679,8 +682,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                 (!_noteLists[laneIdxScratch].empty() && notetime - _noteLists[laneIdxScratch].back().time >= threshold_scr_ms))
                             {
                                 std::vector<NoteLaneIndex> placable;
-                                for (NoteLaneIndex i = NoteLaneIndex(laneMin); i != NoteLaneIndex(laneMax + 1); ++ * (size_t*)&i)
+                                for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
                                 {
+                                    const auto i = static_cast<NoteLaneIndex>(ii);
                                     if (laneOccupiedByLN[i])
                                     {
                                         continue;
@@ -705,8 +709,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                 {
                                     using noteTimePair = std::pair<long long, NoteLaneIndex>;
                                     std::vector<noteTimePair> placableMin;
-                                    for (NoteLaneIndex i = NoteLaneIndex(laneMin); i != NoteLaneIndex(laneMax + 1); ++ * (size_t*)&i)
+                                    for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
                                     {
+                                        const auto i = static_cast<NoteLaneIndex>(ii);
                                         if (laneOccupiedByLN[i])
                                         {
                                             continue;

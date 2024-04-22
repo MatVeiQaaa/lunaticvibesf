@@ -356,9 +356,13 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
     }
 
     // Skip expired notes
-    for (NoteLaneCategory cat = NoteLaneCategory::Note; (size_t)cat < (size_t)NoteLaneCategory::NOTECATEGORY_COUNT; ++*((size_t*)&cat))
-        for (NoteLaneIndex idx = Sc1; idx < NOTELANEINDEX_COUNT; ++*((size_t*)&idx))
+    for (auto cat_i = static_cast<size_t>(NoteLaneCategory::Note);
+         cat_i < static_cast<size_t>(NoteLaneCategory::NOTECATEGORY_COUNT); ++cat_i)
+    {
+        const auto cat = static_cast<NoteLaneCategory>(cat_i);
+        for (size_t idx_i = Sc1; idx_i < NOTELANEINDEX_COUNT; ++idx_i)
         {
+            const NoteLaneIndex idx{idx_i};
             auto it = incomingNote(cat, idx);
             while (!isLastNote(cat, idx, it) && vt >= it->time && it->expired)
             {
@@ -366,6 +370,7 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
                 it = nextNote(cat, idx);
             }
         } 
+    }
 
     // Skip expired barline
     {

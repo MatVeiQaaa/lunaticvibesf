@@ -54,7 +54,7 @@ void InputWrapper::_loop()
         curr |= (curr >> Input::S2L) & INPUT_MASK_1P;
         curr &= ~INPUT_MASK_2P;
     }
-    for (Input::Pad i = Input::S1L; i < Input::KEY_COUNT; ++(int&)i)
+    for (size_t i = Input::S1L; i < Input::KEY_COUNT; ++i)
     {
         auto& [ms, stat] = _inputBuffer[i];
         if (curr[i] && !stat)
@@ -105,16 +105,18 @@ void InputWrapper::_loop()
         {
             KeyboardMask mask;
             _kbprev = _kbcurr;
-            for (Input::Keyboard k = Input::Keyboard::K_ESC; k != Input::Keyboard::K_COUNT; ++ * (unsigned*)&k)
+            for (auto i = static_cast<unsigned>(Input::Keyboard::K_ESC);
+                 i != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++i)
             {
-                if (isKeyPressed(k)) mask.set(static_cast<size_t>(k));
+                const auto k = static_cast<Input::Keyboard>(i);
+                if (isKeyPressed(k)) mask.set(i);
             }
             _kbcurr = mask;
 
             KeyboardMask p;
-            for (Input::Keyboard k = Input::Keyboard::K_ESC; k != Input::Keyboard::K_COUNT; ++ * (unsigned*)&k)
+            for (auto ki = static_cast<unsigned>(Input::Keyboard::K_ESC);
+                 ki != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++ki)
             {
-                size_t ki = static_cast<size_t>(k);
                 if (_kbcurr[ki] && !_kbprev[ki]) p.set(ki);
             }
             if (p.any())

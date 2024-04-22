@@ -13,6 +13,7 @@ using StringContent = std::string;          // std::ifstream, std::getline
 using StringContentView = std::string_view; // std::ifstream, std::getline
 using StringPath = Path::string_type;
 using StringPathView = std::basic_string_view<Path::value_type>;
+using uint8_t = std::uint8_t;
 using namespace std::string_literals;
 
 const size_t INDEX_INVALID	= ~0;
@@ -22,7 +23,9 @@ const size_t INDEX_INVALID	= ~0;
     return Path(std::string_view(s, len));
 }
 
-enum class SkinType {
+// Exhaustive.
+// Iterated on using underlying value.
+enum class SkinType : uint8_t {
     EXIT = 0,
     TITLE = 1,
     MUSIC_SELECT,

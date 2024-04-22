@@ -300,9 +300,11 @@ void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvib
             filtered[(size_t)Input::Keyboard::K_ESC] = false;
             filtered[(size_t)Input::Keyboard::K_DEL] = false;
 
-            for (Input::Keyboard k = Input::Keyboard::K_1; k != Input::Keyboard::K_COUNT; ++ * (unsigned*)&k)
+            for (auto i = static_cast<unsigned>(Input::Keyboard::K_1);
+                 i != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++i)
             {
-                if (filtered[static_cast<size_t>(k)])
+                const auto k = static_cast<Input::Keyboard>(i);
+                if (filtered[i])
                 {
                     // modify slot
                     KeyMap km(k);
@@ -492,8 +494,10 @@ void SceneKeyConfig::updateForceBargraphs()
     const lunaticvibes::Time t;
 
     // update keyboard force bargraph
-    for (Input::Keyboard k = Input::Keyboard::K_1; k != Input::Keyboard::K_COUNT; ++ * (unsigned*)&k)
+    for (auto i = static_cast<unsigned>(Input::Keyboard::K_1); i != static_cast<unsigned>(Input::Keyboard::K_COUNT);
+         ++i)
     {
+        const auto k = static_cast<Input::Keyboard>(i);
         for (const auto& [p, bar] : forceBargraphMap)
         {
             const auto binding = input->getBindings(p);

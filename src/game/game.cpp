@@ -257,20 +257,6 @@ int main(int argc, char* argv[])
         gNextScene = SceneType::PRE_SELECT;
     }
 
-    /*
-#ifdef NDEBUG
-    // preload all skins
-    LOG_INFO << "==============================================";
-    LOG_INFO << "Preload all skins";
-    for (SkinType e = SkinType::TITLE; e < SkinType::MODE_COUNT; ++(*(int*)&e))
-    {
-        SkinMgr::load(e);
-    }
-    LOG_INFO << "Preload all skins finished";
-    LOG_INFO << "==============================================";
-#endif
-    */
-
 #ifdef _WIN32
     timeBeginPeriod(1);
 
@@ -280,7 +266,7 @@ int main(int argc, char* argv[])
         LOG_ERROR << "OleInitialize Failed";
     }
 #endif
-    
+
     ///////////////////////////////////////////////////////////
 
     mainLoop();

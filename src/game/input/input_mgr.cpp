@@ -42,8 +42,9 @@ void InputMgr::updateBindings(GameModeKeys keys)
     case 5:
     case 7:
     case 9:
-        for (Input::Pad key = Input::S1L; key < Input::ESC; ++(*(int*)&key))
+        for (size_t key_i = Input::S1L; key_i < Input::ESC; ++key_i)
         {
+            const auto key = static_cast<Input::Pad>(key_i);
             _inst.padBindings[key] = ConfigMgr::Input(keys)->getBindings(key);
         }
         break;
@@ -97,11 +98,6 @@ double InputMgr::getDeadzone(Input::Pad k)
 {
     return _inst.padDeadzones[k];
 }
-
-
-#ifdef RENDER_SDL2
-#include "SDL_mouse.h"
-#endif
 
 std::bitset<KEY_COUNT> InputMgr::_detect()
 {

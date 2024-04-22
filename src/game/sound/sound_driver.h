@@ -1,13 +1,15 @@
 #pragma once
 #include <array>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include "common/asynclooper.h"
 #include "fmod.hpp"
 
-typedef std::size_t size_t;
+using size_t = std::size_t;
+using uint8_t = std::uint8_t;
 
-enum class DSPType
+enum class DSPType : uint8_t
 {
     OFF,
     REVERB,
@@ -19,7 +21,7 @@ enum class DSPType
     DISTORTION,
 };
 
-enum class EQFreq
+enum class EQFreq : uint8_t
 {
     _62_5,
     _160,
@@ -30,14 +32,16 @@ enum class EQFreq
     _16k
 };
 
-enum class SampleChannel
+enum class SampleChannel : uint8_t
 {
     MASTER,
     KEY,
     BGM,
 };
 
-enum class SoundChannelType
+// Exhaustive.
+// Iterated on using underlying value.
+enum class SoundChannelType : uint8_t
 {
     BGM_SYS,
     BGM_NOTE,

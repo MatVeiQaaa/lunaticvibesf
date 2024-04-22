@@ -137,8 +137,8 @@ void SkinMgr::clean()
 	{
 		s.reset();
 	}
-	for (SkinType e = SkinType::TITLE; e < SkinType::MODE_COUNT; ++*((int*)&e))
+	for (int e = static_cast<int>(SkinType::TITLE); e < static_cast<int>(SkinType::MODE_COUNT); ++e)
 	{
-		unload(e);
+		unload(static_cast<SkinType>(e));
 	}
 }

@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
             bms->genre,
             bms->version,
 
-            2.0,
+            bms->levelEstimated,
             bms->minBPM,
             bms->startBPM,
             bms->maxBPM,

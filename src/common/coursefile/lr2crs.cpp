@@ -32,15 +32,11 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 	// convert codepage
 	auto encoding = getFileEncoding(ss);
 	std::stringstream ssUTF8;
-	std::string lineBuf;
-	while (!ss.eof())
+	for (std::string lineBuf; std::getline(ss, lineBuf);)
 	{
-		std::getline(ss, lineBuf);
-
 		// convert codepage
 		lineBuf = to_utf8(lineBuf, encoding);
 		lunaticvibes::trim_in_place(lineBuf);
-
 		ssUTF8 << lineBuf;
 	}
 	ssUTF8.sync();

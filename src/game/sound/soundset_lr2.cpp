@@ -51,10 +51,8 @@ void SoundSetLR2::loadCSV(Path p)
     std::vector<StringContent> tokenBuf;
     tokenBuf.reserve(32);
 
-    while (!csvFile.eof())
+    for (std::string raw; std::getline(csvFile, raw);)
     {
-        std::string raw;
-        std::getline(csvFile, raw);
         ++csvLineNumber;
 
         // convert codepage
@@ -103,10 +101,8 @@ void SoundSetLR2::loadCSV(Path p)
     csvFile.clear();
     csvFile.seekg(0);
     csvLineNumber = 0;
-    while (!csvFile.eof())
+    for (std::string raw; std::getline(csvFile, raw);)
     {
-        std::string raw;
-        std::getline(csvFile, raw);
         ++csvLineNumber;
 
         // convert codepage

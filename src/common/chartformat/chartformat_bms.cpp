@@ -114,10 +114,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit parameters
     bool hasDifficulty = false;
 
-    while (!bmsFile.eof())
+    for (StringContent lineBuf; std::getline(bmsFile, lineBuf);)
     {
-        StringContent lineBuf;
-        std::getline(bmsFile, lineBuf, '\n');
         srcLine++;
         if (lineBuf.length() <= 1) continue;
 

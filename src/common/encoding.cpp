@@ -145,10 +145,8 @@ eFileEncoding getFileEncoding(std::istream& is)
 
     std::string buf;
     eFileEncoding enc = eFileEncoding::LATIN1;
-    while (!is.eof())
+    for (std::string buf; std::getline(is, buf);)
     {
-        std::getline(is, buf, '\n');
-
         if (is_ascii(buf)) continue;
 
         if (is_utf8(buf))

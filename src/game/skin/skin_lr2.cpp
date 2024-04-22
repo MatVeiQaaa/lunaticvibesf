@@ -893,10 +893,8 @@ int SkinLR2::LR2FONT()
 
         auto pf = std::make_shared<LR2Font>();
 
-        while (!lr2font.eof())
+        for (std::string raw; std::getline(lr2font, raw);)
         {
-            std::string raw;
-            std::getline(lr2font, raw);
 
             // convert codepage
             std::string rawUTF8 = to_utf8(raw, encoding);
@@ -3508,10 +3506,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
     if (skipOnly)
     {
         // only look for #ENDIF, skip the whole sub #IF block
-        while (!lr2skin.eof())
+        for (std::string raw; std::getline(lr2skin, raw);)
         {
-            std::string raw;
-            std::getline(lr2skin, raw);
             ++csvLineNumber;
 
             std::string rawUTF8 = to_utf8(raw, enc);
@@ -3562,10 +3558,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
     if (ifStmtTrue)
     {
         bool ifBlockEnded = false;
-        while (!lr2skin.eof())
+        for (std::string raw; std::getline(lr2skin, raw);)
         {
-            std::string raw;
-            std::getline(lr2skin, raw);
             ++csvLineNumber;
 
             std::string rawUTF8 = to_utf8(raw, enc);
@@ -3618,10 +3612,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
     }
     else
     {
-        while (!lr2skin.eof())
+        for (std::string raw; std::getline(lr2skin, raw);)
         {
-            std::string raw;
-            std::getline(lr2skin, raw);
             ++csvLineNumber;
             auto tokens = csvLineTokenize(raw);
             if (tokens.empty()) continue;
@@ -3768,10 +3760,8 @@ bool SkinLR2::loadCSV(Path p)
     LOG_INFO << "[Skin] File (" << getFileEncodingName(encoding) << "): " << p;
 
     bool haveEndOfHeader = false;
-    while (!csvFile.eof())
+    for (std::string raw; std::getline(csvFile, raw);)
     {
-        std::string raw;
-        std::getline(csvFile, raw);
         ++csvLineNumber;
 
         // convert codepage
@@ -3907,10 +3897,8 @@ bool SkinLR2::loadCSV(Path p)
 
         // Add extra textures
 
-        while (!csvFile.eof())
+        for (std::string raw; std::getline(csvFile, raw);)
         {
-            std::string raw;
-            std::getline(csvFile, raw);
             ++csvLineNumber;
 
             std::string rawUTF8 = to_utf8(raw, encoding);

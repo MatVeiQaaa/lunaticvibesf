@@ -24,16 +24,18 @@ i18n::i18n(const Path& translationFile)
 
     // File is in UTF-8 encoding, no need to convert
 
-    for (size_t i = 0; i < i18n_TEXT_COUNT && !ss.eof(); ++i)
+    size_t i = 0;
+    for (std::string line; std::getline(ss, line);)
     {
-        std::string line;
-        std::getline(ss, line);
+        if (i >= i18n_TEXT_COUNT)
+            break;
 
         static const RE2 regexIn{ "\\\\n" };
         static const re2::StringPiece regexOut{ "\n" };
         RE2::GlobalReplace(&line, regexIn, regexOut);
 
         text[i] = line;
+        i++;
     }
 }
 

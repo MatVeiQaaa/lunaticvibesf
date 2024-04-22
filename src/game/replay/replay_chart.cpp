@@ -7,6 +7,11 @@
 #include <cstdlib>
 #include <sstream>
 
+// TODO: LVF version.
+// TODO: play timestamp.
+// TODO: player UUID?
+// TODO: player name.
+
 bool ReplayChart::loadFile(const Path& path)
 {
 	std::ifstream ifs(path, std::ios::binary);

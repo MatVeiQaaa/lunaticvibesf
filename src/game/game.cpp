@@ -218,6 +218,18 @@ int main(int argc, char* argv[])
         gQuitOnFinish = true;
 
         std::shared_ptr<ChartFormatBMS> bms = std::make_shared<ChartFormatBMS>(bmsFile, std::time(NULL));
+        auto skinTypeForKeys = [](unsigned keys) {
+            switch (keys)
+            {
+            case 5: return SkinType::PLAY5;
+            case 7: return SkinType::PLAY7;
+            case 9: return SkinType::PLAY9;
+            case 10: return SkinType::PLAY10;
+            case 14: return SkinType::PLAY14;
+            default: panic("Error", "Invalid chart key count");
+            }
+        };
+        gPlayContext.mode = skinTypeForKeys(bms->gamemode);
         gChartContext = ChartContextParams{
             bmsFile,
             md5file(bmsFile),

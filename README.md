@@ -13,7 +13,7 @@ After using LVF, profiles will not be compatible with Lunatic Vibes anymore, so 
 -   Async input handling
 -   Full Unicode support
 -   Built-in difficulty table support
--   Mixed skin resolution support (SD, HD, FHD)
+-   Mixed skin resolution support (SD, HD, FHD, UHD)
 -   ARENA Mode over LAN / VLAN
 
 For LR2 feature compatibility list, check out [the wiki](https://github.com/yaasdf/lunaticvibes/wiki/LR2-Features-Compatibility).

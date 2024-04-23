@@ -669,10 +669,10 @@ void setEntryInfo()
         param["havestagefile"] = !pf->stagefile.empty();
 
         param["havereplay"] = false;
-        auto& score = e[idx].second;
+        const auto& score = e[idx].second;
         if (score && !score->replayFileName.empty())
         {
-            Path replayFilePath = ReplayChart::getReplayPath(ps->md5) / score->replayFileName;
+            Path replayFilePath = ReplayChart::getReplayPath(pf->fileHash) / score->replayFileName;
             if (fs::is_regular_file(replayFilePath))
             {
                 gPlayContext.replay = std::make_shared<ReplayChart>();
@@ -706,7 +706,7 @@ void setEntryInfo()
         param["min"] = pf->totalLength / 60;
         param["sec"] = pf->totalLength % 60;
 
-        switch (ps->_file->type())
+        switch (pf->type())
         {
         case eChartFormat::BMS:
         {
@@ -768,24 +768,12 @@ void setEntryInfo()
         unsigned op_difficulty = Option::DIFF_0;
         switch (pf->difficulty)
         {
-        case 0:
-            op_difficulty = Option::DIFF_0;
-            break;
-        case 1:
-            op_difficulty = Option::DIFF_1;
-            break;
-        case 2:
-            op_difficulty = Option::DIFF_2;
-            break;
-        case 3:
-            op_difficulty = Option::DIFF_3;
-            break;
-        case 4:
-            op_difficulty = Option::DIFF_4;
-            break;
-        case 5:
-            op_difficulty = Option::DIFF_5;
-            break;
+        case 0: op_difficulty = Option::DIFF_0; break;
+        case 1: op_difficulty = Option::DIFF_1; break;
+        case 2: op_difficulty = Option::DIFF_2; break;
+        case 3: op_difficulty = Option::DIFF_3; break;
+        case 4: op_difficulty = Option::DIFF_4; break;
+        case 5: op_difficulty = Option::DIFF_5; break;
         }
         param["difficulty"] = op_difficulty;
         double barMaxLevel = 12.0;
@@ -952,14 +940,9 @@ void setEntryInfo()
     case eEntryType::SONG:
     case eEntryType::RIVAL_SONG:
         param["entry"] = Option::ENTRY_SONG;
-
         break;
 
-    case eEntryType::RIVAL_CHART:
-    {
-        // TODO 
-        [[fallthrough]];
-    }
+    case eEntryType::RIVAL_CHART: [[fallthrough]]; // TODO(rustbell): RIVAL_CHART
     case eEntryType::CHART:
     {
         param["entry"] = Option::ENTRY_SONG;

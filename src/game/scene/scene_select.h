@@ -124,7 +124,6 @@ private:
     void inputGameAxisSelect(double s1, double s2, const lunaticvibes::Time&);
 
     void inputGamePressPanel(InputMask&, const lunaticvibes::Time&);
-    void inputGameHoldPanel(InputMask&, const lunaticvibes::Time&);
     void inputGameReleasePanel(InputMask&, const lunaticvibes::Time&);
 
     void inputGamePressReadme(InputMask&, const lunaticvibes::Time&);

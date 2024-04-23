@@ -1262,18 +1262,6 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         return;
     }
 
-    //if (m[Input::Pad::ESC])
-    //{
-    //    // close panels if opened. exit if no panel is opened
-    //    bool hasPanelOpened = closeAllPanels(t);
-    //    if (!hasPanelOpened)
-    //    {
-    //        LOG_DEBUG << "[Select] ESC";
-    //        gNextScene = SceneType::EXIT_TRANS;
-    //        return;
-    //    }
-    //}
-
     auto input = _inputAvailable & m;
     if (input.any())
     {
@@ -1285,24 +1273,12 @@ void SceneSelect::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         if (input[Pad::K27]) isHoldingK27 = true;
 
         // sub callbacks
-        if (State::get(IndexSwitch::SELECT_PANEL1))
+        switch (state)
         {
-            inputGamePressPanel(input, t);
-        }
-        else
-        {
-            switch (state)
-            {
-            case eSelectState::PREPARE: break;
-            case eSelectState::SELECT: inputGamePressSelect(input, t); break;
-            case eSelectState::FADEOUT: break;
-            case eSelectState::WATCHING_README: inputGamePressReadme(input, t); return;
-            }
-        }
-
-        if (input[Pad::M2])
-        {
-            closeAllPanels(t);
+        case eSelectState::PREPARE: break;
+        case eSelectState::SELECT: inputGamePressSelect(input, t); break;
+        case eSelectState::WATCHING_README: inputGamePressReadme(input, t); break;
+        case eSelectState::FADEOUT: break;
         }
 
         // lights
@@ -1346,21 +1322,12 @@ void SceneSelect::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
     if (input.any())
     {
         // sub callbacks
-        if (State::get(IndexSwitch::SELECT_PANEL1))
+        switch (state)
         {
-            inputGameHoldPanel(input, t);
-        }
-        else
-        {
-            switch (state)
-            {
-            case eSelectState::SELECT:
-                inputGameHoldSelect(input, t);
-                break;
-
-            default:
-                break;
-            }
+        case eSelectState::PREPARE: break;
+        case eSelectState::SELECT: inputGameHoldSelect(input, t); break;
+        case eSelectState::WATCHING_README:
+        case eSelectState::FADEOUT: break;
         }
     }
 }
@@ -1385,22 +1352,12 @@ void SceneSelect::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
         if (input[Pad::K27]) isHoldingK27 = false;
 
         // sub callbacks
-        if (State::get(IndexSwitch::SELECT_PANEL1))
+        switch (state)
         {
-            inputGameReleasePanel(input, t);
-        }
-        else
-        {
-
-            switch (state)
-            {
-            case eSelectState::SELECT:
-                inputGameReleaseSelect(input, t);
-                break;
-
-            default:
-                break;
-            }
+        case eSelectState::PREPARE: break;
+        case eSelectState::SELECT: inputGameReleaseSelect(input, t); break;
+        case eSelectState::WATCHING_README:
+        case eSelectState::FADEOUT: break;
         }
 
         // lights
@@ -1434,6 +1391,12 @@ void SceneSelect::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 
 void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Time& t)
 {
+    if (State::get(IndexSwitch::SELECT_PANEL1))
+    {
+        inputGamePressPanel(input, t);
+        return;
+    }
+
     if (input[Input::Pad::F9] || input[Input::Pad::ESC])
     {
         imguiShow = !imguiShow;
@@ -1579,21 +1542,9 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
         }
         if (input[Input::M2])
         {
-            bool hasPanelOpened = false;
-            for (int i = 1; i <= 9; ++i)
-            {
-                IndexSwitch p = static_cast<IndexSwitch>(int(IndexSwitch::SELECT_PANEL1) - 1 + i);
-                if (State::get(p))
-                {
-                    hasPanelOpened = true;
-                    break;
-                }
-            }
-            if (!hasPanelOpened)
-            {
+            if (!closeAllPanels(t))
                 navigateBack(t);
-                return;
-            }
+            return;
         }
         if (selectDownTimestamp == -1 && (input[Input::Pad::K1SELECT] || input[Input::Pad::K2SELECT]) && !gSelectContext.entries.empty())
         {
@@ -1710,6 +1661,12 @@ void SceneSelect::inputGameHoldSelect(InputMask& input, const lunaticvibes::Time
 
 void SceneSelect::inputGameReleaseSelect(InputMask& input, const lunaticvibes::Time& t)
 {
+    if (State::get(IndexSwitch::SELECT_PANEL1))
+    {
+        inputGameReleasePanel(input, t);
+        return;
+    }
+
     if (pSkin->version() == SkinVersion::LR2beta3)
     {
         if (selectDownTimestamp != -1 && (input[Input::Pad::K1SELECT] || input[Input::Pad::K2SELECT]))
@@ -1767,6 +1724,12 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
     {
         if (State::get(IndexSwitch::SELECT_PANEL1))
         {
+            if (input[Input::M2])
+            {
+                closeAllPanels(t);
+                return;
+            }
+
             if (input[Pad::K1SELECT] || input[Pad::K2SELECT])
             {
                 // SELECT: TARGET
@@ -1917,10 +1880,6 @@ void SceneSelect::inputGamePressPanel(InputMask& input, const lunaticvibes::Time
             }
         }
     }
-}
-
-void SceneSelect::inputGameHoldPanel(InputMask& input, const lunaticvibes::Time& t)
-{
 }
 
 void SceneSelect::inputGameReleasePanel(InputMask& input, const lunaticvibes::Time& t)
@@ -2758,7 +2717,6 @@ void SceneSelect::navigateVersionBack(const lunaticvibes::Time& t)
 
 bool SceneSelect::closeAllPanels(const lunaticvibes::Time& t)
 {
-    //
     bool hasPanelOpened = false;
     for (int i = 1; i <= 9; ++i)
     {

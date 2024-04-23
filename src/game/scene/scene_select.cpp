@@ -3163,7 +3163,8 @@ void SceneSelect::updatePreview()
                     auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);
                     auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(
                         bms, previewChartObjTmp, PlayModifiers{}, bms->gamemode, RulesetBMS::JudgeDifficulty::VERYHARD,
-                        0.2, RulesetBMS::PlaySide::RIVAL, -1);
+                        0.2, RulesetBMS::PlaySide::RIVAL,
+                        gPlayContext.shiftFiveKeyForSevenKeyIndex(bms->gamemode == 5 || bms->gamemode == 10));
 
                     // load samples
                     SoundMgr::freeNoteSamples();

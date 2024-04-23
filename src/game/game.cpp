@@ -61,7 +61,6 @@ int main(int argc, char* argv[])
         std::string str = ss.str();
         LOG_FATAL << str;
         panic("Error", str.c_str());
-        return -1;
     }
     LOG_INFO << "libcurl version: " << curl_version();
     
@@ -77,7 +76,6 @@ int main(int argc, char* argv[])
     {
         LOG_FATAL << "LR2files directory not found! " << lr2path;
         panic("Error", "LR2files directory not found!");
-        return -1;
     }
 
     // init imgui
@@ -149,7 +147,6 @@ int main(int argc, char* argv[])
     {
         LOG_FATAL << "Font file not found. Please reinstall the game.";
         panic("Error", "Font file not found. Please reinstall the game.");
-        return -1;
     }
     ImFontConfig fontConfig;
     fontConfig.FontNo = fontIndex;

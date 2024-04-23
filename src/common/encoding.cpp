@@ -281,7 +281,6 @@ static const char* get_iconv_encoding_name(eFileEncoding encoding)
         return "UTF-8";
     }
     panic("Error", "Incorrect eFileEncoding");
-    return "INVALID-DUMMY";
 }
 
 struct IcdDeleter {

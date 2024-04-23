@@ -527,7 +527,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
 // chart may duplicate, return all found
 std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const HashMD5& folder, unsigned long long addTime) const
 {
-    LOG_INFO << "[SongDB] Search from epoch time " << addTime;
+    LOG_DEBUG << "[SongDB] Search from epoch time " << addTime;
 
     std::stringstream ss;
     ss << "SELECT * FROM song WHERE ";
@@ -570,7 +570,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
         }
     }
 
-    LOG_INFO << "[SongDB] found " << ret.size() << " songs";
+    LOG_DEBUG << "[SongDB] Found " << ret.size() << " songs";
     return ret;
 
 }

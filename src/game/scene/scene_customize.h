@@ -16,9 +16,9 @@ enum class CustomizeState
 class SceneCustomize : public SceneBase
 {
 private:
+    std::shared_ptr<Texture> graphics_get_screen_texture;
     lunaticvibes::CustomizeState _state;
     bool exiting = false;
-    std::shared_ptr<Texture> graphics_get_screen_texture;
 
 public:
     SceneCustomize();
@@ -60,8 +60,6 @@ protected:
 protected:
     void inputGamePress(InputMask&, const lunaticvibes::Time&);
 
-protected:
-    std::shared_ptr<SceneBase> pSubScene = nullptr;
 public:
     void draw() const override;
 };

@@ -4,7 +4,6 @@
 #include <vector>
 #include <list>
 #include <utility>
-#include <chrono>
 
 #include "common/beat.h"
 #include "common/chartformat/chartformat.h"
@@ -228,9 +227,9 @@ public:
     constexpr auto getCurrentBPM() -> decltype(_currentBPM) { return _currentBPM; }
 
 public:
-    std::list<HitableNote>  noteExpired;
-    std::list<Note>   noteBgmExpired;
-    std::list<Note>   noteSpecialExpired;
+    std::vector<HitableNote> noteExpired;
+    std::vector<Note> noteBgmExpired;
+    std::vector<Note> noteSpecialExpired;
 
 public:
     virtual chart::NoteLaneIndex getLaneFromKey(chart::NoteLaneCategory cat, Input::Pad input) = 0;

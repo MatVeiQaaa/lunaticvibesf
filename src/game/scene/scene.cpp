@@ -105,9 +105,6 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
         // Skin may be cached. Reset mouse status
         pSkin->setHandleMouseEvents(true);
     }
-
-    if ((!gInCustomize && skinType == SkinType::THEME_SELECT) || (gInCustomize && skinType != SkinType::THEME_SELECT))
-        _input.disableCountFPS();
 }
 
 SceneBase::~SceneBase() 

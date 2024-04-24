@@ -69,7 +69,6 @@ protected:
     std::array<long long, Input::KEY_COUNT> _releaseBuffer{ -1 };
     int _cursor_x = 0, _cursor_y = 0;
     bool _background = false;
-    bool _countFPS = true;
 
     InputMask _prev = 0;
     InputMask _curr = 0;
@@ -118,8 +117,6 @@ public:
 
     // Merge 2P button inputs into 1P. Note that abs axis are ALSO merged.
     void setMergeInput() { mergeInput = true; }
-
-    void disableCountFPS() { _countFPS = false; }
 
 private:
     // Callback function maps

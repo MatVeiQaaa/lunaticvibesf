@@ -80,6 +80,15 @@ SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240), _stat
 
 SceneCustomize::~SceneCustomize()
 {
+    // Reset option entry names to avoid showing garbage in select skin customize mode.
+    // FIXME: if virtual customize scene exists but is disabled, when we exit real customize scene customize mode kicks
+    // up and refills texts with data again.
+    optionsKeyList.clear();
+    optionsMap.clear();
+    updateTexts();
+    State::set(IndexText::SKIN_NAME, "");
+    State::set(IndexText::SKIN_MAKER_NAME, "");
+
     // NOTE: do *not* call this here, as it may unintentionally load another skin which may wait for a callback from
     // main thread, causing a dead lock.
     // Not saving here is okay, since we are also saving on each option change.

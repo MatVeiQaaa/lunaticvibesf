@@ -80,7 +80,10 @@ SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240), _stat
 
 SceneCustomize::~SceneCustomize()
 {
-    save(selectedMode);
+    // NOTE: do *not* call this here, as it may unintentionally load another skin which may wait for a callback from
+    // main thread, causing a dead lock.
+    // Not saving here is okay, since we are also saving on each option change.
+    // save(selectedMode);
 
     _input.unregister_p("SCENE_PRESS_CUSTOMIZE");
     _input.loopEnd();

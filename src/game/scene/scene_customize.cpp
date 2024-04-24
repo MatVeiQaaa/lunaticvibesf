@@ -106,10 +106,8 @@ void SceneCustomize::_updateAsync()
     if (gAppIsExiting)
     {
         pSkin->setHandleMouseEvents(false);
-        if (SkinMgr::get(selectedMode))
-        {
-            SkinMgr::unload(selectedMode);
-        }
+        // NOTE: do *not* get() or unload() skins here, as we will be waiting on main thread, while it will waiting on
+        // async task ending in ~SceneCustomize, resulting in a dead lock.
         gNextScene = SceneType::EXIT_TRANS;
         gExitingCustomize = true;
     }

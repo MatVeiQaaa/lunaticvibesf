@@ -1339,6 +1339,7 @@ void skinselect_skin(int plus)
 
 void skinselect_option(int index, int plus)
 {
+    LOG_VERBOSE << "[SkinLR2] Skin select option index=" << index << " plus=" << plus;
     gCustomizeContext.optionIdx = index;
     gCustomizeContext.optionDir = plus;
     gCustomizeContext.optionUpdate = true;

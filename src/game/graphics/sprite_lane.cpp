@@ -1,7 +1,7 @@
 #include "sprite_lane.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
-#include <cassert>
+#include <list>
 
 using namespace chart;
 

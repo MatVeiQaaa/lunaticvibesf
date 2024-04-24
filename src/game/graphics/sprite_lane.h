@@ -1,7 +1,7 @@
 #pragma once
 #include "sprite.h"
 #include "game/chart/chart.h"
-#include <vector>
+#include <list>
 #include <memory>
 
 // Draw the whole lane (on screen) with only one sprite per key.

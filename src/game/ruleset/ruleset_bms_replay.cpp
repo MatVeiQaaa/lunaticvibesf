@@ -1,6 +1,7 @@
 #include "ruleset_bms_replay.h"
 
 #include <cassert>
+#include <iterator>
 #include <utility>
 
 RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,
@@ -20,6 +21,9 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
     }
     else
     {
+        assert(fiveKeyMapIndex >= 0);
+        assert(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_DOWN_MAP_5K)));
+        assert(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_UP_MAP_5K)));
         _inputDownMap = &REPLAY_CMD_INPUT_DOWN_MAP_5K[fiveKeyMapIndex];
         _inputUpMap = &REPLAY_CMD_INPUT_UP_MAP_5K[fiveKeyMapIndex];
     }

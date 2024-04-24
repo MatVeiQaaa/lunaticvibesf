@@ -5,6 +5,7 @@
 #include "common/chartformat/chartformat_types.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
+#include <iterator>
 
 
 using namespace chart;
@@ -89,7 +90,7 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
 // from Input::Pad to NoteLaneIndex
 chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
 {
-    assert(pad < 30);
+    assert(pad < Input::Pad::LANE_COUNT);
 
     using namespace chart;
     switch (keys)
@@ -97,7 +98,7 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
     case 5:
     case 10:
     {
-        static const NoteLaneIndex lane[4][30] =
+        static constexpr NoteLaneIndex lane[4][Input::Pad::LANE_COUNT] =
         {
             {
                 Sc1, Sc1, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _,
@@ -116,12 +117,15 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
                 Sc2, Sc2, _, _, N21, N22, N23, N24, N25, _, _, _, _, _, _,
             },
         };
-        return lane[gPlayContext.shiftFiveKeyForSevenKeyIndex(true)][pad];
+        const auto fiveKeyMapIndex = gPlayContext.shiftFiveKeyForSevenKeyIndex(true);
+        assert(fiveKeyMapIndex >= 0);
+        assert(fiveKeyMapIndex < static_cast<int>(std::size(lane)));
+        return lane[fiveKeyMapIndex][pad];
     }
     case 7:
     case 14:
     {
-        static const NoteLaneIndex lane[] =
+        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] =
         {
             Sc1, Sc1, N11, N12, N13, N14, N15, N16, N17, _, _, _, _, _, _,
             Sc2, Sc2, N21, N22, N23, N24, N25, N26, N27, _, _, _, _, _, _,
@@ -130,7 +134,7 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
     }
     case 9:
     {
-        static const NoteLaneIndex lane[] =
+        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] =
         {
             _, _, N11, N12, N13, N14, N15, N16, N17, N18, N19, _, _, _, _,
             _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,

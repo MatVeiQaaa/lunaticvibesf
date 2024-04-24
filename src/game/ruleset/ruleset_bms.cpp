@@ -1,5 +1,6 @@
 #include "ruleset_bms.h"
 
+#include <iterator>
 #include <utility>
 
 #include "game/arena/arena_data.h"
@@ -241,6 +242,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     {
     case 5:
     case 10: {
+        assert(fiveKeyMapIndex >= 0);
+        assert(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5k)));
+        assert(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5kLN)));
         _bombTimerMap = &bombTimer5k[fiveKeyMapIndex];
         _bombLNTimerMap = &bombTimer5kLN[fiveKeyMapIndex];
         break;

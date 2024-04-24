@@ -903,15 +903,13 @@ bool ScenePlay::createRuleset()
                 return std::make_shared<RulesetBMS>(
                     gChartContext.chart, gPlayContext.chartObj[slot], gPlayContext.mods[slot], keys, judgeDiff,
                     gPlayContext.initialHealth[slot], playSide,
-                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
-                                                              gPlayContext.mode == SkinType::PLAY5_2));
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10));
 
             case AUTO:
                 return std::make_shared<RulesetBMSAuto>(
                     gChartContext.chart, gPlayContext.chartObj[slot], gPlayContext.mods[slot], keys, judgeDiff,
                     gPlayContext.initialHealth[slot], playSide,
-                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
-                                                              gPlayContext.mode == SkinType::PLAY5_2));
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10));
 
             case REPLAY:
                 assert(gPlayContext.replayMybest != nullptr);
@@ -919,9 +917,7 @@ bool ScenePlay::createRuleset()
                 return std::make_shared<RulesetBMSReplay>(
                     gChartContext.chartMybest, gPlayContext.chartObj[slot], gPlayContext.replayMybest,
                     gPlayContext.mods[slot], keys, judgeDiff, gPlayContext.initialHealth[slot], playSide,
-                    gPlayContext.shiftFiveKeyForSevenKeyIndex(gPlayContext.mode == SkinType::PLAY5 ||
-                                                              gPlayContext.mode == SkinType::PLAY5_2),
-                    gSelectContext.pitchSpeed);
+                    gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10), gSelectContext.pitchSpeed);
 
             default:
                 return nullptr;

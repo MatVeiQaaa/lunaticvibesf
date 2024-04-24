@@ -19,10 +19,13 @@ private:
     std::shared_ptr<Texture> graphics_get_screen_texture;
     lunaticvibes::CustomizeState _state;
     bool exiting = false;
+    bool _is_virtual = false;
 
 public:
     SceneCustomize();
     ~SceneCustomize() override;
+
+    void setIsVirtual(bool is_virtual) { _is_virtual = is_virtual; };
 
 protected:
     struct Option

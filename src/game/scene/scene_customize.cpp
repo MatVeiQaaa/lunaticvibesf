@@ -163,6 +163,13 @@ static void reload_preview(SkinType selectedMode)
 
 void SceneCustomize::updateMain()
 {
+    // For the virtual customize scene gInCustomize is always false, so this means we are in a virtual scene and are
+    // switching to a real customize scene.
+    // Let's allow the new customize scene to actually load stuff. If we load skins here in such case, main thread may
+    // be waiting for ~SceneCustomize, but we here will be waiting for the main thread to load textures, causing a dead
+    // lock.
+    if (gInCustomize && _is_virtual) return;
+
     lunaticvibes::Time t;
 
     // Mode has changed

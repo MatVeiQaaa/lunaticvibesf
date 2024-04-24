@@ -923,6 +923,7 @@ void SceneSelect::_updateAsync()
 
             pSkin->setHandleMouseEvents(false);
             _virtualSceneCustomize = std::make_shared<SceneCustomize>();
+            _virtualSceneCustomize->setIsVirtual(true);
             _virtualSceneCustomize->loopStart();
             pSkin->setHandleMouseEvents(true);
 

@@ -40,37 +40,57 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
 
 void RulesetBMSReplay::update(const lunaticvibes::Time& t)
 {
-    const bool skipToEnd = t.hres() == LLONG_MAX;
+    isSkippingToEnd = t.hres() == LLONG_MAX;
+    showJudge = showJudge && !isSkippingToEnd;
 
     if (!_hasStartTime)
-    {
-        setStartTime(skipToEnd ? lunaticvibes::Time(0) : t);
-    }
+        setStartTime(isSkippingToEnd ? lunaticvibes::Time(0) : t);
 
-    auto rt = t - _startTime.norm();
+    const auto rt = t - _startTime.norm();
     _basic.play_time = rt;
 
-    const InputMask prevKeyPressing = keyPressing;
-    while (itReplayCommand != replay->commands.end() && rt.norm() >= (long long)std::round(itReplayCommand->ms * replayTimestampMultiplier))
+    InputMask prevKeyPressing = keyPressing;
+    lunaticvibes::Time prevReplayT{0};
+    auto updateInput = [this, &prevKeyPressing, &prevReplayT]() {
+        // NOTE: _chart takes rt, but in this case t == rt as _startTime = 0.
+        // NOTE: important to call this periodically, or after some time notes will not be judged.
+        if (isSkippingToEnd)
+            _chart->update(prevReplayT);
+        InputMask pressed = keyPressing & ~prevKeyPressing;
+        InputMask released = ~keyPressing & prevKeyPressing;
+        if (pressed.any())
+            RulesetBMS::updatePress(pressed, prevReplayT);
+        if (keyPressing.any())
+            RulesetBMS::updateHold(keyPressing, prevReplayT);
+        if (released.any())
+            RulesetBMS::updateRelease(released, prevReplayT);
+        // NOTE: important to call this often or unpressed notes will be judged incorrectly.
+        RulesetBMS::update(prevReplayT);
+        prevKeyPressing = keyPressing;
+    };
+    while (itReplayCommand != replay->commands.end())
     {
+        const lunaticvibes::Time replayT{
+            _startTime.norm() + static_cast<long long>(std::round(itReplayCommand->ms * replayTimestampMultiplier)),
+            false};
+        if (t < replayT) break;
+
+        if (prevReplayT != 0 && replayT != prevReplayT)
+            updateInput();
+
         auto cmd = itReplayCommand->type;
         if (_side == PlaySide::AUTO_2P)
-        {
             cmd = ReplayChart::Commands::leftSideCmdToRightSide(cmd);
-        }
 
-        if (!skipToEnd)
+        if (auto it = _inputDownMap->find(cmd); it != _inputDownMap->end())
         {
-            if (auto it = _inputDownMap->find(cmd); it != _inputDownMap->end())
-            {
-                keyPressing[it->second] = true;
-            }
-            else if (auto it = _inputUpMap->find(cmd); it != _inputUpMap->end())
-            {
-                keyPressing[it->second] = false;
-            }
-
-            switch (cmd)
+            keyPressing[it->second] = true;
+        }
+        if (auto it = _inputUpMap->find(cmd); it != _inputUpMap->end())
+        {
+            keyPressing[it->second] = false;
+        }
+        else switch (cmd)
             {
             case ReplayChart::Commands::Type::S1A_PLUS:  playerScratchAccumulator[PLAYER_SLOT_PLAYER] = 0.0015; break;
             case ReplayChart::Commands::Type::S1A_MINUS: playerScratchAccumulator[PLAYER_SLOT_PLAYER] = -0.0015; break;
@@ -80,29 +100,11 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
             case ReplayChart::Commands::Type::S2A_STOP:  playerScratchAccumulator[PLAYER_SLOT_TARGET] = 0; break;
             default: break;
             }
-        }
 
         itReplayCommand++;
+        prevReplayT = replayT;
     }
-
-    InputMask pressed, released;
-    if (!skipToEnd)
-    {
-        pressed = keyPressing & ~prevKeyPressing;
-        released = ~keyPressing & prevKeyPressing;
-    }
-    else
-    {
-        released = keyPressing;
-    }
-    if (pressed.any())
-        RulesetBMS::updatePress(pressed, t);
-    if (keyPressing.any())
-        RulesetBMS::updateHold(keyPressing, t);
-    if (released.any())
-        RulesetBMS::updateRelease(released, t);
-
-    RulesetBMS::update(t);
+    updateInput();
 }
 
 void RulesetBMSReplay::fail()
@@ -110,4 +112,10 @@ void RulesetBMSReplay::fail()
     _startTime = lunaticvibes::Time(0);
     _hasStartTime = true;
     RulesetBMS::fail();
+}
+
+void RulesetBMSReplay::updateGlobals()
+{
+    if (!isSkippingToEnd)
+        RulesetBMS::updateGlobals();
 }

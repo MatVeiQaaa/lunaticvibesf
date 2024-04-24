@@ -14,12 +14,13 @@ public:
 public:
     double replayTimestampMultiplier = 1.0;
 
-protected:
+private:
     std::shared_ptr<ReplayChart> replay;
     std::vector<ReplayChart::Commands>::iterator itReplayCommand;
     InputMask keyPressing;
     const std::map<ReplayChart::Commands::Type, Input::Pad>* _inputDownMap;
     const std::map<ReplayChart::Commands::Type, Input::Pad>* _inputUpMap;
+    bool isSkippingToEnd = false;
 
 public:
 
@@ -35,4 +36,6 @@ public:
     void update(const lunaticvibes::Time& t) override;
 
     void fail() override;
+
+    void updateGlobals() override;
 };

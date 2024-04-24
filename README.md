@@ -6,6 +6,7 @@ The project is still in development stage. Please do not expect a bug-free exper
 
 It is a fork of [Lunatic Vibes](https://github.com/yaasdf/lunaticvibes), a clone of Lunatic Rave 2 (beta3 100201).
 After using LVF, profiles will not be compatible with Lunatic Vibes anymore, so make sure to have backups before moving.
+Replays set in LVF will not work in Lunatic Vibes either.
 
 ## Features
 

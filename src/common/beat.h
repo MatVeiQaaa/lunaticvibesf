@@ -37,8 +37,11 @@ namespace lunaticvibes {
 class Time
 {
 private:
+	static constexpr auto nsInMs = std::chrono::duration_cast<timeHighRes>(timeNormRes{1}).count();
+
 	decltype(std::declval<timeNormRes>().count()) _regular;
 	decltype(std::declval<timeHighRes>().count()) _highres;
+
 public:
 	// TODO: have a separate helper that would construct with current time.
 	Time()
@@ -49,7 +52,7 @@ public:
 	}
 	constexpr Time(long long n, bool init_with_high_resolution_timestamp = false) : _regular(), _highres()
 	{
-		if (init_with_high_resolution_timestamp || n > std::numeric_limits<long long>::max() / 1000000)
+		if (init_with_high_resolution_timestamp || n > std::numeric_limits<long long>::max() / nsInMs)
 		{
 			_highres = n;
 			_regular = std::chrono::duration_cast<timeNormRes>(timeHighRes(n)).count();

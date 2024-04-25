@@ -481,33 +481,39 @@ void preciseSleep(long long sleep_ns)
     using namespace std::chrono_literals;
 
 #ifdef _WIN32
+    static constexpr auto nsInMs = std::chrono::duration_cast<nanoseconds>(milliseconds{1}).count();
 
     static HANDLE timer = CreateWaitableTimer(NULL, FALSE, NULL);
-
-    while (sleep_ns > 1'000'000)
+    while (sleep_ns > nsInMs)
     {
-        LARGE_INTEGER due;
-        due.QuadPart = -int64_t((sleep_ns - sleep_ns % 1'000'000) / 100);  // wrap to 1ms
+        LARGE_INTEGER due{};
+        due.QuadPart = -int64_t((sleep_ns - sleep_ns % nsInMs) / 100);  // wrap to 1ms
 
-        auto start = high_resolution_clock::now();
+        const auto start = high_resolution_clock::now();
         SetWaitableTimerEx(timer, &due, 0, NULL, NULL, NULL, 0);
         WaitForSingleObjectEx(timer, INFINITE, TRUE);
-        auto end = high_resolution_clock::now();
+        const auto end = high_resolution_clock::now();
 
-        double observed = duration_cast<nanoseconds>(end - start).count();
+        const auto observed = duration_cast<nanoseconds>(end - start).count();
         sleep_ns -= observed;
     }
 
     // spin lock
-    auto start = high_resolution_clock::now();
-    while (duration_cast<nanoseconds>(high_resolution_clock::now() - start).count() < sleep_ns);
-
+    const auto end = high_resolution_clock::now() + nanoseconds{sleep_ns};
+    while (high_resolution_clock::now() < end)
+        std::this_thread::yield();
 #else
+    // Spin locking time tests for 1000hz desired update rate on my Linux machine (chown2):
+    //  <1000us (1ms) - 100% core utilization, 999-1000hz update rate.
+    //  <100us        - 4.5-6% core utilization, 998-999hz update rate.
+    //  <10us         - same as below.
+    //  <1us          - same as below.
+    //  None          - 0.6% core utilization, 946-947hz update rate.
+    // By these results spin lock for under 100us would be perfect, however when I add it, the game start dropping FPS
+    // when pressing keys.
+    // TODO: increase sleep precision.
     const auto duration = std::chrono::nanoseconds(sleep_ns);
-
-    // FIXME not optimized and not accurate
     std::this_thread::sleep_for(duration);
-
 #endif
 }
 

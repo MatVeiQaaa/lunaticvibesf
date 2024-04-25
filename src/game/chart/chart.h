@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <limits>
 #include <vector>
 #include <list>
 #include <utility>
@@ -19,9 +20,10 @@ struct HitableNote: Note
 namespace chart
 {
 
+// Exhaustive enum.
 enum class NoteLaneCategory : size_t
 {
-    _ = -1ull, // INVALID
+    _ = std::numeric_limits<size_t>::max(), // INVALID
     Note = 0,
     Mine,
     Invs,
@@ -30,9 +32,10 @@ enum class NoteLaneCategory : size_t
     NOTECATEGORY_COUNT,
 };
 
+// Exhaustive enum.
 enum NoteLaneIndex : size_t
 {
-    _ = -1ull, // INVALID
+    _ = std::numeric_limits<size_t>::max(), // INVALID
     Sc1 = 0,
     N11,
     N12,
@@ -56,6 +59,7 @@ enum NoteLaneIndex : size_t
     NOTELANEINDEX_COUNT,
 };
 
+// Exhaustive enum.
 enum NoteLaneExtra : size_t
 {
     EXTRA_BARLINE_1P,

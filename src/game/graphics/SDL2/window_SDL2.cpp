@@ -573,7 +573,10 @@ void startTextInput(const RectF& textBox, const std::string& oldText, std::funct
     r.w = static_cast<int>(std::ceil(scaledTextBox.w));
     r.h = static_cast<int>(std::ceil(scaledTextBox.h));
     SDL_SetTextInputRect(&r);
-    SDL_StartTextInput();
+    // Do *not* start and stop text inputs. They are enabled by default in SDL2.
+    // https://github.com/ocornut/imgui/issues/6306
+    // TODO(SDL3): uncomment this, it won't longer be enabled by default.
+    // SDL_StartTextInput();
     isEditing = true;
 
     ::funUpdateText(textBuf);
@@ -585,7 +588,9 @@ void stopTextInput()
 
     isEditing = false;
     funUpdateText = [](const std::string&) {};
-    SDL_StopTextInput();
+    // See the comment for SDL_StartTextInput above.
+    // TODO(SDL3): uncomment this.
+    // SDL_StopTextInput();
 }
 
 

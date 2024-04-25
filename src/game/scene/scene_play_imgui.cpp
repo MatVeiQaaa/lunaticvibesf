@@ -48,8 +48,8 @@ void ScenePlay::imguiAdjustMenu()
     {
         ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 
-        ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_Once);
-        ImGui::SetNextWindowSize(ImVec2(500, 0), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(20.f, 20.f), ImGuiCond_Once);
+        ImGui::SetNextWindowSize(ImVec2(500.f, 0.f), ImGuiCond_Always);
         if (ImGui::Begin("Adjust Menu", &imguiShowAdjustMenu, ImGuiWindowFlags_NoCollapse))
         {
             ImGui::Checkbox(i18n::c(PLAY_SKIN_ADJUST_JUDGE_POS_LIFT), &s->adjustPlayJudgePositionLift);

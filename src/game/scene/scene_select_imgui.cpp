@@ -178,8 +178,10 @@ void SceneSelect::imguiSettings()
     {
         ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH), ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT)), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                                        static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+                                 ImGuiCond_Always);
         if (ImGui::Begin("Main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
         {
             if (ImGui::BeginTable("##main", 2, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit))
@@ -1660,8 +1662,10 @@ bool SceneSelect::imguiArenaJoinLobbyPrompt()
 
         ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
 
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH), ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT)), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                                        static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+                                 ImGuiCond_Always);
         if (ImGui::Begin("Join Lobby Main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
         {
             ImGui::OpenPopup("JOIN LOBBY");

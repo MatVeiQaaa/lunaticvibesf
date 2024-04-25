@@ -480,8 +480,10 @@ void ScenePreSelect::updateImgui()
 {
     if (gInCustomize) return;
 
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH), ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT)), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
+                                    static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
+                             ImGuiCond_Always);
     if (ImGui::Begin("LoadSong", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
     {
         ImGui::TextUnformatted(textHint.c_str());

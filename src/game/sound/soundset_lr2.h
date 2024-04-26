@@ -1,6 +1,7 @@
 #pragma once
 #include "soundset.h"
 #include "game/skin/skin.h"
+#include <string_view>
 #include <vector>
 #include <string>
 
@@ -23,7 +24,6 @@ private:
 
 		// file
 		StringContent filepath;
-		std::vector<Path> pathList;
 		size_t defIdx;
 	};
 	std::vector<CustomFile> customfiles;
@@ -61,8 +61,12 @@ public:
 	Path getPathBGMCourseFailed() const override;
 
 public:
-	virtual size_t getCustomizeOptionCount() const;
-	virtual SkinBase::CustomizeOption getCustomizeOptionInfo(size_t idx) const;
+	size_t getCustomizeOptionCount() const;
+	SkinBase::CustomizeOption getCustomizeOptionInfo(size_t idx) const;
 	StringPath getFilePath() const;
+	StringPath getThumbnailPath() const;
 
+	// Set in-memory value, without writing to config.
+	// This must be called after parsing headers, but before parsing body.
+	bool setCustomFileOptionForBodyParsing(std::string_view title, std::string_view value);
 };

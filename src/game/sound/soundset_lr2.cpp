@@ -1,9 +1,11 @@
 #include "soundset_lr2.h"
 
 #include <algorithm>
+#include <string_view>
 #include <utility>
 
 #include "common/encoding.h"
+#include "common/utils.h"
 #include "config/config_mgr.h"
 #include "game/scene/scene_customize.h"
 
@@ -58,7 +60,7 @@ void SoundSetLR2::loadCSV(Path p)
         // convert codepage
         std::string rawUTF8 = to_utf8(raw, encoding);
 
-        static boost::char_separator<char> sep(",");
+        static const boost::char_separator<char> sep(",");
         boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);
         if (tokens.begin() == tokens.end()) continue;
         tokenBuf.assign(tokens.begin(), tokens.end());
@@ -76,20 +78,11 @@ void SoundSetLR2::loadCSV(Path p)
             auto key = node.first.as<std::string>();
             if (key.substr(0, 5) == "FILE_")
             {
-                opFileMap[key.substr(5)] = node.second.as<std::string>();
+                setCustomFileOptionForBodyParsing(key.substr(5), node.second.as<std::string>());
             }
-        }
-        for (auto& itOp : customfiles)
-        {
-            for (auto& itFile : opFileMap)
+            else
             {
-                if (itOp.title == itFile.first)
-                {
-                    if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itFile.second); itEntry != itOp.label.end())
-                    {
-                        itOp.value = std::distance(itOp.label.begin(), itEntry);
-                    }
-                }
+                LOG_WARNING << "[SoundSetLR2] Unknown config option '" << key << "' ignored";
             }
         }
     }
@@ -120,61 +113,86 @@ void SoundSetLR2::loadCSV(Path p)
     LOG_DEBUG << "[SoundSet] File: " << p << "(Line " << csvLineNumber << "): loading finished";
 }
 
+// TODO: use std::span
 bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
 {
+    if (tokens.empty())
+        return false;
+
     StringContentView key = tokens[0];
 
     if (lunaticvibes::iequals(key, "#INFORMATION"))
     {
+        if (tokens.size() <= 1)
+        {
+            LOG_WARNING << "[SoundSetLR2] Missing #INFORMATION fields";
+            return false;
+        }
+
+        if (tokens[1] != "10")
+        {
+            LOG_WARNING << "[SoundSetLR2] Invalid #INFORMATION type";
+            return false;
+        }
         if (tokens.size() > 2) name = tokens[2];
         if (tokens.size() > 3) maker = tokens[3];
-        if (tokens.size() > 4) thumbnailPath = PathFromUTF8(tokens[4]);
+        if (tokens.size() > 4)
+            thumbnailPath =
+                PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), lunaticvibes::trim(tokens[4])));
 
         return true;
     }
     else if (lunaticvibes::iequals(key, "#CUSTOMFILE"))
     {
-        auto& title(tokens[1]);
-        auto& path(tokens[2]);
-        Path pathf = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path));
-        auto& def(tokens[3]);
-
-        auto ls = findFiles(pathf);
-        size_t defVal = 0;
-        for (size_t param = 0; param < ls.size(); ++param)
+        if (tokens.size() < 4)
         {
-            if (ls[param].filename().stem().u8string() == def)
-            {
-                defVal = param;
-                break;
-            }
+            LOG_WARNING << "[SoundSetLR2] Missing #CUSTOMFILE fields";
+            return false;
         }
+
+        const auto& title = tokens[1];
+        const auto& path = tokens[2];
+        Path pathf = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path));
+        const auto& def = tokens[3];
 
         LOG_DEBUG << "[SoundSet] " << csvLineNumber << ": Loaded Custom file " << title << ": " << pathf;
 
         CustomFile c;
         c.title = title;
         c.filepath = pathf.u8string();
-        for (auto& p : ls)
+        for (auto& p : findFiles(pathf))
         {
-            c.label.push_back(p.filename().stem().u8string());
-            c.pathList.push_back(p);
+            c.label.push_back(p.filename().u8string());
         }
         c.label.emplace_back("RANDOM");
-        c.pathList.emplace_back("RANDOM");
-        c.defIdx = defVal;
-        c.value = defVal;
-        customfiles.push_back(c);
+
+        std::sort(c.label.begin(), c.label.end());
+        c.defIdx = 0;
+        for (size_t i = 0; i < c.label.size(); ++i)
+        {
+            if (c.label[i] == def)
+            {
+                c.defIdx = i;
+                break;
+            }
+        }
+        c.value = c.defIdx;
+        customfiles.push_back(std::move(c));
 
         std::srand(std::time(NULL));
-        customizeRandom.push_back(ls.empty() ? 0 : (std::rand() % ls.size()));
+        customizeRandom.push_back(c.label.empty() ? 0 : (std::rand() % (c.label.size() - 1)));
 
         return true;
     }
     return false;
 }
+
+// TODO: use std::span
 bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
 {
+    if (tokens.size() < 2)
+        return false;
+
     StringContentView key = tokens[0];
 
     static const std::set<std::string> soundKeys =
@@ -202,9 +220,7 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
     {
         if (lunaticvibes::iequals(k, key))
         {
-            loadPath(k, tokens[1]);
-
-            return true;
+            return loadPath(k, tokens[1]);
         }
     }
     return false;
@@ -213,10 +229,16 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
 
 bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
 {
+    if (auto it = soundFilePath.find(key); it != soundFilePath.end())
+    {
+        LOG_WARNING << "[SoundSetLR2] Ignoring duplicate key " << key;
+        return false;
+    }
+
     Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), rawpath));
-    StringPath pathStr = path.native();
-    std::string pathU8Str = path.u8string();
-    if (pathStr.find("*"_p) != pathStr.npos)
+    const std::string pathU8Str = path.u8string();
+    const std::string_view pathU8StrView{pathU8Str};
+    if (pathU8StrView.find(u8'*') != pathU8StrView.npos)
     {
         bool customFileFound = false;
 
@@ -225,15 +247,13 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
         for (size_t idx = 0; idx < customfiles.size(); ++idx)
         {
             const auto& cf = customfiles[idx];
-            if (cf.filepath == pathU8Str.substr(0, cf.filepath.length()))
+            if (cf.filepath == pathU8StrView.substr(0, cf.filepath.length()))
             {
-                int value = (cf.pathList[cf.value] == "RANDOM") ? customizeRandom[idx] : cf.value;
+                int value = (cf.label[cf.value] == "RANDOM") ? customizeRandom[idx] : cf.value;
 
-                Path pathFile = cf.pathList[value];
-                if (cf.filepath.length() < pathU8Str.length())
-                    pathFile /= PathFromUTF8(pathU8Str.substr(cf.filepath.length() + 1));
-
-                soundFilePath[key] = pathFile;
+                std::string pathFile = pathU8Str;
+                boost::replace_all(pathFile, "*", cf.label[value]);
+                soundFilePath.insert_or_assign(key, pathFile);
                 LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added " << key << ": " << pathFile;
 
                 customFileFound = true;
@@ -269,85 +289,90 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
     return soundFilePath.find(key) != soundFilePath.end() && !soundFilePath[key].empty();
 }
 
+static Path getPathOrDefault(const std::map<std::string, Path>& soundFilePath, const std::string& key)
+{
+    if (auto it = soundFilePath.find(key); it != soundFilePath.end()) return it->second;
+    return {};
+}
 
 Path SoundSetLR2::getPathBGMSelect() const
 {
-    return soundFilePath.find("#SELECT") != soundFilePath.end() ? soundFilePath.at("#SELECT") : Path();
+    return getPathOrDefault(soundFilePath, "#SELECT");
 }
 
 Path SoundSetLR2::getPathBGMDecide() const
 {
-    return soundFilePath.find("#DECIDE") != soundFilePath.end() ? soundFilePath.at("#DECIDE") : Path();
+    return getPathOrDefault(soundFilePath, "#DECIDE");
 }
 
 Path SoundSetLR2::getPathSoundOpenFolder() const
 {
-    return soundFilePath.find("#FOLDER_OPEN") != soundFilePath.end() ? soundFilePath.at("#FOLDER_OPEN") : Path();
+    return getPathOrDefault(soundFilePath, "#FOLDER_OPEN");
 }
 
 Path SoundSetLR2::getPathSoundCloseFolder() const
 {
-    return soundFilePath.find("#FOLDER_CLOSE") != soundFilePath.end() ? soundFilePath.at("#FOLDER_CLOSE") : Path();
+    return getPathOrDefault(soundFilePath, "#FOLDER_CLOSE");
 }
 
 Path SoundSetLR2::getPathSoundOpenPanel() const
 {
-    return soundFilePath.find("#PANEL_OPEN") != soundFilePath.end() ? soundFilePath.at("#PANEL_OPEN") : Path();
+    return getPathOrDefault(soundFilePath, "#PANEL_OPEN");
 }
 
 Path SoundSetLR2::getPathSoundClosePanel() const
 {
-    return soundFilePath.find("#PANEL_CLOSE") != soundFilePath.end() ? soundFilePath.at("#PANEL_CLOSE") : Path();
+    return getPathOrDefault(soundFilePath, "#PANEL_CLOSE");
 }
 
 Path SoundSetLR2::getPathSoundOptionChange() const
 {
-    return soundFilePath.find("#OPTION_CHANGE") != soundFilePath.end() ? soundFilePath.at("#OPTION_CHANGE") : Path();
+    return getPathOrDefault(soundFilePath, "#OPTION_CHANGE");
 }
 
 Path SoundSetLR2::getPathSoundDifficultyChange() const
 {
-    return soundFilePath.find("#DIFFICULTY") != soundFilePath.end() ? soundFilePath.at("#DIFFICULTY") : Path();
+    return getPathOrDefault(soundFilePath, "#DIFFICULTY");
 }
 
 Path SoundSetLR2::getPathSoundScreenshot() const
 {
-    return soundFilePath.find("#SCREENSHOT") != soundFilePath.end() ? soundFilePath.at("#SCREENSHOT") : Path();
+    return getPathOrDefault(soundFilePath, "#SCREENSHOT");
 }
 
 Path SoundSetLR2::getPathBGMResultClear() const
 {
-    return soundFilePath.find("#CLEAR") != soundFilePath.end() ? soundFilePath.at("#CLEAR") : Path();
+    return getPathOrDefault(soundFilePath, "#CLEAR");
 }
 
 Path SoundSetLR2::getPathBGMResultFailed() const
 {
-    return soundFilePath.find("#FAIL") != soundFilePath.end() ? soundFilePath.at("#FAIL") : Path();
+    return getPathOrDefault(soundFilePath, "#FAIL");
 }
 
 Path SoundSetLR2::getPathSoundFailed() const
 {
-    return soundFilePath.find("#STOP") != soundFilePath.end() ? soundFilePath.at("#STOP") : Path();
+    return getPathOrDefault(soundFilePath, "#STOP");
 }
 
 Path SoundSetLR2::getPathSoundLandmine() const
 {
-    return soundFilePath.find("#MINE") != soundFilePath.end() ? soundFilePath.at("#MINE") : Path();
+    return getPathOrDefault(soundFilePath, "#MINE");
 }
 
 Path SoundSetLR2::getPathSoundScratch() const
 {
-    return soundFilePath.find("#SCRATCH") != soundFilePath.end() ? soundFilePath.at("#SCRATCH") : Path();
+    return getPathOrDefault(soundFilePath, "#SCRATCH");
 }
 
 Path SoundSetLR2::getPathBGMCourseClear() const
 {
-    return soundFilePath.find("#COURSECLEAR") != soundFilePath.end() ? soundFilePath.at("#COURSECLEAR") : Path();
+    return getPathOrDefault(soundFilePath, "#COURSECLEAR");
 }
 
 Path SoundSetLR2::getPathBGMCourseFailed() const
 {
-    return soundFilePath.find("#COURSEFAIL") != soundFilePath.end() ? soundFilePath.at("#COURSEFAIL") : Path();
+    return getPathOrDefault(soundFilePath, "#COURSEFAIL");
 }
 
 
@@ -361,12 +386,11 @@ SkinBase::CustomizeOption SoundSetLR2::getCustomizeOptionInfo(size_t idx) const
     SkinBase::CustomizeOption ret;
     const auto& op = customfiles[idx];
 
+    ret.id = 0;
     ret.internalName = "FILE_";
     ret.internalName += op.title;
     ret.displayName = op.title;
-    for (size_t i = 0; i < op.pathList.size(); ++i)
-        ret.entries.push_back(op.pathList[i].filename().stem().u8string());
-    std::sort(ret.entries.begin(), ret.entries.end());
+    ret.entries = op.label;
     ret.defaultEntry = op.defIdx;
 
     return ret;
@@ -376,3 +400,29 @@ StringPath SoundSetLR2::getFilePath() const
 {
     return filePath.is_absolute() ? filePath : filePath.relative_path();
 }
+
+StringPath SoundSetLR2::getThumbnailPath() const
+{
+    return thumbnailPath.is_absolute() ? thumbnailPath : thumbnailPath.relative_path();
+}
+
+bool SoundSetLR2::setCustomFileOptionForBodyParsing(const std::string_view title, const std::string_view value)
+{
+    for (auto& customFile : customfiles)
+    {
+        if (customFile.title == title)
+        {
+            if (const auto entry = std::find(customFile.label.begin(), customFile.label.end(), value);
+                entry != customFile.label.end())
+            {
+                customFile.value = std::distance(customFile.label.begin(), entry);
+                return true;
+            }
+            LOG_WARNING << "[SoundSetLR2] Config value for option '" << title << "' '" << value
+                        << "' is not available";
+            return false;
+        }
+    }
+    LOG_WARNING << "[SoundSetLR2] Config option '" << title << "' not found";
+    return false;
+};

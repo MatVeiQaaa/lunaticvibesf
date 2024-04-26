@@ -16,6 +16,7 @@ add_executable(apptest
     db/test_song_db.cpp
     game/test_graphics.cpp
     game/test_lr2skin.cpp
+    game/test_lr2soundset.cpp
     game/test_scene_select.cpp
 )
 target_link_libraries(apptest PUBLIC

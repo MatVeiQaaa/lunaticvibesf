@@ -509,6 +509,9 @@ void SceneCustomize::load(SkinType mode)
             optionsKeyList.push_back(opSkin.internalName);
         }
 
+        // FIXME: stop previous customized scene from playing.
+        *pSkin->getTextureCustomizeThumbnail() = Texture{Image{ss.getThumbnailPath()}};
+
         configFilePath = ss.getFilePath();
     }
     else

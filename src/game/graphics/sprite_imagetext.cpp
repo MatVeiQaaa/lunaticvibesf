@@ -37,7 +37,12 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
     {
         auto chrIt = _chrList->find(c);
         if (chrIt == _chrList->end())
-            continue;
+        {
+            static constexpr char placeholder{' '};
+            chrIt = _chrList->find(placeholder);
+            if (chrIt == _chrList->end())
+                continue;
+        }
 
         const auto& r = chrIt->second.textureRect;
         if (c == U'\n')

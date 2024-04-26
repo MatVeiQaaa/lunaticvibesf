@@ -166,7 +166,6 @@ private:
     void imguiSettings();
 
     // pages
-    void imguiPageArenaDiagnose();
     void imguiPageOptions();
     void imguiPageOptionsGeneral();
     void imguiPageOptionsJukebox();
@@ -174,6 +173,9 @@ private:
     void imguiPageOptionsAudio();
     void imguiPageOptionsPlay();
     void imguiPageOptionsSelect();
+    void imguiPageDebug();
+    void imguiPageDebugArena();
+    void imguiPageDebugMain();
     void imguiPageAbout();
     void imguiPageExit();
 
@@ -285,6 +287,8 @@ private:
     bool imgui_play_adjustLanecoverWithStart67 = false;
     bool imgui_play_adjustLanecoverWithMousewheel = false;
     bool imgui_play_adjustLanecoverWithLeftRight = false;
+
+    bool _imgui_show_demo_window = false;
 };
 
 namespace lunaticvibes {

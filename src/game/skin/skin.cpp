@@ -2,6 +2,7 @@
 
 #include "game/graphics/sprite_video.h"
 #include "game/scene/scene_context.h"
+#include "game/skin/skin_lr2_debug.h"
 #include <execution>
 #include <algorithm>
 
@@ -92,22 +93,27 @@ void SkinBase::update_mouse_click(int x, int y)
     // sprite inserted last has priority
     bool invoked = false;
     pSpriteLastClicked = nullptr;
-#ifndef NDEBUG
-    for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
+
+    if(lunaticvibes::g_enable_show_clicked_sprite)
     {
-        if ((*it)->type() != SpriteTypes::MOUSE_CURSOR && (*it)->isDraw() && !(*it)->isHidden())
+        for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
         {
-            const RectF& rc = (*it)->_current.rect;
-            if (x >= rc.x && y >= rc.y && x < rc.x + rc.w && y < rc.y + rc.h)
+            if ((*it)->type() != SpriteTypes::MOUSE_CURSOR && (*it)->isDraw() && !(*it)->isHidden())
             {
-                createNotification((boost::format("Clicked sprite #%d (%d,%d)[%dx%d] (Line:%d)") %
-                    (int)std::distance(it, _sprites.rend()) %
-                    (*it)->_current.rect.x % (*it)->_current.rect.y % (*it)->_current.rect.w % (*it)->_current.rect.h % (*it)->srcLine).str());
-                break;
+                const RectF &rc = (*it)->_current.rect;
+                if (x >= rc.x && y >= rc.y && x < rc.x + rc.w && y < rc.y + rc.h)
+                {
+                    createNotification((boost::format("Clicked sprite #%d (%d,%d)[%dx%d] (Line:%d)") %
+                                        (int)std::distance(it, _sprites.rend()) % (*it)->_current.rect.x %
+                                        (*it)->_current.rect.y % (*it)->_current.rect.w % (*it)->_current.rect.h %
+                                        (*it)->srcLine)
+                                           .str());
+                    break;
+                }
             }
         }
     }
-#endif
+
     for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
     {
         if ((*it)->isDraw() && !(*it)->isHidden())

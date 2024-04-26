@@ -2,6 +2,7 @@
 
 #include "common/sysutil.h"
 #include "game/runtime/state.h"
+#include "game/skin/skin_lr2.h"
 #include "imgui.h"
 
 void imguiMonitorLR2DST()

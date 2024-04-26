@@ -332,46 +332,23 @@ void SceneBase::updateImgui()
         ImGui::PopStyleColor();
     }
 
-#ifndef NDEBUG
-    if (imguiShowMonitorLR2DST)
+    if (lunaticvibes::g_enable_imgui_debug_monitor)
     {
-        imguiMonitorLR2DST();
+        if (imguiShowMonitorLR2DST) imguiMonitorLR2DST();
+        if (imguiShowMonitorNumber) imguiMonitorNumber();
+        if (imguiShowMonitorOption) imguiMonitorOption();
+        if (imguiShowMonitorSlider) imguiMonitorSlider();
+        if (imguiShowMonitorSwitch) imguiMonitorSwitch();
+        if (imguiShowMonitorText) imguiMonitorText();
+        if (imguiShowMonitorBargraph) imguiMonitorBargraph();
+        if (imguiShowMonitorTimer) imguiMonitorTimer();
     }
-    if (imguiShowMonitorNumber)
-    {
-        imguiMonitorNumber();
-    }
-    if (imguiShowMonitorOption)
-    {
-        imguiMonitorOption();
-    }
-    if (imguiShowMonitorSlider)
-    {
-        imguiMonitorSlider();
-    }
-    if (imguiShowMonitorSwitch)
-    {
-        imguiMonitorSwitch();
-    }
-    if (imguiShowMonitorText)
-    {
-        imguiMonitorText();
-    }
-    if (imguiShowMonitorBargraph)
-    {
-        imguiMonitorBargraph();
-    }
-    if (imguiShowMonitorTimer)
-    {
-        imguiMonitorTimer();
-    }
-#endif
 }
 
 void SceneBase::DebugToggle(InputMask& p, const lunaticvibes::Time& t)
 {
-#ifndef NDEBUG
     if (!(!gInCustomize || _type == SceneType::CUSTOMIZE)) return;
+    if (!lunaticvibes::g_enable_imgui_debug_monitor) return;
 
     if (p[Input::F1])
     {
@@ -405,8 +382,6 @@ void SceneBase::DebugToggle(InputMask& p, const lunaticvibes::Time& t)
     {
         imguiShowMonitorTimer = !imguiShowMonitorTimer;
     }
-#endif
-
 }
 
 bool SceneBase::isInTextEdit() const

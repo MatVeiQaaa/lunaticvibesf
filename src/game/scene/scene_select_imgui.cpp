@@ -1,3 +1,5 @@
+#include "game/scene/scene_context.h"
+#include "game/skin/skin_lr2_debug.h"
 #include "scene_select.h"
 
 #include <array>
@@ -194,12 +196,11 @@ void SceneSelect::imguiSettings()
                 enum MenuPage
                 {
                     MENU_NONE = 0,
-
-                    MENU_ARENADIAGNOSE,
-                    MENU_________,
+                    MENU_SPACING_1_,
                     MENU_OPTIONS,
-                    MENU__________,
+                    MENU_SPACING_2_,
                     MENU_ABOUT,
+                    MENU_DEBUG,
                     MENU_EXIT,
                     MENU_COUNT
                 };
@@ -211,18 +212,6 @@ void SceneSelect::imguiSettings()
 
                     ImGui::Dummy( { mainTagWidth, ImGui::GetWindowHeight() - (height + interval) * MENU_COUNT - 20.0f });
 
-#ifndef NDEBUG
-                    if (ImGui::Button("ARENA", {-1.f, height}))
-                    {
-                        imgui_main_index = MENU_ARENADIAGNOSE;
-                    }
-                    ImGui::Dummy({ 0.f, interval });
-#else
-                    if (ImGui::InvisibleButton("##dummy123123121", { -1.f, height }))
-                    {
-                    }
-                    ImGui::Dummy({ 0.f, interval });
-#endif
                     if (ImGui::InvisibleButton("##dummy123123122", { -1.f, height }))
                     {
                     }
@@ -230,7 +219,7 @@ void SceneSelect::imguiSettings()
 
                     if (ImGui::Button(i18n::c(MAIN_SETTINGS), {-1.f, height}))
                     {
-                        imgui_main_index = MENU_OPTIONS;
+                        imgui_main_index = ImGui::GetIO().KeyShift ? MENU_DEBUG : MENU_OPTIONS;
                     }
                     ImGui::Dummy({ 0.f, interval });
 
@@ -253,12 +242,6 @@ void SceneSelect::imguiSettings()
 
                     if (ImGui::TableNextColumn())
                     {
-                        if (imgui_main_index == MENU_ARENADIAGNOSE && ImGui::BeginTabBar("##arena", ImGuiTabBarFlags_FittingPolicyScroll))
-                        {
-                            imguiPageArenaDiagnose();
-                            ImGui::EndTabBar();
-                        }
-
                         if (imgui_main_index == MENU_OPTIONS && ImGui::BeginTabBar("##option", ImGuiTabBarFlags_FittingPolicyScroll))
                         {
                             imguiPageOptions();
@@ -268,6 +251,12 @@ void SceneSelect::imguiSettings()
                         if (imgui_main_index == MENU_ABOUT && ImGui::BeginTabBar("##about", ImGuiTabBarFlags_FittingPolicyScroll))
                         {
                             imguiPageAbout();
+                            ImGui::EndTabBar();
+                        }
+
+                        if (imgui_main_index == MENU_DEBUG && ImGui::BeginTabBar("##debug", ImGuiTabBarFlags_FittingPolicyScroll))
+                        {
+                            imguiPageDebug();
                             ImGui::EndTabBar();
                         }
 
@@ -355,6 +344,11 @@ void SceneSelect::imguiSettings()
                 }
             }
         }
+
+        // If focus breaks, close and open escape screen to work-around.
+        if (_imgui_show_demo_window)
+            ImGui::ShowDemoWindow(&_imgui_show_demo_window);
+
         ImGui::End();
     }
 
@@ -364,7 +358,7 @@ void SceneSelect::imguiSettings()
 static const float tabItemWidth = 120.f;
 static const float infoRowWidth = 240.f;
 
-void SceneSelect::imguiPageArenaDiagnose()
+void SceneSelect::imguiPageDebugArena()
 {
     auto& d = gArenaData;
 
@@ -548,20 +542,6 @@ void SceneSelect::imguiPageOptionsGeneral()
         {
             imgui_add_profile_popup = true;
         }
-
-        // TODO: translations.
-        if (ImGui::Button("Rebuild score cache"))
-        {
-            g_pScoreDB->rebuildBmsPbCache();
-            for (size_t idx = 0; idx < gSelectContext.entries.size(); ++idx)
-            {
-                std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
-                updateEntryScore(idx);
-                setEntryInfo();
-            }
-        }
-
-        // TODO: rebuild profile stats button.
 
         ImGui::Spacing();
         ImGui::Separator();
@@ -996,6 +976,56 @@ void SceneSelect::imguiPageOptionsSelect()
 
         ImGui::EndChild();
     }
+}
+
+void SceneSelect::imguiPageDebug()
+{
+    using namespace i18nText;
+
+    ImGui::SetNextItemWidth(tabItemWidth);
+
+    if (ImGui::BeginTabItem("Main", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    {
+        // TODO: translations.
+        if (ImGui::BeginChild("##imguiPageOptionsDebug"))
+        {
+            imguiPageDebugMain();
+            ImGui::EndChild();
+        }
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("Arena", nullptr, ImGuiTabItemFlags_NoCloseWithMiddleMouseButton))
+    {
+        if (ImGui::BeginChild("##debugpagearena"))
+        {
+            imguiPageDebugArena();
+            ImGui::EndChild();
+        }
+        ImGui::EndTabItem();
+    }
+}
+
+void SceneSelect::imguiPageDebugMain()
+{
+    if (ImGui::Button("Rebuild score cache"))
+    {
+        g_pScoreDB->rebuildBmsPbCache();
+        for (size_t idx = 0; idx < gSelectContext.entries.size(); ++idx)
+        {
+            std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
+            updateEntryScore(idx);
+            setEntryInfo();
+        }
+    }
+    // TODO: rebuild profile stats button.
+
+    ImGui::Checkbox("Enable skin debug monitors", &lunaticvibes::g_enable_imgui_debug_monitor);
+    ImGui::SameLine();
+    HelpMarker("F1-F8");
+
+    ImGui::Checkbox("Show clicked sprite", &lunaticvibes::g_enable_show_clicked_sprite);
+    ImGui::Checkbox("Show ImGui demo window", &_imgui_show_demo_window);
 }
 
 void SceneSelect::imguiPageAbout()

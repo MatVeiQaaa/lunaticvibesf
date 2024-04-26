@@ -688,11 +688,12 @@ int SoundDriverFMOD::setAsyncIO(bool async)
     return 0;
 }
 
-static const std::list<std::string> wavExtensionList =
-{
-    ".wav",
-    ".ogg",
-    ".flac",    // lmao
+static constexpr const char* wavExtensionList[]{
+    ".wav", ".ogg", ".flac",
+// Alternatively we could try each of these with resolve_windows_path.
+#ifndef _WIN32
+    ".WAV", ".OGG", ".FLAC",
+#endif //  _WIN32
 };
 
 int SoundDriverFMOD::loadNoteSample(const Path& spath, size_t index)

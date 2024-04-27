@@ -1,5 +1,8 @@
 #pragma once
+
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "common/types.h"
@@ -26,6 +29,8 @@ public:
 	long long addTime = 0;
 
 public:
+	// Delegates to the other constructor.
 	CourseLr2crs(const Path& filePath);
+	CourseLr2crs(std::string_view source, long long addTime, std::stringstream ssUTF8);
 	~CourseLr2crs() = default;
 };

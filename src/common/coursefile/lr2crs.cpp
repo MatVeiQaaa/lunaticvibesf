@@ -1,7 +1,9 @@
 #include "lr2crs.h"
 
+#include <exception>
 #include <fstream>
 #include <sstream>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -11,7 +13,7 @@
 #include "common/utils.h"
 #include "common/sysutil.h"
 
-CourseLr2crs::CourseLr2crs(const Path& filePath)
+std::stringstream readIntoUtf8StringStream(const Path& filePath)
 {
 	// .lr2crs is a standard xml file. A file may contain muiltiple courses.
 
@@ -20,14 +22,13 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 	if (ifs.fail())
 	{
 		LOG_WARNING << "[lr2crs] " << filePath << " File ERROR";
-		return;
+		return {};
 	}
+
 	std::stringstream ss;
 	ss << ifs.rdbuf();
 	ss.sync();
 	ifs.close();
-
-	addTime = getFileLastWriteTime(filePath);
 
 	// convert codepage
 	auto encoding = getFileEncoding(ss);
@@ -42,6 +43,16 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 	ssUTF8.sync();
 	ss.clear();
 
+	return ssUTF8;
+}
+
+CourseLr2crs::CourseLr2crs(const Path& filePath)
+	: CourseLr2crs(filePath.filename().u8string(), getFileLastWriteTime(filePath), readIntoUtf8StringStream(filePath))
+{
+}
+
+CourseLr2crs::CourseLr2crs(std::string_view source, long long addTime, std::stringstream ssUTF8) : addTime(addTime)
+{
 	// parse as XML
 	try
 	{
@@ -50,8 +61,7 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 		pt::read_xml(ssUTF8, tree);
 		for (auto& course : tree.get_child("courselist"))
 		{
-			courses.emplace_back();
-			Course& c = courses.back();
+			Course& c = courses.emplace_back();
 			for (auto& [name, value] : course.second)
 			{
 				// NOTE: LR2 parses fields case-sensitively.
@@ -59,9 +69,9 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 					c.title = value.data();
 				else if (name == "line")
 					c.line = toInt(value.data());
-				else if ("type")
+				else if (name == "type")
 					c.type = decltype(c.type)(toInt(value.data()));
-				else if ("hash")
+				else if (name == "hash")
 				{
 					// first 32 characters are course metadata, of which we didn't make use; the 10th char is course type, the last 4 are assumed to be uploader ID
 					// after that, each 32 chars indicates a chart MD5
@@ -72,17 +82,26 @@ CourseLr2crs::CourseLr2crs(const Path& filePath)
 						c.chartHash.emplace_back(hash.substr(count * 32, 32));
 					}
 				}
+				else
+				{
+					LOG_WARNING << "[CourseLr2crs] Unknown field type " << name;
+				}
 			}
 		}
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
+		LOG_WARNING << "[CourseLr2crs] Exception while parsing courses: " << e.what();
 		courses.clear();
 	}
+
+	LOG_DEBUG << "[CourseLr2crs] Loaded " << courses.size() << " courses from " << source;
 }
 
 HashMD5 CourseLr2crs::Course::getCourseHash() const
 {
+	// NOTE: do *not* change this, or old Lunatic Vibes course scores in the DB will get broken.
+
 	std::stringstream ss;
 	ss << (int)type;
 	ss << chartHash.size();

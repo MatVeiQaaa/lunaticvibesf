@@ -184,13 +184,10 @@ void updateDstOpt()
 
 	// 40 BGA off
 	// 41 BGA on
-	switch (State::get(IndexOption::PLAY_BGA_TYPE))
-	{
-		using namespace Option;
-	case BGA_OFF:      set(40); break;
-	case BGA_ON:       set(41); break;
-	case BGA_AUTOPLAY: set(State::get(IndexSwitch::SYSTEM_AUTOPLAY) ? 41 : 40); break;
-	}
+	if (State::get(IndexSwitch::_LOAD_BGA))
+		set(41);
+	else
+		set(40);
 
 	// 42 1P側がノーマルゲージ
 	// 43 1P側が赤ゲージ

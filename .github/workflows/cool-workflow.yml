@@ -1,7 +1,5 @@
 name: cool-workflow
 on: [push, workflow_dispatch]
-env:
-  UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
 jobs:
   build:
@@ -74,6 +72,8 @@ jobs:
 
       - name: Run tests
         run: ctest --test-dir build -j $(nproc) --output-on-failure --timeout 10
+        env:
+          UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
 
       - name: Package
         run: cpack -G ZIP --config build/CPackConfig.cmake -B build/my_packages

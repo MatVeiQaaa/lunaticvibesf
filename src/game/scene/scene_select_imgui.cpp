@@ -1024,8 +1024,22 @@ void SceneSelect::imguiPageDebugMain()
     ImGui::SameLine();
     HelpMarker("F1-F8");
 
+    ImGui::BeginDisabled(!lunaticvibes::g_enable_imgui_debug_monitor);
+    ImGui::Checkbox("imguiShowMonitorLR2DST", &imguiShowMonitorLR2DST);
+    ImGui::Checkbox("imguiShowMonitorNumber", &imguiShowMonitorNumber);
+    ImGui::Checkbox("imguiShowMonitorOption", &imguiShowMonitorOption);
+    ImGui::Checkbox("imguiShowMonitorSlider", &imguiShowMonitorSlider);
+    ImGui::Checkbox("imguiShowMonitorSwitch", &imguiShowMonitorSwitch);
+    ImGui::Checkbox("imguiShowMonitorText", &imguiShowMonitorText);
+    ImGui::Checkbox("imguiShowMonitorBargraph", &imguiShowMonitorBargraph);
+    ImGui::Checkbox("imguiShowMonitorTimer", &imguiShowMonitorTimer);
+    ImGui::EndDisabled();
+
     ImGui::Checkbox("Show clicked sprite", &lunaticvibes::g_enable_show_clicked_sprite);
+
     ImGui::Checkbox("Show ImGui demo window", &_imgui_show_demo_window);
+    ImGui::SameLine();
+    HelpMarker("Showcase Dear ImGui's features");
 }
 
 void SceneSelect::imguiPageAbout()

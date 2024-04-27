@@ -159,3 +159,5 @@ TEST(Lr2SoundSet, CustomFileDefaultEntry)
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.2/mybgm.2.wav"_pp);
 }
+
+// TODO: add auto tests for RANDOM

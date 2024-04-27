@@ -166,6 +166,9 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
         }
         c.label.emplace_back("RANDOM");
 
+        std::srand(std::time(NULL));
+        customizeRandom.push_back(c.label.empty() ? 0 : (std::rand() % c.label.size()));
+
         std::sort(c.label.begin(), c.label.end());
         c.defIdx = 0;
         for (size_t i = 0; i < c.label.size(); ++i)
@@ -178,9 +181,6 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
         }
         c.value = c.defIdx;
         customfiles.push_back(std::move(c));
-
-        std::srand(std::time(NULL));
-        customizeRandom.push_back(c.label.empty() ? 0 : (std::rand() % (c.label.size() - 1)));
 
         return true;
     }

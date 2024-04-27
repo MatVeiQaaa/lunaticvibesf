@@ -835,19 +835,18 @@ void setEntryInfo()
             break;
         }
         param["coursestagecount"] = (int)ps->charts.size();
+        if (ps->charts.empty())
+        {
+            param["coursenotplayable"s] = 1;
+            param["coursestagechartexist1"s] = 0;
+            param["courselevel1"s] = 0;
+            param["coursedifficulty1"s] = 0;
+            text["coursetitle1"s] = "(EMPTY COURSE)";
+        }
         for (size_t stage = 0; stage < ps->charts.size(); ++stage)
         {
-            auto chartList = g_pSongDB->findChartByHash(ps->charts[stage]);
-            if (!chartList.empty())
-            {
-                auto pChart = chartList[0];
-                param["coursestagechartexist"s + std::to_string(stage + 1)] = 1;
-                param["courselevel"s + std::to_string(stage + 1)] = pChart->playLevel;
-                param["coursedifficulty"s + std::to_string(stage + 1)] = pChart->difficulty;
-                text["coursetitle"s + std::to_string(stage + 1)] = pChart->title;
-                text["coursesubtitle"s + std::to_string(stage + 1)] = pChart->title2;
-            }
-            else
+            const auto chartList = g_pSongDB->findChartByHash(ps->charts[stage]);
+            if (chartList.empty())
             {
                 param["coursenotplayable"s] = 1;
                 param["coursestagechartexist"s + std::to_string(stage + 1)] = 0;
@@ -855,7 +854,15 @@ void setEntryInfo()
                 param["coursedifficulty"s + std::to_string(stage + 1)] = 0;
                 text["coursetitle"s + std::to_string(stage + 1)] = i18n::s(i18nText::CHART_NOT_FOUND);
                 text["coursesubtitle"s + std::to_string(stage + 1)] = (boost::format(i18n::c(i18nText::CHART_NOT_FOUND_MD5)) % ps->charts[stage].hexdigest()).str();
+                LOG_VERBOSE << "[Select] Course chart not found";
+                continue;
             }
+            const auto& pChart = chartList[0];
+            param["coursestagechartexist"s + std::to_string(stage + 1)] = 1;
+            param["courselevel"s + std::to_string(stage + 1)] = pChart->playLevel;
+            param["coursedifficulty"s + std::to_string(stage + 1)] = pChart->difficulty;
+            text["coursetitle"s + std::to_string(stage + 1)] = pChart->title;
+            text["coursesubtitle"s + std::to_string(stage + 1)] = pChart->title2;
         }
 
         param["havereplay"] = false;

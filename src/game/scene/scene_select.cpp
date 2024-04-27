@@ -1956,7 +1956,10 @@ void SceneSelect::decide()
     }
 
     if (State::get(IndexOption::SELECT_ENTRY_TYPE) == Option::ENTRY_COURSE && State::get(IndexSwitch::COURSE_NOT_PLAYABLE))
+    {
+        LOG_DEBUG << "[Select] Can not a enter non-playable course";
         return;
+    }
 
     const int bga = State::get(IndexOption::PLAY_BGA_TYPE);
     State::set(IndexSwitch::_LOAD_BGA,

@@ -224,6 +224,9 @@ public:
     bool saveFile(const Path& path);
     bool validate();
 
+    bool loadXml(std::string_view);
+    std::string serializeAsXml();
+
     static Path getReplayPath(const HashMD5& chartMD5);
     Path getReplayPath();
     PlayModifiers getMods() const;

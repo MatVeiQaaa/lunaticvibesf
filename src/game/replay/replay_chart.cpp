@@ -4,9 +4,11 @@
 #include "config/config_mgr.h"
 
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/xml.hpp>
 
 #include <cstdlib>
 #include <sstream>
+#include <string_view>
 
 // TODO: LVF version.
 // TODO: play timestamp.
@@ -31,11 +33,33 @@ bool ReplayChart::loadFile(const Path& path)
 		const bool valid = validate();
 		if (!valid)
 		{
-			LOG_DEBUG << "invalid replay file";
+			LOG_DEBUG << "[ReplayChart] Loaded replay file is invalid";
 		}
 		return valid;
 	}
 	return false;
+}
+
+bool ReplayChart::loadXml(const std::string_view xml)
+{
+    std::stringstream ss;
+    ss << xml;
+    try
+    {
+        cereal::XMLInputArchive ia{ss};
+        ia(*this);
+    }
+    catch (const cereal::Exception &e)
+    {
+        LOG_ERROR << "[ReplayChart] loadXml() cereal exception: " << e.what();
+        return false;
+    }
+    const bool valid = validate();
+    if (!valid)
+    {
+        LOG_DEBUG << "[ReplayChart] Loaded replay XML is invalid";
+    }
+    return valid;
 }
 
 bool ReplayChart::saveFile(const Path& path)
@@ -58,6 +82,24 @@ bool ReplayChart::saveFile(const Path& path)
 		return true;
 	}
 	return false;
+}
+
+std::string ReplayChart::serializeAsXml()
+{
+    std::stringstream ss;
+    {
+        try
+        {
+            cereal::XMLOutputArchive ia{ss};
+            ia(*this);
+        }
+        catch (const cereal::Exception& e)
+        {
+            LOG_ERROR << "[ReplayChart] cereal XMLOutputArchive failed: " << e.what();
+            return {};
+        }
+    }
+    return ss.str();
 }
 
 bool ReplayChart::validate()

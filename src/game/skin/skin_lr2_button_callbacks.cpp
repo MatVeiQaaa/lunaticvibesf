@@ -969,7 +969,7 @@ void default_target_rate(int plus)
     number_change_clamp(IndexNumber::DEFAULT_TARGET_RATE, 0, 100, plus);
 
     if (State::get(IndexOption::PLAY_TARGET_TYPE) == Option::TARGET_DEFAULT)
-        State::set(IndexText::TARGET_NAME, (boost::format("%d%%") % State::get(IndexNumber::DEFAULT_TARGET_RATE)).str());
+        State::set(IndexText::TARGET_NAME, (boost::format("RATE %d%%") % State::get(IndexNumber::DEFAULT_TARGET_RATE)).str());
 }
 
 // 77

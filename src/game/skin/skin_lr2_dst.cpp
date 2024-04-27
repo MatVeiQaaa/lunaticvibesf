@@ -315,13 +315,13 @@ void updateDstOpt()
 	// 103 NORMAL CLEARED
 	// 104 HARD / EXHARD CLEARED
 	// 105 FULL COMBO / PERFECT / MAX
-	// 146 EASY CLEARED
-	// 147 HARD CLEARED
-	// 148 FULL COMBO 
-	// 106 EXHARD CLEARED
-	// 107 PERFECT
-	// 108 MAX
-	// 109 ASSISTED
+	// 146 New: EASY CLEARED
+	// 147 New: HARD CLEARED
+	// 148 New: FULL COMBO
+	// 106 New: EXHARD CLEARED
+	// 107 New: PERFECT
+	// 108 New: MAX
+	// 109 New: ASSISTED
 	{
         using namespace Option;
         switch (State::get(IndexOption::SELECT_ENTRY_LAMP))

@@ -8,7 +8,7 @@ endif()
 # PROJECT CONFIG
 
 project(LunaticVibesF
-    VERSION 0.13.12
+    VERSION 0.13.13
     LANGUAGES CXX
 )
 set(PROJECT_TITLE "Lunatic Vibes F")

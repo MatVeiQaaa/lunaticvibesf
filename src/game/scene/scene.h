@@ -1,5 +1,4 @@
 #pragma once
-#include <bitset>
 #include <string>
 #include <memory>
 #include <array>
@@ -24,26 +23,27 @@ enum class SceneType
     EXIT_TRANS,
     EXIT
 };
+
 inline SceneType getSceneFromSkinType(SkinType m)
 {
-    static const std::map<SkinType, SceneType> modeSceneMap =
+    switch (m)
     {
-        { SkinType::MUSIC_SELECT,  SceneType::SELECT},
-        { SkinType::DECIDE,        SceneType::DECIDE},
-        { SkinType::THEME_SELECT,  SceneType::CUSTOMIZE},
-        { SkinType::KEY_CONFIG,    SceneType::KEYCONFIG},
-        { SkinType::PLAY5,         SceneType::PLAY},
-        { SkinType::PLAY5_2,       SceneType::PLAY},
-        { SkinType::PLAY7,         SceneType::PLAY},
-        { SkinType::PLAY7_2,       SceneType::PLAY},
-        { SkinType::PLAY9,         SceneType::PLAY},
-        { SkinType::PLAY9_2,       SceneType::PLAY},
-        { SkinType::PLAY10,        SceneType::PLAY},
-        { SkinType::PLAY14,        SceneType::PLAY},
-        { SkinType::RESULT,        SceneType::RESULT},
-        { SkinType::COURSE_RESULT, SceneType::COURSE_RESULT},
-    };
-    return modeSceneMap.find(m) != modeSceneMap.end() ? modeSceneMap.at(m) : SceneType::NOT_INIT;
+    case SkinType::MUSIC_SELECT: return SceneType::SELECT;
+    case SkinType::DECIDE: return SceneType::DECIDE;
+    case SkinType::THEME_SELECT: return SceneType::CUSTOMIZE;
+    case SkinType::KEY_CONFIG: return SceneType::KEYCONFIG;
+    case SkinType::PLAY5:
+    case SkinType::PLAY5_2:
+    case SkinType::PLAY7:
+    case SkinType::PLAY7_2:
+    case SkinType::PLAY9:
+    case SkinType::PLAY9_2:
+    case SkinType::PLAY10:
+    case SkinType::PLAY14: return SceneType::PLAY;
+    case SkinType::RESULT: return SceneType::RESULT;
+    case SkinType::COURSE_RESULT: return SceneType::COURSE_RESULT;
+    default: return SceneType::NOT_INIT;
+    }
 }
 
 // Parent class of scenes, defines how an object being stored and drawn.

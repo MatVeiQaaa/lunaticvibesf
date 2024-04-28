@@ -1,5 +1,6 @@
 #include "chart_bms.h"
 
+#include <bitset>
 #include <random>
 
 #include "common/log.h"

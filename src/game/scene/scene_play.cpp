@@ -2383,6 +2383,7 @@ void ScenePlay::updateFadeout()
 
     if (ft >= pSkin->info.timeOutro)
     {
+        assert(!sceneEnding);
         sceneEnding = true;
         if (_loadChartFuture.valid())
             _loadChartFuture.wait();
@@ -2536,6 +2537,7 @@ void ScenePlay::updateFadeout()
         }
         if (wantRetry)
         {
+            LOG_DEBUG << "[Select] wantRetry";
             if (wantNewRandomSeed)
             {
                 // the retry is requested by START+SELECT
@@ -2549,14 +2551,10 @@ void ScenePlay::updateFadeout()
         {
             // Auto mode skips single result
 
-            if (gPlayContext.isCourse)
+            // If playing course mode, just go straight to next stage
+            if (gPlayContext.isCourse && playerState[PLAYER_SLOT_PLAYER].finished)
             {
-                // If playing course mode, just go straight to next stage
-                if (playerState[PLAYER_SLOT_PLAYER].finished && gPlayContext.courseStage < gPlayContext.courseCharts.size())
-                {
-                    ++gPlayContext.courseStage;
-                    gNextScene = SceneType::COURSE_TRANS;
-                }
+                gNextScene = lunaticvibes::advanceCourseStage(gNextScene, SceneType::COURSE_TRANS);
             }
         }
         else if (gPlayContext.isCourse && gPlayContext.courseStage > 0)

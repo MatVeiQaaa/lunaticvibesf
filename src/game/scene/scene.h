@@ -46,6 +46,11 @@ inline SceneType getSceneFromSkinType(SkinType m)
     }
 }
 
+namespace lunaticvibes {
+// Update global state to next course stage.
+[[nodiscard]] SceneType advanceCourseStage(const SceneType exitScene, const SceneType playScene);
+} // namespace lunaticvibes
+
 // Parent class of scenes, defines how an object being stored and drawn.
 // Every classes of scenes should inherit this class.
 class SceneBase: public AsyncLooper

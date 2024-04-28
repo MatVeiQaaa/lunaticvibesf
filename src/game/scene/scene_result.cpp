@@ -281,6 +281,82 @@ void SceneResult::updateRecord()
     }
 }
 
+[[nodiscard]] SceneType lunaticvibes::advanceCourseStage(const SceneType exitScene, const SceneType playScene)
+{
+    gPlayContext.courseStage++;
+    if (gPlayContext.courseStage >= gPlayContext.courseCharts.size())
+    {
+        return exitScene;
+    }
+
+    if (gPlayContext.isReplay)
+    {
+        gPlayContext.replay = std::make_shared<ReplayChart>();
+        gPlayContext.replay->loadFile(gPlayContext.courseStageReplayPath[gPlayContext.courseStage]);
+    }
+
+    if (gPlayContext.courseStage + 1 == gPlayContext.courseCharts.size())
+        State::set(IndexOption::PLAY_COURSE_STAGE, Option::STAGE_FINAL);
+    else
+        State::set(IndexOption::PLAY_COURSE_STAGE, Option::STAGE_1 + gPlayContext.courseStage);
+
+    // set metadata
+    auto pChart = *g_pSongDB->findChartByHash(gPlayContext.courseCharts[gPlayContext.courseStage]).begin();
+    gChartContext.chart = pChart;
+
+    auto& nextChart = *gChartContext.chart;
+    //gChartContext.path = chart._filePath;
+    gChartContext.path = nextChart.absolutePath;
+
+    // only reload resources if selected chart is different
+    if (gChartContext.hash != nextChart.fileHash)
+    {
+        gChartContext.isSampleLoaded = false;
+        gChartContext.sampleLoadedHash.reset();
+        gChartContext.isBgaLoaded = false;
+        gChartContext.bgaLoadedHash.reset();
+    }
+    gChartContext.hash = nextChart.fileHash;
+
+    //gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
+    gChartContext.title = nextChart.title;
+    gChartContext.title2 = nextChart.title2;
+    gChartContext.artist = nextChart.artist;
+    gChartContext.artist2 = nextChart.artist2;
+    gChartContext.genre = nextChart.genre;
+    gChartContext.version = nextChart.version;
+    gChartContext.level = nextChart.levelEstimated;
+    gChartContext.minBPM = nextChart.minBPM;
+    gChartContext.maxBPM = nextChart.maxBPM;
+    gChartContext.startBPM = nextChart.startBPM;
+
+    auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
+    if (pScore && !pScore->replayFileName.empty())
+    {
+        Path replayFilePath = ReplayChart::getReplayPath(gChartContext.hash) / pScore->replayFileName;
+        if (fs::is_regular_file(replayFilePath))
+        {
+            gPlayContext.replayMybest = std::make_shared<ReplayChart>();
+            if (gPlayContext.replayMybest->loadFile(replayFilePath))
+            {
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].randomLeft = gPlayContext.replayMybest->randomTypeLeft;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].randomRight = gPlayContext.replayMybest->randomTypeRight;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].gauge = gPlayContext.replayMybest->gaugeType;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect = (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
+            }
+            else
+            {
+                gPlayContext.replayMybest.reset();
+            }
+        }
+    }
+    clearContextPlayForRetry();
+    return playScene;
+}
+
 void SceneResult::updateFadeout()
 {
     auto t = lunaticvibes::Time();
@@ -427,80 +503,7 @@ void SceneResult::updateFadeout()
                 gPlayContext.courseMaxCombo[PLAYER_SLOT_TARGET] = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().maxComboDisplay;
             }
 
-            gPlayContext.courseStage++;
-            if (gPlayContext.courseStage < gPlayContext.courseCharts.size())
-            {
-                if (gPlayContext.isReplay)
-                {
-                    gPlayContext.replay = std::make_shared<ReplayChart>();
-                    gPlayContext.replay->loadFile(gPlayContext.courseStageReplayPath[gPlayContext.courseStage]);
-                }
-
-                if (gPlayContext.courseStage + 1 == gPlayContext.courseCharts.size())
-                    State::set(IndexOption::PLAY_COURSE_STAGE, Option::STAGE_FINAL);
-                else
-                    State::set(IndexOption::PLAY_COURSE_STAGE, Option::STAGE_1 + gPlayContext.courseStage);
-
-                // set metadata
-                auto pChart = *g_pSongDB->findChartByHash(gPlayContext.courseCharts[gPlayContext.courseStage]).begin();
-                gChartContext.chart = pChart;
-
-                auto& nextChart = *gChartContext.chart;
-                //gChartContext.path = chart._filePath;
-                gChartContext.path = nextChart.absolutePath;
-
-                // only reload resources if selected chart is different
-                if (gChartContext.hash != nextChart.fileHash)
-                {
-                    gChartContext.isSampleLoaded = false;
-                    gChartContext.sampleLoadedHash.reset();
-                    gChartContext.isBgaLoaded = false;
-                    gChartContext.bgaLoadedHash.reset();
-                }
-                gChartContext.hash = nextChart.fileHash;
-
-                //gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
-                gChartContext.title = nextChart.title;
-                gChartContext.title2 = nextChart.title2;
-                gChartContext.artist = nextChart.artist;
-                gChartContext.artist2 = nextChart.artist2;
-                gChartContext.genre = nextChart.genre;
-                gChartContext.version = nextChart.version;
-                gChartContext.level = nextChart.levelEstimated;
-                gChartContext.minBPM = nextChart.minBPM;
-                gChartContext.maxBPM = nextChart.maxBPM;
-                gChartContext.startBPM = nextChart.startBPM;
-
-                auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
-                if (pScore && !pScore->replayFileName.empty())
-                {
-                    Path replayFilePath = ReplayChart::getReplayPath(gChartContext.hash) / pScore->replayFileName;
-                    if (fs::is_regular_file(replayFilePath))
-                    {
-                        gPlayContext.replayMybest = std::make_shared<ReplayChart>();
-                        if (gPlayContext.replayMybest->loadFile(replayFilePath))
-                        {
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].randomLeft = gPlayContext.replayMybest->randomTypeLeft;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].randomRight = gPlayContext.replayMybest->randomTypeRight;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].gauge = gPlayContext.replayMybest->gaugeType;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect = (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
-                            gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
-                        }
-                        else
-                        {
-                            gPlayContext.replayMybest.reset();
-                        }
-                    }
-                }
-                clearContextPlayForRetry();
-                gNextScene = SceneType::PLAY;
-            }
-            else
-            {
-                gNextScene = SceneType::COURSE_RESULT;
-            }
+            gNextScene = lunaticvibes::advanceCourseStage(SceneType::COURSE_RESULT, SceneType::PLAY);
         }
         else
         {

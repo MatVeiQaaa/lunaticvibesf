@@ -34,6 +34,6 @@ void loadLR2Sound()
 
     SoundMgr::loadSysSample(ss.getPathSoundScreenshot(), eSoundSample::SOUND_SCREENSHOT, false);
 
-    SoundMgr::loadSysSample(ss.getPathBGMCourseClear(), eSoundSample::SOUND_COURSE_CLEAR, false);
-    SoundMgr::loadSysSample(ss.getPathBGMCourseFailed(), eSoundSample::SOUND_COURSE_FAIL, false);
+    SoundMgr::loadSysSample(ss.getPathBGMCourseClear(), eSoundSample::SOUND_COURSE_CLEAR, true, true);
+    SoundMgr::loadSysSample(ss.getPathBGMCourseFailed(), eSoundSample::SOUND_COURSE_FAIL, true, true);
 }

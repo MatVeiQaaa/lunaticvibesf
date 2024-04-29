@@ -270,6 +270,7 @@ SceneCourseResult::SceneCourseResult() : SceneBase(SkinType::COURSE_RESULT, 1000
     if (!gInCustomize)
     {
         SoundMgr::stopSysSamples();
+        SoundMgr::setSysVolume(1.0);
 
         if (State::get(IndexSwitch::RESULT_CLEAR))
             SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_COURSE_CLEAR);

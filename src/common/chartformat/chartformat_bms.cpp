@@ -278,6 +278,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 if (key.empty()) continue;
                 if (value.empty()) continue;
 
+                // https://hitkey.nekokan.dyndns.info/cmds.htm
                 // digits
                 if (lunaticvibes::iequals(key, "PLAYER"))
                     player = toInt(value);
@@ -285,6 +286,15 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 {
                     raw_rank = toInt(value);
                     rank = lunaticvibes::parser_bms::parse_rank(raw_rank);
+                }
+                else if (lunaticvibes::iequals(key, "DEFEXRANK"))
+                {
+                    static constexpr int default_defexrank{100};
+                    if (toInt(value, -1) != default_defexrank)
+                    {
+                        // TODO(far future): support DEFEXRANK. Would need to support both LR2 and the new way.
+                        LOG_DEBUG << "[BMS] DEFEXRANK is not supported";
+                    }
                 }
                 else if (lunaticvibes::iequals(key, "TOTAL"))
                     total = toInt(value);
@@ -316,6 +326,30 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     stagefile.assign(value.begin(), value.end());
                 else if (lunaticvibes::iequals(key, "BANNER"))
                     banner.assign(value.begin(), value.end());
+                else if (lunaticvibes::iequals(key, "PREVIEW"))
+                {
+                    // TODO: parse it here and use it directly instead of using extraCommands.
+                }
+                else if (lunaticvibes::iequals(key, "BACKBMP"))
+                {
+                    // TODO: save this do the database and use it?
+                    backbmp.assign(value.begin(), value.end());
+                }
+                else if (lunaticvibes::iequals(key, "COMMENT"))
+                {
+                    // https://hitkey.nekokan.dyndns.info/cmds.htm#COMMENT
+                    // TODO: save and use in addition to txt files.
+                    // Usually surrounded by quotes, sometimes not.
+                    value = lunaticvibes::trim(value, "\"");
+                    LOG_VERBOSE << "[BMS] COMMENT '" << value << "' ignored";
+                }
+                else if (lunaticvibes::iequals(key, "LNTYPE"))
+                {
+                    if (toInt(value, -1) != 1)
+                    {
+                        LOG_DEBUG << "[BMS] LNTYPE '" << value << "' unhandled?";
+                    }
+                }
                 else if (lunaticvibes::iequals(key, "LNOBJ") && value.length() >= 2)
                 {
                     if (!lnobjSet.empty())
@@ -354,10 +388,11 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     if (idx != 0)
                         stop[idx] = toDouble(value);
                 }
-
-                // unknown
                 else
+                {
+                    LOG_DEBUG << "[BMS] Unknown command key='" << key << "' value='" << value << "'";
                     extraCommands[std::string(key)] = StringContent(value.begin(), value.end());
+                }
             }
             else // #zzzxy:......
             {
@@ -380,8 +415,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
                 try
                 {
-                    int x_ = base36(key[3]);
-                    int _y = base36(key[4]);
+                    const auto x_ = static_cast<int>(base36(key[3]));
+                    const auto _y = static_cast<int>(base36(key[4]));
 
                     if (x_ == 0) // 0x: basic info
                     {
@@ -391,41 +426,35 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                             seqToLane36(chBGM[bgmLayersCount[bar]][bar], value);
                             ++bgmLayersCount[bar];
                             break;
-
                         case 2:            // 02: Bar Length
                             metres[bar] = toDouble(value);
                             haveMetricMod = true;
                             break;
-
                         case 3:            // 03: BPM change
                             seqToLane16(chBPMChange[bar], value);
                             haveBPMChange = true;
                             break;
-
                         case 4:            // 04: BGA Base
                             seqToLane36(chBGABase[bar], value);
                             haveBGA = true;
                             break;
-
                         case 6:            // 06: BGA Poor
                             seqToLane36(chBGAPoor[bar], value);
                             haveBGA = true;
                             break;
-
                         case 7:            // 07: BGA Layer
                             seqToLane36(chBGALayer[bar], value);
                             haveBGA = true;
                             break;
-
                         case 8:            // 08: ExBPM
                             seqToLane36(chExBPMChange[bar], value);
                             haveBPMChange = true;
                             break;
-
                         case 9:            // 09: Stop
                             seqToLane36(chStop[bar], value);
                             haveStop = true;
                             break;
+                        default: LOG_DEBUG << "[BMS] Unhandled x=0 (basic info) << y=" << _y; break;
                         }
                     }
                     else // not 0x
@@ -496,6 +525,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                                 seqToLane36(chMines[chIdx][bar], value);
                                 haveMine = true;
                                 break;
+                            default: LOG_VERBOSE << "[BMS] Unhandled x=" << x_ << "; y=" << _y; break;
                             }
 
                             switch (idx)
@@ -515,6 +545,10 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                                     have89 = true;
                                 break;
                             }
+                        }
+                        else
+                        {
+                            LOG_VERBOSE << "[BMS] side<0; x=" << x_ << " y=" << _y;
                         }
                     }
                 }
@@ -743,11 +777,17 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         }
     }
 
+    // Notes swapped by https://hitkey.nekokan.dyndns.info/cmds.htm#PMS
+    // Sometimes there is a mix of those note channels, for example `Calamity Fortune [9 THOUGHTLESS]`.
+    // LR2 seems to merge together at the same time.
+    // FIXME: do so as well, or some 9k charts like the one above have missing notes on lanes 6-9.
+    // https://github.com/chown2/lunaticvibesf/issues/99
     if (isPMS)
     {
         gamemode = 9;
         if (have89)
         {
+            LOG_VERBOSE << "[BMS] Swapping PMS notes by have89";
             // 11	12	13	14	15	18	19	16	17	not known or well known
             player = 1;
             std::swap(chNotesRegular[6], chNotesRegular[8]);
@@ -763,7 +803,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
             if (have67_2)
             {
                 // 21	22	23	24	25	28	29	26	27	2P-side (right)
-                // 18KEYS is not supported. Parse as 9KEYS
+                LOG_DEBUG << "[BMS] 18KEYS is not supported, parsing as 9KEYS";
                 gamemode = 9;
                 player = 1;
                 std::swap(chNotesRegular[16], chNotesRegular[18]);
@@ -779,6 +819,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         }
         else
         {
+            LOG_VERBOSE << "[BMS] Swapping PMS notes by *not* have89";
             // 11	12	13	14	15	22	23	24	25	standard PMS
             player = 1;
             std::swap(chNotesRegular[6], chNotesRegular[12]);
@@ -937,6 +978,7 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexBME(int x_, int _y)
         side = 1;
         break;
     default:
+        LOG_VERBOSE << "[BMS] getLaneIndexBME returning side=-1 for x_=" << x_ << "; unused _y=" << _y;
         side = -1;
         break;
     }
@@ -987,6 +1029,7 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexPMS(int x_, int _y)
         side = 1;
         break;
     default:
+        LOG_VERBOSE << "[BMS] getLaneIndexPMS returning side=-1 for x_=" << x_ << "; unused _y=" << _y;
         side = -1;
         break;
     }

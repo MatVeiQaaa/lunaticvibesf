@@ -772,6 +772,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 std::swap(chNotesInvisible[17], chNotesInvisible[19]);
                 std::swap(chNotesLN[16], chNotesLN[18]);
                 std::swap(chNotesLN[17], chNotesLN[19]);
+                std::swap(chMines[16], chMines[18]);
+                std::swap(chMines[17], chMines[19]);
                 have67_2 = true;
             }
         }

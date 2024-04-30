@@ -785,11 +785,11 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     if (isPMS)
     {
         gamemode = 9;
+        player = 1;
         if (have89)
         {
             LOG_VERBOSE << "[BMS] Swapping PMS notes by have89";
             // 11	12	13	14	15	18	19	16	17	not known or well known
-            player = 1;
             std::swap(chNotesRegular[6], chNotesRegular[8]);
             std::swap(chNotesRegular[7], chNotesRegular[9]);
             std::swap(chNotesInvisible[6], chNotesInvisible[8]);
@@ -799,13 +799,10 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 			std::swap(chMines[6], chMines[8]);
 			std::swap(chMines[7], chMines[9]);
             have67 = true;
-
             if (have67_2)
             {
                 // 21	22	23	24	25	28	29	26	27	2P-side (right)
                 LOG_DEBUG << "[BMS] 18KEYS is not supported, parsing as 9KEYS";
-                gamemode = 9;
-                player = 1;
                 std::swap(chNotesRegular[16], chNotesRegular[18]);
                 std::swap(chNotesRegular[17], chNotesRegular[19]);
                 std::swap(chNotesInvisible[16], chNotesInvisible[18]);
@@ -821,7 +818,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         {
             LOG_VERBOSE << "[BMS] Swapping PMS notes by *not* have89";
             // 11	12	13	14	15	22	23	24	25	standard PMS
-            player = 1;
             std::swap(chNotesRegular[6], chNotesRegular[12]);
             std::swap(chNotesRegular[7], chNotesRegular[13]);
             std::swap(chNotesRegular[8], chNotesRegular[14]);

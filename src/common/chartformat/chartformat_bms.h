@@ -146,6 +146,9 @@ public:
         unsigned resolution = 1;
 
         unsigned relax(unsigned target_resolution);
+        // Merge with another channel.
+        // \param c Channel to destructively merge with this channel.
+        void imbue(channel& c);
         void sortNotes();
     };
     typedef std::map<unsigned, channel> LaneMap;    // bar -> channel

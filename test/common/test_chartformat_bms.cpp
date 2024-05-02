@@ -10,6 +10,7 @@
 
 #include "common/chartformat/chartformat_bms.h"
 #include "../../src/common/utils.h"
+#include "common/hash.h"
 
 bool ExpectNotePosition(const ChartFormatBMS& bms, LaneCode area, int ch, int bar, int res, const std::vector<int>& segments)
 {
@@ -266,6 +267,36 @@ TEST(tBMS, note_7k)
 	EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 5, 2, 8, std::vector<int>{ 5 }));
 	EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 6, 2, 8, std::vector<int>{ 6 }));
 	EXPECT_TRUE(ExpectNotePosition(*bms, bms::LaneCode::NOTE1, 7, 2, 8, std::vector<int>{ 7 }));
+}
+TEST(tBMS, note_9k_mixed_channels)
+{
+	std::shared_ptr<ChartFormatBMS> bms = nullptr;
+	ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>("bms/9k_mixed_channels.pms"));
+	ASSERT_EQ(bms->isLoaded(), true);
+	EXPECT_EQ(bms->fileHash, HashMD5{"646ed39249f11e2e579fd52a10ec174a"});
+	EXPECT_EQ(bms->gamemode, 9);
+
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 0, 1).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 1, 1).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 2, 1).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 3, 1).notes.size(), 2);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 4, 1).notes.size(), 2);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 5, 1).notes.size(), 4);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 6, 1).notes.size(), 3);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 7, 1).notes.size(), 1);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 8, 1).notes.size(), 1);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 9, 1).notes.size(), 0);
+
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 0, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 1, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 2, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 3, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 4, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 5, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 6, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 7, 2).notes.size(), 1);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 8, 2).notes.size(), 0);
+	EXPECT_EQ(bms->getLane(bms::LaneCode::NOTE1, 9, 2).notes.size(), 0);
 }
 TEST(tBMS, note_10k)
 {

@@ -780,66 +780,62 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // Notes swapped by https://hitkey.nekokan.dyndns.info/cmds.htm#PMS
     // Sometimes there is a mix of those note channels, for example `Calamity Fortune [9 THOUGHTLESS]`.
     // LR2 seems to merge together at the same time.
-    // FIXME: do so as well, or some 9k charts like the one above have missing notes on lanes 6-9.
-    // https://github.com/chown2/lunaticvibesf/issues/99
     if (isPMS)
     {
         gamemode = 9;
         player = 1;
-        if (have89)
+
+        // 11	12	13	14	15	18	19	16	17	not known or well known
+        std::swap(chNotesRegular[6], chNotesRegular[8]);
+        std::swap(chNotesRegular[7], chNotesRegular[9]);
+        std::swap(chNotesInvisible[6], chNotesInvisible[8]);
+        std::swap(chNotesInvisible[7], chNotesInvisible[9]);
+        std::swap(chNotesLN[6], chNotesLN[8]);
+        std::swap(chNotesLN[7], chNotesLN[9]);
+        std::swap(chMines[6], chMines[8]);
+        std::swap(chMines[7], chMines[9]);
+        have67 = true;
+        have67_2 = false;
+        have89 = true;
+        have89_2 = false;
+        haveAny_2 = false;
+        if (have67_2)
         {
-            LOG_VERBOSE << "[BMS] Swapping PMS notes by have89";
-            // 11	12	13	14	15	18	19	16	17	not known or well known
-            std::swap(chNotesRegular[6], chNotesRegular[8]);
-            std::swap(chNotesRegular[7], chNotesRegular[9]);
-            std::swap(chNotesInvisible[6], chNotesInvisible[8]);
-            std::swap(chNotesInvisible[7], chNotesInvisible[9]);
-            std::swap(chNotesLN[6], chNotesLN[8]);
-            std::swap(chNotesLN[7], chNotesLN[9]);
-			std::swap(chMines[6], chMines[8]);
-			std::swap(chMines[7], chMines[9]);
-            have67 = true;
-            if (have67_2)
-            {
-                // 21	22	23	24	25	28	29	26	27	2P-side (right)
-                LOG_DEBUG << "[BMS] 18KEYS is not supported, parsing as 9KEYS";
-                std::swap(chNotesRegular[16], chNotesRegular[18]);
-                std::swap(chNotesRegular[17], chNotesRegular[19]);
-                std::swap(chNotesInvisible[16], chNotesInvisible[18]);
-                std::swap(chNotesInvisible[17], chNotesInvisible[19]);
-                std::swap(chNotesLN[16], chNotesLN[18]);
-                std::swap(chNotesLN[17], chNotesLN[19]);
-                std::swap(chMines[16], chMines[18]);
-                std::swap(chMines[17], chMines[19]);
-                have67_2 = true;
-            }
+            // 21	22	23	24	25	28	29	26	27	2P-side (right)
+            LOG_DEBUG << "[BMS] 18KEYS is not supported, parsing as 9KEYS";
+            std::swap(chNotesRegular[16], chNotesRegular[18]);
+            std::swap(chNotesRegular[17], chNotesRegular[19]);
+            std::swap(chNotesInvisible[16], chNotesInvisible[18]);
+            std::swap(chNotesInvisible[17], chNotesInvisible[19]);
+            std::swap(chNotesLN[16], chNotesLN[18]);
+            std::swap(chNotesLN[17], chNotesLN[19]);
+            std::swap(chMines[16], chMines[18]);
+            std::swap(chMines[17], chMines[19]);
+            have67_2 = true;
         }
-        else
-        {
-            LOG_VERBOSE << "[BMS] Swapping PMS notes by *not* have89";
-            // 11	12	13	14	15	22	23	24	25	standard PMS
-            std::swap(chNotesRegular[6], chNotesRegular[12]);
-            std::swap(chNotesRegular[7], chNotesRegular[13]);
-            std::swap(chNotesRegular[8], chNotesRegular[14]);
-            std::swap(chNotesRegular[9], chNotesRegular[15]);
-            std::swap(chNotesInvisible[6], chNotesInvisible[12]);
-            std::swap(chNotesInvisible[7], chNotesInvisible[13]);
-            std::swap(chNotesInvisible[8], chNotesInvisible[14]);
-            std::swap(chNotesInvisible[9], chNotesInvisible[15]);
-            std::swap(chNotesLN[6], chNotesLN[12]);
-            std::swap(chNotesLN[7], chNotesLN[13]);
-            std::swap(chNotesLN[8], chNotesLN[14]);
-            std::swap(chNotesLN[9], chNotesLN[15]);
-			std::swap(chMines[6], chMines[12]);
-            std::swap(chMines[7], chMines[13]);
-            std::swap(chMines[8], chMines[14]);
-            std::swap(chMines[9], chMines[15]);
-            have67 = true;
-            have89 = true;
-            haveAny_2 = false;
-            have67_2 = false;
-            have89_2 = false;
-        }
+
+        // 11	12	13	14	15	22	23	24	25	standard PMS
+        auto imbue = [](LaneMap& lhs, LaneMap& rhs) {
+            if (lhs.empty()) std::swap(lhs, rhs);
+            for (auto &[k, rv] : rhs)
+                lhs[k].imbue(rv);
+        };
+        imbue(chNotesRegular[6], chNotesRegular[12]);
+        imbue(chNotesRegular[7], chNotesRegular[13]);
+        imbue(chNotesRegular[8], chNotesRegular[14]);
+        imbue(chNotesRegular[9], chNotesRegular[15]);
+        imbue(chNotesInvisible[6], chNotesInvisible[12]);
+        imbue(chNotesInvisible[7], chNotesInvisible[13]);
+        imbue(chNotesInvisible[8], chNotesInvisible[14]);
+        imbue(chNotesInvisible[9], chNotesInvisible[15]);
+        imbue(chNotesLN[6], chNotesLN[12]);
+        imbue(chNotesLN[7], chNotesLN[13]);
+        imbue(chNotesLN[8], chNotesLN[14]);
+        imbue(chNotesLN[9], chNotesLN[15]);
+        imbue(chMines[6], chMines[12]);
+        imbue(chMines[7], chMines[13]);
+        imbue(chMines[8], chMines[14]);
+        imbue(chMines[9], chMines[15]);
     }
     else
     {
@@ -1069,6 +1065,24 @@ unsigned ChartFormatBMS::channel::relax(unsigned target_resolution)
         n.segment *= pow;
     }
     return target;
+}
+
+void ChartFormatBMS::channel::imbue(channel& c)
+{
+    if (notes.empty())
+    {
+        resolution = c.resolution;
+        std::swap(notes, c.notes);
+        return;
+    }
+    relax(c.resolution);
+    for (const auto& note : c.notes)
+    {
+        notes.push_back(note);
+    }
+    c.notes.clear();
+    c.resolution = 1;
+    sortNotes();
 }
 
 void ChartFormatBMS::channel::sortNotes()

@@ -128,8 +128,6 @@ protected:
 protected:
     ErrorCode errorCode = ErrorCode::OK;
     int errorLine;
-public:
-    std::string getError();
 
 public:
     struct channel {
@@ -154,9 +152,7 @@ public:
     
 protected:
     // Lanes.
-    int seqToLane36(channel&, const StringContent& str, unsigned flags = 0);
     int seqToLane36(channel&, StringContentView str, unsigned flags = 0);
-    int seqToLane16(channel&, const StringContent& str);
     int seqToLane16(channel&, StringContentView str);
 
     std::map<unsigned, LaneMap> chBGM{}; // lane -> [bar -> channel]

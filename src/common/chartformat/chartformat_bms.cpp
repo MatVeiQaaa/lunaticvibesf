@@ -865,22 +865,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     return 0;
 }
 
-std::string ChartFormatBMS::getError()
-{
-    using err = ErrorCode;
-    switch (errorCode)
-    {
-    // TODO: i18n
-    case err::OK: return "OK";
-    case err::FILE_ERROR: return "File error";
-    case err::ALREADY_INITIALIZED: return "Already initialized";
-    case err::VALUE_ERROR: return "Value error";
-    case err::TYPE_MISMATCH: return "Type mismatch";
-    case err::NOTE_LINE_ERROR: return "Note line error";
-    }
-    abort();
-}
-
 int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned flags)
 {
     //if (str.length() % 2 != 0)
@@ -912,10 +896,6 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
     ch.sortNotes();
 
     return 0;
-}
-int ChartFormatBMS::seqToLane36(channel& ch, const StringContent& str, unsigned flags)
-{
-    return seqToLane36(ch, StringContentView(str), flags);
 }
 
 int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
@@ -949,10 +929,6 @@ int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
     ch.sortNotes();
 
     return 0;
-}
-int ChartFormatBMS::seqToLane16(channel& ch, const StringContent& str)
-{
-    return seqToLane16(ch, StringContentView(str));
 }
 
 std::pair<int, int> ChartFormatBMS::getLaneIndexBME(int x_, int _y)

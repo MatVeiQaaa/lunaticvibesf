@@ -72,7 +72,7 @@ public:
     bool failWhenNoHealth() const { return _failWhenNoHealth; }
 
     virtual bool isNoScore() const { return false; }    // for quick esc
-    virtual bool isFinished() const { return notesExpired >= getNoteCount(); }
+    virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }
     virtual bool isCleared() const { return _isCleared; }
     virtual bool isFailed() const { return _isFailed; }
 

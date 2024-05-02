@@ -692,24 +692,24 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         case JudgeArea::LATE_GREAT:
         case JudgeArea::EARLY_GOOD:
         case JudgeArea::LATE_GOOD:
-            updateJudge(t, idx, judge.area, slot);
             pushReplayCommand = true;
             note.hit = true;
             note.expired = true;
             notesExpired++;
+            updateJudge(t, idx, judge.area, slot);
             break;
 
         case JudgeArea::EARLY_BAD:
         case JudgeArea::LATE_BAD:
-            updateJudge(t, idx, judge.area, slot);
             pushReplayCommand = true;
             note.expired = true;
             notesExpired++;
+            updateJudge(t, idx, judge.area, slot);
             break;
 
         case JudgeArea::EARLY_KPOOR:
-            updateJudge(t, idx, judge.area, slot);
             pushReplayCommand = true;
+            updateJudge(t, idx, judge.area, slot);
             break;
 
         case JudgeArea::NOTHING:
@@ -744,15 +744,15 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
 
             case JudgeArea::EARLY_BAD:
             case JudgeArea::LATE_BAD:
-                updateJudge(t, idx, judge.area, slot);
                 note.expired = true;
                 notesExpired++;
                 pushReplayCommand = true;
+                updateJudge(t, idx, judge.area, slot);
                 break;
 
             case JudgeArea::EARLY_KPOOR:
-                updateJudge(t, idx, judge.area, slot);
                 pushReplayCommand = true;
+                updateJudge(t, idx, judge.area, slot);
                 break;
 
             case JudgeArea::NOTHING:
@@ -849,10 +849,10 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 (judge.area == JudgeArea::EARLY_PERFECT && judge.time < -2) ||
                 (judge.area == JudgeArea::LATE_PERFECT && judge.time < 2))
             {
-                updateJudge(t, idx, _lnJudge[idx], slot);
                 note.hit = true;
                 note.expired = true;
                 notesExpired++;
+                updateJudge(t, idx, _lnJudge[idx], slot);
 
                 if (showJudge && _bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
                     State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
@@ -930,10 +930,10 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
                 break;
             }
 
-            updateJudge(t, idx, lnJudge, slot);
             note.hit = hit;
             note.expired = true;
             notesExpired++;
+            updateJudge(t, idx, lnJudge, slot);
             _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
             _lastNoteJudge[slot] = judge;
             pushReplayCommand = true;

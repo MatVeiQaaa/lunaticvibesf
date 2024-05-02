@@ -29,8 +29,7 @@ TEST(RulesetBmsReplay, SkipToEndWorks)
     const RulesetBase::BasicData data = rr.getData();
     EXPECT_EQ(data.play_time, (lunaticvibes::Time{6857, false})); // Scuffed number. The chart itself is a bit shorter.
     EXPECT_DOUBLE_EQ(data.health, 1.0);
-    // FIXME: why not 50%? I would expect this to be the same as total_acc by the chart's end.
-    EXPECT_DOUBLE_EQ(data.acc, 57.142857142857146);
+    EXPECT_DOUBLE_EQ(data.acc, 50.);
     EXPECT_DOUBLE_EQ(data.total_acc, 50.);
     EXPECT_EQ(data.combo, 1);
     EXPECT_EQ(data.maxCombo, 4);

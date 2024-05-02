@@ -1907,15 +1907,10 @@ ParseRet SkinLR2::SRC_NOWJUDGE1()
     {
         size_t idx = GLOBAL_SPRITE_IDX_1PJUDGE + bufJudge1PSlot;
         auto ret = SRC_NOWJUDGE(idx);
-        if (ret == ParseRet::OK)
-        {
-            noshiftJudge1P[bufJudge1PSlot] = toInt(parseParamBuf[10]);
-            _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
-        }
-        else
-        {
+        if (ret != ParseRet::OK)
             return ret;
-        }
+        noshiftJudge1P[bufJudge1PSlot] = toInt(parseParamBuf[10]);
+        _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
     }
     return ParseRet::OK;
 }
@@ -1929,15 +1924,10 @@ ParseRet SkinLR2::SRC_NOWJUDGE2()
     {
         size_t idx = GLOBAL_SPRITE_IDX_2PJUDGE + bufJudge2PSlot;
         auto ret = SRC_NOWJUDGE(idx);
-        if (ret == ParseRet::OK)
-        {
-            noshiftJudge2P[bufJudge2PSlot] = toInt(parseParamBuf[10]);
-            _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
-        }
-        else
-        {
+        if (ret != ParseRet::OK)
             return ret;
-        }
+        noshiftJudge2P[bufJudge2PSlot] = toInt(parseParamBuf[10]);
+        _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
     }
     return ParseRet::OK;
 }
@@ -1957,14 +1947,9 @@ ParseRet SkinLR2::SRC_NOWCOMBO1()
     {
         size_t idx = GLOBAL_SPRITE_IDX_1PJUDGENUM + bufJudge1PSlot;
         auto ret = SRC_NOWCOMBO(idx);
-        if (ret == ParseRet::OK)
-        {
-            _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
-        }
-        else
-        {
+        if (ret != ParseRet::OK)
             return ret;
-        }
+        _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
     }
     return ParseRet::OK;
 }
@@ -1984,14 +1969,9 @@ ParseRet SkinLR2::SRC_NOWCOMBO2()
     {
         size_t idx = GLOBAL_SPRITE_IDX_2PJUDGENUM + bufJudge2PSlot;
         auto ret = SRC_NOWCOMBO(idx);
-        if (ret == ParseRet::OK)
-        {
-            _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
-        }
-        else
-        {
+        if (ret != ParseRet::OK)
             return ret;
-        }
+        _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
     }
     return ParseRet::OK;
 }

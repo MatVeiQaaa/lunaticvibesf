@@ -181,18 +181,17 @@ void SceneCustomize::updateMain()
         selectedMode = gCustomizeContext.mode;
         save(modeOld);
 
+        SoundMgr::stopNoteSamples();
+        SoundMgr::stopSysSamples();
+        pSkin->setHandleMouseEvents(false);
         if (selectedMode == SkinType::SOUNDSET)
         {
-            pSkin->setHandleMouseEvents(false);
-            SoundMgr::stopSysSamples();
             load(SkinType::SOUNDSET);
             loadLR2Sound();
             SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
-            pSkin->setHandleMouseEvents(true);
         }
         else
         {
-            pSkin->setHandleMouseEvents(false);
             if (!gInCustomize || selectedMode != SkinType::MUSIC_SELECT)
             {
                 if (SkinMgr::get(selectedMode))
@@ -201,10 +200,9 @@ void SceneCustomize::updateMain()
                 }
             }
             load(selectedMode);
-            pSkin->setHandleMouseEvents(true);
-
-            reload_preview(selectedMode);
         }
+        pSkin->setHandleMouseEvents(true);
+        reload_preview(selectedMode);
     }
 
     // Skin has changed
@@ -509,7 +507,6 @@ void SceneCustomize::load(SkinType mode)
             optionsKeyList.push_back(opSkin.internalName);
         }
 
-        // FIXME: stop previous customized scene from playing.
         *pSkin->getTextureCustomizeThumbnail() = Texture{Image{ss.getThumbnailPath()}};
 
         configFilePath = ss.getFilePath();

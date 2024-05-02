@@ -867,30 +867,28 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
 int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned flags)
 {
-    //if (str.length() % 2 != 0)
-    //    throw new noteLineException;
-
-    size_t length = 0;
-
+    const size_t length = str.length();;
+    if (length / 2 == 0)
+    {
+        LOG_VERBOSE << "[BMS] Invalid string length " << str;
+        return 1;
+    }
     for (auto c : str)
     {
         if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')))
         {
-            //throw new noteLineException;
+            LOG_VERBOSE << "[BMS] Invalid symbol in string " << str;
             break;
         }
-        length++;
     }
-    if (length / 2 == 0) return 1;
 
-    unsigned resolution = static_cast<unsigned>(length / 2);
-    unsigned scale = ch.relax(resolution) / resolution;
+    const unsigned resolution = static_cast<unsigned>(length / 2);
+    const unsigned scale = ch.relax(resolution) / resolution;
     for (unsigned i = 0; i < resolution; i++)
     {
-        unsigned segment = i * scale;
-        unsigned value = base36(str[i * 2], str[i * 2 + 1]);
+        const unsigned segment = i * scale;
+        const unsigned value = base36(str[i * 2], str[i * 2 + 1]);
         if (value == 0) continue;
-
         ch.notes.push_back({ segment, value, flags });
     }
     ch.sortNotes();
@@ -900,30 +898,28 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
 
 int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
 {
-    //if (str.length() % 2 != 0)
-    //    throw new noteLineException;
-
-    size_t length = 0;
-
+    const size_t length = str.length();;
+    if (length / 2 == 0)
+    {
+        LOG_VERBOSE << "[BMS] Invalid string length " << str;
+        return 1;
+    }
     for (auto c : str)
     {
         if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
         {
-            //throw new noteLineException;
+            LOG_VERBOSE << "[BMS] Invalid symbol in string " << str;
             break;
         }
-        length++;
     }
-    if (length / 2 == 0) return 1;
 
-    unsigned resolution = static_cast<unsigned>(length / 2);
-    unsigned scale = ch.relax(resolution) / resolution;
+    const unsigned resolution = static_cast<unsigned>(length / 2);
+    const unsigned scale = ch.relax(resolution) / resolution;
     for (unsigned i = 0; i < resolution; i++)
     {
-        unsigned segment = i * scale;
-        unsigned value = base16(str[i * 2], str[i * 2 + 1]);
+        const unsigned segment = i * scale;
+        const unsigned value = base16(str[i * 2], str[i * 2 + 1]);
         if (value == 0) continue;
-
         ch.notes.push_back({ segment, value });
     }
     ch.sortNotes();
@@ -1020,26 +1016,20 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
     {
         auto getCommonLane = [](const LaneMap& ch, unsigned barIdx) -> const channel&
         {
-            if (ch.find(barIdx) != ch.end())
+            if (auto it = ch.find(barIdx); it != ch.end())
             {
-                return ch.at(barIdx);
+                return it->second;
             }
-            else
-            {
-                return emptyChannel;
-            }
+            return emptyChannel;
         };
 
         auto getNoteLane = [&](const std::map<unsigned, LaneMap>& ch, unsigned chIdx, unsigned barIdx) -> const channel&
         {
-            if (ch.find(chIdx) != ch.end())
+            if (auto it = ch.find(chIdx); it != ch.end())
             {
-                return getCommonLane(ch.at(chIdx), barIdx);
+                return getCommonLane(it->second, barIdx);
             }
-            else
-            {
-                return emptyChannel;
-            }
+            return emptyChannel;
         };
 
         using eC = LaneCode;
@@ -1070,10 +1060,9 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
 
 unsigned ChartFormatBMS::channel::relax(unsigned target_resolution)
 {
-    unsigned target = std::lcm(target_resolution, resolution);
-    unsigned pow = target / resolution;
+    const unsigned target = std::lcm(target_resolution, resolution);
+    const unsigned pow = target / resolution;
     if (pow == 1) return target;
-
     resolution = target;
     for (auto& n : notes)
     {
@@ -1084,10 +1073,9 @@ unsigned ChartFormatBMS::channel::relax(unsigned target_resolution)
 
 void ChartFormatBMS::channel::sortNotes()
 {
-    std::vector<NoteParseValue> vec(notes.begin(), notes.end());
-    std::stable_sort(vec.begin(), vec.end(), [](const NoteParseValue& lhs, const NoteParseValue& rhs)
+    // NOTE: stable_sort
+    notes.sort([](const NoteParseValue& lhs, const NoteParseValue& rhs)
         {
             return lhs.segment < rhs.segment;
         });
-    notes.assign(vec.begin(), vec.end());
 }

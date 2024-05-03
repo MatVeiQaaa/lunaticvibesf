@@ -2,8 +2,6 @@
 #include <cstdint>
 #include <memory>
 #include <array>
-#include <list>
-#include <utility>
 #include "sprite.h"
 #include "sprite_imagetext.h"
 
@@ -78,21 +76,6 @@ enum class BarRivalType : uint8_t
     RIVAL_TYPE_COUNT
 };
 
-enum class BarPartsType : uint8_t
-{
-    BODY_OFF,
-    BODY_ON,
-    TITLE,
-    FLASH,
-    LEVEL,
-    LAMP,
-    RANK,
-    RIVAL,
-    MYLAMP,
-    RIVALLAMP,
-    PARTS_TYPE_COUNT
-};
-
 enum class BarTitleType : uint8_t
 {
     NORMAL,
@@ -146,9 +129,6 @@ protected:
     size_t drawRivalLampSelfType = 0;
     size_t drawRivalLampRivalType = 0;
 
-    std::list<BarPartsType> partsOrder;
-    std::list<std::pair<BarPartsType, unsigned>> drawQueue;
-
 public:
     SpriteBarEntry(size_t idx) : SpriteBase(SpriteTypes::BAR_ENTRY, -1), index(idx) {}
     ~SpriteBarEntry() override = default;
@@ -162,8 +142,6 @@ public:
     int setRivalWinLose(BarRivalType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setRivalLampSelf(BarLampType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setRivalLampRival(BarLampType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
-
-    void pushPartsOrder(BarPartsType type);
 
 public:
     bool update(const lunaticvibes::Time& time) override;

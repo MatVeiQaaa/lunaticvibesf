@@ -152,14 +152,6 @@ int SpriteBarEntry::setRivalLampRival(BarLampType type, const SpriteAnimated::Sp
     return 0;
 }
 
-
-void SpriteBarEntry::pushPartsOrder(BarPartsType type)
-{
-    if (std::find(partsOrder.begin(), partsOrder.end(), type) == partsOrder.end())
-        partsOrder.emplace_back(type);
-}
-
-
 bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 {
     for (auto& s: sBodyOff) if (s) s->setHideInternal(true);

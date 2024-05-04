@@ -2747,21 +2747,24 @@ bool SkinLR2::DST()
                 }
             }
 
-            std::vector<dst_option> opEx;
+            std::vector<dst_option> dstOpt;
+            if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
             if (type == DefType::NUMBER)
             {
                 auto p = std::reinterpret_pointer_cast<SpriteNumber>(e);
                 switch (p->numInd)
                 {
-                case IndexNumber::MUSIC_BEGINNER_LEVEL:  opEx.push_back(dst_option::SELECT_HAVE_BEGINNER_IN_SAME_FOLDER); break;
-                case IndexNumber::MUSIC_NORMAL_LEVEL:    opEx.push_back(dst_option::SELECT_HAVE_NORMAL_IN_SAME_FOLDER);   break;
-                case IndexNumber::MUSIC_HYPER_LEVEL:     opEx.push_back(dst_option::SELECT_HAVE_HYPER_IN_SAME_FOLDER);    break;
-                case IndexNumber::MUSIC_ANOTHER_LEVEL:   opEx.push_back(dst_option::SELECT_HAVE_ANOTHER_IN_SAME_FOLDER);  break;
-                case IndexNumber::MUSIC_INSANE_LEVEL:    opEx.push_back(dst_option::SELECT_HAVE_INSANE_IN_SAME_FOLDER);   break;
+                case IndexNumber::MUSIC_BEGINNER_LEVEL:  dstOpt.push_back(dst_option::SELECT_HAVE_BEGINNER_IN_SAME_FOLDER); break;
+                case IndexNumber::MUSIC_NORMAL_LEVEL:    dstOpt.push_back(dst_option::SELECT_HAVE_NORMAL_IN_SAME_FOLDER);   break;
+                case IndexNumber::MUSIC_HYPER_LEVEL:     dstOpt.push_back(dst_option::SELECT_HAVE_HYPER_IN_SAME_FOLDER);    break;
+                case IndexNumber::MUSIC_ANOTHER_LEVEL:   dstOpt.push_back(dst_option::SELECT_HAVE_ANOTHER_IN_SAME_FOLDER);  break;
+                case IndexNumber::MUSIC_INSANE_LEVEL:    dstOpt.push_back(dst_option::SELECT_HAVE_INSANE_IN_SAME_FOLDER);   break;
                 default: break;
                 }
             }
-            drawQueue.push_back({ e, dst_option(d.op[0]), dst_option(d.op[1]), dst_option(d.op[2]), dst_option(d.op[3]), opEx });
+            drawQueue.push_back({e, dstOpt, d.op[3]});
 
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
@@ -2804,8 +2807,11 @@ ParseRet SkinLR2::DST_NOTE()
     {
         if (e->isMotionKeyFramesEmpty())
         {
-             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, dst_option(d.op[0]), dst_option(d.op[1]), dst_option(d.op[2]), dst_option(d.op[3]), {} });
+            std::vector<dst_option> dstOpt;
+            if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+            drawQueue.push_back({e, dstOpt, d.op[3]});
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
         }
@@ -2879,8 +2885,11 @@ ParseRet SkinLR2::DST_LINE()
     p->pNote->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
 
-    // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-    drawQueue.push_back({ e, dst_option(d.op[0]), dst_option(d.op[1]), dst_option(d.op[2]), dst_option(d.op[3]), {} });
+    std::vector<dst_option> dstOpt;
+    if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
+    if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
+    if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+    drawQueue.push_back({e, dstOpt, d.op[3]});
     e->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
     e->setMotionLoopTo(0);
@@ -2932,12 +2941,16 @@ ParseRet SkinLR2::DST_BAR_BODY()
             {
                 barSprites[idx]->setSrcLine(csvLineNumber);
                 barSpriteAvailable[idx] = true;
-                // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-                drawQueue.push_back({ barSprites[idx], dst_option(d.op[0]), dst_option(d.op[1]), dst_option(d.op[2]), dst_option(d.op[3]), {} });
+
+                std::vector<dst_option> dstOpt;
+                if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
+                if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
+                if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+                drawQueue.push_back({barSprites[idx], dstOpt, dst_option(d.op[3])});
             }
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -2971,7 +2984,7 @@ ParseRet SkinLR2::DST_BAR_FLASH()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3013,7 +3026,7 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3056,7 +3069,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3097,7 +3110,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3139,7 +3152,7 @@ ParseRet SkinLR2::DST_BAR_LAMP()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3181,7 +3194,7 @@ ParseRet SkinLR2::DST_BAR_TITLE()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3223,7 +3236,7 @@ ParseRet SkinLR2::DST_BAR_RANK()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -3265,7 +3278,7 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
             e->setMotionStartTimer((IndexTimer)d.timer);
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
-            drawQueue.push_back({ e, DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE, {} });
+            drawQueue.push_back({e});
         }
 
         e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
@@ -4315,20 +4328,8 @@ void SkinLR2::update()
     {
         const int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);
         const int ttAngle2P = State::get(IndexNumber::_ANGLE_TT_2P);
-        auto update_tt = [ttAngle1P, ttAngle2P](element &e) {
-            const bool hide = [&e]() {
-                if (!(getDstOpt(e.op1) && getDstOpt(e.op2) && getDstOpt(e.op3))) return true;
-
-                for (auto op : e.opEx)
-                {
-                    if (!getDstOpt(op))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }();
-            e.ps->setHideExternal(hide);
+        auto updateSprite = [ttAngle1P, ttAngle2P](element &e) {
+            e.ps->setHideExternal(std::any_of(e.dstOpt.begin(), e.dstOpt.end(), std::not_fn(&getDstOpt)));
 
             switch (e.op4)
             {
@@ -4337,7 +4338,7 @@ void SkinLR2::update()
             default: break;
             }
         };
-        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), update_tt);
+        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), updateSprite);
     }
 
     // update nowjudge/nowcombo

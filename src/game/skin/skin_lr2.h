@@ -1630,11 +1630,10 @@ protected:
     struct element
     {
         std::shared_ptr<SpriteBase> ps;
-        dst_option op1;
-        dst_option op2;
-        dst_option op3;
-        dst_option op4;
-        std::vector<dst_option> opEx;
+        // op1, op2, op3 and opEx.
+        std::vector<dst_option> dstOpt;
+        // Turntable angle. Either 1 for P1 or 2 for P2.
+        int op4;
     };
     std::vector<element> drawQueue;
 public:

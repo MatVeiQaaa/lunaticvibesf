@@ -1,0 +1,7 @@
+---
+Language:        Cpp
+BasedOnStyle: microsoft
+AccessModifierOffset: -4
+AllowShortCaseLabelsOnASingleLine: true
+PointerAlignment: Left
+QualifierAlignment: Left

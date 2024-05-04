@@ -58,17 +58,19 @@ bool getDstOpt(int d)
 	bool result = false;
 	dst_option op = (dst_option)std::abs(d);
 
-	std::shared_lock l(_mutex);
-	if (d == 9999)	// Lunatic Vibes flag
-		result = true;
-	else if (d == DST_TRUE)
+	static constexpr int is_lunatic_vibes {9999};
+	if (d == is_lunatic_vibes || d == DST_TRUE)
 		result = true;
 	else if (d == DST_FALSE)
 		result = false;
 	else if (op < 900)
-		result = _op[op];
-	else if (op >= 900) 
 	{
+		std::shared_lock l(_mutex);
+		result = _op[op];
+	}
+	else if (op >= 900)
+	{
+		std::shared_lock l(_mutex);
 		if (op > 999)
 			result = _extendedOp[op];
 		else

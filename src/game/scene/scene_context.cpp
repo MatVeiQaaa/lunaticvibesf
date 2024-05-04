@@ -665,6 +665,7 @@ void setEntryInfo()
         auto pf = std::reinterpret_pointer_cast<ChartFormatBase>(ps->_file);
 
         param["havereadme"] = true; // TODO: store readme availability in the db. pf->checkHasReadme() is too slow.
+        param["havebackbmp"] = !pf->backbmp.empty();
         param["havebanner"] = !pf->banner.empty();
         param["havestagefile"] = !pf->stagefile.empty();
 
@@ -1107,6 +1108,7 @@ void setEntryInfo()
     // save
     {
         State::set(IndexSwitch::CHART_HAVE_README, param["havereadme"]);
+        State::set(IndexSwitch::CHART_HAVE_BACKBMP, param["havebackbmp"]);
         State::set(IndexSwitch::CHART_HAVE_BANNER, param["havebanner"]);
         State::set(IndexSwitch::CHART_HAVE_STAGEFILE, param["havestagefile"]);
         State::set(IndexSwitch::CHART_HAVE_REPLAY, param["havereplay"]);

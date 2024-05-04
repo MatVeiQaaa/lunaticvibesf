@@ -72,10 +72,6 @@ bool is_euckr(const std::string_view str)
         if (c == 0x8e || c == 0x8f)
             return false;
 
-        // gbk
-        else if (0 /* nobody write bms in gbk */)
-            return false;
-
         // shared range
         else if (c >= 0xa1 && c <= 0xfe)
         {

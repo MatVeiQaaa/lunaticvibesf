@@ -738,14 +738,14 @@ Tokens SkinLR2::csvLineTokenize(const std::string& raw)
     // #ELSE
     if (res.size() == 1 && lunaticvibes::iequals(res[0], "#ELSE"))
     {
-        LOG_DEBUG << "[Skin] Ignored #ELSE without trailing comma. Line: " << csvLineNumber;
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Ignored #ELSE without trailing comma";
         res.clear();
     }
 
     // last param
     if (!res.empty() && (lunaticvibes::iequals(res[0], "#IF") || lunaticvibes::iequals(res[0], "#ELSEIF")) && res.back().length() == 1)
     {
-        LOG_DEBUG << "[Skin] Ignored last parameter with 1 character long. Don't forget the trailing comma! Line: " << csvLineNumber;
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Ignored last parameter with 1 character long. Don't forget the trailing comma!";
         res.pop_back();
     }
 
@@ -2622,7 +2622,7 @@ bool SkinLR2::DST()
         auto e = _sprites.back();
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid (Line: " << csvLineNumber << ")";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid";
             return false;
         }
 
@@ -2636,7 +2636,7 @@ bool SkinLR2::DST()
                 auto enext = gSprites[p->getMyGlobalSpriteIndex()];
                 if (enext == nullptr)
                 {
-                    LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid (Line: " << csvLineNumber << ")";
+                    LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid";
                     return false;
                 }
                 sType = enext->type();
@@ -2672,7 +2672,7 @@ bool SkinLR2::DST()
         }
         if (!typeMatch)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition type mismatch (Line: " << csvLineNumber << ")";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition type mismatch";
             return false;
         }
 
@@ -2852,21 +2852,18 @@ ParseRet SkinLR2::DST_LINE()
     auto e = _sprites.back();
     if (e == nullptr)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline SRC definition invalid " <<
-            "(Line: " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline SRC definition invalid";
         return ParseRet::SRC_DEF_INVALID;
     }
 
     if (e->type() != SpriteTypes::NOTE_VERT)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline SRC definition is not NOTE " <<
-            "(Line: " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline SRC definition is not NOTE";
         return ParseRet::SRC_DEF_WRONG_TYPE;
     }
     if (!e->isMotionKeyFramesEmpty())
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline DST is already defined " <<
-            "(Line: " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Barline DST is already defined";
         e->clearMotionKeyFrames();
     }
 
@@ -2876,8 +2873,7 @@ ParseRet SkinLR2::DST_LINE()
     const auto [cat, idx] = p->getLane();
     if (cat != chart::NoteLaneCategory::EXTRA || (idx != chart::EXTRA_BARLINE_1P && idx != chart::EXTRA_BARLINE_2P))
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous SRC definition is not LINE " <<
-            "(Line: " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous SRC definition is not LINE";
         return ParseRet::SRC_DEF_WRONG_TYPE;
     }
 
@@ -3475,15 +3471,15 @@ int SkinLR2::parseBody(const Tokens &raw)
         if (HELPFILE() != 0)
             return 9;
 
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid def \"" << parseKeyBuf << "\" (Line " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid def \"" << parseKeyBuf;
     }
     catch (const std::invalid_argument& e)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid Argument: " << "(Line " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid Argument";
     }
     catch (const std::out_of_range& e)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Out of range: " << "(Line " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Out of range";
     }
     return 0;
 }
@@ -3492,7 +3488,7 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
 {
     if (t.size() <= 1 && !matchToken(*t.begin(), "#ELSEIF") && matchToken(*t.begin(), "#ENDIF"))
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": No IF parameters, ignoring. " << " (Line " << csvLineNumber << ")";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": No IF parameters, ignoring";
         return;
     }
 

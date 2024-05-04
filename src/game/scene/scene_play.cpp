@@ -2232,18 +2232,23 @@ void ScenePlay::updatePlaying()
     // graphs
     if (rt.norm() / 500 >= (long)gPlayContext.graphGauge[PLAYER_SLOT_PLAYER].size())
     {
-        auto& g = gPlayContext.graphGauge[PLAYER_SLOT_PLAYER];
-        auto& r = gPlayContext.ruleset[PLAYER_SLOT_PLAYER];
-        int h = r->getClearHealth() * 100;
-        if (!g.empty())
-        {
-            int ch = r->getData().health * 100;
-            if ((g.back() < h && ch > h) || (g.back() > h && ch < h))
+        auto insertInterimPoints = [](unsigned playerSlot) {
+            auto& r = gPlayContext.ruleset[playerSlot];
+            assert(r != nullptr);
+            const auto h = static_cast<int>(r->getClearHealth() * 100);
+            if (auto& g = gPlayContext.graphGauge[playerSlot]; !g.empty())
             {
-                // just insert an interim point, as for a game we don't need to be too precise
-                g.push_back(h);
+                const auto ch = static_cast<int>(r->getData().health * 100);
+                if ((g.back() < h && ch > h) || (g.back() > h && ch < h))
+                {
+                    // just insert an interim point, as for a game we don't need to be too precise
+                    g.push_back(h);
+                }
             }
-        }
+        };
+        insertInterimPoints(PLAYER_SLOT_PLAYER);
+        if (!gPlayContext.isAuto && !gPlayContext.isReplay && gPlayContext.replayMybest)
+            insertInterimPoints(PLAYER_SLOT_MYBEST);
 
         pushGraphPoints();
     }

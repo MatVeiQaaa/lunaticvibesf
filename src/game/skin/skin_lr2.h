@@ -1587,7 +1587,7 @@ private:
     ParseRet SRC_NOWCOMBO2();
     ParseRet SRC_BGA();
 
-    ParseRet SRC_GAUGECHART(int player);
+    ParseRet SRC_GAUGECHART(unsigned playerSlot);
     ParseRet SRC_SCORECHART();
 
     ParseRet SRC_BAR_BODY();

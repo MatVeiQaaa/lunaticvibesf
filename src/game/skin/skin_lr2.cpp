@@ -1323,8 +1323,8 @@ bool SkinLR2::SRC()
         case DefType::NOWCOMBO_2P:    flipSide ? SRC_NOWCOMBO1() : SRC_NOWCOMBO2(); break;
         case DefType::BGA:            SRC_BGA();                 break;
         case DefType::MOUSECURSOR:    SRC_MOUSECURSOR();         break;
-        case DefType::GAUGECHART_1P:  SRC_GAUGECHART(flipSide ? 1 : 0); break;
-        case DefType::GAUGECHART_2P:  SRC_GAUGECHART(flipSide ? 0 : 1); break;
+        case DefType::GAUGECHART_1P:  SRC_GAUGECHART(flipSide ? PLAYER_SLOT_TARGET : PLAYER_SLOT_PLAYER); break;
+        case DefType::GAUGECHART_2P:  SRC_GAUGECHART(flipSide ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET); break;
         case DefType::SCORECHART:     SRC_SCORECHART();          break;
         case DefType::BAR_BODY:       SRC_BAR_BODY();            break;
         case DefType::BAR_FLASH:      SRC_BAR_FLASH();           break;
@@ -1711,13 +1711,13 @@ ParseRet SkinLR2::SRC_TEXT()
     return ParseRet::OK;
 }
 
-ParseRet SkinLR2::SRC_GAUGECHART(int player)
+ParseRet SkinLR2::SRC_GAUGECHART(unsigned playerSlot)
 {
     lr2skin::s_gaugechart d(parseParamBuf, csvLineNumber);
 
     SpriteLine::SpriteLineBuilder builder;
     builder.srcLine = csvLineNumber;
-    builder.player = player == 0 ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET;
+    builder.player = playerSlot;
     builder.canvasW = d.field_w;
     builder.canvasH = d.field_h;
     builder.start = d.start;
@@ -1728,7 +1728,7 @@ ParseRet SkinLR2::SRC_GAUGECHART(int player)
     {
     case 0: builder.lineType = LineType::GAUGE_F; break;
     case 1: builder.lineType = LineType::GAUGE_C; break;
-    default: break;
+    default: LOG_DEBUG << "[SkinLR2] Invalid _null=" << d._null;
     }
 
     _sprites.push_back(builder.build());
@@ -2664,9 +2664,9 @@ bool SkinLR2::DST()
         case DefType::NOWCOMBO_2P:   typeMatch = sType == SpriteTypes::NUMBER; break;
         case DefType::BGA:           typeMatch = sType == SpriteTypes::STATIC; break;
         case DefType::MOUSECURSOR:   typeMatch = sType == SpriteTypes::MOUSE_CURSOR; break;
-        case DefType::GAUGECHART_1P: typeMatch = sType == SpriteTypes::LINE; break;
-        case DefType::GAUGECHART_2P: typeMatch = sType == SpriteTypes::LINE; break;
-        case DefType::SCORECHART:    typeMatch = sType == SpriteTypes::LINE; break;
+        case DefType::GAUGECHART_1P:
+        case DefType::GAUGECHART_2P:
+        case DefType::SCORECHART: typeMatch = sType == SpriteTypes::LINE; break;
 
         default: break;
         }

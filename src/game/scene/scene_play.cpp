@@ -3310,11 +3310,14 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
             playerState[slot].hispeedAddPending += val;
         }
     };
-    ttUpdateSide(PLAYER_SLOT_PLAYER, S1L, S1R);
-    if (isPlaymodeDP())
-        ttUpdateSide(PLAYER_SLOT_PLAYER, S2L, S2R);
-    else if (gPlayContext.isBattle)
-        ttUpdateSide(PLAYER_SLOT_TARGET, S2L, S2R);
+    if (!gPlayContext.isAuto && !gPlayContext.isReplay && gChartContext.started)
+    {
+        ttUpdateSide(PLAYER_SLOT_PLAYER, S1L, S1R);
+        if (isPlaymodeDP())
+            ttUpdateSide(PLAYER_SLOT_PLAYER, S2L, S2R);
+        else if (gPlayContext.isBattle)
+            ttUpdateSide(PLAYER_SLOT_TARGET, S2L, S2R);
+    }
 }
 
 // CALLBACK

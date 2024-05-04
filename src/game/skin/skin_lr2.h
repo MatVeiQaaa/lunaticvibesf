@@ -1507,6 +1507,8 @@ private:
         AUTO_LN_END,
         AUTO_LN_BODY,
         AUTO_LN_START,
+
+        LRV_EXPERIMENTAL_GAUGECHART_MYBEST,
     };
 
     static inline const std::vector<std::pair<StringContent, DefType>> defTypeName =
@@ -1552,6 +1554,7 @@ private:
         {"AUTO_LN_END",    DefType::AUTO_LN_END},
         {"AUTO_LN_BODY",   DefType::AUTO_LN_BODY},
         {"AUTO_LN_START",  DefType::AUTO_LN_START},
+        {"LRV_EXPERIMENTAL_GAUGECHART_MYBEST", DefType::LRV_EXPERIMENTAL_GAUGECHART_MYBEST},
     };
 
     Path getCustomizePath(StringContentView input);

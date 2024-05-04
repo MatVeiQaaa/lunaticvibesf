@@ -1348,6 +1348,8 @@ bool SkinLR2::SRC()
         case DefType::AUTO_LN_BODY:   
         case DefType::AUTO_LN_START:  SRC_NOTE(type); break;
 
+        case DefType::LRV_EXPERIMENTAL_GAUGECHART_MYBEST: SRC_GAUGECHART(PLAYER_SLOT_MYBEST); break;
+
         case DefType::UNDEF:
         case DefType::BAR_BODY_OFF:
         case DefType::BAR_BODY_ON: break;
@@ -2666,6 +2668,7 @@ bool SkinLR2::DST()
         case DefType::MOUSECURSOR:   typeMatch = sType == SpriteTypes::MOUSE_CURSOR; break;
         case DefType::GAUGECHART_1P:
         case DefType::GAUGECHART_2P:
+        case DefType::LRV_EXPERIMENTAL_GAUGECHART_MYBEST:
         case DefType::SCORECHART: typeMatch = sType == SpriteTypes::LINE; break;
 
         case DefType::UNDEF:

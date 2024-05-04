@@ -277,7 +277,15 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 // https://hitkey.nekokan.dyndns.info/cmds.htm
                 // digits
                 if (lunaticvibes::iequals(key, "PLAYER"))
-                    player = toInt(value);
+                {
+                    // https://hitkey.nekokan.dyndns.info/cmds.htm#PLAYER
+                    if (const auto player = toInt(value); player != 1 && player != 3)
+                    {
+                        // NOTE: follows LR2, only one gauge is supported.
+                        LOG_DEBUG << "[BMS] #PLAYER " << player
+                                  << " is not supported, will guess either 1 or 3 from parsed channels instead";
+                    }
+                }
                 else if (lunaticvibes::iequals(key, "RANK"))
                 {
                     raw_rank = toInt(value);
@@ -834,10 +842,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     }
     else
     {
-        if (player == 0)
-        {
-            player = (have67_2 || haveAny_2) ? 3 : 1;
-        }
+        player = (have67_2 || haveAny_2) ? 3 : 1;
         if (have67 || have67_2)
         {
             gamemode = (player == 1 ? 7 : 14);

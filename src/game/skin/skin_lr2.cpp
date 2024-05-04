@@ -2668,7 +2668,29 @@ bool SkinLR2::DST()
         case DefType::GAUGECHART_2P:
         case DefType::SCORECHART: typeMatch = sType == SpriteTypes::LINE; break;
 
-        default: break;
+        case DefType::UNDEF:
+        case DefType::BAR_BODY:
+        case DefType::BAR_BODY_OFF:
+        case DefType::BAR_BODY_ON:
+        case DefType::BAR_FLASH:
+        case DefType::BAR_LEVEL:
+        case DefType::BAR_LAMP:
+        case DefType::BAR_TITLE:
+        case DefType::BAR_RANK:
+        case DefType::BAR_RIVAL:
+        case DefType::BAR_MY_LAMP:
+        case DefType::BAR_RIVAL_LAMP:
+        case DefType::LINE:
+        case DefType::NOTE:
+        case DefType::MINE:
+        case DefType::LN_END:
+        case DefType::LN_BODY:
+        case DefType::LN_START:
+        case DefType::AUTO_NOTE:
+        case DefType::AUTO_MINE:
+        case DefType::AUTO_LN_END:
+        case DefType::AUTO_LN_BODY:
+        case DefType::AUTO_LN_START: break;
         }
         if (!typeMatch)
         {

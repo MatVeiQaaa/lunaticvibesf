@@ -999,6 +999,8 @@ bool ScenePlay::createRuleset()
 
         // load mybest score
         auto pScore = g_pScoreDB->getChartScoreBMS(gChartContext.hash);
+        // TODO: save best score as member, set DST options 330-332, 352-354 while playing.
+        // https://github.com/chown2/lunaticvibesf/issues/15
         if (pScore)
         {
             if (!gArenaData.isOnline())

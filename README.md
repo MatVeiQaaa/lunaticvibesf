@@ -17,7 +17,7 @@ Replays set in LVF will not work in Lunatic Vibes either.
 -   Mixed skin resolution support (SD, HD, FHD, UHD)
 -   ARENA Mode over LAN / VLAN
 
-For LR2 feature compatibility list, check out [the wiki](https://github.com/yaasdf/lunaticvibes/wiki/LR2-Features-Compatibility).
+For LR2 feature compatibility list, check out [the wiki](https://github.com/chown2/lunaticvibesf/wiki/LR2-Features-Compatibility).
 
 ## Requirements
 

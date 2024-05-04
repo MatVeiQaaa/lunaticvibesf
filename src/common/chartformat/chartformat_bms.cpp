@@ -328,7 +328,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 }
                 else if (lunaticvibes::iequals(key, "BACKBMP"))
                 {
-                    // TODO: save this do the database and use it?
                     backbmp.assign(value.begin(), value.end());
                 }
                 else if (lunaticvibes::iequals(key, "COMMENT"))

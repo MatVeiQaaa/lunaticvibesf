@@ -3644,7 +3644,7 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SkinLR2::SkinLR2(const Path& p, int loadMode): loadMode(loadMode)
+SkinLR2::SkinLR2(Path p, int loadMode): loadMode(loadMode)
 {
     _version = SkinVersion::LR2beta3;
 
@@ -3664,11 +3664,11 @@ SkinLR2::SkinLR2(const Path& p, int loadMode): loadMode(loadMode)
     laneSprites.resize(chart::LANE_COUNT);
 
     updateDstOpt();
-    if (loadCSV(p))
+    if (loadCSV(std::move(p)))
     {
         postLoad();
 
-        LOG_DEBUG << "[Skin] File: " << p << "(Line " << csvLineNumber << "): Body loading finished";
+        LOG_DEBUG << "[Skin] File: " << filePath << "(Line " << csvLineNumber << "): Body loading finished";
         loaded = true;
 
         startSpriteVideoPlayback();

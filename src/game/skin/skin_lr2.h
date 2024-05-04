@@ -1404,7 +1404,7 @@ public:
 
 public:
     SkinLR2() = delete;
-    SkinLR2(const Path& p, int loadMode = 0);
+    SkinLR2(Path p, int loadMode = 0);
     ~SkinLR2() override;
 
 protected:

@@ -14,10 +14,6 @@ ChartObjectBMS::ChartObjectBMS(int slot) : ChartObjectBase(slot, BGM_LANE_COUNT,
 {
 }
 
-ChartObjectBMS::ChartObjectBMS(int slot, const std::shared_ptr<ChartFormatBMS>& b) : ChartObjectBMS(slot)
-{
-    loadBMS(*b);
-}
 ChartObjectBMS::ChartObjectBMS(int slot, const ChartFormatBMS& b) : ChartObjectBMS(slot)
 {
     loadBMS(b);

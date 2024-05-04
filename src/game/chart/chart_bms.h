@@ -40,7 +40,6 @@ public:
 public:
     ChartObjectBMS() = delete;
     ChartObjectBMS(int slot);
-    ChartObjectBMS(int slot, const std::shared_ptr<ChartFormatBMS>& bms);
     ChartObjectBMS(int slot, const ChartFormatBMS& bms);
 protected:
     void loadBMS(const ChartFormatBMS& bms);

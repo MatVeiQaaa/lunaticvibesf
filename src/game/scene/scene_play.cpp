@@ -746,15 +746,15 @@ bool ScenePlay::createChartObj()
     {
         auto bms = std::reinterpret_pointer_cast<ChartFormatBMS>(gChartContext.chart);
 
-        gPlayContext.chartObj[PLAYER_SLOT_PLAYER] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);
+        gPlayContext.chartObj[PLAYER_SLOT_PLAYER] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, *bms);
 
         if (gPlayContext.isBattle)
-            gPlayContext.chartObj[PLAYER_SLOT_TARGET] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_TARGET, bms);
+            gPlayContext.chartObj[PLAYER_SLOT_TARGET] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_TARGET, *bms);
         else
-            gPlayContext.chartObj[PLAYER_SLOT_TARGET] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);    // create for rival; loading with 1P options
+            gPlayContext.chartObj[PLAYER_SLOT_TARGET] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, *bms);    // create for rival; loading with 1P options
 
         if (gPlayContext.replayMybest)
-            gPlayContext.chartObj[PLAYER_SLOT_MYBEST] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_MYBEST, bms);
+            gPlayContext.chartObj[PLAYER_SLOT_MYBEST] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_MYBEST, *bms);
 
         if (gPlayContext.isReplay && (!gPlayContext.isBattle || State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
             itReplayCommand = gPlayContext.replay->commands.begin();

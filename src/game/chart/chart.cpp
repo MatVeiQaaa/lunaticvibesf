@@ -163,7 +163,8 @@ std::shared_ptr<ChartObjectBase> ChartObjectBase::createFromChartFormat(int slot
     case eChartFormat::BMS:
         try
         {
-            return std::static_pointer_cast<ChartObjectBase>(std::make_shared<ChartObjectBMS>(slot, std::reinterpret_pointer_cast<ChartFormatBMS>(p)));
+            return std::static_pointer_cast<ChartObjectBase>(
+                std::make_shared<ChartObjectBMS>(slot, *std::reinterpret_pointer_cast<ChartFormatBMS>(p)));
         }
         catch (std::exception& e)
         {

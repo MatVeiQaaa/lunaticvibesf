@@ -3166,7 +3166,7 @@ void SceneSelect::updatePreview()
                     _previewLoading.join();
                 _previewLoading = std::thread([&, bms] {
                     SetThreadName("PreviewSampleLoad");
-                    auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, bms);
+                    auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, *bms);
                     auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(
                         bms, previewChartObjTmp, PlayModifiers{}, bms->gamemode, RulesetBMS::JudgeDifficulty::VERYHARD,
                         0.2, RulesetBMS::PlaySide::RIVAL,

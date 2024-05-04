@@ -1459,6 +1459,7 @@ private:
     int parseHeader(const Tokens& raw);
     int parseBody(const Tokens& raw);
 
+    // Private enum, LRV internal.
     enum class DefType
     {
         UNDEF,

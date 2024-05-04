@@ -11,13 +11,14 @@ struct ColorPoint
     Color c;
 };
 
+// Private enum, LRV internal.
 enum class LineType
 {
     GAUGE_F,
     GAUGE_C,
     SCORE,
     SCORE_MYBEST,
-    SCORE_TARGET
+    SCORE_TARGET,
 };
 
 class SpriteLine : public SpriteStatic

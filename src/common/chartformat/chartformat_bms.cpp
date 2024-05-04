@@ -649,7 +649,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         {
             if (chNotesRegular.find(chIdx) == chNotesRegular.end()) continue;
 
-            std::list<size_t> modifiedChannels;
             decltype(std::declval<channel>().notes.begin()) LNhead;
             unsigned bar_head = 0;
             unsigned resolution_head = 1;
@@ -684,9 +683,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         if (!resetItNote) itPrev--;
                         chNotesRegular[chIdx][bar_curr].notes.erase(itNote);
                         itNote = resetItNote ? noteList.begin() : ++itPrev;
-
-                        modifiedChannels.push_back(bar_head);
-                        modifiedChannels.push_back(bar_curr);
 
                         bar_head = 0;
                         resolution_head = 1;

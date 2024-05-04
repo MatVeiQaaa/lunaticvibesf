@@ -36,11 +36,7 @@ std::optional<RulesetBMS::JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(
 
 bool ChartFormatBMS::getExtendedProperty(const std::string& key, void* ret)
 {
-    if (lunaticvibes::iequals(key, "PLAYER"))
-    {
-        *(int*)ret = player;
-    }
-    else if (lunaticvibes::iequals(key, "TOTAL"))
+    if (lunaticvibes::iequals(key, "TOTAL"))
     {
         *(int*)ret = total;
     }

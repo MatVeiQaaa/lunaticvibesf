@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <iomanip>
 #include <string>
 #include <thread>
 
@@ -129,8 +130,8 @@ const char* safe_strerror(const int errnum, char* buffer, const size_t buffer_le
 
 bool lunaticvibes::open(const std::string& link)
 {
-    // FIXME: escape quotes.
-    const std::string s = (boost::format("xdg-open \"%s\"") % link).str();
+    // SAFETY: quotes are escaped so that `/tmp";echo pwned"` doesn't hack the system.
+    const std::string s = (boost::format("xdg-open %s") % std::quoted(link)).str();
     // TODO: make it non-blocking.
     int ret = system(s.c_str());
     if (ret != 0)

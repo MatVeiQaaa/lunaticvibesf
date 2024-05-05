@@ -248,40 +248,20 @@ bool SpriteLine::update(const lunaticvibes::Time& t)
         switch (_ltype)
         {
         case LineType::GAUGE_F:
-            if (_player == PLAYER_SLOT_MYBEST)
-            {
-                // LRV extension.
-                _current.color.r = 0;
-                _current.color.g = 0;
-                _current.color.b = 255;
-            }
-            else
-            {
-                _current.color.r = 0;
-                _current.color.b = 0;
-            }
+            _current.color.r = 0;
+            _current.color.b = 0;
             break;
 
         case LineType::GAUGE_C:
-            if (_player == PLAYER_SLOT_MYBEST)
+            switch (gPlayContext.mods[_player].gauge)
             {
-                // LRV extension.
-                _current.color.r = 0;
-                _current.color.g = 0;
-                _current.color.b = 255;
+            case PlayModifierGaugeType::EXHARD:
+            case PlayModifierGaugeType::DEATH:
+            case PlayModifierGaugeType::GRADE_HARD:
+            case PlayModifierGaugeType::GRADE_DEATH: _current.color.g = _current.color.r; break;
+            default: _current.color.g = 0; break;
             }
-            else
-            {
-                switch (gPlayContext.mods[_player].gauge)
-                {
-                case PlayModifierGaugeType::EXHARD:
-                case PlayModifierGaugeType::DEATH:
-                case PlayModifierGaugeType::GRADE_HARD:
-                case PlayModifierGaugeType::GRADE_DEATH: _current.color.g = _current.color.r; break;
-                default: _current.color.g = 0; break;
-                }
-                _current.color.b = 0;
-            }
+            _current.color.b = 0;
             break;
 
         case LineType::SCORE:

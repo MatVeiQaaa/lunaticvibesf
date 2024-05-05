@@ -310,7 +310,7 @@ private:
 protected:
     IndexText textInd;
     // Which line to start drawing from.
-    IndexNumber _lrvLineIdx;
+    IndexNumber _lvfLineIdx;
 	TextAlign align;
     bool editable = false;
 
@@ -329,7 +329,7 @@ public:
     {
         std::shared_ptr<TTFFont> font = nullptr;
         IndexText textInd = IndexText::INVALID;
-        IndexNumber lrvLineIdx = IndexNumber::ZERO;
+        IndexNumber lvfLineIdx = IndexNumber::ZERO;
         TextAlign align = TEXT_ALIGN_LEFT;
         unsigned ptsize = 72;
         Color color = 0xffffffff;

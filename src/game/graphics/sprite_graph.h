@@ -11,7 +11,7 @@ struct ColorPoint
     Color c;
 };
 
-// Private enum, LRV internal.
+// Private enum, LVF internal.
 enum class LineType
 {
     GAUGE_F,

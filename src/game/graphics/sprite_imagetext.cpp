@@ -149,7 +149,7 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
     _draw = updateMotion(t);
     if (_draw)
     {
-        updateTextTexture(State::get(textInd), State::get(_lrvLineIdx));
+        updateTextTexture(State::get(textInd), State::get(_lvfLineIdx));
         if (_draw) updateTextRect();
     }
     return _draw;

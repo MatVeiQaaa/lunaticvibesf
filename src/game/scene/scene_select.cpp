@@ -547,8 +547,8 @@ void SceneSelect::closeReadme(const lunaticvibes::Time& closing_time)
     }
     pSkin->setHandleMouseEvents(true);
     state = eSelectState::SELECT;
-    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
-    State::set(IndexText::LRV_INTERNAL_README, {});
+    State::set(IndexNumber::LVF_INTERNAL_README_LINE, 0);
+    State::set(IndexText::LVF_INTERNAL_README, {});
     State::set(IndexTimer::README_START, TIMER_NEVER);
     State::set(IndexTimer::README_END, closing_time.norm());
 }
@@ -563,8 +563,8 @@ void SceneSelect::openReadme(const lunaticvibes::Time& open_time, std::string_vi
     }
     pSkin->setHandleMouseEvents(false);
     state = eSelectState::WATCHING_README;
-    State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
-    State::set(IndexText::LRV_INTERNAL_README, text);
+    State::set(IndexNumber::LVF_INTERNAL_README_LINE, 0);
+    State::set(IndexText::LVF_INTERNAL_README, text);
     State::set(IndexTimer::README_START, open_time.norm());
     State::set(IndexTimer::README_END, TIMER_NEVER);
 }
@@ -1909,20 +1909,20 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     }
     if (input[Input::Pad::MWHEELUP])
     {
-        const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
+        const int current_line = State::get(IndexNumber::LVF_INTERNAL_README_LINE);
         if (current_line < lines_per_scroll)
-            State::set(IndexNumber::LRV_INTERNAL_README_LINE, 0);
+            State::set(IndexNumber::LVF_INTERNAL_README_LINE, 0);
         else
-            State::set(IndexNumber::LRV_INTERNAL_README_LINE, current_line - lines_per_scroll);
+            State::set(IndexNumber::LVF_INTERNAL_README_LINE, current_line - lines_per_scroll);
         return;
     }
     if (input[Input::Pad::MWHEELDOWN])
     {
-        const auto helpfile = State::get(IndexText::LRV_INTERNAL_README);
+        const auto helpfile = State::get(IndexText::LVF_INTERNAL_README);
         const auto max_lines = static_cast<int>(std::count(helpfile.begin(), helpfile.end(), '\n'));
-        const int current_line = State::get(IndexNumber::LRV_INTERNAL_README_LINE);
+        const int current_line = State::get(IndexNumber::LVF_INTERNAL_README_LINE);
         if (current_line <= max_lines)
-            State::set(IndexNumber::LRV_INTERNAL_README_LINE, std::min(current_line + lines_per_scroll, max_lines));
+            State::set(IndexNumber::LVF_INTERNAL_README_LINE, std::min(current_line + lines_per_scroll, max_lines));
         return;
     }
 }

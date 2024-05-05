@@ -184,7 +184,7 @@ enum class IndexText: unsigned
 
         _TEST1 = 250,
         _TEST2,
-        LRV_INTERNAL_README,
+        LVF_INTERNAL_README,
 
         ARENA_LOBBY_STATUS = 260,
         ARENA_PLAYER_NAME_1 = 261,

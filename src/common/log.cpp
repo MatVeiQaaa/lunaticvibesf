@@ -43,19 +43,20 @@ namespace plog
 static std::shared_ptr<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>> pConsoleAppender;
 static std::shared_ptr<plog::RollingFileAppender<plog::TxtFormatterFileLine>> pTxtAppender;
 
-int InitLogger()
+namespace lunaticvibes {
+
+void InitLogger(const char* logFileName)
 {
     pConsoleAppender = std::make_shared<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>>();
     plog::init(plog::info, pConsoleAppender.get());
 
-    pTxtAppender =
-        std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>("LunaticVibesF.log", 1000000, 5);
-    plog::get()->addAppender(pTxtAppender.get());
-
-    return 0;
+    if (logFileName != nullptr)
+    {
+        pTxtAppender =
+            std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>(logFileName, 1000000, 5);
+        plog::get()->addAppender(pTxtAppender.get());
+    }
 }
-
-namespace lunaticvibes {
 
 static plog::Severity plogSeverityFromLogLevel(const LogLevel level)
 {
@@ -94,10 +95,3 @@ void SetLogLevel(const LogLevel level)
 }
 
 } // namespace lunaticvibes
-
-int FreeLogger()
-{
-    pTxtAppender.reset();
-    pConsoleAppender.reset();
-    return 0;
-}

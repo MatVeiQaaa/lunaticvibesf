@@ -17,8 +17,8 @@ int main(int argc, char** argv)
 
     SetThreadAsMainThread();
 
-    auto appender = plog::ColorConsoleAppender<plog::TxtFormatterImpl<false>>();
-    plog::init(plog::verbose, &appender);
+    lunaticvibes::InitLogger("apptest.log");
+    lunaticvibes::SetLogLevel(lunaticvibes::LogLevel::Verbose);
 
     ConfigMgr::init();
     ConfigMgr::load();

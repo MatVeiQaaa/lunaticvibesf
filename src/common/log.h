@@ -5,10 +5,9 @@
 #define PLOG_CAPTURE_FILE
 #include <plog/Log.h> // IWYU pragma: export
 
-int InitLogger();
-int FreeLogger();
-
 namespace lunaticvibes {
+
+void InitLogger(const char* logFileName);
 
 enum class LogLevel
 {

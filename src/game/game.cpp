@@ -49,8 +49,7 @@ int main(int argc, char* argv[])
     executablePath = GetExecutablePath();
     fs::current_path(executablePath);
 
-    // init logger
-    InitLogger();
+    lunaticvibes::InitLogger("LunaticVibesF.log");
 
     // init curl
     LOG_INFO << "Initializing libcurl...";

@@ -624,6 +624,31 @@ void SceneSelect::openHelpFile(const lunaticvibes::Time& open_time, size_t idx)
     openReadme(open_time, help_files[idx]);
 }
 
+void SceneSelect::enterEntry(const eEntryType type, const lunaticvibes::Time t)
+{
+    switch (type)
+    {
+    case eEntryType::FOLDER:
+    case eEntryType::CUSTOM_FOLDER:
+    case eEntryType::COURSE_FOLDER:
+    case eEntryType::NEW_SONG_FOLDER:
+    case eEntryType::ARENA_FOLDER: navigateEnter(t); break;
+    case eEntryType::SONG:
+    case eEntryType::CHART:
+    case eEntryType::RIVAL_SONG:
+    case eEntryType::RIVAL_CHART:
+    case eEntryType::COURSE: decide(); break;
+    case eEntryType::ARENA_COMMAND: arenaCommand(); break;
+    case eEntryType::ARENA_LOBBY: // TODO(rustbell): enter ARENA_LOBBY
+    case eEntryType::UNKNOWN:
+    case eEntryType::RIVAL:
+    case eEntryType::NEW_COURSE:
+    case eEntryType::RANDOM_COURSE:
+    case eEntryType::CHART_LINK:
+    case eEntryType::REPLAY: break;
+    }
+}
+
 void SceneSelect::_updateAsync()
 {
     if (gNextScene != SceneType::SELECT) return;
@@ -688,36 +713,7 @@ void SceneSelect::_updateAsync()
     if (gSelectContext.cursorEnterPending)
     {
         gSelectContext.cursorEnterPending = false;
-
-        switch (gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type())
-        {
-        case eEntryType::FOLDER:
-        case eEntryType::CUSTOM_FOLDER:
-        case eEntryType::COURSE_FOLDER:
-        case eEntryType::NEW_SONG_FOLDER:
-        case eEntryType::ARENA_FOLDER:
-            navigateEnter(t);
-            break;
-
-        case eEntryType::SONG:
-        case eEntryType::CHART:
-        case eEntryType::RIVAL_SONG:
-        case eEntryType::RIVAL_CHART:
-        case eEntryType::COURSE:
-            decide();
-            break;
-
-        case eEntryType::ARENA_COMMAND:
-            arenaCommand();
-            break;
-
-        case eEntryType::ARENA_LOBBY:
-            // TODO enter ARENA_LOBBY
-            break;
-
-        default:
-            break;
-        }
+        enterEntry(gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type(), t);
     }
     if (gSelectContext.cursorClickScroll != 0)
     {
@@ -1570,28 +1566,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
     {
         if ((bindings9K && (input & INPUT_MASK_DECIDE_9K).any()) || (!bindings9K && (input & INPUT_MASK_DECIDE).any()))
         {
-            switch (gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type())
-            {
-            case eEntryType::FOLDER:
-            case eEntryType::CUSTOM_FOLDER:
-            case eEntryType::COURSE_FOLDER:
-            case eEntryType::NEW_SONG_FOLDER:
-            case eEntryType::ARENA_FOLDER:
-                return navigateEnter(t);
-
-            case eEntryType::SONG:
-            case eEntryType::CHART:
-            case eEntryType::RIVAL_SONG:
-            case eEntryType::RIVAL_CHART:
-            case eEntryType::COURSE:
-                return decide();
-
-            case eEntryType::ARENA_COMMAND:
-                return arenaCommand();
-
-            default:
-                break;
-            }
+            enterEntry(gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type(), t);
         }
         if ((bindings9K && (input & INPUT_MASK_CANCEL_9K).any()) || (!bindings9K && (input & INPUT_MASK_CANCEL).any()))
             return navigateBack(t);

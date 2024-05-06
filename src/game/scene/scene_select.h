@@ -129,6 +129,9 @@ private:
     void inputGamePressReadme(InputMask&, const lunaticvibes::Time&);
 
 private:
+    void enterEntry(const eEntryType type, const lunaticvibes::Time t);
+
+private:
     void navigateUpBy1(const lunaticvibes::Time& t);
     void navigateDownBy1(const lunaticvibes::Time& t);
     void navigateEnter(const lunaticvibes::Time& t);

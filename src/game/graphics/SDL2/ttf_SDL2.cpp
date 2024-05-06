@@ -43,7 +43,7 @@ void TTFFont::setStyle(TTFStyle style)
     case TTFStyle::Normal: TTF_SetFontStyle(_pFont, TTF_STYLE_NORMAL); break;
     case TTFStyle::Bold: TTF_SetFontStyle(_pFont, TTF_STYLE_BOLD); break;
     case TTFStyle::Italic: TTF_SetFontStyle(_pFont, TTF_STYLE_ITALIC); break;
-    case TTFStyle::_BI: TTF_SetFontStyle(_pFont, TTF_STYLE_BOLD | TTF_STYLE_ITALIC); break;
+    case TTFStyle::BoldItalic: TTF_SetFontStyle(_pFont, TTF_STYLE_BOLD | TTF_STYLE_ITALIC); break;
     }
 }
 void TTFFont::setOutline(int width, const Color& c)
@@ -82,7 +82,7 @@ void TTFFont::setHinting(TTFHinting mode)
     case TTFHinting::Normal:    TTF_SetFontHinting(_pFont, TTF_HINTING_NORMAL); break;
     case TTFHinting::Light:     TTF_SetFontHinting(_pFont, TTF_HINTING_LIGHT);  break;
     case TTFHinting::Mono:      TTF_SetFontHinting(_pFont, TTF_HINTING_MONO);   break;
-    case TTFHinting::None_:      TTF_SetFontHinting(_pFont, TTF_HINTING_NONE);   break;
+    case TTFHinting::None_:     TTF_SetFontHinting(_pFont, TTF_HINTING_NONE);   break;
     }
 }
 void TTFFont::setKerning(bool enabled)

@@ -42,7 +42,7 @@ enum class TTFStyle
     Normal,
     Bold,
     Italic,
-    _BI,
+    BoldItalic,
 };
 
 enum class TTFHinting
@@ -50,7 +50,7 @@ enum class TTFHinting
     Normal,
     Light,
     Mono,
-    // FIXME: something somewhere has #define None ... ?
+    // When building on Linux something somewhere has `#define None`.
     None_,
 };
 

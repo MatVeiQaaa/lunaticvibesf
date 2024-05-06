@@ -4044,10 +4044,10 @@ void SkinLR2::postLoad()
                 pS->setAvailable(true);
             }
         }
-        // TODO: is this needed with setLaneHeight below?
-        // set note area height
         else if (auto pS = std::dynamic_pointer_cast<SpriteLaneVertical>(s); pS != nullptr)
         {
+            // Fallback note area height. This should not normally be needed with setLaneHeight below. Does this
+            // actually fix any skins?
             pS->setHeight(500);
         }
         else if (auto pS = std::dynamic_pointer_cast<SpriteImageText>(s); pS != nullptr)

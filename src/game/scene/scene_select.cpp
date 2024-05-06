@@ -2818,6 +2818,8 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
     const auto entryType = entry->type();
     const auto& entryHash = entry->md5;
 
+    // TODO: only allow deleting specific scores, when score view is available.
+    // https://github.com/chown2/lunaticvibesf/issues/107
     switch (entryType)
     {
     case eEntryType::CHART:

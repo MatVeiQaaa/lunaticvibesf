@@ -777,6 +777,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         _lastNoteJudge[slot] = judge;
     }
 
+    std::unique_lock l{gPlayContext._mutex};
     // push replay command
     if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
     {
@@ -827,6 +828,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
 
             _lastNoteJudge = {{JudgeArea::MINE_KPOOR, t.norm()}};
 
+            std::unique_lock l{gPlayContext._mutex};
             // push replay command
             if (gChartContext.started && gPlayContext.replayNew)
             {
@@ -860,6 +862,8 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 _lastNoteJudge[slot].area = _lnJudge[idx];
                 _lastNoteJudge[slot].time = 0;
 
+                {
+                std::unique_lock l{gPlayContext._mutex};
                 // push replay command
                 if (gChartContext.started && gPlayContext.replayNew)
                 {
@@ -871,6 +875,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                         cmd.type = judgeAreaReplayCommandType[slot].at(_lnJudge[idx]);
                         gPlayContext.replayNew->commands.push_back(cmd);
                     }
+                }
                 }
 
                 _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
@@ -949,6 +954,7 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
         break;
     }
 
+    std::unique_lock l{gPlayContext._mutex};
     // push replay command
     if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
     {
@@ -1371,6 +1377,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                             _lastNoteJudge[slot].area = JudgeArea::MISS;
                             _lastNoteJudge[slot].time = latePoorWindow;
 
+                            std::unique_lock l{gPlayContext._mutex};
                             // push replay command
                             if (gChartContext.started && gPlayContext.replayNew)
                             {
@@ -1416,6 +1423,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                     _lastNoteJudge[slot].area = JudgeArea::MISS;
                                     _lastNoteJudge[slot].time = hitTime;
 
+                                    std::unique_lock l{gPlayContext._mutex};
                                     // push replay command
                                     if (gChartContext.started && gPlayContext.replayNew)
                                     {

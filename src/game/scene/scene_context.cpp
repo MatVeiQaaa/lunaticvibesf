@@ -96,6 +96,7 @@ void clearContextPlayForRetry()
             gPlayContext.ruleset[i].reset();
     }
 
+    std::unique_lock l{gPlayContext._mutex};
     gPlayContext.replayNew.reset();
 
 }

@@ -938,6 +938,8 @@ bool ScenePlay::createRuleset()
             }
         }
 
+        {
+        std::unique_lock l{gPlayContext._mutex};
         if (!gPlayContext.isAuto && !gPlayContext.isReplay &&
             (!gPlayContext.isBattle || (gPlayContext.replay && State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST)))
         {
@@ -957,6 +959,7 @@ bool ScenePlay::createRuleset()
                 gPlayContext.replayNew->pitchValue = (int8_t)std::round((State::get(IndexSlider::PITCH) - 0.5) * 2 * 12);
             }
             gPlayContext.replayNew->DPFlip = gPlayContext.mods[PLAYER_SLOT_PLAYER].DPFlip;
+        }
         }
 
         if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr && !gPlayContext.isBattle)
@@ -1367,6 +1370,8 @@ void ScenePlay::_updateAsync()
     // absolute axis scratch
     updateAsyncAbsoluteAxis(t);
 
+    {
+    std::unique_lock l{gPlayContext._mutex};
     // record 
     if (gChartContext.started && gPlayContext.replayNew)
     {
@@ -1387,6 +1392,7 @@ void ScenePlay::_updateAsync()
         {
             gPlayContext.replayNew->commands.push_back({ int64_t(ms), ReplayChart::Commands::Type::LANECOVER_ENABLE, double(int(State::get(IndexSwitch::P1_LANECOVER_ENABLED))) });
         }
+    }
     }
 
     // adjust lanecover display
@@ -1805,6 +1811,8 @@ void ScenePlay::updateAsyncAbsoluteAxis(const lunaticvibes::Time& t)
             }
         }
 
+        {
+        std::unique_lock l{gPlayContext._mutex};
         // push replay command
         if (gChartContext.started && gPlayContext.replayNew)
         {
@@ -1850,6 +1858,7 @@ void ScenePlay::updateAsyncAbsoluteAxis(const lunaticvibes::Time& t)
                     }
                 }
             }
+        }
         }
 
         if (axisDir != AxisDir::AXIS_NONE && playerState[slot].scratchDirection != axisDir)
@@ -1993,12 +2002,15 @@ void ScenePlay::updateLoadEnd()
         State::set(IndexTimer::PLAY_START, t.norm());
         setInputJudgeCallback();
 		gChartContext.started = true;
+        {
+        std::unique_lock l{gPlayContext._mutex};
         if (gPlayContext.replayNew)
         {
             gPlayContext.replayNew->hispeed = gPlayContext.playerState[PLAYER_SLOT_PLAYER].hispeed;
             gPlayContext.replayNew->lanecoverTop = State::get(IndexNumber::LANECOVER_TOP_1P);
             gPlayContext.replayNew->lanecoverBottom = State::get(IndexNumber::LANECOVER_BOTTOM_1P);
             gPlayContext.replayNew->lanecoverEnabled = State::get(IndexSwitch::P1_LANECOVER_ENABLED);
+        }
         }
         state = ePlayState::PLAYING;
         LOG_DEBUG << "[Play] State changed to PLAY_START";
@@ -2897,10 +2909,13 @@ void ScenePlay::requestExit()
                 g_pArenaHost->setPlayingFinished();
         }
 
+        {
+        std::unique_lock l{gPlayContext._mutex};
         if (gPlayContext.replayNew)
         {
             long long ms = t.norm() - State::get(IndexTimer::PLAY_START);
             gPlayContext.replayNew->commands.push_back({ ms, ReplayChart::Commands::Type::ESC, 0 });
+        }
         }
 
         pushGraphPoints();
@@ -2997,6 +3012,9 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         inputGamePressTimer(input, t);
         inputGamePressPlayKeysounds(input, t);
     }
+
+    {
+    std::unique_lock l{gPlayContext._mutex};
     if (gChartContext.started && gPlayContext.replayNew)
     {
         long long ms = t.norm() - State::get(IndexTimer::PLAY_START);
@@ -3023,6 +3041,7 @@ void ScenePlay::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
                 }
             }
         }
+    }
     }
 
     bool pressedStart[2]{ input[K1START], input[K2START] };
@@ -3330,7 +3349,8 @@ void ScenePlay::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
     {
         inputGameReleaseTimer(input, t);
     }
-    
+
+    std::unique_lock l{gPlayContext._mutex};
     if (gChartContext.started && gPlayContext.replayNew)
     {
         long long ms = t.norm() - State::get(IndexTimer::PLAY_START);

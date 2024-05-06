@@ -380,6 +380,7 @@ void SceneResult::updateFadeout()
         // save replay
         if (saveScore)
         {
+            std::unique_lock l{gPlayContext._mutex};
             gPlayContext.replayNew->saveFile(replayPath);
         }
         // save score

@@ -418,13 +418,13 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
     {
         switch (_format->type())
         {
-        case eChartFormat::BMS:
-            _format->getExtendedProperty("TOTAL", (void*)&total);
+        case eChartFormat::BMS: {
+            auto bms = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(_format);
+            total = bms->total;
             break;
-
-        case eChartFormat::BMSON:
-        default:
-            break;
+        }
+        case eChartFormat::UNKNOWN:
+        case eChartFormat::BMSON: break;
         }
     }
     // NOTE: LR2 handles #TOTAL 0 as if total was not set.

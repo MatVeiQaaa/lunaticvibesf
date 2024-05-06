@@ -34,19 +34,6 @@ std::optional<RulesetBMS::JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(
     abort(); // unreachable.
 }
 
-bool ChartFormatBMS::getExtendedProperty(const std::string& key, void* ret)
-{
-    if (lunaticvibes::iequals(key, "TOTAL"))
-    {
-        *(int*)ret = total;
-    }
-    else
-    {
-        return false;
-    }
-    return true;
-}
-
 ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta() {
     wavFiles.resize(MAXSAMPLEIDX + 1);
     bgaFiles.resize(MAXSAMPLEIDX + 1);

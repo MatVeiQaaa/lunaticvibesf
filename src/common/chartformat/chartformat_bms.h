@@ -115,9 +115,6 @@ class ChartFormatBMS: public ChartFormatBMSMeta
     friend class SongDB;
 
 public:
-    bool getExtendedProperty(const std::string& key, void* ret) override;
-
-public:
     ChartFormatBMS();
     ChartFormatBMS(const Path& absolutePath, uint64_t randomSeed = 0);
     ~ChartFormatBMS() override = default;

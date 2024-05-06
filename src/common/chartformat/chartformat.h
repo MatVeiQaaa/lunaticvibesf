@@ -90,6 +90,4 @@ public:
 
 public:
     Path getDirectory() const;
-
-    virtual bool getExtendedProperty(const StringContent& key, void* ret) { return false; }
 };

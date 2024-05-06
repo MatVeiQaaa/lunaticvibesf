@@ -220,8 +220,8 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
             {eEntryType::ARENA_LOBBY, (size_t)BarType::SONG},
         };
         size_t barTypeIdx = (size_t)BarType::SONG;
-        if (BAR_TYPE_MAP.find(pEntry->type()) != BAR_TYPE_MAP.end())
-            barTypeIdx = BAR_TYPE_MAP.at(pEntry->type());
+        if (auto it = BAR_TYPE_MAP.find(pEntry->type()); it != BAR_TYPE_MAP.end())
+            barTypeIdx = it->second;
         if (isNewEntry && (BarType)barTypeIdx == BarType::SONG)
         {
             barTypeIdx = (size_t)BarType::NEW_SONG;

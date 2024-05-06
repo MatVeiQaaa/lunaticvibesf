@@ -3030,21 +3030,20 @@ static constexpr int STANDALONE_PREVIEW_SAMPLE_INDEX = 0;
 
 bool tryLoadDedicatedPreview(ChartFormatBMS& bms)
 {
-    for (auto &[key, val] : bms.extraCommands)
+    if (!bms.dedicatedPreview.empty())
     {
-        if (!lunaticvibes::iequals(key, "PREVIEW") || val.empty())
-            continue;
-
-        Path pWav = PathFromUTF8(val);
+        Path pWav = PathFromUTF8(bms.dedicatedPreview);
         if (pWav.is_absolute())
         {
             LOG_WARNING << "[Select] #PREVIEW contains absolute path, this is forbidden";
-            continue;
         }
-        pWav = bms.getDirectory() / pWav;
-        if (SoundMgr::loadNoteSample(pWav, STANDALONE_PREVIEW_SAMPLE_INDEX) == 0)
-            return true;
-        // TODO: else: warn
+        else
+        {
+            pWav = bms.getDirectory() / pWav;
+            if (SoundMgr::loadNoteSample(pWav, STANDALONE_PREVIEW_SAMPLE_INDEX) == 0)
+                return true;
+            LOG_WARNING << "[Select] Failed to load #PREVIEW sample (" << pWav << ")";
+        }
     }
 
     // check if preview(*).ogg is valid

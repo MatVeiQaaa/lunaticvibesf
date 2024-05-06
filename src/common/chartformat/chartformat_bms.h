@@ -72,8 +72,9 @@ public:
     int raw_rank = -1;
     int total = -1;
     double bpm = 130.0;
-    std::map<std::string, StringContent> extraCommands;
     std::optional<RulesetBMS::JudgeDifficulty> rank;
+
+    StringContent dedicatedPreview;
 
     // File assigned by the BMS file.
     // Ported to super class

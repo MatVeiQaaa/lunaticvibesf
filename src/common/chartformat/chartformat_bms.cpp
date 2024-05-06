@@ -319,7 +319,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     banner.assign(value.begin(), value.end());
                 else if (lunaticvibes::iequals(key, "PREVIEW"))
                 {
-                    // TODO: parse it here and use it directly instead of using extraCommands.
+                    dedicatedPreview.assign(value.begin(), value.end());
                 }
                 else if (lunaticvibes::iequals(key, "BACKBMP"))
                 {
@@ -381,7 +381,6 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 else
                 {
                     LOG_DEBUG << "[BMS] Unknown command key='" << key << "' value='" << value << "'";
-                    extraCommands[std::string(key)] = StringContent(value.begin(), value.end());
                 }
             }
             else // #zzzxy:......

@@ -218,6 +218,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
             {eEntryType::ARENA_FOLDER, (size_t)BarType::RIVAL},
             {eEntryType::ARENA_COMMAND, (size_t)BarType::RIVAL},
             {eEntryType::ARENA_LOBBY, (size_t)BarType::SONG},
+            {eEntryType::RANDOM_CHART, (size_t)BarType::CUSTOM_FOLDER},
         };
         size_t barTypeIdx = (size_t)BarType::SONG;
         if (auto it = BAR_TYPE_MAP.find(pEntry->type()); it != BAR_TYPE_MAP.end())

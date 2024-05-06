@@ -16,6 +16,7 @@ add_library(common STATIC
     chartformat/chartformat.cpp
     chartformat/chartformat_bms.cpp
     entry/entry_folder.cpp
+    entry/entry_random_song.cpp
     entry/entry_song.cpp
     difficultytable/difficultytable.cpp
     difficultytable/table_bms.cpp

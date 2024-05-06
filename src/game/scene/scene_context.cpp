@@ -645,12 +645,10 @@ void setBarInfo()
     }
 }
 
-void setEntryInfo()
+void setEntryInfo(const size_t idx)
 {
     const EntryList& e = gSelectContext.entries;
     if (e.empty()) return;
-
-    const size_t idx = gSelectContext.selectedEntryIndex;
 
     std::map<std::string, int> param;
     std::map<std::string, double> paramf;
@@ -940,7 +938,8 @@ void setEntryInfo()
         case eEntryType::COURSE:
         case eEntryType::RANDOM_COURSE:
         case eEntryType::CHART_LINK:
-        case eEntryType::REPLAY: break;
+        case eEntryType::REPLAY:
+        case eEntryType::RANDOM_CHART: break;
         }
     }
 
@@ -1240,6 +1239,11 @@ void setEntryInfo()
     setPlayModeInfo();
 }
 
+void setEntryInfo()
+{
+    setEntryInfo(gSelectContext.selectedEntryIndex);
+}
+
 void setPlayModeInfo()
 {
     bool isModeDP = false;
@@ -1459,20 +1463,21 @@ void setDynamicTextures()
     }
     break;
 
-    case UNKNOWN:
-    case NEW_SONG_FOLDER:
-    case FOLDER:
-    case CUSTOM_FOLDER:
-    case COURSE_FOLDER:
-    case RIVAL:
-    case NEW_COURSE:
-    case COURSE:
-    case RANDOM_COURSE:
-    case ARENA_FOLDER:
-    case ARENA_COMMAND:
-    case ARENA_LOBBY:
-    case CHART_LINK:
-    case REPLAY: break;
+    case eEntryType::UNKNOWN:
+    case eEntryType::NEW_SONG_FOLDER:
+    case eEntryType::FOLDER:
+    case eEntryType::CUSTOM_FOLDER:
+    case eEntryType::COURSE_FOLDER:
+    case eEntryType::RIVAL:
+    case eEntryType::NEW_COURSE:
+    case eEntryType::COURSE:
+    case eEntryType::RANDOM_COURSE:
+    case eEntryType::ARENA_FOLDER:
+    case eEntryType::ARENA_COMMAND:
+    case eEntryType::ARENA_LOBBY:
+    case eEntryType::CHART_LINK:
+    case eEntryType::REPLAY:
+    case eEntryType::RANDOM_CHART: break;
     }
 }
 

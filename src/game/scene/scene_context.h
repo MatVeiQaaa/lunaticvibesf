@@ -219,6 +219,7 @@ void updateEntryScore(size_t idx);
 void sortSongList();
 void setBarInfo();
 void setEntryInfo();
+void setEntryInfo(size_t idx);
 void setPlayModeInfo();
 void switchVersion(unsigned difficulty);
 

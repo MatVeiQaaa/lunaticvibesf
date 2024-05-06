@@ -5,7 +5,7 @@
 #include "common/types.h"
 #include "common/hash.h"
 
-enum eEntryType
+enum class eEntryType
 {
     UNKNOWN,
     NEW_SONG_FOLDER,
@@ -14,6 +14,7 @@ enum eEntryType
     CHART,  // one chart in folder
     CUSTOM_FOLDER,
     COURSE_FOLDER,
+    RANDOM_CHART,
     RIVAL,
     RIVAL_SONG,
     RIVAL_CHART,
@@ -39,6 +40,7 @@ public:
     virtual ~EntryBase() = default;
 
 public:
+    // Used to uniquely identify this entry in the list.
     HashMD5 md5;
     StringContent _name;
     StringContent _name2;

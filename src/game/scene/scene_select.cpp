@@ -2,11 +2,15 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <random>
 #include <shared_mutex>
 #include <string_view>
+#include <tuple>
 #include <variant>
 
 #include "common/chartformat/chartformat_types.h"
+#include "common/entry/entry.h"
+#include "common/entry/entry_random_song.h"
 #include "common/entry/entry_song.h"
 #include "common/entry/entry_types.h"
 #include "common/utils.h"
@@ -359,7 +363,8 @@ SceneSelect::SceneSelect() : SceneBase(SkinType::MUSIC_SELECT, 250)
 
     gSelectContext.lastLaneEffectType1P = State::get(IndexOption::PLAY_LANE_EFFECT_TYPE_1P);
 
-    if (!gSelectContext.entries.empty())
+    if (!gSelectContext.entries.empty() && gSelectContext.entries[gSelectContext.selectedEntryIndex].first &&
+        gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type() != eEntryType::RANDOM_CHART)
     {
         // delay sorting chart list after playing
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
@@ -600,6 +605,7 @@ void SceneSelect::openChartReadme(const lunaticvibes::Time& open_time)
         case eEntryType::ARENA_LOBBY:
         case eEntryType::CHART_LINK:
         case eEntryType::REPLAY:
+        case eEntryType::RANDOM_CHART: break;
             LOG_WARNING << "[Select] Not a song/chart entry";
             return;
         }
@@ -637,7 +643,8 @@ void SceneSelect::enterEntry(const eEntryType type, const lunaticvibes::Time t)
     case eEntryType::CHART:
     case eEntryType::RIVAL_SONG:
     case eEntryType::RIVAL_CHART:
-    case eEntryType::COURSE: decide(); break;
+    case eEntryType::COURSE:
+    case eEntryType::RANDOM_CHART: decide(); break;
     case eEntryType::ARENA_COMMAND: arenaCommand(); break;
     case eEntryType::ARENA_LOBBY: // TODO(rustbell): enter ARENA_LOBBY
     case eEntryType::UNKNOWN:
@@ -1902,6 +1909,58 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     }
 }
 
+std::shared_ptr<ChartFormatBase> getChart(EntryBase& entry) {
+
+    if (entry.type() == eEntryType::SONG || entry.type() == eEntryType::RIVAL_SONG)
+    {
+        return reinterpret_cast<EntryFolderSong&>(entry).getCurrentChart();
+    }
+    if (entry.type() == eEntryType::CHART || entry.type() == eEntryType::RIVAL_CHART)
+    {
+        return reinterpret_cast<EntryChart&>(entry)._file;
+    }
+    return nullptr;
+};
+
+// NOTE: don't forget to lock mutex for 'entries'.
+static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(const EntryList& entries,
+                                                     const lunaticvibes::EntryRandomChart::Filter filter)
+{
+    std::mt19937 rd(std::random_device{}());
+    std::uniform_int_distribution<size_t> distribution{0, entries.size() - 1};
+
+    for (size_t i = 0; i < entries.size(); i++)
+    {
+        const size_t idx = distribution(rd);
+        auto [entry, score] = entries[idx];
+        switch (filter)
+        {
+            using Filter = lunaticvibes::EntryRandomChart::Filter;
+        case Filter::Any: break;
+        case Filter::Failed:
+            if (score == nullptr || score->clearcount > 0)
+                continue;
+            {
+                // TODO: remove this, it should be redundant, but clearcount and playcount values in scores seem to be
+                // broken.
+                const auto scoreBms = std::dynamic_pointer_cast<ScoreBMS>(score);
+                if (scoreBms && scoreBms->lamp != ScoreBMS::Lamp::FAILED)
+                    continue;
+            }
+            break;
+        case Filter::Unplayed:
+            if (score != nullptr)
+                continue;
+            break;
+        }
+        if (auto chart = getChart(*entry))
+            return {chart, idx};
+    }
+
+    LOG_DEBUG << "[Select] No matching entries found";
+    return {nullptr, 0};
+}
+
 void SceneSelect::decide()
 {
     std::shared_lock<std::shared_mutex> u(gSelectContext._mutex);
@@ -1986,17 +2045,20 @@ void SceneSelect::decide()
     case eEntryType::RIVAL_SONG:
     case eEntryType::CHART:
     case eEntryType::RIVAL_CHART:
-    {
+    case eEntryType::RANDOM_CHART: {
         // set metadata
-        if (entry->type() == eEntryType::SONG || entry->type() == eEntryType::RIVAL_SONG)
+        if (entry->type() == eEntryType::RANDOM_CHART)
         {
-            auto pFile = std::reinterpret_pointer_cast<EntryFolderSong>(entry)->getCurrentChart();
-            gChartContext.chart = pFile;
+            auto e = std::reinterpret_pointer_cast<lunaticvibes::EntryRandomChart>(entry);
+            size_t idx;
+            std::tie(gChartContext.chart, idx) = selectRandom(gSelectContext.entries, e->filter());
+            if (gChartContext.chart == nullptr)
+                return;
+            setEntryInfo(idx);
         }
         else
         {
-            auto pFile = std::reinterpret_pointer_cast<EntryChart>(entry)->_file;
-            gChartContext.chart = pFile;
+            gChartContext.chart = getChart(*entry);
         }
 
         auto& chart = *gChartContext.chart;
@@ -2169,7 +2231,21 @@ void SceneSelect::decide()
 
         break;
     }
-    default:
+    case eEntryType::UNKNOWN:
+    case eEntryType::NEW_SONG_FOLDER:
+    case eEntryType::FOLDER:
+    case eEntryType::CUSTOM_FOLDER:
+    case eEntryType::COURSE_FOLDER:
+    case eEntryType::RIVAL:
+    case eEntryType::NEW_COURSE:
+    case eEntryType::RANDOM_COURSE:
+    case eEntryType::ARENA_FOLDER:
+    case eEntryType::ARENA_COMMAND:
+    case eEntryType::ARENA_LOBBY:
+    case eEntryType::CHART_LINK:
+    case eEntryType::REPLAY:
+        LOG_ERROR << "[Select] decide() with wrong entry type";
+        assert(false && "decide() with wrong entry type");
         break;
     }
 
@@ -2414,7 +2490,8 @@ void SceneSelect::decide()
         if (pScore && !pScore->replayFileName.empty())
         {
             Path replayFilePath;
-            if ((entry->type() == eEntryType::CHART || entry->type() == eEntryType::RIVAL_CHART))
+            if (entry->type() == eEntryType::CHART || entry->type() == eEntryType::RIVAL_CHART ||
+                entry->type() == eEntryType::RANDOM_CHART)
             {
                 replayFilePath = ReplayChart::getReplayPath(gChartContext.hash) / pScore->replayFileName;
             }
@@ -2501,6 +2578,26 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
 
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
 
+        auto canAddRandomSongEntries = [](EntryList& entries) {
+            return std::any_of(entries.begin(), entries.end(), [](const Entry& entry) {
+                auto& [e, score] = entry;
+                return e->type() == eEntryType::CHART || e->type() == eEntryType::SONG;
+            });
+        };
+        auto addRandomSongEntries = [](EntryList& entries) {
+            using namespace lunaticvibes;
+            // TODO: translations.
+            // TODO: turn off option.
+            entries.emplace_back(
+                std::make_shared<EntryRandomChart>("RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Any), nullptr);
+            entries.emplace_back(
+                std::make_shared<EntryRandomChart>("NO PLAY RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Unplayed),
+                nullptr);
+            entries.emplace_back(
+                std::make_shared<EntryRandomChart>("FAILED RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Failed),
+                nullptr);
+        };
+
         if (gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type() == eEntryType::FOLDER)
         {
             {
@@ -2520,6 +2617,11 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
                 {
                     for (size_t i = 0; i < top->getContentsCount(); ++i)
                         prop.dbBrowseEntries.emplace_back(top->getEntry(i), nullptr);
+                }
+
+                if (canAddRandomSongEntries(prop.dbBrowseEntries))
+                {
+                    addRandomSongEntries(prop.dbBrowseEntries);
                 }
 
                 gSelectContext.backtrace.front().index = gSelectContext.selectedEntryIndex;
@@ -2569,6 +2671,15 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
                 };
                 for (size_t i = 0; i < top->getContentsCount(); ++i)
                     prop.dbBrowseEntries.emplace_back(top->getEntry(i), nullptr);
+
+                if (folderType == eEntryType::CUSTOM_FOLDER)
+                {
+                    const auto table = std::dynamic_pointer_cast<EntryFolderTable>(e);
+                    if (table && canAddRandomSongEntries(prop.dbBrowseEntries))
+                    {
+                        addRandomSongEntries(prop.dbBrowseEntries);
+                    }
+                }
 
                 gSelectContext.backtrace.front().index = gSelectContext.selectedEntryIndex;
                 gSelectContext.backtrace.front().displayEntries = gSelectContext.entries;

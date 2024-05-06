@@ -40,43 +40,6 @@ static MotionKeyFrameParams::accelType parseAccelType(const int value)
     return accelType::CONSTANT;
 }
 
-enum sprite_type
-{
-    // General
-    LR2_IMAGE,
-    LR2_NUMBER,
-    LR2_SLIDER,
-    LR2_BARGRAPH,
-    LR2_BUTTON,
-    LR2_ONMOUSE,
-    LR2_TEXT,
-
-    // Play
-    LR2_BGA,
-    LR2_JUDGELINE,
-    LR2_BARLINE,
-    LR2_NOTE,
-    LR2_NOWJUDGE_1P,
-    LR2_NOWCOMBO_1P,
-    LR2_NOWJUDGE_2P,
-    LR2_NOWCOMBO_2P,
-
-    // Select
-    LR2_BAR_BODY,
-    LR2_BAR_FLASH,
-    LR2_BAR_LEVEL,
-    LR2_BAR_LAMP,
-    LR2_BAR_TITLE,
-    LR2_BAR_RANK,
-    LR2_BAR_RIVAL,
-    LR2_README,
-    LR2_MOUSECURSOR,
-
-    // Result
-    LR2_GAUGECHART_1P,
-    LR2_GAUGECHART_2P,
-};
-
 namespace lr2skin
 {
 

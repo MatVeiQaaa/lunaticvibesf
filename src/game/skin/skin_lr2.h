@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <cstdint>
 #include <variant>
 #include <filesystem>
 #include <bitset>
@@ -210,8 +211,9 @@ namespace LR2SkinDef
         TIMER_COUNT
     };
     
+    // Negative value means inverse of the option.
     // bool
-    enum dst_option : int
+    enum dst_option : int16_t
     {
         DST_TRUE = 0,
 
@@ -1328,8 +1330,6 @@ namespace LR2SkinDef
 
 using namespace LR2SkinDef;
 
-struct setDst { dst_option dst; bool set; };
-
 class SkinLR2: public SkinBase
 {
 public:
@@ -1634,7 +1634,7 @@ protected:
     struct element
     {
         std::shared_ptr<SpriteBase> ps;
-        // op1, op2, op3 and opEx.
+        // op1, op2, op3 and LVF internal opEx.
         std::vector<dst_option> dstOpt;
         // Turntable angle. Either 1 for P1 or 2 for P2.
         int op4;

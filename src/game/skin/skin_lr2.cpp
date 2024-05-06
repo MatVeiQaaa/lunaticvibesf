@@ -2773,9 +2773,9 @@ bool SkinLR2::DST()
             }
 
             std::vector<dst_option> dstOpt;
-            if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
-            if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
-            if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+            if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
             if (type == DefType::NUMBER)
             {
                 auto p = std::reinterpret_pointer_cast<SpriteNumber>(e);
@@ -2833,9 +2833,9 @@ ParseRet SkinLR2::DST_NOTE()
         if (e->isMotionKeyFramesEmpty())
         {
             std::vector<dst_option> dstOpt;
-            if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
-            if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
-            if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+            if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
             drawQueue.push_back({e, dstOpt, d.op[3]});
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
@@ -2907,9 +2907,9 @@ ParseRet SkinLR2::DST_LINE()
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
 
     std::vector<dst_option> dstOpt;
-    if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
-    if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
-    if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
+    if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
+    if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
+    if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
     drawQueue.push_back({e, dstOpt, d.op[3]});
     e->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
         lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
@@ -2964,10 +2964,10 @@ ParseRet SkinLR2::DST_BAR_BODY()
                 barSpriteAvailable[idx] = true;
 
                 std::vector<dst_option> dstOpt;
-                if (d.op[0] != 0) dstOpt.push_back(dst_option(d.op[0]));
-                if (d.op[1] != 0) dstOpt.push_back(dst_option(d.op[1]));
-                if (d.op[2] != 0) dstOpt.push_back(dst_option(d.op[2]));
-                drawQueue.push_back({barSprites[idx], dstOpt, dst_option(d.op[3])});
+                if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
+                if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
+                if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
+                drawQueue.push_back({barSprites[idx], dstOpt, d.op[3]});
             }
 
             // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.

@@ -779,7 +779,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
 
     std::unique_lock l{gPlayContext._mutex};
     // push replay command
-    if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
+    if (pushReplayCommand && _hasStartTime && gPlayContext.replayNew)
     {
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
@@ -830,7 +830,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
 
             std::unique_lock l{gPlayContext._mutex};
             // push replay command
-            if (gChartContext.started && gPlayContext.replayNew)
+            if (_hasStartTime && gPlayContext.replayNew)
             {
                 long long ms = t.norm() - _startTime.norm();
                 ReplayChart::Commands cmd;
@@ -865,7 +865,7 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 {
                 std::unique_lock l{gPlayContext._mutex};
                 // push replay command
-                if (gChartContext.started && gPlayContext.replayNew)
+                if (_hasStartTime && gPlayContext.replayNew)
                 {
                     if (judgeAreaReplayCommandType[slot].find(_lnJudge[idx]) != judgeAreaReplayCommandType[slot].end())
                     {
@@ -956,7 +956,7 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
 
     std::unique_lock l{gPlayContext._mutex};
     // push replay command
-    if (pushReplayCommand && gChartContext.started && gPlayContext.replayNew)
+    if (pushReplayCommand && _hasStartTime && gPlayContext.replayNew)
     {
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
@@ -1299,7 +1299,7 @@ void RulesetBMS::updateAxis(double s1, double s2, const lunaticvibes::Time& t)
 
     using namespace Input;
 
-    if (!gPlayContext.isAuto && (!gPlayContext.isReplay || !gChartContext.started))
+    if (!gPlayContext.isAuto && (!gPlayContext.isReplay || !_hasStartTime))
     {
         playerScratchAccumulator[PLAYER_SLOT_PLAYER] += s1;
         playerScratchAccumulator[PLAYER_SLOT_TARGET] += s2;
@@ -1379,7 +1379,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
                             std::unique_lock l{gPlayContext._mutex};
                             // push replay command
-                            if (gChartContext.started && gPlayContext.replayNew)
+                            if (_hasStartTime && gPlayContext.replayNew)
                             {
                                 long long ms = t.norm() - _startTime.norm();
                                 ReplayChart::Commands cmd;
@@ -1425,7 +1425,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
                                     std::unique_lock l{gPlayContext._mutex};
                                     // push replay command
-                                    if (gChartContext.started && gPlayContext.replayNew)
+                                    if (_hasStartTime && gPlayContext.replayNew)
                                     {
                                         long long ms = t.norm() - _startTime.norm();
                                         ReplayChart::Commands cmd;

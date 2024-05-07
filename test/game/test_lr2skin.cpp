@@ -63,16 +63,17 @@ TEST(tLR2Skin, IF4)
 	EXPECT_EQ(v[0].dstOpt, std::vector{dst_option(1)});
 }
 
-TEST(tLR2Skin, IF5)
+TEST(tLR2Skin, IfStatementTrailingSingleDigit)
 {
-	GTEST_SKIP() << "FIXME: Broken test";
 	std::shared_ptr<mock_SkinLR2> ps = nullptr;
 	ASSERT_NO_THROW(ps = std::make_shared<mock_SkinLR2>("lr2skin/if5.lr2skin"));
 	ASSERT_EQ(ps->isLoaded(), true);
 
 	ASSERT_EQ(ps->getDrawQueue().size(), 3);
 	const auto v = ps->getDrawQueue();
-	EXPECT_EQ(v[0].dstOpt, std::vector{dst_option(0)});
+	EXPECT_EQ(v[0].dstOpt, std::vector{dst_option(1)});
+	EXPECT_EQ(v[1].dstOpt, (std::vector{dst_option(1), dst_option(4)}));
+	EXPECT_EQ(v[2].dstOpt, std::vector{dst_option(1)});
 }
 
 TEST(tLR2Skin, IF6)

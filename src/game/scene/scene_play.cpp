@@ -2013,7 +2013,7 @@ void ScenePlay::updateLoadEnd()
         }
         }
         state = ePlayState::PLAYING;
-        LOG_DEBUG << "[Play] State changed to PLAY_START";
+        LOG_DEBUG << "[Play] State changed to PLAYING";
     }
 }
 

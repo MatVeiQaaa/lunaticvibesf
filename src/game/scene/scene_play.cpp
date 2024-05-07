@@ -1422,31 +1422,15 @@ void ScenePlay::_updateAsync()
         requestExit();
     }
 
-    // state based callback
     switch (state)
     {
-    case ePlayState::PREPARE:
-		State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_PREPARE);
-        updatePrepare();
-        break;
-    case ePlayState::LOADING:
-        updateLoading();
-        break;
-    case ePlayState::LOAD_END:
-        updateLoadEnd();
-        break;
-    case ePlayState::PLAYING:
-        updatePlaying();
-        break;
-    case ePlayState::FADEOUT:
-        updateFadeout();
-        break;
-    case ePlayState::FAILED:
-        updateFailed();
-        break;
-    case ePlayState::WAIT_ARENA:
-        updateWaitArena();
-        break;
+    case ePlayState::PREPARE: updatePrepare(); break;
+    case ePlayState::LOADING: updateLoading(); break;
+    case ePlayState::LOAD_END: updateLoadEnd(); break;
+    case ePlayState::PLAYING: updatePlaying(); break;
+    case ePlayState::FADEOUT: updateFadeout(); break;
+    case ePlayState::FAILED: updateFailed(); break;
+    case ePlayState::WAIT_ARENA: updateWaitArena(); break;
     }
 
     if (gArenaData.isOnline() && gArenaData.isExpired())
@@ -1930,6 +1914,7 @@ void ScenePlay::updateAsyncAbsoluteAxis(const lunaticvibes::Time& t)
 
 void ScenePlay::updatePrepare()
 {
+    State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_PREPARE);
 	auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::SCENE_START);
     if (rt.norm() > pSkin->info.timeIntro)

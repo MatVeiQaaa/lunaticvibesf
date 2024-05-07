@@ -54,9 +54,14 @@ void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
 
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
                        PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health,
-                       RulesetBMS::PlaySide side, const int fiveKeyMapIndex)
-    : RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty)
+                       RulesetBMS::PlaySide side, const int fiveKeyMapIndex,
+                       std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew)
+    : RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty), _replayNew(std::move(replayNew))
 {
+    if (_replayNew)
+    {
+        assert(_replayNew->replay != nullptr);
+    }
 
     static const NoteLaneTimerMap bombTimer5k[] = {
         {{
@@ -777,17 +782,17 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         _lastNoteJudge[slot] = judge;
     }
 
-    std::unique_lock l{gPlayContext._mutex};
     // push replay command
-    if (pushReplayCommand && _hasStartTime && gPlayContext.replayNew)
+    if (pushReplayCommand && _hasStartTime && _replayNew)
     {
+        std::unique_lock rl{_replayNew->mutex};
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
             long long ms = t.norm() - _startTime.norm();
             ReplayChart::Commands cmd;
             cmd.ms = ms;
             cmd.type = judgeAreaReplayCommandType[slot].at(judge.area);
-            gPlayContext.replayNew->commands.push_back(cmd);
+            _replayNew->replay->commands.push_back(cmd);
         }
     }
 }
@@ -828,15 +833,15 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
 
             _lastNoteJudge = {{JudgeArea::MINE_KPOOR, t.norm()}};
 
-            std::unique_lock l{gPlayContext._mutex};
             // push replay command
-            if (_hasStartTime && gPlayContext.replayNew)
+            if (_hasStartTime && _replayNew)
             {
+                std::unique_lock rl{_replayNew->mutex};
                 long long ms = t.norm() - _startTime.norm();
                 ReplayChart::Commands cmd;
                 cmd.ms = ms;
                 cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LANDMINE : ReplayChart::Commands::Type::JUDGE_RIGHT_LANDMINE;
-                gPlayContext.replayNew->commands.push_back(cmd);
+                _replayNew->replay->commands.push_back(cmd);
             }
         }
         break;
@@ -862,20 +867,18 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 _lastNoteJudge[slot].area = _lnJudge[idx];
                 _lastNoteJudge[slot].time = 0;
 
-                {
-                std::unique_lock l{gPlayContext._mutex};
                 // push replay command
-                if (_hasStartTime && gPlayContext.replayNew)
+                if (_hasStartTime && _replayNew)
                 {
+                    std::unique_lock rl{_replayNew->mutex};
                     if (judgeAreaReplayCommandType[slot].find(_lnJudge[idx]) != judgeAreaReplayCommandType[slot].end())
                     {
                         long long ms = t.norm() - _startTime.norm();
                         ReplayChart::Commands cmd;
                         cmd.ms = ms;
                         cmd.type = judgeAreaReplayCommandType[slot].at(_lnJudge[idx]);
-                        gPlayContext.replayNew->commands.push_back(cmd);
+                        _replayNew->replay->commands.push_back(cmd);
                     }
-                }
                 }
 
                 _lnJudge[idx] = RulesetBMS::JudgeArea::NOTHING;
@@ -954,17 +957,17 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
         break;
     }
 
-    std::unique_lock l{gPlayContext._mutex};
     // push replay command
-    if (pushReplayCommand && _hasStartTime && gPlayContext.replayNew)
+    if (pushReplayCommand && _hasStartTime && _replayNew)
     {
+        std::unique_lock rl{_replayNew->mutex};
         if (judgeAreaReplayCommandType[slot].find(judge.area) != judgeAreaReplayCommandType[slot].end())
         {
             long long ms = t.norm() - _startTime.norm();
             ReplayChart::Commands cmd;
             cmd.ms = ms;
             cmd.type = judgeAreaReplayCommandType[slot].at(judge.area);
-            gPlayContext.replayNew->commands.push_back(cmd);
+            _replayNew->replay->commands.push_back(cmd);
         }
     }
 }
@@ -1371,15 +1374,15 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                             _lastNoteJudge[slot].area = JudgeArea::MISS;
                             _lastNoteJudge[slot].time = latePoorWindow;
 
-                            std::unique_lock l{gPlayContext._mutex};
                             // push replay command
-                            if (_hasStartTime && gPlayContext.replayNew)
+                            if (_hasStartTime && _replayNew)
                             {
+                                std::unique_lock rl{_replayNew->mutex};
                                 long long ms = t.norm() - _startTime.norm();
                                 ReplayChart::Commands cmd;
                                 cmd.ms = ms;
                                 cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_4 : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4;
-                                gPlayContext.replayNew->commands.push_back(cmd);
+                                _replayNew->replay->commands.push_back(cmd);
                             }
                         }
 
@@ -1417,15 +1420,15 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                     _lastNoteJudge[slot].area = JudgeArea::MISS;
                                     _lastNoteJudge[slot].time = hitTime;
 
-                                    std::unique_lock l{gPlayContext._mutex};
                                     // push replay command
-                                    if (_hasStartTime && gPlayContext.replayNew)
+                                    if (_hasStartTime && _replayNew)
                                     {
+                                        std::unique_lock rl{_replayNew->mutex};
                                         long long ms = t.norm() - _startTime.norm();
                                         ReplayChart::Commands cmd;
                                         cmd.ms = ms;
                                         cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_3 : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3;
-                                        gPlayContext.replayNew->commands.push_back(cmd);
+                                        _replayNew->replay->commands.push_back(cmd);
                                     }
                                 }
 

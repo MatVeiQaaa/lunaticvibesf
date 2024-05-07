@@ -174,6 +174,7 @@ protected:
     bool _k1P = false, _k2P = false;
     JudgeDifficulty _judgeDifficulty = LR2_DEFAULT_RANK;
     GaugeType _gauge = GaugeType::GROOVE;
+    std::shared_ptr<PlayContextParams::MutexReplayChart> _replayNew;
 
     std::map<JudgeType, double> _healthGain;
 
@@ -210,7 +211,8 @@ protected:
 public:
     // fiveKeyMapIndex - if not 5k, set to -1.
     RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart, PlayModifiers mods,
-               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex);
+               GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side, int fiveKeyMapIndex,
+               std::shared_ptr<PlayContextParams::MutexReplayChart> replayNew);
 
     void initGaugeParams(PlayModifierGaugeType gauge);
 

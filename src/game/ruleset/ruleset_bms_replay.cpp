@@ -9,7 +9,7 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
                                    JudgeDifficulty difficulty, double health, PlaySide side, const int fiveKeyMapIndex,
                                    const double pitchSpeed)
     : RulesetBase(format_, chart_),
-      RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex),
+      RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr),
       replay(std::move(replay_))
 {
     assert(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL || side == PlaySide::MYBEST);

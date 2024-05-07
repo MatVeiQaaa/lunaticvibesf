@@ -87,7 +87,14 @@ struct PlayContextParams
 
     std::shared_ptr<ReplayChart> replay;
     std::shared_ptr<ReplayChart> replayMybest;
-    std::shared_ptr<ReplayChart> replayNew;
+
+    struct MutexReplayChart
+    {
+        // Usage: name locks 'rl'.
+        std::mutex mutex;
+        std::shared_ptr<ReplayChart> replay;
+    };
+    std::shared_ptr<MutexReplayChart> replayNew;
 
     bool isCourse = false;
     size_t courseStage = 0;

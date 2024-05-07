@@ -382,7 +382,8 @@ void SceneResult::updateFadeout()
         {
             LOG_DEBUG << "[Result] Saving replay to " << replayPath;
             std::unique_lock l{gPlayContext._mutex};
-            gPlayContext.replayNew->saveFile(replayPath);
+            std::unique_lock rl{gPlayContext.replayNew->mutex};
+            gPlayContext.replayNew->replay->saveFile(replayPath);
         }
         // save score
         if (saveScore && !gChartContext.hash.empty())

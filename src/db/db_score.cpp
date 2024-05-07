@@ -498,6 +498,7 @@ void ScoreDB::initTables()
     // TODO: remove default values.
     // TODO: remove 'rate'.
     // TODO: rename 'pc' column.
+    // FIXME: score algorithm version.
     static constexpr auto&& create_score_bms_sql = R"(
         CREATE TABLE IF NOT EXISTS score_bms (
             md5 TEXT PRIMARY KEY UNIQUE NOT NULL,

@@ -1353,8 +1353,12 @@ static void open_ir_page()
     const EntryList& e = gSelectContext.entries;
     assert(!e.empty());
     const size_t idx = gSelectContext.selectedEntryIndex;
-    assert(e[idx].first->type() == eEntryType::CHART || e[idx].first->type() == eEntryType::RIVAL_CHART);
-    const auto& ps = std::dynamic_pointer_cast<EntryChart>(e[idx].first);
+    if(e[idx].first->type() != eEntryType::CHART && e[idx].first->type() != eEntryType::RIVAL_CHART)
+    {
+        LOG_DEBUG << "[SkinLR2] Not a chart entry";
+        return;
+    }
+    const auto& ps = std::reinterpret_pointer_cast<EntryChart>(e[idx].first);
     const auto& song = ps->getSongEntry();
     assert(song != nullptr);
     const auto& chart = song->getCurrentChart();

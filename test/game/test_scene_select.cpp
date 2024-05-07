@@ -100,7 +100,7 @@ TEST(SceneSelect, HashQueryingWorks)
         auto result_variant = lunaticvibes::execute_search_query(select_context, song_db, score_db, "/hash");
         HashResult result;
         EXPECT_NO_THROW(result = std::get<HashResult>(result_variant));
-        // TODO: probably show something for courses too.
+        // TODO: show LR2 course string.
         EXPECT_EQ(result.hash, std::nullopt);
     }
 
@@ -145,7 +145,7 @@ TEST(SceneSelect, PathQueryingWorks)
         PathResult result;
         EXPECT_NO_THROW(result = std::get<PathResult>(result_variant));
         EXPECT_TRUE(result.path.empty());
-        // TODO: idk path. What does LR2 do?
+        // LR2 shows '0' for courses.
     }
 
     {

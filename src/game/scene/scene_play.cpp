@@ -1151,10 +1151,13 @@ void ScenePlay::loadChart()
         return false;
     };
 
+    std::future<void> samplesFuture;
+    std::future<void> bgaFuture;
+
     // load samples
     if ((!gChartContext.isSampleLoaded || gChartContext.hash != gChartContext.sampleLoadedHash) && !sceneEnding)
     {
-        auto dtor = std::async(std::launch::async, [&]() {
+        samplesFuture = std::async(std::launch::async, [&]() {
             SetThreadName("ChartSampleLoad");
             SoundMgr::freeNoteSamples();
 
@@ -1223,7 +1226,7 @@ void ScenePlay::loadChart()
     {
         if (!gChartContext.isBgaLoaded)
         {
-            auto dtor = std::async(std::launch::async, [&]() {
+            bgaFuture = std::async(std::launch::async, [&]() {
                 SetThreadName("ChartBgaLoad");
                 gPlayContext.bgaTexture->clear();
 
@@ -1243,16 +1246,12 @@ void ScenePlay::loadChart()
                     return;
                 }
 
-                // TODO: make addBmp thread-safe and use the thread pool here.
-                // const auto thread_count = std::thread::hardware_concurrency();
-                // boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
                 for (size_t i = 0; i < _pChart->bgaFiles.size(); ++i)
                 {
                     if (shouldDiscard(*this)) return;
                     const auto& bmp = _pChart->bgaFiles[i];
                     if (bmp.empty()) continue;
-                    // boost::asio::post(pool, [&bmp, this, i, &chartDir]() {
-                     {
+                    {
                         if (shouldDiscard(*this)) return;
                         const auto pBmp = PathFromUTF8(bmp);
                         if (pBmp.is_absolute())
@@ -1269,9 +1268,7 @@ void ScenePlay::loadChart()
                         }
                         ++bmpLoaded;
                     }
-                    // });
                 }
-                // pool.wait();
 
                 if (shouldDiscard(*this))
                 {
@@ -1295,6 +1292,11 @@ void ScenePlay::loadChart()
             gPlayContext.bgaTexture->setVideoSpeed();
         }
     }
+
+    if (samplesFuture.valid())
+        samplesFuture.get();
+    if (bgaFuture.valid())
+        bgaFuture.get();
 }
 
 void ScenePlay::setInputJudgeCallback()

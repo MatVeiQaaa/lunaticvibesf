@@ -1,7 +1,12 @@
 #pragma once
+
+#include "game/scene/scene_context.h"
+#include "common//chartformat/chartformat_bms.h"
 #include "ruleset.h"
 
-#include <stdint.h>
+#include <memory>
+
+using lunaticvibes::parser_bms::JudgeDifficulty;
 
 class RulesetBMS : virtual public RulesetBase
 {
@@ -34,12 +39,6 @@ public:
         JUDGE_MINE_POOR,
     };
 
-    enum class JudgeDifficulty : uint8_t {
-        VERYHARD = 0,
-        HARD = 1,
-        NORMAL = 2,
-        EASY = 3,
-    };
     static constexpr auto LR2_DEFAULT_RANK{JudgeDifficulty::NORMAL};
 
     enum class JudgeType {

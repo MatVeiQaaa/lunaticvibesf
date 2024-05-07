@@ -1,11 +1,14 @@
 #include "scene_context.h"
-#include "game/runtime/state.h"
-#include "common/chartformat/chartformat_types.h"
-#include "config/config_mgr.h"
+
+#include "common/chartformat/chartformat_bms.h"
 #include "common/entry/entry_types.h"
-#include <random>
-#include <mutex>
+#include "config/config_mgr.h"
+#include "game/ruleset/ruleset_bms.h"
 #include "game/runtime/i18n.h"
+#include "game/runtime/state.h"
+
+#include <mutex>
+#include <random>
 
 #include <boost/algorithm/string.hpp>
 
@@ -20,6 +23,8 @@ UpdateContextParams gUpdateContext;
 OverlayContextParams gOverlayContext;
 std::shared_ptr<SongDB> g_pSongDB;
 std::shared_ptr<ScoreDB> g_pScoreDB;
+
+using lunaticvibes::parser_bms::JudgeDifficulty;
 
 std::pair<bool, Option::e_lamp_type> getSaveScoreType(bool byGauge)
 {
@@ -731,10 +736,10 @@ void setEntryInfo(const size_t idx)
             unsigned op_judgerank{0xDEADBEEF};
             switch (bms->rank.value_or(RulesetBMS::LR2_DEFAULT_RANK))
             {
-            case RulesetBMS::JudgeDifficulty::VERYHARD: op_judgerank = Option::JUDGE_VHARD; break;
-            case RulesetBMS::JudgeDifficulty::HARD: op_judgerank = Option::JUDGE_HARD; break;
-            case RulesetBMS::JudgeDifficulty::NORMAL: op_judgerank = Option::JUDGE_NORMAL; break;
-            case RulesetBMS::JudgeDifficulty::EASY: op_judgerank = Option::JUDGE_EASY; break;
+            case JudgeDifficulty::VERYHARD: op_judgerank = Option::JUDGE_VHARD; break;
+            case JudgeDifficulty::HARD: op_judgerank = Option::JUDGE_HARD; break;
+            case JudgeDifficulty::NORMAL: op_judgerank = Option::JUDGE_NORMAL; break;
+            case JudgeDifficulty::EASY: op_judgerank = Option::JUDGE_EASY; break;
             }
             param["judgerank"] = op_judgerank;
 

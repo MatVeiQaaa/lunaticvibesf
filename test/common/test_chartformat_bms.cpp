@@ -12,6 +12,8 @@
 #include "../../src/common/utils.h"
 #include "common/hash.h"
 
+using lunaticvibes::parser_bms::JudgeDifficulty;
+
 bool ExpectNotePosition(const ChartFormatBMS& bms, LaneCode area, int ch, int bar, int res, const std::vector<int>& segments)
 {
 	const auto& lane = bms.getLane(area, ch, bar);
@@ -129,7 +131,7 @@ TEST(tBMS, RankVeryEasyParsedCorrectly)
     ASSERT_EQ(bms->isLoaded(), true);
     EXPECT_EQ(bms->fileHash.hexdigest(), "333c659406a1cb4312e76b447f5ee0cc");
     EXPECT_EQ(bms->raw_rank, 4);
-    EXPECT_EQ(bms->rank, RulesetBMS::JudgeDifficulty::NORMAL);
+    EXPECT_EQ(bms->rank, JudgeDifficulty::NORMAL);
 }
 
 TEST(tBMS, RankVeryHardParsedCorrectly)
@@ -139,7 +141,7 @@ TEST(tBMS, RankVeryHardParsedCorrectly)
     ASSERT_EQ(bms->isLoaded(), true);
     EXPECT_EQ(bms->fileHash.hexdigest(), "180d007b193e1367838eda5d5d10dd4f");
     EXPECT_EQ(bms->raw_rank, 1);
-    EXPECT_EQ(bms->rank, RulesetBMS::JudgeDifficulty::HARD);
+    EXPECT_EQ(bms->rank, JudgeDifficulty::HARD);
 }
 
 TEST(tBMS, metre_change)

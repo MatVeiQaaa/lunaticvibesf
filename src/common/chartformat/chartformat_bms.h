@@ -8,7 +8,6 @@
 
 #include "chartformat.h"
 #include "common/types.h"
-#include "game/ruleset/ruleset_bms.h"
 
 namespace bms
 {
@@ -55,8 +54,16 @@ using namespace bms;
 
 namespace lunaticvibes::parser_bms {
 
+enum class JudgeDifficulty : uint8_t
+{
+    VERYHARD = 0,
+    HARD = 1,
+    NORMAL = 2,
+    EASY = 3,
+};
+
 // Parse #RANK.
-[[nodiscard]] std::optional<RulesetBMS::JudgeDifficulty> parse_rank(int);
+[[nodiscard]] std::optional<JudgeDifficulty> parse_rank(int);
 
 } // namespace lunaticvibes::parser_bms
 
@@ -72,7 +79,7 @@ public:
     int raw_rank = -1;
     int total = -1;
     double bpm = 130.0;
-    std::optional<RulesetBMS::JudgeDifficulty> rank;
+    std::optional<lunaticvibes::parser_bms::JudgeDifficulty> rank;
 
     StringContent dedicatedPreview;
 

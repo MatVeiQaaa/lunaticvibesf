@@ -53,7 +53,7 @@ void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
 }
 
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
-                       PlayModifiers mods, GameModeKeys keys, RulesetBMS::JudgeDifficulty difficulty, double health,
+                       PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health,
                        RulesetBMS::PlaySide side, const int fiveKeyMapIndex)
     : RulesetBase(std::move(format), std::move(chart)), _judgeDifficulty(difficulty)
 {

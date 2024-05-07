@@ -228,25 +228,17 @@ public:
     std::string serializeAsXml();
 
     static Path getReplayPath(const HashMD5& chartMD5);
-    Path getReplayPath();
+    Path getReplayPath() const;
     PlayModifiers getMods() const;
 };
 
 CEREAL_CLASS_VERSION(ReplayChart, 2);
 
-
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_DOWN_CMD_MAP;
-
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_UP_CMD_MAP;
-
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_DOWN_CMD_MAP_5K[4];
-
 extern const std::map<Input::Pad, ReplayChart::Commands::Type> REPLAY_INPUT_UP_CMD_MAP_5K[4];
-
 extern const std::map<ReplayChart::Commands::Type, Input::Pad> REPLAY_CMD_INPUT_DOWN_MAP;
-
 extern const std::map<ReplayChart::Commands::Type, Input::Pad> REPLAY_CMD_INPUT_UP_MAP;
-
 extern const std::map<ReplayChart::Commands::Type, Input::Pad> REPLAY_CMD_INPUT_DOWN_MAP_5K[4];
-
 extern const std::map<ReplayChart::Commands::Type, Input::Pad> REPLAY_CMD_INPUT_UP_MAP_5K[4];

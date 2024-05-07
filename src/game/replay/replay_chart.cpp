@@ -111,7 +111,7 @@ bool ReplayChart::validate()
 	return valid;
 }
 
-// NOTE: mutable this to set checksum to 0 before serializing
+// NOTE: mutable 'this' to set checksum to 0 before serializing.
 void ReplayChart::updateChecksum()
 {
 	checksum = 0;
@@ -141,7 +141,7 @@ Path ReplayChart::getReplayPath(const HashMD5& chartMD5)
 	return ConfigMgr::Profile()->getPath() / "replay" / "chart" / chartMD5.hexdigest();
 }
 
-Path ReplayChart::getReplayPath()
+Path ReplayChart::getReplayPath() const
 {
 	return getReplayPath(chartHash);
 }

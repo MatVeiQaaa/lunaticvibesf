@@ -188,10 +188,10 @@ public:
     bool isLastNoteSpecial    (size_t idx);
     bool isLastNoteBpm        ();
 
-    bool isLastNote           (chart::NoteLaneCategory cat, size_t idx, const NoteIterator& it);
-    bool isLastNoteBgm        (size_t idx, const decltype(_bgmNoteLists)::value_type::iterator& it);
-    bool isLastNoteSpecial    (size_t idx, const decltype(_specialNoteLists)::value_type::iterator& it);
-    bool isLastNoteBpm        (const decltype(_bpmNoteList)::iterator& it);
+    bool isLastNote           (chart::NoteLaneCategory cat, size_t idx, const NoteIterator& it) const;
+    bool isLastNoteBgm        (size_t idx, const decltype(_bgmNoteLists)::value_type::iterator& it) const;
+    bool isLastNoteSpecial    (size_t idx, const decltype(_specialNoteLists)::value_type::iterator& it) const;
+    bool isLastNoteBpm        (const decltype(_bpmNoteList)::iterator& it) const;
 
 protected:
     auto nextNote             (chart::NoteLaneCategory cat, size_t idx) -> NoteIterator&;

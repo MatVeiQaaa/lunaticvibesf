@@ -1070,10 +1070,11 @@ Current programmer:
     chown2
 
 Contributors:
-   Vad1mCSO2
+    Vad1mCSO2
 
 Testers:
-   Vad1mCSO2
+    Vad1mCSO2
+    lyko
 
 Original cast:（敬称略）
 

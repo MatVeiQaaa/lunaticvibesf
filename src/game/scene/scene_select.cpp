@@ -477,6 +477,9 @@ SceneSelect::SceneSelect() : SceneBase(SkinType::MUSIC_SELECT, 250)
             InputMgr::updateBindings(7);
         }
     }
+    _show_random_any = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_ANY, false);
+    _show_random_failed = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_FAILED, false);
+    _show_random_noplay = ConfigMgr::get('P', cfg::P_SELECT_SHOW_RANDOM_NOPLAY, false);
 
     state = eSelectState::PREPARE;
 
@@ -2588,18 +2591,27 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
         auto canAddRandomSongEntries = [](const EntryList& entries) {
             return std::any_of(entries.begin(), entries.end(), isChartEntry);
         };
-        auto addRandomSongEntries = [](EntryList& entries) {
+        auto addRandomSongEntries = [this](EntryList& entries) {
             using namespace lunaticvibes;
             // TODO: translations.
-            // TODO: turn off option.
-            entries.emplace_back(
-                std::make_shared<EntryRandomChart>("RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Any), nullptr);
-            entries.emplace_back(
-                std::make_shared<EntryRandomChart>("NO PLAY RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Unplayed),
-                nullptr);
-            entries.emplace_back(
-                std::make_shared<EntryRandomChart>("FAILED RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Failed),
-                nullptr);
+            if (_show_random_any)
+            {
+                entries.emplace_back(
+                    std::make_shared<EntryRandomChart>("RANDOM SELECT", "RANDOM", EntryRandomChart::Filter::Any),
+                    nullptr);
+            }
+            if (_show_random_noplay)
+            {
+                entries.emplace_back(std::make_shared<EntryRandomChart>("NO PLAY RANDOM SELECT", "RANDOM",
+                                                                        EntryRandomChart::Filter::Unplayed),
+                                     nullptr);
+            }
+            if (_show_random_failed)
+            {
+                entries.emplace_back(std::make_shared<EntryRandomChart>("FAILED RANDOM SELECT", "RANDOM",
+                                                                        EntryRandomChart::Filter::Failed),
+                                     nullptr);
+            }
         };
 
         if (gSelectContext.entries[gSelectContext.selectedEntryIndex].first->type() == eEntryType::FOLDER)

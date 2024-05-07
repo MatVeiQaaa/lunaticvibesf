@@ -292,6 +292,10 @@ private:
     bool imgui_play_adjustLanecoverWithLeftRight = false;
 
     bool _imgui_show_demo_window = false;
+
+    bool _show_random_any;
+    bool _show_random_failed;
+    bool _show_random_noplay;
 };
 
 namespace lunaticvibes {

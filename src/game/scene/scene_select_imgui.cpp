@@ -973,6 +973,19 @@ void SceneSelect::imguiPageOptionsSelect()
         {
             ConfigMgr::set('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, imgui_sel_ignore5keysif7keysexist);
         }
+        // TODO: translations.
+        if (ImGui::Checkbox("Show random any", &_show_random_any))
+        {
+            ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_ANY, _show_random_any);
+        }
+        if (ImGui::Checkbox("Show random failed", &_show_random_failed))
+        {
+            ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_FAILED, _show_random_failed);
+        }
+        if (ImGui::Checkbox("Show random noplay", &_show_random_noplay))
+        {
+            ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_NOPLAY, _show_random_noplay);
+        }
 
         ImGui::EndChild();
     }

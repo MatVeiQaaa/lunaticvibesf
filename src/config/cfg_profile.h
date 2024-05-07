@@ -276,6 +276,10 @@ namespace cfg
     constexpr char P_IGNORE_DP_CHARTS[] = "IgnoreDPCharts";
     constexpr char P_IGNORE_9KEYS_CHARTS[] = "Ignore9kCharts";
     constexpr char P_IGNORE_5KEYS_IF_7KEYS_EXIST[] = "Ignore5keysIf7keysExist";
+
+    constexpr char P_SELECT_SHOW_RANDOM_ANY[] = "bSelShowRandomSongAny";
+    constexpr char P_SELECT_SHOW_RANDOM_FAILED[] = "bSelShowRandomSongFail";
+    constexpr char P_SELECT_SHOW_RANDOM_NOPLAY[] = "bSelShowRandomSongNoPlay";
 }
 
 class ConfigProfile : public vConfig

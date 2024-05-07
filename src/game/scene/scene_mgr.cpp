@@ -30,21 +30,10 @@ pScene SceneMgr::get(SceneType e)
     switch (e)
     {
     case SceneType::EXIT:
-    case SceneType::NOT_INIT:
-        break;
-
-    case SceneType::PRE_SELECT:
-        ps = std::make_shared<ScenePreSelect>();
-        break;
-
-    case SceneType::SELECT:
-        ps = std::make_shared<SceneSelect>();
-        break;
-
-    case SceneType::DECIDE:
-        ps = std::make_shared<SceneDecide>();
-        break;
-
+    case SceneType::NOT_INIT: break;
+    case SceneType::PRE_SELECT: ps = std::make_shared<ScenePreSelect>(); break;
+    case SceneType::SELECT: ps = std::make_shared<SceneSelect>(); break;
+    case SceneType::DECIDE: ps = std::make_shared<SceneDecide>(); break;
     case SceneType::PLAY:
         switch (gPlayContext.mode)
         {
@@ -55,20 +44,11 @@ pScene SceneMgr::get(SceneType e)
         case SkinType::PLAY14:
         case SkinType::PLAY5_2:
         case SkinType::PLAY7_2:
-        case SkinType::PLAY9_2:
-            ps = std::make_shared<ScenePlay>();
-            break;
-
-        default:
-            LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode);
-            return nullptr;
+        case SkinType::PLAY9_2: ps = std::make_shared<ScenePlay>(); break;
+        default: LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode); return nullptr;
         }
         break;
-
-    case SceneType::RETRY_TRANS:
-        ps = std::make_shared<ScenePlayRetryTrans>();
-        break;
-
+    case SceneType::RETRY_TRANS: ps = std::make_shared<ScenePlayRetryTrans>(); break;
     case SceneType::RESULT:
         switch (gPlayContext.mode)
         {
@@ -79,38 +59,15 @@ pScene SceneMgr::get(SceneType e)
         case SkinType::PLAY14:
         case SkinType::PLAY5_2:
         case SkinType::PLAY7_2:
-        case SkinType::PLAY9_2:
-            ps = std::make_shared<SceneResult>();
-            break;
-
-        default:
-            LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode);
-            return nullptr;
+        case SkinType::PLAY9_2: ps = std::make_shared<SceneResult>(); break;
+        default: LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode); return nullptr;
         }
         break;
-
-    case SceneType::COURSE_TRANS:
-        ps = std::make_shared<ScenePlayCourseTrans>();
-        break;
-
-    case SceneType::KEYCONFIG:
-        ps = std::make_shared<SceneKeyConfig>();
-        break;
-
-    case SceneType::CUSTOMIZE:
-        ps = std::make_shared<SceneCustomize>();
-        break;
-
-    case SceneType::COURSE_RESULT:
-        ps = std::make_shared<SceneCourseResult>();
-        break;
-
-    case SceneType::EXIT_TRANS:
-        ps = std::make_shared<SceneExitTrans>();
-        break;
-
-	default:
-		return nullptr;
+    case SceneType::COURSE_TRANS: ps = std::make_shared<ScenePlayCourseTrans>(); break;
+    case SceneType::KEYCONFIG: ps = std::make_shared<SceneKeyConfig>(); break;
+    case SceneType::CUSTOMIZE: ps = std::make_shared<SceneCustomize>(); break;
+    case SceneType::COURSE_RESULT: ps = std::make_shared<SceneCourseResult>(); break;
+    case SceneType::EXIT_TRANS: ps = std::make_shared<SceneExitTrans>(); break;
     }
 
     lunaticvibes::Time t;

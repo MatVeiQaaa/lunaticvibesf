@@ -1124,7 +1124,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     }
 }
 
-void RulesetBMS::judgeNotePress(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot)
+void RulesetBMS::judgeNotePress(const Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt,
+                                const int slot)
 {
     NoteLaneIndex idx1 = _chart->getLaneFromKey(NoteLaneCategory::Note, k);
     HitableNote* pNote1 = nullptr;
@@ -1157,13 +1158,6 @@ void RulesetBMS::judgeNotePress(Input::Pad k, const lunaticvibes::Time& t, const
     {
         j = _calcJudgeByTimes(*pNote2, rt);
         _judgePress(NoteLaneCategory::LN, idx2, *pNote2, j, t, slot);
-    }
-
-    // break-out BAD chain 
-    if (j.area == JudgeArea::LATE_BAD)
-    {
-        // FIXME: infinite recursion and stack overflow.
-        judgeNotePress(k, t, rt, slot);
     }
 }
 void RulesetBMS::judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot)

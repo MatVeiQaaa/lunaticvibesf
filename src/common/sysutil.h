@@ -100,6 +100,8 @@ namespace lunaticvibes {
 bool open(const std::string& link);
 // buf MUST be at least 26 bytes.
 const char* safe_ctime(const std::time_t* timep, char* buf);
+const tm* safe_gmtime(const std::time_t* timep, tm* result);
 const tm* safe_localtime(const std::time_t* timep, tm* result);
+time_t localtime_utc_offset();
 
 } // namespace lunaticvibes

@@ -131,3 +131,13 @@ std::string safe_strerror(int errnum) {
     const char* error_description = safe_strerror(errnum, static_cast<char*>(error_description_buffer), ERROR_DESCRIPTION_BUFFER_SIZE);
     return {error_description};
 }
+
+time_t lunaticvibes::localtime_utc_offset()
+{
+    static const time_t seconds = 0;
+    tm tmUtc{};
+    tm tmLocal{};
+    lunaticvibes::safe_gmtime(&seconds, &tmUtc);
+    lunaticvibes::safe_localtime(&seconds, &tmLocal);
+    return mktime(&tmUtc) - mktime(&tmLocal);
+}

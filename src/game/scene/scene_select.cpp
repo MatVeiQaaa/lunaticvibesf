@@ -2569,6 +2569,13 @@ void SceneSelect::navigateDownBy1(const lunaticvibes::Time& t)
     }
 }
 
+static bool isChartEntry(const Entry& entry)
+{
+    const auto& [e, _score] = entry;
+    return e->type() == eEntryType::CHART || e->type() == eEntryType::RIVAL_CHART || e->type() == eEntryType::SONG ||
+           e->type() == eEntryType::RIVAL_SONG;
+}
+
 void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
 {
     if (!gSelectContext.entries.empty())
@@ -2578,11 +2585,8 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
 
         std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
 
-        auto canAddRandomSongEntries = [](EntryList& entries) {
-            return std::any_of(entries.begin(), entries.end(), [](const Entry& entry) {
-                auto& [e, score] = entry;
-                return e->type() == eEntryType::CHART || e->type() == eEntryType::SONG;
-            });
+        auto canAddRandomSongEntries = [](const EntryList& entries) {
+            return std::any_of(entries.begin(), entries.end(), isChartEntry);
         };
         auto addRandomSongEntries = [](EntryList& entries) {
             using namespace lunaticvibes;
@@ -2631,13 +2635,13 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
             }
 
             loadSongList();
-            if (gSelectContext.entries.empty())
+            if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
             {
                 State::set(IndexOption::SELECT_FILTER_DIFF, Option::DIFF_ANY);
                 gSelectContext.filterDifficulty = State::get(IndexOption::SELECT_FILTER_DIFF);
                 loadSongList();
             }
-            if (gSelectContext.entries.empty())
+            if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
             {
                 State::set(IndexOption::SELECT_FILTER_KEYS, Option::FILTER_KEYS_ALL);
                 switch (State::get(IndexOption::SELECT_FILTER_KEYS))

@@ -205,6 +205,13 @@ void select_difficulty_filter(int plus, int iterateCount)
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_DIFFICULTY);
 }
 
+static bool isChartEntry(const Entry& entry)
+{
+    const auto& [e, _score] = entry;
+    return e->type() == eEntryType::CHART || e->type() == eEntryType::RIVAL_CHART || e->type() == eEntryType::SONG ||
+           e->type() == eEntryType::RIVAL_SONG;
+}
+
 // 11
 void select_keys_filter(int plus, int iterateCount)
 {
@@ -249,7 +256,11 @@ void select_keys_filter(int plus, int iterateCount)
             setEntryInfo();
 
         }
-        if (!gSelectContext.entries.empty())
+
+        if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
+            return select_keys_filter(plus, iterateCount + 1);
+
+        if (true)
         {
             State::set(IndexOption::PLAY_BATTLE_TYPE, Option::BATTLE_OFF);
             State::set(IndexText::BATTLE, "OFF");
@@ -262,10 +273,6 @@ void select_keys_filter(int plus, int iterateCount)
             State::set(IndexSwitch::CHART_CAN_SAVE_SCORE, score);
             State::set(IndexOption::CHART_SAVE_LAMP_TYPE, lamp);
             State::set(IndexText::FILTER_KEYS, Option::s_filter_keys[val]);
-        }
-        else
-        {
-            return select_keys_filter(plus, iterateCount + 1);
         }
     }
 

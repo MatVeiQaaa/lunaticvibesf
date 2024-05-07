@@ -1,4 +1,7 @@
 #pragma once
+
+// FIXME: cereal is not meant for persistent storage.
+
 #include <vector>
 #include "common/hash.h"
 #include "common/types.h"
@@ -157,6 +160,8 @@ public:
     };
 
 private:
+    // FIXME: this should not use cereal for the calculation. You can't even update CEREAL_CLASS_VERSION because of
+    // this.
     uint32_t    checksum = 0;           // md5(serirization of this, checksum=0)
 
 public:

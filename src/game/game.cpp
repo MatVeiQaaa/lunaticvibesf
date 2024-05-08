@@ -38,7 +38,6 @@
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
-bool gEventQuit;
 GenericInfoUpdater gGenericInfo{ 1 };
 
 void mainLoop();
@@ -301,9 +300,9 @@ void mainLoop()
     std::shared_ptr<SceneBase> sceneCustomize;
     while (currentScene != SceneType::EXIT && gNextScene != SceneType::EXIT)
     {
-        // Evenet handling
-        event_handle();
-        if (gEventQuit)
+        // Event handling
+        const bool quit = lunaticvibes::event_handle();
+        if (quit)
         {
             gAppIsExiting = true;
         }

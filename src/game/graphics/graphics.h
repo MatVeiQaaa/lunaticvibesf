@@ -61,7 +61,10 @@ double graphics_get_canvas_scale_y();
 
 void graphics_set_maxfps(int fps);
 
-void event_handle();
+namespace lunaticvibes {
+// Returns true if quit event received.
+bool event_handle();
+} // namespace lunaticvibes
 
 void ImGuiNewFrame();
 

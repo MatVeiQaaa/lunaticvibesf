@@ -416,8 +416,6 @@ void graphics_set_maxfps(int fps)
 
 ///////////////////////////////////////////////////////////////////////////
 
-extern bool gEventQuit;
-
 static bool isEditing = false;
 static std::string textBuf, textBufSuffix;
 void funEditing(const SDL_TextEditingEvent& e);
@@ -434,8 +432,9 @@ static std::int16_t i16_from_i32(std::int32_t value) {
     }
 }
 
-void event_handle()
+bool lunaticvibes::event_handle()
 {
+    bool quit = false;
     SDL_Event e;
     while (SDL_PollEvent(&e))
     {
@@ -445,7 +444,7 @@ void event_handle()
         {
         case SDL_QUIT:
             LOG_WARNING << "[Event] SDL_QUIT";
-            gEventQuit = true;
+            quit = true;
             break;
 
         case SDL_WINDOWEVENT:
@@ -539,6 +538,7 @@ void event_handle()
             break;
         }
     }
+    return quit;
 }
 
 void ImGuiNewFrame()

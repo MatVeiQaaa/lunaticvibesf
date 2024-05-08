@@ -7,8 +7,6 @@
 #include "common/sysutil.h"
 #include "config/config_mgr.h"
 
-bool gEventQuit;
-
 int main(int argc, char** argv)
 {
     executablePath = GetExecutablePath();

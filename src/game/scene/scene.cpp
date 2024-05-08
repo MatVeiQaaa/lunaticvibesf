@@ -21,14 +21,8 @@
 // prototype
 SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate, bool backgroundInput)
     : AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
-      _input(1000, backgroundInput)
+      _input(ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput)
 {
-    unsigned inputPollingRate = ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000);
-    if (inputPollingRate != 1000)
-    {
-        _input.setRate(inputPollingRate);
-    }
-
     // Disable skin caching for now. dst options are changing all the time
     const bool simple_skin = gInCustomize && skinType != SkinType::THEME_SELECT;
     if (skinMgr)

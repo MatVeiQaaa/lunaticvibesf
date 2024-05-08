@@ -38,8 +38,6 @@
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
-GenericInfoUpdater gGenericInfo{ 1 };
-
 void mainLoop();
 
 // SDL_main
@@ -291,7 +289,8 @@ int main(int argc, char* argv[])
 
 void mainLoop()
 {
-    gGenericInfo.loopStart();
+    GenericInfoUpdater genericInfo{1};
+    genericInfo.loopStart();
 
     SceneType currentScene = SceneType::NOT_INIT;
 
@@ -382,5 +381,5 @@ void mainLoop()
         scene.reset();
     }
 
-    gGenericInfo.loopEnd();
+    genericInfo.loopEnd();
 }

@@ -1,21 +1,12 @@
 #pragma once
+
+#include "game/scene/scene.h"
+
 #include <memory>
-#include "scene.h"
-#include "scene_context.h"
 
-typedef std::shared_ptr<SceneBase> pScene;
-
-class SceneMgr
+namespace lunaticvibes
 {
-private:
-    static SceneMgr _inst;
-private:
-    SceneMgr() = default;
-    ~SceneMgr() = default;
-    SceneMgr(SceneMgr&) = delete;
-    SceneMgr& operator= (SceneMgr&) = delete;
 
-public:
-    static pScene get(SceneType);
-	static void clean();
-};
+std::shared_ptr<SceneBase> buildScene(SceneType);
+
+} // namespace lunaticvibes

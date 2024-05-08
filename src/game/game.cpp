@@ -2,6 +2,7 @@
 #include "common/meta.h"
 #include "config/config_mgr.h"
 #include "game/graphics/graphics.h"
+#include "game/scene/scene.h"
 #include "game/sound/sound_mgr.h"
 #include "game/scene/scene_mgr.h"
 #include "game/input/input_mgr.h"
@@ -19,6 +20,7 @@
 #include "game/arena/arena_client.h"
 #include "game/arena/arena_host.h"
 
+#include <memory>
 #include <string_view>
 
 #ifdef _WIN32
@@ -274,7 +276,7 @@ int main(int argc, char* argv[])
 
     SoundMgr::stopUpdate();
 
-    SceneMgr::clean();	// clean resources before releasing framework
+    SkinMgr::clean();
     graphics_free();
 
     ImGui::DestroyContext();
@@ -295,7 +297,8 @@ void mainLoop()
 
     SceneType currentScene = SceneType::NOT_INIT;
 
-    pScene scene = nullptr;
+    std::shared_ptr<SceneBase> scene;
+    std::shared_ptr<SceneBase> sceneCustomize;
     while (currentScene != SceneType::EXIT && gNextScene != SceneType::EXIT)
     {
         // Evenet handling
@@ -306,12 +309,11 @@ void mainLoop()
         }
 
         // Scene change
-        static pScene sceneCustomize = nullptr;
         if (gInCustomize)
         {
             if (sceneCustomize == nullptr)
             {
-                sceneCustomize = SceneMgr::get(SceneType::CUSTOMIZE);
+                sceneCustomize = lunaticvibes::buildScene(SceneType::CUSTOMIZE);
                 sceneCustomize->loopStart();
                 sceneCustomize->inputLoopStart();
             }
@@ -340,8 +342,16 @@ void mainLoop()
             currentScene = gNextScene;
             if (currentScene != SceneType::EXIT && currentScene != SceneType::NOT_INIT)
             {
-                scene = SceneMgr::get(currentScene);
+                State::set(IndexTimer::SCENE_START, TIMER_NEVER);
+                State::set(IndexTimer::START_INPUT, TIMER_NEVER);
+                State::set(IndexTimer::_LOAD_START, TIMER_NEVER);
+                State::set(IndexTimer::PLAY_READY, TIMER_NEVER);
+                State::set(IndexTimer::PLAY_START, TIMER_NEVER);
+                scene = lunaticvibes::buildScene(currentScene);
                 assert(scene != nullptr);
+                lunaticvibes::Time t;
+                State::set(IndexTimer::SCENE_START, t.norm());
+                State::set(IndexTimer::START_INPUT, t.norm() + (scene ? scene->getSkinInfo().timeIntro : 0));
                 scene->loopStart();
                 if (!gInCustomize)
                     scene->inputLoopStart();

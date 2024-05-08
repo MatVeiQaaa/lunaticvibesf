@@ -1,24 +1,24 @@
+#include "common/chartformat/chartformat_bms.h"
 #include "common/hash.h"
+#include "common/log.h"
 #include "common/meta.h"
+#include "common/sysutil.h"
+#include "common/utils.h"
 #include "config/config_mgr.h"
+#include "game/arena/arena_client.h"
+#include "game/arena/arena_data.h"
+#include "game/arena/arena_host.h"
 #include "game/graphics/graphics.h"
-#include "game/scene/scene.h"
-#include "game/sound/sound_mgr.h"
-#include "game/scene/scene_mgr.h"
 #include "game/input/input_mgr.h"
+#include "game/runtime/generic_info.h"
+#include "game/runtime/i18n.h"
+#include "game/scene/scene.h"
+#include "game/scene/scene_context.h"
+#include "game/scene/scene_mgr.h"
 #include "game/skin/skin_lr2.h"
 #include "game/skin/skin_lr2_slider_callbacks.h"
 #include "game/skin/skin_mgr.h"
-#include "common/utils.h"
-#include "common/sysutil.h"
-#include "game/scene/scene_context.h"
-#include "game/runtime/generic_info.h"
-#include "common/chartformat/chartformat_bms.h"
-#include "common/log.h"
-#include "game/runtime/i18n.h"
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
+#include "game/sound/sound_mgr.h"
 
 #include <memory>
 #include <string_view>
@@ -32,7 +32,6 @@
 #include <timeapi.h>
 #endif //WIN32
 
-#include <boost/format.hpp>
 #include <curl/curl.h>
 #include <imgui.h>
 

@@ -10,6 +10,7 @@ public:
 
 protected:
     // Looper callbacks
+    bool readyToStopAsync() const override;
     void _updateAsync() override;
     std::function<void()> _updateCallback;
 

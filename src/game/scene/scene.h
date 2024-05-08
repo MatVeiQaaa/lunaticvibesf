@@ -1,4 +1,6 @@
 #pragma once
+
+#include <atomic>
 #include <string>
 #include <memory>
 #include <array>
@@ -82,6 +84,13 @@ public:
     SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate = 240,
               bool backgroundInput = false);
     ~SceneBase() override;
+    enum class AsyncStopState {
+        Running,
+        Stopping,
+        Stopped,
+    };
+    AsyncStopState postAsyncStop();
+    void postAsyncStart();
     void inputLoopStart() { _input.loopStart(); }
     void inputLoopEnd() { _input.loopEnd(); }
     void disableMouseInput() { pSkin->setHandleMouseEvents(false); }
@@ -98,6 +107,11 @@ public:
 protected:
     virtual void _updateAsync() = 0;
     void _updateAsync1();
+    // For any additional state when transitioning from Stopping to Stopped.
+    virtual bool readyToStopAsync() const
+    {
+        return true;
+    };
 
     virtual void updateImgui();
     void DebugToggle(InputMask& m, const lunaticvibes::Time& t);
@@ -109,6 +123,9 @@ protected:
     virtual void stopTextEdit(bool modify);
 
     void GlobalFuncKeys(InputMask& m, const lunaticvibes::Time& t);
+
+private:
+    std::atomic<AsyncStopState> _asyncStopState{AsyncStopState::Running};
 };
 
 

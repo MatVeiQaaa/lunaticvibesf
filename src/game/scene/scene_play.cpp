@@ -1317,6 +1317,14 @@ void ScenePlay::removeInputJudgeCallback()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool ScenePlay::readyToStopAsync() const
+{
+    auto futureReady = [](const std::future<void>& future) {
+        return !future.valid() || future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+    };
+    return futureReady(_loadChartFuture);
+}
+
 void ScenePlay::_updateAsync()
 {
     if (gNextScene != SceneType::PLAY) return;

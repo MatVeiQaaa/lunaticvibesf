@@ -309,14 +309,30 @@ void mainLoop()
         }
 
         // Scene change
-        if (gInCustomize)
+        auto wantSceneChange = [&]() {
+            if (!gInCustomize && currentScene != gNextScene)
+                return true;
+            if (gInCustomize && gCustomizeSceneChanged)
+                return true;
+            return gExitingCustomize;
+        };
+        auto readyForSceneChange = [&]() {
+            if (scene && scene->postAsyncStop() != SceneBase::AsyncStopState::Stopped)
+                return false;
+            if (!gInCustomize || sceneCustomize == nullptr)
+                return true;
+            return !gExitingCustomize || sceneCustomize->postAsyncStop() == SceneBase::AsyncStopState::Stopped;
+        };
+        // TODO: move this under the 'if' below.
+        if (gInCustomize && sceneCustomize == nullptr)
         {
-            if (sceneCustomize == nullptr)
-            {
-                sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
-                sceneCustomize->loopStart();
-                sceneCustomize->inputLoopStart();
-            }
+            sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
+            assert(sceneCustomize != nullptr);
+            sceneCustomize->loopStart();
+            sceneCustomize->inputLoopStart();
+        }
+        if (wantSceneChange() && readyForSceneChange())
+        {
             if (gExitingCustomize && sceneCustomize)
             {
                 gInCustomize = false;
@@ -325,10 +341,9 @@ void mainLoop()
                 sceneCustomize.reset();
                 gNextScene = SceneType::SELECT;
             }
-        }
-        if ((gInCustomize && gCustomizeSceneChanged) || (!gInCustomize && currentScene != gNextScene) || gExitingCustomize)
-        {
-            if (!gInCustomize) gExitingCustomize = false;
+
+            if (!gInCustomize)
+                gExitingCustomize = false;
             gCustomizeSceneChanged = false;
 
             if (scene)

@@ -152,6 +152,7 @@ protected:
 
 protected:
     // Looper callbacks
+    bool readyToStopAsync() const override;
     void _updateAsync() override;
     void updateAsyncLanecover(const lunaticvibes::Time& t);
     void updateAsyncGreenNumber(const lunaticvibes::Time& t);

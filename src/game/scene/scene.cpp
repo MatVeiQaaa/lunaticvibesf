@@ -122,6 +122,20 @@ SceneBase::~SceneBase()
     sceneEnding = true; 
 }
 
+void SceneBase::postAsyncStart()
+{
+    _asyncStopState = AsyncStopState::Running;
+}
+
+SceneBase::AsyncStopState SceneBase::postAsyncStop()
+{
+    if (_asyncStopState == AsyncStopState::Running)
+    {
+        _asyncStopState = AsyncStopState::Stopping;
+    }
+    return _asyncStopState;
+}
+
 void SceneBase::update()
 {
     lunaticvibes::Time t;
@@ -275,7 +289,16 @@ void SceneBase::draw() const
 
 void SceneBase::_updateAsync1()
 {
-    _updateAsync();
+    switch (_asyncStopState)
+    {
+    case AsyncStopState::Running: _updateAsync(); break;
+    case AsyncStopState::Stopping:
+        _updateAsync();
+        if (readyToStopAsync())
+            _asyncStopState = AsyncStopState::Stopped;
+        break;
+    case AsyncStopState::Stopped: break;
+    }
 
     if ((!gInCustomize && _type != SceneType::CUSTOMIZE) || (gInCustomize && _type == SceneType::CUSTOMIZE))
         gFrameCount[FRAMECOUNT_IDX_SCENE]++;

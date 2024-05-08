@@ -1339,7 +1339,7 @@ public:
     ~SkinLR2() override;
 
 public:
-    int setExtendedProperty(std::string_view key, void* value) override;
+    void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) override;
 
 private:
     static std::map<std::string, Path> LR2SkinFontPathCache;
@@ -1347,7 +1347,7 @@ private:
 
     struct Customize
     {
-        enum class _Type { OPT, FILE } type;
+        enum class Type { OPT, FILE } type;
 
         // shared
         StringContent title;
@@ -1559,9 +1559,9 @@ private:
         {"LVF_EXPERIMENTAL_GAUGECHART_MYBEST", DefType::LVF_EXPERIMENTAL_GAUGECHART_MYBEST},
     };
 
-    Path getCustomizePath(StringContentView input);
+    [[nodiscard]] Path getCustomizePath(StringContentView input);
 
-    Tokens csvLineTokenize(const std::string& raw);
+    [[nodiscard]] Tokens csvLineTokenize(const std::string& raw);
 
     int HELPFILE();
     int IMAGE();
@@ -1648,12 +1648,12 @@ public:
     void start_bar_animation() override;
     void draw() const override;
 
-    size_t getCustomizeOptionCount() const override;
-    CustomizeOption getCustomizeOptionInfo(size_t idx) const override;
+    [[nodiscard]] size_t getCustomizeOptionCount() const override;
+    [[nodiscard]] CustomizeOption getCustomizeOptionInfo(size_t idx) const override;
 
-    StringContent getName() const override;
-    StringContent getMaker() const override;
-    StringPath getFilePath() const override;
+    [[nodiscard]] StringContent getName() const override;
+    [[nodiscard]] StringContent getMaker() const override;
+    [[nodiscard]] StringPath getFilePath() const override;
 
     const std::vector<std::string>& getHelpFiles() const;
 

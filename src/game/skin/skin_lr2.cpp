@@ -6,6 +6,7 @@
 #include <optional>
 #include <set>
 #include <sstream>
+#include <string_view>
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
@@ -27,17 +28,18 @@
 using uint8_t = std::uint8_t;
 using namespace std::placeholders;
 
-static MotionKeyFrameParams::accelType parseAccelType(const int value)
+[[nodiscard]] static MotionKeyFrameParams::accelType parseAccelType(const int value)
 {
     using accelType = MotionKeyFrameParams::accelType;
-    switch (value) {
+    switch (value)
+    {
     case 0: return accelType::CONSTANT;
     case 1: return accelType::ACCEL;
     case 2: return accelType::DECEL;
     case 3: return accelType::DISCONTINOUS;
     default: break;
     }
-    LOG_WARNING << "[SkinLR2] Invalid accelType '" << value << "'";
+    LOG_DEBUG << "[SkinLR2] Invalid accelType '" << value << "'";
     return accelType::CONSTANT;
 }
 
@@ -455,10 +457,16 @@ std::map<Path, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontCache;
 std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::prevSkinLR2FontNameMap;
 std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontNameMap;
 
-int SkinLR2::setExtendedProperty(const std::string_view key, void* value)
+void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 {
-    assert(value != nullptr);
-
+    auto spriteIdxForSlot = [](unsigned slot) -> size_t {
+        switch (slot)
+        {
+        case PLAYER_SLOT_PLAYER: return GLOBAL_SPRITE_IDX_1PGAUGE;
+        case PLAYER_SLOT_TARGET: return GLOBAL_SPRITE_IDX_2PGAUGE;
+        default: assert(false); return {};
+        }
+    };
     auto gaugeDisplayTypeToSpriteType = [](GaugeDisplayType type) -> SpriteGaugeGrid::GaugeType {
         switch (type)
         {
@@ -470,49 +478,26 @@ int SkinLR2::setExtendedProperty(const std::string_view key, void* value)
         assert(false);
         return {};
     };
-
-    if (key == "GAUGETYPE_1P")
+    auto sprite = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[spriteIdxForSlot(slot)]);
+    if (sprite)
     {
-        if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PGAUGE] == nullptr)
-        {
-            return 1;
-        }
-        auto type = *static_cast<GaugeDisplayType*>(value);
-        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PGAUGE]);
-        pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
-        return 0;
+        sprite->setGaugeType(gaugeDisplayTypeToSpriteType(type));
     }
-
-    if (key == "GAUGETYPE_2P")
-    {
-        if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PGAUGE] == nullptr)
-        {
-            return 1;
-        }
-        auto type = *static_cast<GaugeDisplayType*>(value);
-        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PGAUGE]);
-        pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
-        return 0;
-    }
-
-    return -1;
 }
 
 
-bool matchToken(const StringContent& str1, std::string_view str2) noexcept
+[[nodiscard]] static bool matchToken(std::string_view str1, std::string_view str2) noexcept
 {
-    if (str1.length() >= str2.length()) 
-        return lunaticvibes::iequals(std::string_view(str1.c_str(), str2.length()), str2);
-    else
+    if (str1.length() < str2.length())
         return false;
+    return lunaticvibes::iequals(str1.substr(0, str2.length()), str2);
 }
-
 
 #pragma region Parsing helpers
 
 // For LR2 skin .csv parsing:
 // op1~4 may include a '!' before the number, split it out
-[[nodiscard]] std::optional<std::pair<unsigned, bool>> toPairUIntBool(const std::string_view str) noexcept
+[[nodiscard]] static std::optional<std::pair<unsigned, bool>> toPairUIntBool(const std::string_view str) noexcept
 {
     if (str.empty())
         return {};
@@ -536,7 +521,7 @@ bool matchToken(const StringContent& str1, std::string_view str2) noexcept
     return std::pair{ val, notPref };
 }
 
-std::string_view csvLineNormalize(const std::string& raw)
+[[nodiscard]] std::string_view csvLineNormalize(const std::string& raw)
 {
     if (raw.empty()) return {};
 
@@ -562,7 +547,7 @@ std::string_view csvLineNormalize(const std::string& raw)
     return linecsv;
 }
 
-Tokens csvLineTokenizeSimple(const std::string& raw)
+[[nodiscard]] Tokens csvLineTokenizeSimple(const std::string& raw)
 {
     StringContentView linecsv = csvLineNormalize(raw);
     if (linecsv.empty()) return {};
@@ -573,7 +558,7 @@ Tokens csvLineTokenizeSimple(const std::string& raw)
     return res;
 }
 
-Tokens csvLineTokenizeRegex(const std::string& raw)
+[[nodiscard]] Tokens csvLineTokenizeRegex(const std::string& raw)
 {
     Tokens res;
     res.reserve(32);
@@ -590,7 +575,7 @@ Tokens csvLineTokenizeRegex(const std::string& raw)
     return res;
 }
 
-Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
+[[nodiscard]] Point getCenterPoint(const int& wi, const int& hi, int numpadCenter)
 {
     double w = (double)wi;
     double h = (double)hi;
@@ -629,7 +614,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
         for (size_t idx = 0; idx < customize.size(); ++idx)
         {
             const auto& cf = customize[idx];
-            if (cf.type == Customize::_Type::FILE && cf.filepath == pathU8Str.substr(0, cf.filepath.length()))
+            if (cf.type == Customize::Type::FILE && cf.filepath == pathU8Str.substr(0, cf.filepath.length()))
             {
                 int value = (cf.pathList[cf.value] == "RANDOM") ? customizeRandom[idx] : cf.value;
 
@@ -3314,7 +3299,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded Custom option " << title << ": " << dst_op;
 
         Customize c;
-        c.type = Customize::_Type::OPT;
+        c.type = Customize::Type::OPT;
         c.title = title;
         c.dst_op = dst_op;
         c.label = std::move(op_label);
@@ -3347,7 +3332,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded Custom file " << title << ": " << pathf;
 
         Customize c;
-        c.type = Customize::_Type::FILE;
+        c.type = Customize::Type::FILE;
         c.title = title;
         c.dst_op = 0;
         c.filepath = pathf.u8string();
@@ -3825,7 +3810,6 @@ bool SkinLR2::loadCSV(Path p)
             {
                 if (c.dst_op != 0)
                 {
-                    //data().setDstOption(static_cast<dst_option>(c.dst_op + c.value), true);
                     for (size_t i = 0; i < c.label.size(); ++i)
                     {
                         setCustomDstOpt(c.dst_op, i, false);
@@ -4537,7 +4521,7 @@ SkinBase::CustomizeOption SkinLR2::getCustomizeOptionInfo(size_t idx) const
     ret.id = op.dst_op;
     switch (op.type)
     {
-    case Customize::_Type::OPT:
+    case Customize::Type::OPT:
         ret.internalName = "OPT_";
         ret.internalName += std::to_string(op.dst_op);
         ret.displayName = op.title;
@@ -4545,7 +4529,7 @@ SkinBase::CustomizeOption SkinLR2::getCustomizeOptionInfo(size_t idx) const
         ret.defaultEntry = 0;
         break;
 
-    case Customize::_Type::FILE:
+    case Customize::Type::FILE:
         ret.internalName = "FILE_";
         ret.internalName += op.title;
         ret.displayName = op.title;

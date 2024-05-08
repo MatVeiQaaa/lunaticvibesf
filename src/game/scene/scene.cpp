@@ -37,7 +37,6 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
 
     int notificationPosY = 480;
     int notificationWidth = 640;
-    const int notificationHeight = 20;
 
     if (pSkin &&
         ((!gInCustomize && skinType != SkinType::THEME_SELECT) || (gInCustomize && skinType == SkinType::THEME_SELECT)))
@@ -53,6 +52,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
     {
         int faceIndex;
         const Path fontPath = getSysMonoFontPath(NULL, &faceIndex, i18n::getCurrentLanguage());
+        const int notificationHeight = 20;
         const int textHeight = 24;
         _fNotifications = std::make_shared<TTFFont>(fontPath, int(textHeight * 1.5), faceIndex);
         _texNotificationsBG = std::make_shared<TextureFull>(0x000000ff);

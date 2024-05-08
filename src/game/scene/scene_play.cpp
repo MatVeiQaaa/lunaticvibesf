@@ -273,11 +273,8 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr): SceneBase(skinMgr
         switch (gChartContext.chart->type())
         {
         case eChartFormat::BMS:
-        case eChartFormat::BMSON:
-            setInitialHealthBMS();
-            break;
-        default:
-            break;
+        case eChartFormat::BMSON: setInitialHealthBMS(); break;
+        case eChartFormat::UNKNOWN: break;
         }
     }
     playerState[PLAYER_SLOT_PLAYER].healthLastTick = State::get(IndexNumber::PLAY_1P_GROOVEGAUGE);
@@ -285,30 +282,25 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr): SceneBase(skinMgr
 
     auto initDisplayGaugeType = [&](int slot)
     {
-        GaugeDisplayType tmp = GaugeDisplayType::GROOVE;
-        switch (gPlayContext.mods[slot].gauge)
-        {
-        case PlayModifierGaugeType::NORMAL:       tmp = GaugeDisplayType::GROOVE; break;
-        case PlayModifierGaugeType::HARD:         tmp = GaugeDisplayType::SURVIVAL; break;
-        case PlayModifierGaugeType::DEATH:        tmp = GaugeDisplayType::EX_SURVIVAL; break;
-        case PlayModifierGaugeType::EASY:         tmp = GaugeDisplayType::GROOVE; break;
-            // case PlayModifierGaugeType::PATTACK:      tmp = GaugeDisplayType::EX_SURVIVAL; break;
-            // case PlayModifierGaugeType::GATTACK:      tmp = GaugeDisplayType::EX_SURVIVAL; break;
-        case PlayModifierGaugeType::ASSISTEASY:   tmp = GaugeDisplayType::ASSIST_EASY; break;
-        case PlayModifierGaugeType::EXHARD:       tmp = GaugeDisplayType::EX_SURVIVAL; break;
-        case PlayModifierGaugeType::GRADE_NORMAL: tmp = GaugeDisplayType::SURVIVAL; break;
-        case PlayModifierGaugeType::GRADE_HARD:   tmp = GaugeDisplayType::EX_SURVIVAL; break;
-        case PlayModifierGaugeType::GRADE_DEATH:  tmp = GaugeDisplayType::EX_SURVIVAL; break;
-        default: break;
-        }
-        if (slot == PLAYER_SLOT_PLAYER)
-        {
-            pSkin->setExtendedProperty("GAUGETYPE_1P", &tmp);
-        }
-        else
-        {
-            pSkin->setExtendedProperty("GAUGETYPE_2P", &tmp);
-        }
+        auto playModifierGaugeTypeToDisplay = [](PlayModifierGaugeType type) -> GaugeDisplayType {
+            switch (type)
+            {
+            case PlayModifierGaugeType::NORMAL: return GaugeDisplayType::GROOVE;
+            case PlayModifierGaugeType::HARD: return GaugeDisplayType::SURVIVAL;
+            case PlayModifierGaugeType::DEATH: return GaugeDisplayType::EX_SURVIVAL;
+            case PlayModifierGaugeType::EASY: return GaugeDisplayType::GROOVE;
+            case PlayModifierGaugeType::PATTACK:                                       // TODO: check this
+            case PlayModifierGaugeType::GATTACK: return GaugeDisplayType::EX_SURVIVAL; // TODO: check this
+            case PlayModifierGaugeType::ASSISTEASY: return GaugeDisplayType::ASSIST_EASY;
+            case PlayModifierGaugeType::EXHARD: return GaugeDisplayType::EX_SURVIVAL;
+            case PlayModifierGaugeType::GRADE_NORMAL: return GaugeDisplayType::SURVIVAL;
+            case PlayModifierGaugeType::GRADE_HARD:
+            case PlayModifierGaugeType::GRADE_DEATH: return GaugeDisplayType::EX_SURVIVAL;
+            }
+            assert(false);
+            return {};
+        };
+        pSkin->setGaugeDisplayType(slot, playModifierGaugeTypeToDisplay(gPlayContext.mods[slot].gauge));
     };
     initDisplayGaugeType(PLAYER_SLOT_PLAYER);
     if (gPlayContext.isBattle) initDisplayGaugeType(PLAYER_SLOT_TARGET);

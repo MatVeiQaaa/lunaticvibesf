@@ -36,8 +36,7 @@ protected:
     bool loaded = false;
 public:
     constexpr bool isLoaded() { return loaded; }
-    // FIXME: add getters/setters for those properties instead
-    virtual int setExtendedProperty(std::string_view key, void* value) = 0;
+    virtual void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) {};
 
 ////////////////////////////////////////////////////////////////////////////////
 // Images

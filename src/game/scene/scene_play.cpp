@@ -160,15 +160,7 @@ ScenePlay::ScenePlay(): SceneBase(gPlayContext.mode, 1000, true)
     {
         gPlayContext.shift1PNotes5KFor7KSkin = (pSkin->info.scratchSide1P == 1);
         gPlayContext.shift2PNotes5KFor7KSkin = (pSkin->info.scratchSide2P == 1);
-
-        if (gPlayContext.shift1PNotes5KFor7KSkin)
-        {
-            replayCmdMapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 3 : 2;
-        }
-        else
-        {
-            replayCmdMapIndex = gPlayContext.shift2PNotes5KFor7KSkin ? 1 : 0;
-        }
+        replayCmdMapIndex = gPlayContext.shiftFiveKeyForSevenKeyIndex(true);
     }
 
     // ? 
@@ -796,35 +788,11 @@ bool ScenePlay::createRuleset()
             break;
         }
 
-        unsigned keys = 7;
-        switch (gPlayContext.mode)
-        {
-        case SkinType::PLAY5:
-        case SkinType::PLAY5_2: keys = 5; break;
-        case SkinType::PLAY7:
-        case SkinType::PLAY7_2: keys = 7; break;
-        case SkinType::PLAY9:
-        case SkinType::PLAY9_2: keys = 9; break;
-        case SkinType::PLAY10: keys = 10; break;
-        case SkinType::PLAY14: keys = 14; break;
-        default: break;
-        }
+        const unsigned keys = lunaticvibes::skinTypeToKeys(gPlayContext.mode);
 
         if (!gInCustomize)
         {
-            unsigned skinKeys = 7;
-            switch (pSkin->info.mode)
-            {
-            case SkinType::PLAY5:
-            case SkinType::PLAY5_2: skinKeys = 5; break;
-            case SkinType::PLAY7:
-            case SkinType::PLAY7_2: skinKeys = 7; break;
-            case SkinType::PLAY9:
-            case SkinType::PLAY9_2: skinKeys = 9; break;
-            case SkinType::PLAY10: skinKeys = 10; break;
-            case SkinType::PLAY14: skinKeys = 14; break;
-            default: break;
-            }
+            const unsigned skinKeys = lunaticvibes::skinTypeToKeys(pSkin->info.mode);
             InputMgr::updateBindings(skinKeys);
         }
 

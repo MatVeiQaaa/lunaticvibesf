@@ -7,6 +7,8 @@ namespace lr2skin::slider
 {
 std::function<void(double)> getSliderCallback(int type);
 
-// may be used externally
+// ==================== may be used externally
+
 void pitch(double p);
-}
+void updatePitchState(int val);
+} // namespace lr2skin::slider

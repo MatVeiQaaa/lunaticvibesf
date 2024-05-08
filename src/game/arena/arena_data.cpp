@@ -69,22 +69,8 @@ bool ArenaData::isPlayerReady(size_t index)
 
 void ArenaData::initPlaying(RulesetType rulesetType)
 {
-	unsigned keys = 7;
-	switch (gPlayContext.mode)
-	{
-	case SkinType::PLAY5:
-	case SkinType::PLAY5_2: keys = 5; break;
-	case SkinType::PLAY7:
-	case SkinType::PLAY7_2: keys = 7; break;
-	case SkinType::PLAY9:
-	case SkinType::PLAY9_2: keys = 9; break;
-	case SkinType::PLAY10: keys = 10; break;
-	case SkinType::PLAY14: keys = 14; break;
-	default: break;
-	}
-
+	const unsigned keys = lunaticvibes::skinTypeToKeys(gPlayContext.mode);
 	unsigned idx = 0;
-
 	for (auto& [id, d] : data)
 	{
 		switch (rulesetType)

@@ -35,6 +35,7 @@ static MotionKeyFrameParams::accelType parseAccelType(const int value)
     case 1: return accelType::ACCEL;
     case 2: return accelType::DECEL;
     case 3: return accelType::DISCONTINOUS;
+    default: break;
     }
     LOG_WARNING << "[SkinLR2] Invalid accelType '" << value << "'";
     return accelType::CONSTANT;
@@ -302,9 +303,9 @@ static int flipTimer(int timer)
         }
     };
 
-    typedef s_basic s_judgeline;
-    typedef s_basic s_barline;
-    typedef s_basic s_note;
+    using s_judgeline = s_basic;
+    using s_barline = s_basic;
+    using s_note = s_basic;
 
     struct s_nowjudge : s_basic
     {
@@ -352,10 +353,10 @@ static int flipTimer(int timer)
         }
     };
 
-    typedef s_basic s_barbody;
-    typedef s_basic s_barflash;
-    typedef s_nowcombo s_barlevel;
-    typedef s_basic s_barlamp;
+    using s_barbody = s_basic;
+    using s_barflash = s_basic;
+    using s_barlevel = s_nowcombo;
+    using s_barlamp = s_basic;
     struct s_bartitle
     {
         int _null = 0;
@@ -368,8 +369,8 @@ static int flipTimer(int timer)
             convertLine(tokens, (int*)this, 0, count);
         }
     };
-    typedef s_basic s_barrank;
-    typedef s_basic s_barrival;
+    using s_barrank = s_basic;
+    using s_barrival = s_basic;
     struct s_readme
     {
         int _null = 0;
@@ -382,7 +383,7 @@ static int flipTimer(int timer)
             convertLine(tokens, (int*)this, 0, count);
         }
     };
-    typedef s_basic s_mousecursor;
+    using s_mousecursor = s_basic;
 
     struct s_gaugechart : s_basic
     {
@@ -397,7 +398,7 @@ static int flipTimer(int timer)
             convertLine(tokens, (int*)this, offset, count);
         }
     };
-    typedef s_gaugechart s_scorechart;
+    using s_scorechart = s_gaugechart;
 
     struct dst
     {
@@ -432,21 +433,21 @@ static int flipTimer(int timer)
 
     BlendMode convertBlend(int blend)
     {
-        static const std::map<int, BlendMode> blendMap =
+        switch (blend)
         {
-            {0, BlendMode::NONE},
-            {1, BlendMode::ALPHA},
-            {2, BlendMode::ADD},
-            {3, BlendMode::SUBTRACT},
-            {4, BlendMode::MOD},
-            {6, BlendMode::ADD},    // LR2: XOR but implemented as ADD
-            {9, BlendMode::MULTIPLY_INVERTED_BACKGROUND},
-            {10, BlendMode::INVERT},
-            {11, BlendMode::MULTIPLY_WITH_ALPHA},
+        case 0: return BlendMode::NONE;
+        case 1: return BlendMode::ALPHA;
+        case 2: return BlendMode::ADD;
+        case 3: return BlendMode::SUBTRACT;
+        case 4: return BlendMode::MOD;
+        case 6: return BlendMode::ADD; // LR2: XOR but implemented as ADD
+        case 9: return BlendMode::MULTIPLY_INVERTED_BACKGROUND;
+        case 10: return BlendMode::INVERT;
+        case 11: return BlendMode::MULTIPLY_WITH_ALPHA;
+        default: return BlendMode::ALPHA;
         };
-        return (blendMap.find(blend) != blendMap.end()) ? blendMap.at(blend) : BlendMode::ALPHA;
     }
-}
+    } // namespace lr2skin
 
 std::map<std::string, Path> SkinLR2::LR2SkinFontPathCache;
 std::map<Path, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontCache;
@@ -457,63 +458,40 @@ std::map<std::string, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontNameMap
 int SkinLR2::setExtendedProperty(const std::string_view key, void* value)
 {
     assert(value != nullptr);
+
+    auto gaugeDisplayTypeToSpriteType = [](GaugeDisplayType type) -> SpriteGaugeGrid::GaugeType {
+        switch (type)
+        {
+        case GaugeDisplayType::GROOVE: return SpriteGaugeGrid::GaugeType::GROOVE;
+        case GaugeDisplayType::SURVIVAL: return SpriteGaugeGrid::GaugeType::SURVIVAL;
+        case GaugeDisplayType::EX_SURVIVAL: return SpriteGaugeGrid::GaugeType::EX_SURVIVAL;
+        case GaugeDisplayType::ASSIST_EASY: return SpriteGaugeGrid::GaugeType::ASSIST_EASY;
+        }
+        assert(false);
+        return {};
+    };
+
     if (key == "GAUGETYPE_1P")
     {
-        if (gSprites[GLOBAL_SPRITE_IDX_1PGAUGE] != nullptr)
+        if (gSprites[GLOBAL_SPRITE_IDX_1PGAUGE] == nullptr)
         {
-            auto type = *(GaugeDisplayType*)value;
-            auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_1PGAUGE]);
-            switch (type)
-            {
-            case GaugeDisplayType::SURVIVAL:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::SURVIVAL);
-                break;
-
-            case GaugeDisplayType::EX_SURVIVAL:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::EX_SURVIVAL);
-                break;
-
-            case GaugeDisplayType::ASSIST_EASY:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::ASSIST_EASY);
-                break;
-
-            default:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::GROOVE);
-                break;
-            }
-        }
-        else
             return 1;
+        }
+        auto type = *static_cast<GaugeDisplayType*>(value);
+        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_1PGAUGE]);
+        pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
         return 0;
     }
 
     if (key == "GAUGETYPE_2P")
     {
-        if (gSprites[GLOBAL_SPRITE_IDX_2PGAUGE] != nullptr)
+        if (gSprites[GLOBAL_SPRITE_IDX_2PGAUGE] == nullptr)
         {
-            auto type = *(GaugeDisplayType*)value;
-            auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_2PGAUGE]);
-            switch (type)
-            {
-            case GaugeDisplayType::SURVIVAL:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::SURVIVAL);
-                break;
-
-            case GaugeDisplayType::EX_SURVIVAL:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::EX_SURVIVAL);
-                break;
-
-            case GaugeDisplayType::ASSIST_EASY:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::ASSIST_EASY);
-                break;
-
-            default:
-                pS->setGaugeType(SpriteGaugeGrid::GaugeType::GROOVE);
-                break;
-            }
-        }
-        else
             return 1;
+        }
+        auto type = *static_cast<GaugeDisplayType*>(value);
+        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_2PGAUGE]);
+        pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
         return 0;
     }
 
@@ -669,11 +647,8 @@ Path SkinLR2::getCustomizePath(StringContentView input)
         {
             return Path();
         }
-        else
-        {
-            size_t ranidx = std::rand() % ls.size();
-            return ls[ranidx];
-        }
+        size_t ranidx = std::rand() % ls.size();
+        return ls[ranidx];
     }
 
     // Normal path
@@ -1003,66 +978,57 @@ int SkinLR2::TIMEOPTION()
             if (update > 0) info.timeResultRecord = update;
             LOG_DEBUG << "[Skin] " << csvLineNumber << ": STARTINPUT " << info.timeIntro << " " << rank << " " << update;
         }
-
         return 1;
     }
-
-    else if (matchToken(parseKeyBuf, "#LOADSTART"))
+    if (matchToken(parseKeyBuf, "#LOADSTART"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeStartLoading = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set time colddown before loading: " << time;
         return 3;
     }
-
-    else if (matchToken(parseKeyBuf, "#LOADEND"))
+    if (matchToken(parseKeyBuf, "#LOADEND"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeMinimumLoad = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set time colddown after loading: " << time;
         return 4;
     }
-
-    else if (matchToken(parseKeyBuf, "#PLAYSTART"))
+    if (matchToken(parseKeyBuf, "#PLAYSTART"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeGetReady = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set time READY after loading: " << time;
         return 5;
     }
-
-    else if (matchToken(parseKeyBuf, "#CLOSE"))
+    if (matchToken(parseKeyBuf, "#CLOSE"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeFailed = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set FAILED time length: " << time;
         return 6;
     }
-
-    else if (matchToken(parseKeyBuf, "#FADEOUT"))
+    if (matchToken(parseKeyBuf, "#FADEOUT"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeOutro = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set fadeout time length: " << time;
         return 7;
     }
-
-    else if (matchToken(parseKeyBuf, "#SKIP"))
+    if (matchToken(parseKeyBuf, "#SKIP"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeDecideSkip = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set Decide skip time: " << time;
         return 8;
     }
-
-    else if (matchToken(parseKeyBuf, "#SCENETIME"))
+    if (matchToken(parseKeyBuf, "#SCENETIME"))
     {
         int time = toInt(parseParamBuf[0]);
         info.timeDecideExpiry = time;
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set Decide expiry time: " << time;
         return 9;
     }
-
     return 0;
 }
 
@@ -3666,16 +3632,7 @@ SkinLR2::~SkinLR2()
 {
     stopSpriteVideoPlayback();
 
-    switch (info.mode)
-    {
-    case SkinType::PLAY5:
-    case SkinType::PLAY5_2:
-    case SkinType::PLAY7:
-    case SkinType::PLAY7_2:
-    case SkinType::PLAY9:
-    case SkinType::PLAY9_2:
-    case SkinType::PLAY10:
-    case SkinType::PLAY14:
+    if (getSceneFromSkinType(info.mode) == SceneType::PLAY)
     {
         Path pCustomize = ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
         try
@@ -3708,9 +3665,6 @@ SkinLR2::~SkinLR2()
         {
             LOG_WARNING << "[Skin] Bad customize config file: " << pCustomize;
         }
-        break;
-    }
-    default: break;
     }
 }
 
@@ -4409,16 +4363,20 @@ void SkinLR2::update()
         move1PY -= lift1P;
         move2PY -= lift2P;
     }
-    if (move1PX != 0 || move1PY != 0)
-    {
-        for (size_t i = 0; i < 6; ++i)
+    auto adjustPlayJudgePosition = [](size_t base, int movex, int movey) {
+        if (movex == 0 && movey == 0)
+        {
+            return;
+        }
+
+        for (size_t i = base; i < base + 6; ++i)
         {
             if (gSprites[i])
             {
                 std::shared_ptr<SpriteAnimated> judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i]);
                 if (judge->isDraw() && !judge->isHidden())
                 {
-                    judge->adjustAfterUpdate(move1PX, move1PY);
+                    judge->adjustAfterUpdate(movex, movey);
                 }
             }
             if (gSprites[i + 6])
@@ -4426,61 +4384,38 @@ void SkinLR2::update()
                 std::shared_ptr<SpriteNumber> combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 6]);
                 if (combo->isDraw() && !combo->isHidden())
                 {
-                    combo->adjustAfterUpdate(move1PX, move1PY);
+                    combo->adjustAfterUpdate(movex, movey);
                 }
             }
         }
-    }
-    if (move2PX != 0 || move2PY != 0)
-    {
-        for (size_t i = 0; i < 6; ++i)
-        {
-            if (gSprites[i + 12])
-            {
-                std::shared_ptr<SpriteAnimated> judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i + 12]);
-                if (judge->isDraw() && !judge->isHidden())
-                {
-                    judge->adjustAfterUpdate(move2PX, move2PY);
-                }
-            }
-            if (gSprites[i + 18])
-            {
-                std::shared_ptr<SpriteNumber> combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 18]);
-                if (combo->isDraw() && !combo->isHidden())
-                {
-                    combo->adjustAfterUpdate(move2PX, move2PY);
-                }
-            }
-        }
-    }
+    };
+    adjustPlayJudgePosition(0, move1PX, move1PY);
+    adjustPlayJudgePosition(12, move2PX, move2PY);
 
     // LIFT: judgeline, sprites
     move1PX = adjustPlayNote1PX;
     move1PY = adjustPlayNote1PY - lift1P;
     move2PX = adjustPlayNote2PX;
     move2PY = adjustPlayNote2PY - lift2P;
-    if (move1PX != 0 || move1PY != 0)
-    {
-        std::shared_ptr<SpriteAnimated> judgeLine = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[GLOBAL_SPRITE_IDX_1PJUDGELINE]);
+    auto adjustLift = [](size_t judgeline_sprite, std::list<std::shared_ptr<SpriteBase>>& spritesMoveWithLift,
+                         int movex, int movey) {
+        if (movex == 0 && movey == 0)
+        {
+            return;
+        }
+        auto& judgeLine = gSprites[judgeline_sprite];
         if (judgeLine && judgeLine->isDraw() && !judgeLine->isHidden())
         {
-            judgeLine->adjustAfterUpdate(move1PX, move1PY);
+            judgeLine->adjustAfterUpdate(movex, movey);
         }
 
-        for (auto& s : spritesMoveWithLift1P)
-            s->adjustAfterUpdate(move1PX, move1PY);
-    }
-    if (move2PX != 0 || move2PY != 0)
-    {
-        std::shared_ptr<SpriteAnimated> judgeLine = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[GLOBAL_SPRITE_IDX_2PJUDGELINE]);
-        if (judgeLine && judgeLine->isDraw() && !judgeLine->isHidden())
+        for (auto& s : spritesMoveWithLift)
         {
-            judgeLine->adjustAfterUpdate(move2PX, move2PY);
+            s->adjustAfterUpdate(movex, movey);
         }
-
-        for (auto& s : spritesMoveWithLift2P)
-            s->adjustAfterUpdate(move2PX, move2PY);
-    }
+    };
+    adjustLift(GLOBAL_SPRITE_IDX_1PJUDGELINE, spritesMoveWithLift1P, move1PX, move1PY);
+    adjustLift(GLOBAL_SPRITE_IDX_2PJUDGELINE, spritesMoveWithLift2P, move2PX, move2PY);
 
     // note scale
     if (move1PX != 0 || move1PY != 0 || move2PX != 0 || move2PY != 0 || adjustPlayNote1PW != 0 ||
@@ -4611,8 +4546,9 @@ SkinBase::CustomizeOption SkinLR2::getCustomizeOptionInfo(size_t idx) const
         ret.internalName = "FILE_";
         ret.internalName += op.title;
         ret.displayName = op.title;
-        for (size_t i = 0; i < op.pathList.size(); ++i)
-            ret.entries.push_back(op.pathList[i].filename().stem().u8string());
+        ret.entries.reserve(op.pathList.size());
+        for (const auto& path : op.pathList)
+            ret.entries.push_back(path.filename().stem().u8string());
         ret.defaultEntry = op.defIdx;
         break;
     }

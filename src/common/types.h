@@ -59,6 +59,38 @@ enum class SkinType : uint8_t {
 };
 std::ostream& operator<<(std::ostream& os, const SkinType& mode);
 
+namespace lunaticvibes {
+
+[[nodiscard]] inline SkinType skinTypeForKeys(unsigned keys) {
+    switch (keys)
+    {
+    case 5: return SkinType::PLAY5;
+    case 7: return SkinType::PLAY7;
+    case 9: return SkinType::PLAY9;
+    case 10: return SkinType::PLAY10;
+    case 14: return SkinType::PLAY14;
+    default: abort();
+    }
+}
+
+[[nodiscard]] inline unsigned skinTypeToKeys(SkinType mode)
+{
+    switch (mode)
+    {
+    case SkinType::PLAY5:
+    case SkinType::PLAY5_2: return 5;
+    case SkinType::PLAY7:
+    case SkinType::PLAY7_2: return 7;
+    case SkinType::PLAY9:
+    case SkinType::PLAY9_2: return 9;
+    case SkinType::PLAY10: return 10;
+    case SkinType::PLAY14: return 14;
+    default: abort();
+    }
+}
+
+} // namespace lunaticvibes
+
 enum class ePlayMode
 {
     SINGLE_PLAYER,  // means "Single Player Mode", so DP is also included

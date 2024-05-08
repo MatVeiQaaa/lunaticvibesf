@@ -156,13 +156,8 @@ void fx2(int idx, double p)
     }
 }
 
-void pitch(double p)
+void updatePitchState(int val)
 {
-    int val = int(p * 24) - 12;
-    double ps = (val + 12) / 24.0;
-    State::set(IndexSlider::PITCH, ps);
-    State::set(IndexNumber::PITCH, val);
-
     if (State::get(IndexSwitch::SOUND_PITCH))
     {
         static const double tick = std::pow(2, 1.0 / 12);
@@ -187,6 +182,16 @@ void pitch(double p)
             break;
         }
     }
+}
+
+void pitch(double p)
+{
+    int val = int(p * 24) - 12;
+    double ps = (val + 12) / 24.0;
+    State::set(IndexSlider::PITCH, ps);
+    State::set(IndexNumber::PITCH, val);
+
+    updatePitchState(val);
 
     const auto [score, lamp] = getSaveScoreType();
     State::set(IndexSwitch::CHART_CAN_SAVE_SCORE, score);

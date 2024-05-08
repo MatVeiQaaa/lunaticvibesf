@@ -2099,39 +2099,30 @@ void SceneSelect::decide()
         if (gChartContext.chart->type() == eChartFormat::BMS)
         {
             auto pBMS = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(gChartContext.chart);
-            switch (pBMS->gamemode)
-            {
-            case 5:  gPlayContext.mode = SkinType::PLAY5;  break;
-            case 7:  gPlayContext.mode = SkinType::PLAY7;  break;
-            case 9:  gPlayContext.mode = SkinType::PLAY9;  break;
-            case 10: gPlayContext.mode = SkinType::PLAY10; break;
-            case 14: gPlayContext.mode = SkinType::PLAY14; break;
-            default: gPlayContext.mode = SkinType::PLAY7;  break;
-            }
+            gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
             if (gPlayContext.isBattle)
             {
                 if (State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_LOCAL || 
                     State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST)
                 {
-                    switch (pBMS->gamemode)
-                    {
-                    case 5:  gPlayContext.mode = SkinType::PLAY5_2;  break;
-                    case 7:  gPlayContext.mode = SkinType::PLAY7_2;  break;
-                    case 9:  gPlayContext.mode = SkinType::PLAY9;  gPlayContext.isBattle = false; break;
-                    case 10: gPlayContext.mode = SkinType::PLAY10; gPlayContext.isBattle = false; break;
-                    case 14: gPlayContext.mode = SkinType::PLAY14; gPlayContext.isBattle = false; break;
-                    default: assert(false); break;
-                    }
+                    gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
+                    auto canBattleInGameMode = [](unsigned keys) {
+                        switch (keys)
+                        {
+                        case 5:
+                        case 7: return true;
+                        case 9:
+                        case 10:
+                        case 14: return false;
+                        default: assert(false); return false;
+                        }
+                    };
+                    gPlayContext.isBattle = canBattleInGameMode(pBMS->gamemode);
                 }
             }
             else if (State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_DB)
             {
-                switch (pBMS->gamemode)
-                {
-                case 5:  gPlayContext.mode = SkinType::PLAY10;  break;
-                case 7:  gPlayContext.mode = SkinType::PLAY14;  break;
-                default: assert(false); break;
-                }
+                gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
                 gChartContext.isDoubleBattle = true;
             }
         }

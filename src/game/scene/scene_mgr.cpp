@@ -1,6 +1,7 @@
 #include "scene_mgr.h"
 
 #include "common/log.h"
+#include "game/scene/scene.h"
 #include "scene_context.h"
 #include "scene_pre_select.h"
 #include "scene_select.h"
@@ -35,33 +36,21 @@ pScene SceneMgr::get(SceneType e)
     case SceneType::SELECT: ps = std::make_shared<SceneSelect>(); break;
     case SceneType::DECIDE: ps = std::make_shared<SceneDecide>(); break;
     case SceneType::PLAY:
-        switch (gPlayContext.mode)
+        if (getSceneFromSkinType(gPlayContext.mode) != SceneType::PLAY)
         {
-        case SkinType::PLAY5:
-        case SkinType::PLAY7:
-        case SkinType::PLAY9:
-        case SkinType::PLAY10:
-        case SkinType::PLAY14:
-        case SkinType::PLAY5_2:
-        case SkinType::PLAY7_2:
-        case SkinType::PLAY9_2: ps = std::make_shared<ScenePlay>(); break;
-        default: LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode); return nullptr;
+            LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode);
+            return nullptr;
         }
+        ps = std::make_shared<ScenePlay>();
         break;
     case SceneType::RETRY_TRANS: ps = std::make_shared<ScenePlayRetryTrans>(); break;
     case SceneType::RESULT:
-        switch (gPlayContext.mode)
+        if (getSceneFromSkinType(gPlayContext.mode) != SceneType::PLAY)
         {
-        case SkinType::PLAY5:
-        case SkinType::PLAY7:
-        case SkinType::PLAY9:
-        case SkinType::PLAY10:
-        case SkinType::PLAY14:
-        case SkinType::PLAY5_2:
-        case SkinType::PLAY7_2:
-        case SkinType::PLAY9_2: ps = std::make_shared<SceneResult>(); break;
-        default: LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode); return nullptr;
+            LOG_ERROR << "[Scene] Invalid mode: " << int(gPlayContext.mode);
+            return nullptr;
         }
+        ps = std::make_shared<SceneResult>();
         break;
     case SceneType::COURSE_TRANS: ps = std::make_shared<ScenePlayCourseTrans>(); break;
     case SceneType::KEYCONFIG: ps = std::make_shared<SceneKeyConfig>(); break;

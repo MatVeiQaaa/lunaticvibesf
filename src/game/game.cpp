@@ -6,6 +6,7 @@
 #include "game/scene/scene_mgr.h"
 #include "game/input/input_mgr.h"
 #include "game/skin/skin_lr2.h"
+#include "game/skin/skin_lr2_slider_callbacks.h"
 #include "game/skin/skin_mgr.h"
 #include "common/utils.h"
 #include "common/sysutil.h"
@@ -156,39 +157,13 @@ int main(int argc, char* argv[])
     SoundMgr::setVolume(SampleChannel::MASTER, (float)State::get(IndexSlider::VOLUME_MASTER));
     SoundMgr::setVolume(SampleChannel::KEY, (float)State::get(IndexSlider::VOLUME_KEY));
     SoundMgr::setVolume(SampleChannel::BGM, (float)State::get(IndexSlider::VOLUME_BGM));
-
     if (State::get(IndexSwitch::SOUND_FX0))
         SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX0), 0, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX0), State::get(IndexSlider::FX0_P1), State::get(IndexSlider::FX0_P2));
     if (State::get(IndexSwitch::SOUND_FX1))
         SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX1), 1, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX1), State::get(IndexSlider::FX1_P1), State::get(IndexSlider::FX1_P2));
     if (State::get(IndexSwitch::SOUND_FX2))
         SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX2), 2, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX2), State::get(IndexSlider::FX2_P1), State::get(IndexSlider::FX2_P2));
-
-    if (State::get(IndexSwitch::SOUND_PITCH))
-    {
-        static const double tick = std::pow(2, 1.0 / 12);
-        double f = std::pow(tick, State::get(IndexNumber::PITCH));
-        switch (State::get(IndexOption::SOUND_PITCH_TYPE))
-        {
-        case 0: // FREQUENCY
-            SoundMgr::setFreqFactor(f);
-            gSelectContext.pitchSpeed = f;
-            break;
-        case 1: // PITCH
-            SoundMgr::setFreqFactor(1.0);
-            SoundMgr::setPitch(f);
-            gSelectContext.pitchSpeed = 1.0;
-            break;
-        case 2: // SPEED (freq up, pitch down)
-            SoundMgr::setFreqFactor(1.0);
-            SoundMgr::setSpeed(f);
-            gSelectContext.pitchSpeed = f;
-            break;
-        default:
-            break;
-        }
-    }
-
+    lr2skin::slider::updatePitchState(State::get(IndexNumber::PITCH));
     if (State::get(IndexSwitch::SOUND_EQ))
     {
         for (int idx = 0; idx < 7; ++idx)
@@ -217,18 +192,7 @@ int main(int argc, char* argv[])
         gQuitOnFinish = true;
 
         std::shared_ptr<ChartFormatBMS> bms = std::make_shared<ChartFormatBMS>(bmsFile, std::time(NULL));
-        auto skinTypeForKeys = [](unsigned keys) {
-            switch (keys)
-            {
-            case 5: return SkinType::PLAY5;
-            case 7: return SkinType::PLAY7;
-            case 9: return SkinType::PLAY9;
-            case 10: return SkinType::PLAY10;
-            case 14: return SkinType::PLAY14;
-            default: panic("Error", "Invalid chart key count");
-            }
-        };
-        gPlayContext.mode = skinTypeForKeys(bms->gamemode);
+        gPlayContext.mode = lunaticvibes::skinTypeForKeys(bms->gamemode);
         gChartContext = ChartContextParams{
             bmsFile,
             md5file(bmsFile),

@@ -38,8 +38,9 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
         auto chrIt = _chrList->find(c);
         if (chrIt == _chrList->end())
         {
-            static constexpr char placeholder{' '};
-            chrIt = _chrList->find(placeholder);
+            static constexpr char placeholder{'?'};
+            c = placeholder;
+            chrIt = _chrList->find(c);
             if (chrIt == _chrList->end())
                 continue;
         }

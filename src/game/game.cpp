@@ -19,6 +19,7 @@
 #include "game/skin/skin_lr2_slider_callbacks.h"
 #include "game/skin/skin_mgr.h"
 #include "game/sound/sound_mgr.h"
+#include "git_version.h"
 
 #include <memory>
 #include <string_view>
@@ -49,6 +50,8 @@ int main(int argc, char* argv[])
     fs::current_path(executablePath);
 
     lunaticvibes::InitLogger("LunaticVibesF.log");
+
+    LOG_INFO << "Starting Lunatic Vibes F " << PROJECT_VERSION << " (" << GIT_REVISION << ")";
 
     // init curl
     LOG_INFO << "Initializing libcurl...";

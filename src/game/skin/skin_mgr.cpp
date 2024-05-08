@@ -5,17 +5,8 @@
 #include "game/skin/skin_lr2.h"
 #include <memory>
 
-SkinMgr::~SkinMgr()
+SkinMgr::SkinMgr() : _sharedSprites(std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>())
 {
-    // TODO: gSprites should be a shared ptr passed between skins.
-    for (auto& s : gSprites)
-    {
-        s.reset();
-    }
-    for (int e = static_cast<int>(SkinType::TITLE); e < static_cast<int>(SkinType::MODE_COUNT); ++e)
-    {
-        unload(static_cast<SkinType>(e));
-    }
 }
 
 void SkinMgr::reload(SkinType e, bool simple)
@@ -101,9 +92,9 @@ void SkinMgr::reload(SkinType e, bool simple)
     switch (version)
     {
     case SkinVersion::LR2beta3:
-        skinObj = std::make_shared<SkinLR2>(skinFilePath, simple ? 1 : 0);
+        skinObj = std::make_shared<SkinLR2>(_sharedSprites, skinFilePath, simple ? 1 : 0);
         if (!skinObj->isLoaded())
-            skinObj = std::make_shared<SkinLR2>(skinFilePathDefault, simple ? 1 : 0);
+            skinObj = std::make_shared<SkinLR2>(_sharedSprites, skinFilePathDefault, simple ? 1 : 0);
         break;
     case SkinVersion::UNDEF: break;
     }

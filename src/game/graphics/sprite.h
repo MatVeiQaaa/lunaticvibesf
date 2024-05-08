@@ -151,7 +151,6 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Sprite placeholder
 inline const size_t SPRITE_GLOBAL_MAX = 32;
-inline std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX> gSprites{ nullptr };
 class SpriteGlobal: public SpriteBase
 {
 protected:
@@ -176,9 +175,6 @@ public:
 
     bool update(const lunaticvibes::Time& time) override {
         SpriteBase::update(time);
-        // FIXME: is this needed?
-        // if (globalSpriteIndex)
-        //     setSpriteReference(gSprites[getMyGlobalSpriteIndex()]);
         if (pSpriteRef)
             return pSpriteRef->update(time);
         return false;

@@ -6,10 +6,11 @@
 class SkinMgr
 {
 public:
-    SkinMgr() = default;
-    ~SkinMgr();
-    SkinMgr(SkinMgr&) = delete;
+    SkinMgr();
+    SkinMgr& operator=(SkinMgr&&) = delete;
     SkinMgr& operator=(SkinMgr&) = delete;
+    SkinMgr(SkinMgr&&) = delete;
+    SkinMgr(SkinMgr&) = delete;
 
 public:
     void reload(SkinType, bool simple = false);
@@ -19,4 +20,5 @@ public:
 
 protected:
     std::array<std::shared_ptr<SkinBase>, static_cast<size_t>(SkinType::MODE_COUNT)> _skins{};
+    std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> _sharedSprites{};
 };

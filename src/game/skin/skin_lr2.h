@@ -1333,6 +1333,12 @@ using namespace LR2SkinDef;
 class SkinLR2: public SkinBase
 {
 public:
+    SkinLR2() = delete;
+    SkinLR2(std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> sharedSprites, Path p,
+            int loadMode = 0);
+    ~SkinLR2() override;
+
+public:
     int setExtendedProperty(std::string_view key, void* value) override;
 
 private:
@@ -1402,11 +1408,6 @@ public:
     int adjustPlayNote2PW = 0;
     int adjustPlayNote2PH = 0;
 
-public:
-    SkinLR2() = delete;
-    SkinLR2(Path p, int loadMode = 0);
-    ~SkinLR2() override;
-
 protected:
     bool loadCSV(Path p);
     void postLoad();
@@ -1416,6 +1417,7 @@ protected:
     static constexpr size_t BAR_ENTRY_SPRITE_COUNT = 32;
     std::bitset<BAR_ENTRY_SPRITE_COUNT> barSpriteAvailable{ false };
     std::array<std::shared_ptr<SpriteBarEntry>, BAR_ENTRY_SPRITE_COUNT> barSprites;
+    std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> _sharedSprites{};
     unsigned barCenter = 0;
     unsigned barClickableFrom = 0;
     unsigned barClickableTo = 0;

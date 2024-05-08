@@ -51,9 +51,10 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     load(selectedMode);
 
     auto skinFileList = findFiles(PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin")), true);
+    auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
     {
-        SkinLR2 s(p, 2);
+        SkinLR2 s(dummySharedSprites, p, 2);
         LOG_DEBUG << "[Customize] Adding skin: mode='" << s.info.mode << "' p='" << p << "'";
         skinList[s.info.mode].push_back(fs::absolute(p));
 
@@ -505,9 +506,12 @@ void SceneCustomize::load(SkinType mode)
     }
     else
     {
-        if (!_skinMgr->get(mode))
-            _skinMgr->reload(mode, true);
         std::shared_ptr<SkinBase> ps = _skinMgr->get(mode);
+        if (!ps)
+        {
+            _skinMgr->reload(mode, true);
+            ps = _skinMgr->get(mode);
+        }
         optionsMap.clear();
         optionsKeyList.clear();
 

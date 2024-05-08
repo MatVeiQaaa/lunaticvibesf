@@ -473,24 +473,24 @@ int SkinLR2::setExtendedProperty(const std::string_view key, void* value)
 
     if (key == "GAUGETYPE_1P")
     {
-        if (gSprites[GLOBAL_SPRITE_IDX_1PGAUGE] == nullptr)
+        if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PGAUGE] == nullptr)
         {
             return 1;
         }
         auto type = *static_cast<GaugeDisplayType*>(value);
-        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_1PGAUGE]);
+        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PGAUGE]);
         pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
         return 0;
     }
 
     if (key == "GAUGETYPE_2P")
     {
-        if (gSprites[GLOBAL_SPRITE_IDX_2PGAUGE] == nullptr)
+        if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PGAUGE] == nullptr)
         {
             return 1;
         }
         auto type = *static_cast<GaugeDisplayType*>(value);
-        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>(gSprites[GLOBAL_SPRITE_IDX_2PGAUGE]);
+        auto pS = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PGAUGE]);
         pS->setGaugeType(gaugeDisplayTypeToSpriteType(type));
         return 0;
     }
@@ -1726,7 +1726,7 @@ ParseRet SkinLR2::SRC_JUDGELINE()
     builder.animationTimer = (IndexTimer)d.timer;
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    gSprites[spriteIdx] = builder.build();
+    (*_sharedSprites)[spriteIdx] = builder.build();
 
     _sprites.push_back(std::make_shared<SpriteGlobal>(spriteIdx, csvLineNumber));
 
@@ -1752,7 +1752,7 @@ ParseRet SkinLR2::SRC_NOWJUDGE(size_t idx)
     builder.animationTimer = (IndexTimer)d.timer;
     builder.textureSheetRows = d.div_y;
     builder.textureSheetCols = d.div_x;
-    gSprites[idx] = builder.build();
+    (*_sharedSprites)[idx] = builder.build();
 
     return ParseRet::OK;
 }
@@ -1789,7 +1789,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
     builder.maxDigits = d.keta;
     builder.numInd = iNum;
     builder.hideLeadingZeros = true;
-    gSprites[idx] = builder.build();
+    (*_sharedSprites)[idx] = builder.build();
 
     return ParseRet::OK;
 }
@@ -1821,7 +1821,7 @@ ParseRet SkinLR2::SRC_GROOVEGAUGE()
     builder.gaugeMax = 100;
     builder.gridCount = 50;
     builder.numInd = d._null == 0 ? IndexNumber::PLAY_1P_GROOVEGAUGE : IndexNumber::PLAY_2P_GROOVEGAUGE;
-    gSprites[idx] = builder.build();
+    (*_sharedSprites)[idx] = builder.build();
 
     _sprites.push_back(std::make_shared<SpriteGlobal>(idx, csvLineNumber));
 
@@ -2564,7 +2564,7 @@ bool SkinLR2::DST()
             auto p = std::reinterpret_pointer_cast<SpriteGlobal>(e);
             do
             {
-                auto enext = gSprites[p->getMyGlobalSpriteIndex()];
+                auto enext = (*_sharedSprites)[p->getMyGlobalSpriteIndex()];
                 if (enext == nullptr)
                 {
                     LOG_DEBUG << "[Skin] " << csvLineNumber << ": Previous src definition invalid";
@@ -3594,8 +3594,11 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
 
 ////////////////////////////////////////////////////////////////////////////////
 
-SkinLR2::SkinLR2(Path p, int loadMode): loadMode(loadMode)
+SkinLR2::SkinLR2(std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>> sharedSprites, Path p,
+                 int loadMode)
+    : loadMode(loadMode), _sharedSprites(std::move(sharedSprites))
 {
+    assert(_sharedSprites != nullptr);
     _version = SkinVersion::LR2beta3;
 
     // load images from last skin
@@ -4085,16 +4088,16 @@ void SkinLR2::postLoad()
         }
     }
 
-    if (gSprites[GLOBAL_SPRITE_IDX_1PJUDGELINE] && !gSprites[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.empty())
+    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE] && !(*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.empty())
     {
-        Rect d = gSprites[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.back().param.rect;
+        Rect d = (*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.back().param.rect;
         judgeLineRect1P = d;
         if (d.w < 0) { judgeLineRect1P.x += d.w; judgeLineRect1P.w = -d.w; }
         if (d.h < 0) { judgeLineRect1P.y += d.h; judgeLineRect1P.h = -d.h; }
     }
-    if (gSprites[GLOBAL_SPRITE_IDX_2PJUDGELINE] && !gSprites[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.empty())
+    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE] && !(*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.empty())
     {
-        Rect d = gSprites[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.back().param.rect;
+        Rect d = (*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.back().param.rect;
         judgeLineRect2P = d;
         if (d.w < 0) { judgeLineRect2P.x += d.w; judgeLineRect2P.w = -d.w; }
         if (d.h < 0) { judgeLineRect2P.y += d.h; judgeLineRect2P.h = -d.h; }
@@ -4284,11 +4287,11 @@ void SkinLR2::update()
     // 6-11:  NOWCOMBO 1P
     // 12-17: NOWJUDGE 2P
     // 18-23: NOWCOMBO 2P
-    auto shift_combo = [](const bool noshiftJudge, const int alignNowCombo, size_t i) {
-        if (gSprites[i] && gSprites[i + 6])
+    auto shift_combo = [this](const bool noshiftJudge, const int alignNowCombo, size_t i) {
+        if ((*_sharedSprites)[i] && (*_sharedSprites)[i + 6])
         {
-            auto judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i]);
-            auto combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 6]);
+            auto judge = std::reinterpret_pointer_cast<SpriteAnimated>((*_sharedSprites)[i]);
+            auto combo = std::reinterpret_pointer_cast<SpriteNumber>((*_sharedSprites)[i + 6]);
             if (judge->isDraw() && !judge->isHidden())
             {
                 combo->setHideExternal(false);
@@ -4363,7 +4366,7 @@ void SkinLR2::update()
         move1PY -= lift1P;
         move2PY -= lift2P;
     }
-    auto adjustPlayJudgePosition = [](size_t base, int movex, int movey) {
+    auto adjustPlayJudgePosition = [this](size_t base, int movex, int movey) {
         if (movex == 0 && movey == 0)
         {
             return;
@@ -4371,17 +4374,17 @@ void SkinLR2::update()
 
         for (size_t i = base; i < base + 6; ++i)
         {
-            if (gSprites[i])
+            if ((*_sharedSprites)[i])
             {
-                std::shared_ptr<SpriteAnimated> judge = std::reinterpret_pointer_cast<SpriteAnimated>(gSprites[i]);
+                auto judge = std::reinterpret_pointer_cast<SpriteAnimated>((*_sharedSprites)[i]);
                 if (judge->isDraw() && !judge->isHidden())
                 {
                     judge->adjustAfterUpdate(movex, movey);
                 }
             }
-            if (gSprites[i + 6])
+            if ((*_sharedSprites)[i + 6])
             {
-                std::shared_ptr<SpriteNumber> combo = std::reinterpret_pointer_cast<SpriteNumber>(gSprites[i + 6]);
+                auto combo = std::reinterpret_pointer_cast<SpriteNumber>((*_sharedSprites)[i + 6]);
                 if (combo->isDraw() && !combo->isHidden())
                 {
                     combo->adjustAfterUpdate(movex, movey);
@@ -4397,13 +4400,13 @@ void SkinLR2::update()
     move1PY = adjustPlayNote1PY - lift1P;
     move2PX = adjustPlayNote2PX;
     move2PY = adjustPlayNote2PY - lift2P;
-    auto adjustLift = [](size_t judgeline_sprite, std::list<std::shared_ptr<SpriteBase>>& spritesMoveWithLift,
-                         int movex, int movey) {
+    auto adjustLift = [this](size_t judgeline_sprite, std::list<std::shared_ptr<SpriteBase>>& spritesMoveWithLift,
+                             int movex, int movey) {
         if (movex == 0 && movey == 0)
         {
             return;
         }
-        auto& judgeLine = gSprites[judgeline_sprite];
+        auto& judgeLine = (*_sharedSprites)[judgeline_sprite];
         if (judgeLine && judgeLine->isDraw() && !judgeLine->isHidden())
         {
             judgeLine->adjustAfterUpdate(movex, movey);

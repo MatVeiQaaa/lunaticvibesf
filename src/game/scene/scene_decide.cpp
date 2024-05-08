@@ -7,7 +7,7 @@
 #include "game/arena/arena_data.h"
 #include "common/log.h"
 
-SceneDecide::SceneDecide() : SceneBase(SkinType::DECIDE, 1000)
+SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::DECIDE, 1000)
 {
     _type = SceneType::DECIDE;
 

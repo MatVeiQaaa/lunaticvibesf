@@ -5,12 +5,8 @@
 
 class SceneKeyConfig : public SceneBase
 {
-private:
-    bool exiting = false;
-    std::shared_mutex _mutex;
-
 public:
-    SceneKeyConfig();
+    explicit SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneKeyConfig() override;
 
 protected:
@@ -41,4 +37,8 @@ protected:
 
 public:
     static void setInputBindingText(GameModeKeys keys, Input::Pad pad);
+
+private:
+    bool exiting = false;
+    std::shared_mutex _mutex;
 };

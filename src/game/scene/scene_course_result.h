@@ -1,7 +1,9 @@
 #pragma once
-#include <mutex>
 #include "game/ruleset/ruleset.h"
+#include "game/skin/skin_mgr.h"
 #include "scene.h"
+#include <memory>
+#include <mutex>
 
 class ScoreBase;
 enum class eCourseResultState
@@ -14,6 +16,10 @@ enum class eCourseResultState
 
 class SceneCourseResult : public SceneBase
 {
+public:
+    explicit SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr);
+    ~SceneCourseResult() override;
+
 private:
     eCourseResultState state;
     InputMask _inputAvailable;
@@ -44,10 +50,6 @@ protected:
     };
     std::map<SummaryArgs, unsigned> summary;
     double acc = 0.;
-
-public:
-    SceneCourseResult();
-    ~SceneCourseResult() override;
 
 protected:
     // Looper callbacks

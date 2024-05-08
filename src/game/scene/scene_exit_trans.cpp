@@ -2,7 +2,7 @@
 #include "common/log.h"
 #include "scene_context.h"
 
-SceneExitTrans::SceneExitTrans() : SceneBase(SkinType::EXIT_TRANS, 240)
+SceneExitTrans::SceneExitTrans() : SceneBase(nullptr, SkinType::EXIT_TRANS, 240)
 {
 	_type = SceneType::EXIT_TRANS;
 

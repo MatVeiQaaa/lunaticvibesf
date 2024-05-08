@@ -1,27 +1,22 @@
 #pragma once
+#include "skin.h"
 #include <array>
 #include <memory>
-#include "skin.h"
-
-typedef std::shared_ptr<SkinBase> pSkin;
 
 class SkinMgr
 {
-private:
-    static SkinMgr _inst;
-    SkinMgr() = default;
-    ~SkinMgr() = default;
 public:
+    SkinMgr() = default;
+    ~SkinMgr();
     SkinMgr(SkinMgr&) = delete;
-    SkinMgr& operator= (SkinMgr&) = delete;
+    SkinMgr& operator=(SkinMgr&) = delete;
+
+public:
+    void reload(SkinType, bool simple = false);
+    void unload(SkinType);
+    /// May return `nullptr` if that skin has not been loaded yet.
+    std::shared_ptr<SkinBase> get(SkinType);
 
 protected:
-    std::array<pSkin, static_cast<size_t>(SkinType::MODE_COUNT)> c{};
-    std::array<bool, static_cast<size_t>(SkinType::MODE_COUNT)> shouldReload{ false };
-
-public:
-    static void load(SkinType, bool simple = false);
-    static void unload(SkinType);
-    static pSkin get(SkinType);
-	static void clean();
+    std::array<std::shared_ptr<SkinBase>, static_cast<size_t>(SkinType::MODE_COUNT)> _skins{};
 };

@@ -10,11 +10,10 @@
 #include "config/config_mgr.h"
 #include <boost/algorithm/string.hpp>
 
-SceneCourseResult::SceneCourseResult() : SceneBase(SkinType::COURSE_RESULT, 1000)
+SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
+    : SceneBase(skinMgr, SkinType::COURSE_RESULT, 1000), _inputAvailable(INPUT_MASK_FUNC)
 {
     _type = SceneType::COURSE_RESULT;
-
-    _inputAvailable = INPUT_MASK_FUNC;
 
     if (gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr)
     {

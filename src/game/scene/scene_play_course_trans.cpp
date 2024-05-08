@@ -3,7 +3,7 @@
 #include "common/log.h"
 #include "scene_context.h"
 
-ScenePlayCourseTrans::ScenePlayCourseTrans() : SceneBase(SkinType::COURSE_TRANS, 240)
+ScenePlayCourseTrans::ScenePlayCourseTrans() : SceneBase(nullptr, SkinType::COURSE_TRANS, 240)
 {
 	_type = SceneType::COURSE_TRANS;
 

@@ -26,6 +26,10 @@ class ChartFormatBase;
 class SceneCustomize;
 class SceneSelect : public SceneBase
 {
+public:
+    explicit SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr);
+    ~SceneSelect() override;
+
 private:
     eSelectState state;
     InputMask _inputAvailable;
@@ -67,6 +71,7 @@ private:
 
     // virtual Customize scene, customize option toggle in select scene support
     static std::shared_ptr<SceneCustomize> _virtualSceneCustomize;
+    std::shared_ptr<SkinMgr> _skinMgr;
 
     // smooth scrolling
     lunaticvibes::Time scrollButtonTimestamp;
@@ -92,9 +97,6 @@ private:
     bool imguiShow = false;
 
 public:
-    SceneSelect();
-    ~SceneSelect() override;
-
     void closeReadme(const lunaticvibes::Time&);
     void openChartReadme(const lunaticvibes::Time&);
     void openHelpFile(const lunaticvibes::Time&, size_t idx);

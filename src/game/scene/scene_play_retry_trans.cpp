@@ -2,7 +2,7 @@
 #include "common/log.h"
 #include "scene_context.h"
 
-ScenePlayRetryTrans::ScenePlayRetryTrans() : SceneBase(SkinType::RETRY_TRANS, 240)
+ScenePlayRetryTrans::ScenePlayRetryTrans() : SceneBase(nullptr, SkinType::RETRY_TRANS, 240)
 {
 	_type = SceneType::RETRY_TRANS;
 

@@ -14,23 +14,24 @@
 #include "game/scene/scene_pre_select.h"
 #include "game/scene/scene_result.h"
 #include "game/scene/scene_select.h"
+#include "game/skin/skin_mgr.h"
 
-std::shared_ptr<SceneBase> lunaticvibes::buildScene(SceneType type)
+std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMgr>& skinMgr, SceneType type)
 {
     switch (type)
     {
     case SceneType::EXIT:
     case SceneType::NOT_INIT: break;
     case SceneType::PRE_SELECT: return std::make_shared<ScenePreSelect>();
-    case SceneType::SELECT: return std::make_shared<SceneSelect>();
-    case SceneType::DECIDE: return std::make_shared<SceneDecide>();
-    case SceneType::PLAY: return std::make_shared<ScenePlay>();
+    case SceneType::SELECT: return std::make_shared<SceneSelect>(skinMgr);
+    case SceneType::DECIDE: return std::make_shared<SceneDecide>(skinMgr);
+    case SceneType::PLAY: return std::make_shared<ScenePlay>(skinMgr);
     case SceneType::RETRY_TRANS: return std::make_shared<ScenePlayRetryTrans>();
-    case SceneType::RESULT: return std::make_shared<SceneResult>();
+    case SceneType::RESULT: return std::make_shared<SceneResult>(skinMgr);
     case SceneType::COURSE_TRANS: return std::make_shared<ScenePlayCourseTrans>();
-    case SceneType::KEYCONFIG: return std::make_shared<SceneKeyConfig>();
-    case SceneType::CUSTOMIZE: return std::make_shared<SceneCustomize>();
-    case SceneType::COURSE_RESULT: return std::make_shared<SceneCourseResult>();
+    case SceneType::KEYCONFIG: return std::make_shared<SceneKeyConfig>(skinMgr);
+    case SceneType::CUSTOMIZE: return std::make_shared<SceneCustomize>(skinMgr);
+    case SceneType::COURSE_RESULT: return std::make_shared<SceneCourseResult>(skinMgr);
     case SceneType::EXIT_TRANS: return std::make_shared<SceneExitTrans>();
     }
     assert(false);

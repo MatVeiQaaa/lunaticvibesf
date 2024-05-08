@@ -32,7 +32,7 @@ ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
     abort(); // should be unreachable
 }
 
-SceneResult::SceneResult() : SceneBase(SkinType::RESULT, 1000)
+SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::RESULT, 1000)
 {
     _type = SceneType::RESULT;
 

@@ -350,8 +350,10 @@ void config_fx()
 
 std::shared_ptr<SceneCustomize> SceneSelect::_virtualSceneCustomize = nullptr;
 
-SceneSelect::SceneSelect() : SceneBase(SkinType::MUSIC_SELECT, 250)
+SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
+    : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
+    assert(pSkin != nullptr);
     _type = SceneType::SELECT;
 
     _inputAvailable = INPUT_MASK_FUNC | INPUT_MASK_MOUSE;
@@ -930,7 +932,7 @@ void SceneSelect::_updateAsync()
             createNotification("Loading skin options...");
 
             pSkin->setHandleMouseEvents(false);
-            _virtualSceneCustomize = std::make_shared<SceneCustomize>();
+            _virtualSceneCustomize = std::make_shared<SceneCustomize>(_skinMgr);
             _virtualSceneCustomize->setIsVirtual(true);
             _virtualSceneCustomize->loopStart();
             pSkin->setHandleMouseEvents(true);

@@ -137,7 +137,7 @@ std::pair<int, double> calcGreenNumber(double bpm, int slot, double hs)
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-ScenePlay::ScenePlay(): SceneBase(gPlayContext.mode, 1000, true)
+ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr): SceneBase(skinMgr, gPlayContext.mode, 1000, true)
 {
     _type = SceneType::PLAY;
     state = ePlayState::PREPARE;

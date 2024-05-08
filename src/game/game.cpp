@@ -276,7 +276,6 @@ int main(int argc, char* argv[])
 
     SoundMgr::stopUpdate();
 
-    SkinMgr::clean();
     graphics_free();
 
     ImGui::DestroyContext();
@@ -297,6 +296,7 @@ void mainLoop()
 
     SceneType currentScene = SceneType::NOT_INIT;
 
+    auto skinMgr = std::make_shared<SkinMgr>();
     std::shared_ptr<SceneBase> scene;
     std::shared_ptr<SceneBase> sceneCustomize;
     while (currentScene != SceneType::EXIT && gNextScene != SceneType::EXIT)
@@ -313,7 +313,7 @@ void mainLoop()
         {
             if (sceneCustomize == nullptr)
             {
-                sceneCustomize = lunaticvibes::buildScene(SceneType::CUSTOMIZE);
+                sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
                 sceneCustomize->loopStart();
                 sceneCustomize->inputLoopStart();
             }
@@ -347,7 +347,7 @@ void mainLoop()
                 State::set(IndexTimer::_LOAD_START, TIMER_NEVER);
                 State::set(IndexTimer::PLAY_READY, TIMER_NEVER);
                 State::set(IndexTimer::PLAY_START, TIMER_NEVER);
-                scene = lunaticvibes::buildScene(currentScene);
+                scene = lunaticvibes::buildScene(skinMgr, currentScene);
                 assert(scene != nullptr);
                 lunaticvibes::Time t;
                 State::set(IndexTimer::SCENE_START, t.norm());

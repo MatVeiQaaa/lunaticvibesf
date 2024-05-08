@@ -5,7 +5,7 @@
 #include "game/runtime/i18n.h"
 #include <string_view>
 
-SceneKeyConfig::SceneKeyConfig() : SceneBase(SkinType::KEY_CONFIG, 240)
+SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::KEY_CONFIG, 240)
 {
     _type = SceneType::KEYCONFIG;
     gKeyconfigContext.skinHasAbsAxis = pSkin->isSupportKeyConfigAbsAxis;

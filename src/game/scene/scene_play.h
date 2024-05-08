@@ -1,7 +1,9 @@
 #pragma once
+#include <memory>
 #include <variant>
 #include <mutex>
 #include <future>
+#include "game/skin/skin_mgr.h"
 #include "scene.h"
 #include "scene_context.h"
 #include "common/chartformat/chartformat.h"
@@ -20,6 +22,10 @@ enum class ePlayState
 
 class ScenePlay : public SceneBase
 {
+public:
+    explicit ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr);
+    ~ScenePlay() override;
+
 private:
 	std::future<void> _loadChartFuture;
 
@@ -100,8 +106,6 @@ private:
     bool adjustLanecoverWithLeftRight = false;
 
 public:
-    ScenePlay();
-    ~ScenePlay() override;
     void clearGlobalDatas();
     bool createChartObj();
     bool createRuleset();

@@ -11,12 +11,8 @@ enum class eDecideState
 
 class SceneDecide : public SceneBase
 {
-private:
-    eDecideState state;
-    InputMask _inputAvailable;
-
 public:
-    SceneDecide();
+    explicit SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneDecide() override;
 
 protected:
@@ -32,4 +28,8 @@ protected:
     void inputGamePress(InputMask&, const lunaticvibes::Time&);
     void inputGameHold(InputMask&, const lunaticvibes::Time&);
     void inputGameRelease(InputMask&, const lunaticvibes::Time&);
+
+private:
+    eDecideState state;
+    InputMask _inputAvailable;
 };

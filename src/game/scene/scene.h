@@ -6,6 +6,7 @@
 #include "game/runtime/state.h"
 #include "game/input/input_wrapper.h"
 #include "common/types.h"
+#include "game/skin/skin_mgr.h"
 
 enum class SceneType
 {
@@ -78,7 +79,8 @@ protected:
 
 public:
     SceneBase() = delete;
-    SceneBase(SkinType skinType, unsigned rate = 240, bool backgroundInput = false);
+    SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate = 240,
+              bool backgroundInput = false);
     ~SceneBase() override;
     void inputLoopStart() { _input.loopStart(); }
     void inputLoopEnd() { _input.loopEnd(); }

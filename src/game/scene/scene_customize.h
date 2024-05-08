@@ -1,5 +1,7 @@
 #pragma once
+#include "game/skin/skin_mgr.h"
 #include "scene.h"
+#include <memory>
 
 namespace lunaticvibes
 {
@@ -15,14 +17,8 @@ enum class CustomizeState
 
 class SceneCustomize : public SceneBase
 {
-private:
-    std::shared_ptr<Texture> graphics_get_screen_texture;
-    lunaticvibes::CustomizeState _state;
-    bool exiting = false;
-    bool _is_virtual = false;
-
 public:
-    SceneCustomize();
+    explicit SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr);
     ~SceneCustomize() override;
 
     void setIsVirtual(bool is_virtual) { _is_virtual = is_virtual; };
@@ -65,4 +61,12 @@ protected:
 
 public:
     void draw() const override;
+
+private:
+    std::shared_ptr<SkinMgr> _skinMgr;
+    std::shared_ptr<Texture> graphics_get_screen_texture;
+    lunaticvibes::CustomizeState _state;
+    bool exiting = false;
+    bool _is_virtual = false;
+
 };

@@ -18,7 +18,7 @@
 #include "git_version.h"
 #include "scene_context.h"
 
-ScenePreSelect::ScenePreSelect(): SceneBase(SkinType::PRE_SELECT, 240)
+ScenePreSelect::ScenePreSelect(): SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {
     _type = SceneType::PRE_SELECT;
 

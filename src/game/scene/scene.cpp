@@ -1,22 +1,25 @@
 #include "scene.h"
+
+#include <memory>
+
 #include "common/beat.h"
+#include "common/log.h"
 #include "common/sysutil.h"
-#include "game/graphics/graphics.h"
-#include "game/runtime/state.h"
-#include "game/runtime/generic_info.h"
-#include "game/skin/skin_mgr.h"
-#include "scene_context.h"
 #include "config/config_mgr.h"
-
-#include "imgui.h"
-#include "game/skin/skin_lr2_debug.h"
+#include "game/graphics/graphics.h"
+#include "game/runtime/generic_info.h"
 #include "game/runtime/i18n.h"
-
+#include "game/runtime/state.h"
+#include "game/skin/skin_lr2_debug.h"
+#include "game/skin/skin_mgr.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
+#include "scene_context.h"
+
+#include <imgui.h>
 
 // prototype
-SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
+SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate, bool backgroundInput)
     : AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
       _input(1000, backgroundInput)
 {
@@ -28,9 +31,15 @@ SceneBase::SceneBase(SkinType skinType, unsigned rate, bool backgroundInput)
 
     // Disable skin caching for now. dst options are changing all the time
     const bool simple_skin = gInCustomize && skinType != SkinType::THEME_SELECT;
-    SkinMgr::unload(skinType);
-    SkinMgr::load(skinType, gInCustomize && simple_skin);
-    pSkin = SkinMgr::get(skinType);
+    if (skinMgr)
+    {
+        skinMgr->reload(skinType, gInCustomize && simple_skin);
+        pSkin = skinMgr->get(skinType);
+    }
+    else
+    {
+        LOG_VERBOSE << "[SceneBase] No skinMgr";
+    }
 
     int notificationPosY = 480;
     int notificationWidth = 640;

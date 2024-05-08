@@ -9,7 +9,8 @@
 #include "game/sound/soundset_lr2.h"
 #include "scene_context.h"
 
-SceneCustomize::SceneCustomize() : SceneBase(SkinType::THEME_SELECT, 240), _state(lunaticvibes::CustomizeState::Start)
+SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
+    : SceneBase(skinMgr, SkinType::THEME_SELECT, 240), _skinMgr(skinMgr), _state(lunaticvibes::CustomizeState::Start)
 {
     _type = SceneType::CUSTOMIZE;
 
@@ -194,10 +195,7 @@ void SceneCustomize::updateMain()
         {
             if (!gInCustomize || selectedMode != SkinType::MUSIC_SELECT)
             {
-                if (SkinMgr::get(selectedMode))
-                {
-                    SkinMgr::unload(selectedMode);
-                }
+                _skinMgr->unload(selectedMode);
             }
             load(selectedMode);
         }
@@ -259,7 +257,7 @@ void SceneCustomize::updateMain()
             if (skinList[selectedMode].size() > 1)
             {
                 int selectedIdx;
-                const auto currentSkin = SkinMgr::get(selectedMode);
+                const auto currentSkin = _skinMgr->get(selectedMode);
                 for (selectedIdx = 0; selectedIdx < (int)skinList[selectedMode].size(); selectedIdx++)
                 {
                     const Path& p1 = skinList[selectedMode][selectedIdx];
@@ -323,10 +321,7 @@ void SceneCustomize::updateMain()
                     }
 
                     pSkin->setHandleMouseEvents(false);
-                    if (SkinMgr::get(selectedMode))
-                    {
-                        SkinMgr::unload(selectedMode);
-                    }
+                    _skinMgr->unload(selectedMode);
                     load(selectedMode);
                     pSkin->setHandleMouseEvents(true);
 
@@ -407,10 +402,7 @@ void SceneCustomize::updateFadeout()
     if (rt.norm() > pSkin->info.timeOutro)
     {
         pSkin->setHandleMouseEvents(false);
-        if (SkinMgr::get(selectedMode))
-        {
-            SkinMgr::unload(selectedMode);
-        }
+        _skinMgr->unload(selectedMode);
         gNextScene = SceneType::SELECT;
         gExitingCustomize = true;
     }
@@ -513,9 +505,9 @@ void SceneCustomize::load(SkinType mode)
     }
     else
     {
-        if (!SkinMgr::get(mode))
-            SkinMgr::load(mode, true);
-        std::shared_ptr<SkinBase> ps = SkinMgr::get(mode);
+        if (!_skinMgr->get(mode))
+            _skinMgr->reload(mode, true);
+        std::shared_ptr<SkinBase> ps = _skinMgr->get(mode);
         optionsMap.clear();
         optionsKeyList.clear();
 
@@ -598,7 +590,7 @@ void SceneCustomize::save(SkinType mode) const
     }
     else
     {
-        std::shared_ptr<SkinBase> ps = SkinMgr::get(mode);
+        std::shared_ptr<SkinBase> ps = _skinMgr->get(mode);
         if (ps != nullptr)
         {
             pCustomize = ConfigMgr::Profile()->getPath() / "customize";

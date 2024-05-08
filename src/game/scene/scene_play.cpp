@@ -1105,9 +1105,7 @@ void ScenePlay::loadChart()
     }
 
     static const auto shouldDiscard = [](const ScenePlay& s) {
-        if (gAppIsExiting) return true;
-        if (s.state != ePlayState::LOADING) return true;
-        return false;
+        return gAppIsExiting || gNextScene != SceneType::PLAY || s.sceneEnding || s.state != ePlayState::LOADING;
     };
 
     std::future<void> samplesFuture;
@@ -1125,7 +1123,8 @@ void ScenePlay::loadChart()
             LOG_DEBUG << "[Play] Load files from " << chartDir.c_str();
             for (const auto& it : _pChart->wavFiles)
             {
-				if (sceneEnding) break;
+                if (shouldDiscard(*this))
+                    break;
                 if (it.empty()) continue;
                 ++wavTotal;
             }
@@ -1141,18 +1140,22 @@ void ScenePlay::loadChart()
             boost::asio::thread_pool pool(thread_count > 2 ? thread_count : 1);
             for (size_t i = 0; i < _pChart->wavFiles.size(); ++i)
             {
-                if (shouldDiscard(*this)) break;
+                if (shouldDiscard(*this))
+                    break;
 
                 const auto& wav = _pChart->wavFiles[i];
                 if (wav.empty()) continue;
 
                 boost::asio::post(pool, [&, i]() {
-                    if (shouldDiscard(*this)) return;
+                    if (shouldDiscard(*this))
+                        return;
                     Path pWav = PathFromUTF8(wav);
                     if (pWav.is_absolute())
                     {
                         LOG_WARNING << "[Play] Absolute path to sample, this is forbidden";
-                    } else {
+                    }
+                    else
+                    {
                         fs::path p{chartDir / pWav};
 #ifndef _WIN32
                         p = PathFromUTF8(lunaticvibes::resolve_windows_path(p.u8string()));
@@ -1193,7 +1196,8 @@ void ScenePlay::loadChart()
                 auto chartDir = gChartContext.chart->getDirectory();
                 for (const auto& it : _pChart->bgaFiles)
                 {
-                    if (sceneEnding) return;
+                    if (shouldDiscard(*this))
+                        return;
                     if (it.empty()) continue;
                     ++bmpTotal;
                 }
@@ -1207,11 +1211,13 @@ void ScenePlay::loadChart()
 
                 for (size_t i = 0; i < _pChart->bgaFiles.size(); ++i)
                 {
-                    if (shouldDiscard(*this)) return;
+                    if (shouldDiscard(*this))
+                        break;
                     const auto& bmp = _pChart->bgaFiles[i];
                     if (bmp.empty()) continue;
                     {
-                        if (shouldDiscard(*this)) return;
+                        if (shouldDiscard(*this))
+                            break;
                         const auto pBmp = PathFromUTF8(bmp);
                         if (pBmp.is_absolute())
                         {

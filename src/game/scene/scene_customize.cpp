@@ -96,7 +96,6 @@ SceneCustomize::~SceneCustomize()
     // Not saving here is okay, since we are also saving on each option change.
     // save(selectedMode);
 
-    _input.unregister_p("SCENE_PRESS_CUSTOMIZE");
     _input.loopEnd();
     loopEnd();
 }

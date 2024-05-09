@@ -405,7 +405,7 @@ void ScoreDB::rebuildBmsPbCache()
         convertHistoryScoreBms(*score, raw_score);
         updateCachedChartPbBms(HashMD5{md5}, *score);
     }
-    transactionStop();
+    commit();
     preloadScore();
 }
 

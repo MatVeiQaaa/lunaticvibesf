@@ -1,3 +1,4 @@
+#include <cassert>
 #include <string>
 #include <string_view>
 
@@ -39,16 +40,43 @@ std::string any_to_str(const std::any& a)
 // TODO: use std::variant instead of std::any
 void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
 {
-    if (a.type() == typeid(int)) sqlite3_bind_int(stmt, i, std::any_cast<int>(a));
-    else if (a.type() == typeid(bool)) sqlite3_bind_int(stmt, i, int(std::any_cast<bool>(a)));
-    else if (a.type() == typeid(long long)) sqlite3_bind_int64(stmt, i, std::any_cast<long long>(a));
-    else if (a.type() == typeid(unsigned)) sqlite3_bind_int64(stmt, i, std::any_cast<unsigned>(a));
-    else if (a.type() == typeid(time_t)) sqlite3_bind_int64(stmt, i, std::any_cast<time_t>(a));
-    else if (a.type() == typeid(double)) sqlite3_bind_double(stmt, i, std::any_cast<double>(a));
-    else if (a.type() == typeid(std::string)) sqlite3_bind_text(stmt, i, std::any_cast<std::string>(a).c_str(), (int)std::any_cast<std::string>(a).length(), SQLITE_TRANSIENT);
-    else if (a.type() == typeid(const char*)) sqlite3_bind_text(stmt, i, std::any_cast<const char*>(a), (int)strlen(std::any_cast<const char*>(a)), SQLITE_TRANSIENT);
-    else if (a.type() == typeid(nullptr)) sqlite3_bind_null(stmt, i);
-    else assert(false); // type error
+    int ret = SQLITE_OK;
+    if (a.type() == typeid(int))
+        ret = sqlite3_bind_int(stmt, i, std::any_cast<int>(a));
+    else if (a.type() == typeid(bool))
+        ret = sqlite3_bind_int(stmt, i, int(std::any_cast<bool>(a)));
+    else if (a.type() == typeid(long long))
+        ret = sqlite3_bind_int64(stmt, i, std::any_cast<long long>(a));
+    else if (a.type() == typeid(unsigned))
+        ret = sqlite3_bind_int64(stmt, i, std::any_cast<unsigned>(a));
+    else if (a.type() == typeid(time_t))
+        ret = sqlite3_bind_int64(stmt, i, std::any_cast<time_t>(a));
+    else if (a.type() == typeid(double))
+        ret = sqlite3_bind_double(stmt, i, std::any_cast<double>(a));
+    else if (a.type() == typeid(std::string))
+    {
+        const auto str = std::any_cast<std::string>(a);
+        ret = sqlite3_bind_text(stmt, i, str.c_str(), static_cast<int>(str.length()), SQLITE_TRANSIENT);
+    }
+    else if (a.type() == typeid(std::string_view))
+    {
+        const auto str = std::any_cast<std::string_view>(a);
+        ret = sqlite3_bind_text(stmt, i, str.data(), static_cast<int>(str.length()), SQLITE_TRANSIENT);
+    }
+    else if (a.type() == typeid(const char*))
+        ret = sqlite3_bind_text(stmt, i, std::any_cast<const char*>(a), -1, SQLITE_TRANSIENT);
+    else if (a.type() == typeid(nullptr))
+        ret = sqlite3_bind_null(stmt, i);
+    else
+    {
+        LOG_FATAL << "[sqlite3] Unsupported bind type";
+        assert(false && "Unsupported bind type");
+        return;
+    }
+    if (ret != SQLITE_OK)
+    {
+        LOG_ERROR << "[sqlite3] Bind error";
+    }
 }
 void sql_bind_any(sqlite3_stmt* stmt, const std::initializer_list<std::any>& args)
 {
@@ -91,7 +119,10 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql, st
             switch (c) {
             case SQLITE_INTEGER: row[i] = sqlite3_column_int64(stmt, i); break;
             case SQLITE_FLOAT: row[i] = sqlite3_column_double(stmt, i); break;
-            case SQLITE_TEXT: row[i] = std::make_any<std::string>((const char *)sqlite3_column_text(stmt, i)); break;
+            case SQLITE_TEXT:
+                row[i] = std::make_any<std::string>(reinterpret_cast<const char*>(sqlite3_column_text(stmt, i)),
+                                                    static_cast<size_t>(sqlite3_column_bytes(stmt, i)));
+                break;
             case SQLITE_BLOB: LOG_ERROR << "[sqlite3] row[" << i << "]: fetched unsupported type SQLITE_BLOB"; break;
             case SQLITE_NULL: break; // assume !row[i].has_value()
             default: LOG_ERROR << "[sqlite3] row[" << i << "]: unknown column type c=" << c; break;
@@ -159,11 +190,13 @@ int SQLite::exec(const std::string_view zsql, std::initializer_list<std::any> ar
 
 void SQLite::transactionStart()
 {
-
-    if (!inTransaction)
-        inTransaction = true;
-    else
+    if (inTransaction)
+    {
+        LOG_ERROR << "[sqlite3] [" << tag << "] Ignoring nested transactionStart";
+        assert(false && "nested transactionStart");
         return;
+    }
+    inTransaction = true;
 
     sqlite3_stmt* stmt = nullptr;
     int ret = sqlite3_prepare_v3(_db, "BEGIN", 6, 0, &stmt, nullptr);
@@ -172,7 +205,8 @@ void SQLite::transactionStart()
         LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
         return;
     }
-    if ((ret = sqlite3_step(stmt)) != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
+    ret = sqlite3_step(stmt);
+    if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
     {
         LOG_ERROR << "[sqlite3] " << tag << ": " << "Transaction start failed with error: " << errmsg();
     }
@@ -183,27 +217,40 @@ void SQLite::transactionStart()
     sqlite3_finalize(stmt);
 }
 
-void SQLite::transactionStop()
+void SQLite::commit()
 {
-    if (inTransaction)
-        inTransaction = false;
-    else
+    commitOrRollback("COMMIT");
+}
+void SQLite::rollback()
+{
+    commitOrRollback("ROLLBACK");
+}
+void SQLite::commitOrRollback(const std::string_view sql)
+{
+    if (!inTransaction)
+    {
+        LOG_ERROR << "[sqlite3] [" << tag << "] commit or rollback outside of a transaction";
+        assert(false && "commit or rollback outside of a transaction");
         return;
+    }
+
+    inTransaction = false;
 
     sqlite3_stmt* stmt = nullptr;
-    int ret = sqlite3_prepare_v3(_db, "COMMIT", 6, 0, &stmt, nullptr);
+    int ret = sqlite3_prepare_v3(_db, sql.data(), static_cast<int>(sql.size()), 0, &stmt, nullptr);
     if (ret)
     {
         LOG_ERROR << "[sqlite3] " << tag << ": " << "sqlite3_prepare_v3 error";
         return;
     }
-    if ((ret = sqlite3_step(stmt)) != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
+    ret = sqlite3_step(stmt);
+    if (ret != SQLITE_OK && ret != SQLITE_ROW && ret != SQLITE_DONE)
     {
-        LOG_ERROR << "[sqlite3] " << tag << ": " << "Transaction end failed with error: " << errmsg();
+        LOG_ERROR << "[sqlite3] " << tag << ": " << "Transaction '" << sql << "' failed: " << errmsg();
     }
     else
     {
-        LOG_DEBUG << "[sqlite3] " << tag << ": " << "Transaction finished";
+        LOG_DEBUG << "[sqlite3] " << tag << ": " << "Transaction '" << sql << "' success";
     }
     sqlite3_finalize(stmt);
 }
@@ -212,11 +259,4 @@ void SQLite::optimize()
 {
     LOG_DEBUG << "[sqlite3] " << tag << ": optimize ";
     exec("PRAGMA optimize(0xfffe)");
-}
-
-void SQLite::commit()
-{
-    LOG_DEBUG << "[sqlite3] " << tag << ": commit";
-    if (!inTransaction) exec("COMMIT");
-    else LOG_WARNING << "[sqlite3] called Commit during transaction. Please call transactionStop";
 }

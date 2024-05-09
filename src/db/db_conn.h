@@ -4,7 +4,6 @@
 #include <string_view>
 #include <utility>
 #include <vector>
-#include <exception>
 
 #include <common/types.h>
 
@@ -41,16 +40,25 @@ public:
     {
     }
     virtual ~SQLite();
+    SQLite(const SQLite&) = delete;
+    SQLite(SQLite&&) = delete;
+    SQLite& operator=(const SQLite&) = delete;
+    SQLite& operator=(SQLite&&) = delete;
 
 protected:
     [[nodiscard]] std::vector<std::vector<std::any>> query(std::string_view stmt,
                                                            std::initializer_list<std::any> args = {}) const;
     int exec(std::string_view stmt, std::initializer_list<std::any> args = {});
-    void commit();
+
+private:
+    void commitOrRollback(const std::string_view sql);
 
 public:
+    // TODO: RAII.
     void transactionStart();
-    void transactionStop();
+    void commit();
+    void rollback();
+
     void optimize();
-    const char* errmsg() const;
+    [[nodiscard]] const char* errmsg() const;
 };

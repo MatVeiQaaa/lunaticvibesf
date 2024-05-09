@@ -634,7 +634,7 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
                 if (inAddFolderSession && std::chrono::system_clock::now() - sessionTimestamp >= std::chrono::seconds(10))
                 {
                     sessionTimestamp = std::chrono::system_clock::now();
-                    transactionStop();
+                    commit();
                     transactionStart();
                 }
             }
@@ -649,7 +649,7 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
     }
 
     inAddFolderSession = false;
-    transactionStop();
+    commit();
     sessionFuture.wait_for(std::chrono::seconds(10));
 
     waitLoadingFinish();

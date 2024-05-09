@@ -124,7 +124,7 @@ try
         std::string utf8_text;
         for (std::string line_; std::getline(ifs, line_);)
         {
-            utf8_text += to_utf8(line_, encoding);
+            utf8_text += lunaticvibes::trim(to_utf8(line_, encoding));
             utf8_text += '\n';
         }
         out.emplace_back(file.filename().u8string(), std::move(utf8_text));

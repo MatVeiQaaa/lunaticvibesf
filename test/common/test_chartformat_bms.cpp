@@ -66,23 +66,23 @@ TEST(tBMS, meta_basic)
 	{
 		EXPECT_TRUE(bms->checkHasReadme());
 		static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
-			{"readme_euckr.txt", u8"안녕\n불고기\n"},
-			{"readme_sjis.txt", u8"桃太郎は桃を食べた。\nと少年が思った、\n"},
-			{"readme_utf8.txt", u8"Матрёшка.\nВодка.\n"},
+			{"readme_euckr.crlf.txt", u8"안녕\n불고기\n"},
+			{"readme_sjis.crlf.txt", u8"桃太郎は桃を食べた。\nと少年が思った、\n"},
+			{"readme_utf8.crlf.txt", u8"Матрёшка.\nВодка.\n"},
 		};
 		std::vector<std::pair<std::string, std::string>> files;
 		EXPECT_EQ((files = bms->getReadmeFiles()), expected_readme_files);
-		static constexpr std::string_view expected_readme_text = R"(1/3 readme_euckr.txt
+		static constexpr std::string_view expected_readme_text = R"(1/3 readme_euckr.crlf.txt
 
 안녕
 불고기
 
-2/3 readme_sjis.txt
+2/3 readme_sjis.crlf.txt
 
 桃太郎は桃を食べた。
 と少年が思った、
 
-3/3 readme_utf8.txt
+3/3 readme_utf8.crlf.txt
 
 Матрёшка.
 Водка.

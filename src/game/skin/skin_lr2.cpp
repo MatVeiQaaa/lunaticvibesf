@@ -699,7 +699,7 @@ int SkinLR2::HELPFILE()
     std::string help_file;
     for (std::string line_; std::getline(ifs, line_);)
     {
-        help_file += to_utf8(line_, encoding);
+        help_file += lunaticvibes::trim(to_utf8(line_, encoding));
         help_file += '\n';
     }
 

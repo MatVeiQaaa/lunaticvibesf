@@ -1,5 +1,8 @@
 * text=auto
+
 *.bme text eol=crlf
 *.bml text eol=crlf
 *.bms text eol=crlf
 *.pms text eol=crlf
+
+*.crlf.txt text eol=crlf

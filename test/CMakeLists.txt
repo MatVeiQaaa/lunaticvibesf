@@ -13,6 +13,7 @@ add_executable(apptest
     common/test_hash.cpp
     common/test_lr2crs.cpp
     common/test_path.cpp
+    db/test_db_conn.cpp
     db/test_score_db.cpp
     db/test_song_db.cpp
     game/test_graphics.cpp

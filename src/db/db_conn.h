@@ -50,6 +50,11 @@ protected:
                                                            std::initializer_list<std::any> args = {}) const;
     int exec(std::string_view stmt, std::initializer_list<std::any> args = {});
 
+    // Subsequent calls with same 'name' are no-op.
+    // For 'name', use YYYYMMDDTHHMMSS format.
+    // True on success.
+    [[nodiscard]] bool applyMigration(std::string_view name, const std::function<bool()>& migrate);
+
 private:
     void commitOrRollback(const std::string_view sql);
 

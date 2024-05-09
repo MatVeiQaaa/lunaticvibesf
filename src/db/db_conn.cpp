@@ -260,3 +260,47 @@ void SQLite::optimize()
     LOG_DEBUG << "[sqlite3] " << tag << ": optimize ";
     exec("PRAGMA optimize(0xfffe)");
 }
+
+bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& migrate)
+{
+    LOG_DEBUG << "[sqlite3] Applying migration '" << name << "'";
+    assert(name.length() == std::string_view{"YYYYMMDDTHHMMSS"}.length());
+
+    int ret = exec("CREATE TABLE IF NOT EXISTS __lvf_schema_migrations (name TEXT, date TEXT);");
+    if (ret != SQLITE_OK)
+    {
+        LOG_FATAL << "[sqlite3] Creation of __lvf_schema_migrations failed: " << errmsg();
+        assert(false && "Creation of __lvf_schema_migrations failed");
+        return false;
+    }
+
+    transactionStart();
+
+    auto didAlreadyMigrate = query("SELECT EXISTS (SELECT 1 FROM __lvf_schema_migrations WHERE name=?);", {name});
+    assert(didAlreadyMigrate.size() == 1 && didAlreadyMigrate[0].size() == 1);
+    if (ANY_INT(didAlreadyMigrate[0][0]) == 1)
+    {
+        LOG_VERBOSE << "[sqlite3] Migration has already been applied";
+        commit();
+        return true;
+    }
+    if (!migrate())
+    {
+        LOG_ERROR << "[sqlite3] Migration '" << name << "' failed";
+        rollback();
+        return false;
+    }
+
+    ret = exec("INSERT INTO __lvf_schema_migrations(name, date) VALUES (?, datetime());", {name});
+    if (ret != SQLITE_OK)
+    {
+        LOG_FATAL << "[sqlite3] Insertion into __lvf_schema_migrations failed: " << errmsg();
+        assert(false && "Insertion into __lvf_schema_migrations failed");
+        rollback();
+        return false;
+    }
+
+    commit();
+    LOG_VERBOSE << "[sqlite3] Migration has been successfully applied";
+    return true;
+}

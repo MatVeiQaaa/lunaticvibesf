@@ -70,7 +70,7 @@ private:
     std::array<size_t, 128> _keySampleIdxBuf{};
 
     // virtual Customize scene, customize option toggle in select scene support
-    static std::shared_ptr<SceneCustomize> _virtualSceneCustomize;
+    std::shared_ptr<SceneCustomize> _virtualSceneCustomize;
     std::shared_ptr<SkinMgr> _skinMgr;
 
     // smooth scrolling

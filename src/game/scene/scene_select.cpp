@@ -348,8 +348,6 @@ void config_fx()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::shared_ptr<SceneCustomize> SceneSelect::_virtualSceneCustomize = nullptr;
-
 SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
@@ -489,11 +487,6 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     loadLR2Sound();
 
     gCustomizeContext.modeUpdate = false;
-    if (_virtualSceneCustomize != nullptr)
-    {
-        _virtualSceneCustomize->loopStart();
-    }
-
     if (!gInCustomize)
     {
         SoundMgr::stopNoteSamples();
@@ -522,10 +515,7 @@ SceneSelect::~SceneSelect()
     if (_virtualSceneCustomize != nullptr)
     {
         _virtualSceneCustomize->loopEnd();
-        if (gNextScene == SceneType::CUSTOMIZE || gNextScene == SceneType::EXIT_TRANS || gNextScene == SceneType::EXIT)
-        {
-            _virtualSceneCustomize.reset();
-        }
+        _virtualSceneCustomize.reset();
     }
 
     postStartPreview();

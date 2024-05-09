@@ -83,13 +83,15 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 SceneCustomize::~SceneCustomize()
 {
     // Reset option entry names to avoid showing garbage in select skin customize mode.
-    // FIXME: if virtual customize scene exists but is disabled, when we exit real customize scene customize mode kicks
-    // up and refills texts with data again.
-    optionsKeyList.clear();
-    optionsMap.clear();
-    updateTexts();
-    State::set(IndexText::SKIN_NAME, "");
-    State::set(IndexText::SKIN_MAKER_NAME, "");
+    // Don't do it for the virtual scene as it is destructed after normal SceneCustomize is created.
+    if (!_is_virtual)
+    {
+        optionsKeyList.clear();
+        optionsMap.clear();
+        updateTexts();
+        State::set(IndexText::SKIN_NAME, "");
+        State::set(IndexText::SKIN_MAKER_NAME, "");
+    }
 
     // NOTE: do *not* call this here, as it may unintentionally load another skin which may wait for a callback from
     // main thread, causing a dead lock.
@@ -453,6 +455,7 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
 
 void SceneCustomize::load(SkinType mode)
 {
+    LOG_DEBUG << "[Customize] Load";
     StringPath configFilePath;
     if (mode == SkinType::SOUNDSET)
     {
@@ -521,6 +524,7 @@ void SceneCustomize::load(SkinType mode)
         }
         else
         {
+            LOG_DEBUG << "[Customize] ps==nullptr";
             State::set(IndexText::SKIN_NAME, "");
             State::set(IndexText::SKIN_MAKER_NAME, "");
         }

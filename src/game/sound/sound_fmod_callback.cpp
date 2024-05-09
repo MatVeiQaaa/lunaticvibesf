@@ -41,8 +41,10 @@ FMOD_RESULT F_CALLBACK FmodCallbackFileClose(void *handle, void *userData)
 ////////////////////////////////////////////////////////////////////////////////
 // Async Read: Push file to queue
 
-std::mutex queueMutex;
-SampleQueue asyncSampleLoadQueue;
+static std::mutex queueMutex;
+static std::queue<FMOD_ASYNCREADINFO*> asyncSampleLoadQueue;
+
+#define LOCK_QUEUE std::lock_guard<std::mutex> _queueLock_(queueMutex)
 
 FMOD_RESULT F_CALLBACK FmodCallbackAsyncRead(FMOD_ASYNCREADINFO *info, void *userData)
 {

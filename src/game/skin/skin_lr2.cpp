@@ -793,6 +793,9 @@ int SkinLR2::LR2FONT()
         }
 
         findAndExtractDXA(path);
+#ifndef _WIN32
+        path = PathFromUTF8(lunaticvibes::resolve_windows_path(path.u8string()));
+#endif // _WIN32
 
         if (!fs::is_regular_file(path))
         {
@@ -4226,6 +4229,9 @@ void SkinLR2::findAndExtractDXA(const Path& path)
 
             // find dxa file
             Path dxa = folder / PathFromUTF8(archiveName);
+#ifndef _WIN32
+            dxa = PathFromUTF8(lunaticvibes::resolve_windows_path(dxa.u8string()));
+#endif // _WIN32
 
             // extract dxa
             if (std::filesystem::is_regular_file(dxa))

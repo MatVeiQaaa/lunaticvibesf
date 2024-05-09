@@ -87,6 +87,12 @@ namespace lunaticvibes {
 
 void trim_in_place(std::string& s);
 
+[[nodiscard]] inline std::string trim(std::string&& s)
+{
+    trim_in_place(s);
+    return s;
+}
+
 // Fix path separators and resolve case-insensitive paths on case-sensitive file systems.
 // This does IO.
 // Preserves non-existing paths. Does not trim redundant `./`.

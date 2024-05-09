@@ -632,15 +632,11 @@ void SpriteNumber::updateNumberByInd()
         break;
     default:
         // FIXME: wtf is this for
-        if ((unsigned)numInd == 10220) {
-            n = int(lunaticvibes::Time().norm() & 0xFFFFFFFF);
-        } else {
 #ifndef NDEBUG
-            n = (int)numInd >= 10000 ? (int)State::get((IndexTimer)((int)numInd - 10000)) : State::get(numInd);
+        n = (int)numInd >= 10000 ? (int)State::get((IndexTimer)((int)numInd - 10000)) : State::get(numInd);
 #else
-            n = State::get(numInd);
+        n = State::get(numInd);
 #endif
-        }
         break;
     }
     updateNumber(n);

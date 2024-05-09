@@ -162,6 +162,53 @@ static void reload_preview(SkinType selectedMode)
     }
 }
 
+[[nodiscard]] static const char* configOptionNameForSkinType(const SkinType mode)
+{
+    switch (mode)
+    {
+    case SkinType::MUSIC_SELECT: return cfg::S_PATH_MUSIC_SELECT;
+    case SkinType::DECIDE: return cfg::S_PATH_DECIDE;
+    case SkinType::RESULT: return cfg::S_PATH_RESULT;
+    // NOTE: LR2 has a bug that it can't save course result skin.
+    case SkinType::COURSE_RESULT: return cfg::S_PATH_COURSE_RESULT;
+    case SkinType::KEY_CONFIG: return cfg::S_PATH_KEYCONFIG;
+    case SkinType::THEME_SELECT: return cfg::S_PATH_CUSTOMIZE;
+    case SkinType::PLAY5: return cfg::S_PATH_PLAY_5;
+    case SkinType::PLAY5_2: return cfg::S_PATH_PLAY_5_BATTLE;
+    case SkinType::PLAY7: return cfg::S_PATH_PLAY_7;
+    case SkinType::PLAY7_2: return cfg::S_PATH_PLAY_7_BATTLE;
+    case SkinType::PLAY9: return cfg::S_PATH_PLAY_9;
+    case SkinType::PLAY10: return cfg::S_PATH_PLAY_10;
+    case SkinType::PLAY14: return cfg::S_PATH_PLAY_14;
+    case SkinType::EXIT:
+    case SkinType::TITLE:
+    case SkinType::SOUNDSET:
+    case SkinType::PLAY9_2:
+    case SkinType::RETRY_TRANS:
+    case SkinType::COURSE_TRANS:
+    case SkinType::EXIT_TRANS:
+    case SkinType::PRE_SELECT:
+    case SkinType::TMPL:
+    case SkinType::TEST:
+    case SkinType::MODE_COUNT: break;
+    }
+    return nullptr;
+};
+
+[[nodiscard]] static int wrappingAdd(int lhs, int rhs, int min, int max)
+{
+    lhs += rhs;
+    if (lhs > max)
+    {
+        lhs = min;
+    }
+    if (lhs < min)
+    {
+        lhs = max;
+    }
+    return lhs;
+}
+
 void SceneCustomize::updateMain()
 {
     // For the virtual customize scene gInCustomize is always false, so this means we are in a virtual scene and are
@@ -220,28 +267,18 @@ void SceneCustomize::updateMain()
                     if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) && fs::equivalent(soundsetList[selectedIdx], path))
                         break;
                 }
-                selectedIdx += gCustomizeContext.skinDir;
-                if (selectedIdx >= (int)soundsetList.size())
-                {
-                    selectedIdx = 0;
-                }
-                if (selectedIdx < 0)
-                {
-                    selectedIdx = (int)soundsetList.size() - 1;
-                }
-                if (selectedIdx >= 0 && selectedIdx < (int)soundsetList.size())
-                {
-                    const auto& p = fs::relative(soundsetList[selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
+                selectedIdx =
+                    wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0, static_cast<int>(soundsetList.size() - 1));
+                const auto& p = fs::relative(soundsetList[selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
 
-                    ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, p.u8string());
+                ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, p.u8string());
 
-                    pSkin->setHandleMouseEvents(false);
-                    SoundMgr::stopSysSamples();
-                    load(SkinType::SOUNDSET);
-                    loadLR2Sound();
-                    SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
-                    pSkin->setHandleMouseEvents(true);
-                }
+                pSkin->setHandleMouseEvents(false);
+                SoundMgr::stopSysSamples();
+                load(SkinType::SOUNDSET);
+                loadLR2Sound();
+                SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
+                pSkin->setHandleMouseEvents(true);
             }
             else
             {
@@ -265,68 +302,25 @@ void SceneCustomize::updateMain()
                     if (fs::exists(p1) && fs::exists(p2) && fs::equivalent(p1, p2))
                         break;
                 }
-                selectedIdx += gCustomizeContext.skinDir;
-                if (selectedIdx >= (int)skinList[selectedMode].size())
+                selectedIdx = wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0,
+                                          static_cast<int>(skinList[selectedMode].size()) - 1);
+
+                const auto& p = fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
+                if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
-                    selectedIdx = 0;
+                    ConfigMgr::set('S', key, p.u8string());
                 }
-                if (selectedIdx < 0)
+                else
                 {
-                    selectedIdx = (int)skinList[selectedMode].size() - 1;
+                    LOG_ERROR << "[Customize] config_path_for_skin_type(" << selectedMode << ") == nullptr";
                 }
-                if (selectedIdx >= 0 && selectedIdx < (int)skinList[selectedMode].size())
-                {
-                    const auto& p = fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
 
-                    auto config_path_for_skin_type = [](SkinType mode) -> const char* {
-                        switch (mode)
-                        {
-                        case SkinType::MUSIC_SELECT: return cfg::S_PATH_MUSIC_SELECT;
-                        case SkinType::DECIDE: return cfg::S_PATH_DECIDE;
-                        case SkinType::RESULT: return cfg::S_PATH_RESULT;
-                        case SkinType::COURSE_RESULT:
-                            // NOTE: LR2 has a bug that it can't save course result skin.
-                            return cfg::S_PATH_COURSE_RESULT;
-                        case SkinType::KEY_CONFIG: return cfg::S_PATH_KEYCONFIG;
-                        case SkinType::THEME_SELECT: return cfg::S_PATH_CUSTOMIZE;
-                        case SkinType::PLAY5: return cfg::S_PATH_PLAY_5;
-                        case SkinType::PLAY5_2: return cfg::S_PATH_PLAY_5_BATTLE;
-                        case SkinType::PLAY7: return cfg::S_PATH_PLAY_7;
-                        case SkinType::PLAY7_2: return cfg::S_PATH_PLAY_7_BATTLE;
-                        case SkinType::PLAY9: return cfg::S_PATH_PLAY_9;
-                        case SkinType::PLAY10: return cfg::S_PATH_PLAY_10;
-                        case SkinType::PLAY14: return cfg::S_PATH_PLAY_14;
+                pSkin->setHandleMouseEvents(false);
+                _skinMgr->unload(selectedMode);
+                load(selectedMode);
+                pSkin->setHandleMouseEvents(true);
 
-                        case SkinType::EXIT:
-                        case SkinType::TITLE:
-                        case SkinType::SOUNDSET:
-                        case SkinType::PLAY9_2:
-                        case SkinType::RETRY_TRANS:
-                        case SkinType::COURSE_TRANS:
-                        case SkinType::EXIT_TRANS:
-                        case SkinType::PRE_SELECT:
-                        case SkinType::TMPL:
-                        case SkinType::TEST:
-                        case SkinType::MODE_COUNT: break;
-                        }
-                        return nullptr;
-                    };
-                    if (const char* key = config_path_for_skin_type(selectedMode); key != nullptr)
-                    {
-                        ConfigMgr::set('S', key, p.u8string());
-                    }
-                    else
-                    {
-                        LOG_ERROR << "[Customize] config_path_for_skin_type(" << selectedMode << ") == nullptr";
-                    }
-
-                    pSkin->setHandleMouseEvents(false);
-                    _skinMgr->unload(selectedMode);
-                    load(selectedMode);
-                    pSkin->setHandleMouseEvents(true);
-
-                    reload_preview(selectedMode);
-                }
+                reload_preview(selectedMode);
             }
             else
             {
@@ -345,21 +339,9 @@ void SceneCustomize::updateMain()
         if (idxOption < optionsKeyList.size())
         {
             Option& op = optionsMap[optionsKeyList[idxOption]];
-            size_t idxEntry = op.selectedEntry;
-            if (gCustomizeContext.optionDir > 0)
-            {
-                if (idxEntry + 1 >= op.entries.size())
-                    idxEntry = 0;
-                else
-                    idxEntry++;
-            }
-            else
-            {
-                if (idxEntry == 0 && gCustomizeContext.optionDir < 0)
-                    idxEntry = !op.entries.empty() ? (op.entries.size() - 1) : 0;
-                else
-                    idxEntry--;
-            }
+            const size_t idxEntry = wrappingAdd(op.selectedEntry, gCustomizeContext.optionDir, 0,
+                                                op.entries.empty() ? 0 : (op.entries.size() - 1));
+
             if (idxEntry != op.selectedEntry)
             {
                 setOption(idxOption, idxEntry);

@@ -99,8 +99,7 @@ void SoundSetLR2::loadCSV(Path p)
         ++csvLineNumber;
 
         // convert codepage
-        std::string rawUTF8 = to_utf8(raw, encoding);
-        lunaticvibes::trim_in_place(rawUTF8);
+        std::string rawUTF8 = lunaticvibes::trim(to_utf8(raw, encoding));
 
         static boost::char_separator<char> sep(",");
         boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);

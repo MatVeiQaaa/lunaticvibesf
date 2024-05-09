@@ -105,10 +105,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         srcLine++;
         if (lineBuf.length() <= 1) continue;
 
-        lunaticvibes::trim_in_place(lineBuf);
-
         // convert codepage
-        lineBuf = to_utf8(lineBuf, encoding);
+        lineBuf = lunaticvibes::trim(to_utf8(lineBuf, encoding));
 
         StringContentView buf(lineBuf);
         if (buf[0] != '#') continue;

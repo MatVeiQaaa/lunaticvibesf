@@ -3242,8 +3242,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
     if (parseKeyBuf.empty()) return 0;
     for (size_t idx = 0; idx < 24 && idx < raw.size() - 1; ++idx)
     {
-        parseParamBuf[idx] = raw[idx + 1];
-        lunaticvibes::trim_in_place(parseParamBuf[idx]);
+        parseParamBuf[idx] = lunaticvibes::trim(raw[idx + 1]);
     }
 
     if (matchToken(parseKeyBuf, "#INFORMATION"))
@@ -3389,8 +3388,7 @@ int SkinLR2::parseBody(const Tokens &raw)
     if (parseKeyBuf.empty()) return 0;
     for (size_t idx = 0; idx < 24 && idx < raw.size() - 1; ++idx)
     {
-        parseParamBuf[idx] = raw[idx + 1];
-        lunaticvibes::trim_in_place(parseParamBuf[idx]);
+        parseParamBuf[idx] = lunaticvibes::trim(raw[idx + 1]);
     }
 
     try {

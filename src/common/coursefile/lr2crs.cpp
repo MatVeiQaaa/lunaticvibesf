@@ -36,8 +36,7 @@ std::stringstream readIntoUtf8StringStream(const Path& filePath)
 	for (std::string lineBuf; std::getline(ss, lineBuf);)
 	{
 		// convert codepage
-		lineBuf = to_utf8(lineBuf, encoding);
-		lunaticvibes::trim_in_place(lineBuf);
+		lineBuf = lunaticvibes::trim(to_utf8(lineBuf, encoding));
 		ssUTF8 << lineBuf;
 	}
 	ssUTF8.sync();

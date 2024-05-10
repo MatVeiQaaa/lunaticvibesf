@@ -13,12 +13,6 @@ project(LunaticVibesF
 )
 set(PROJECT_TITLE "Lunatic Vibes F")
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(BUILD_X64 TRUE CACHE BOOL "Build x64 arch")
-else()
-    set(BUILD_X64 FALSE CACHE BOOL "Build x64 arch")
-endif()
-
 configure_file(
     "${CMAKE_SOURCE_DIR}/src/cmake_config.h.in"
     "${PROJECT_BINARY_DIR}/cmake_config.h"

@@ -1,15 +1,17 @@
 #pragma once
 #include "soundset.h"
 #include "game/skin/skin.h"
+#include <random>
 #include <string_view>
 #include <vector>
 #include <string>
 
-class SoundSetLR2 : public vSoundSet
+class SoundSetLR2 final : public vSoundSet
 {
 public:
 	SoundSetLR2();
-	SoundSetLR2(Path p);
+	explicit SoundSetLR2(Path p);
+	explicit SoundSetLR2(std::mt19937 gen);
 	~SoundSetLR2() override = default;
 	void loadCSV(Path p);
 	bool parseHeader(const std::vector<StringContent>& tokens);
@@ -29,9 +31,10 @@ private:
 	std::vector<CustomFile> customfiles;
 	std::vector<size_t> customizeRandom;
 
-protected:
 	Path filePath;
 	Path thumbnailPath;
+
+	std::mt19937 _gen;
 
 	unsigned csvLineNumber = 0;          // line parsing index
 

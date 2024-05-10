@@ -1,6 +1,7 @@
 #include "soundset_lr2.h"
 
 #include <algorithm>
+#include <random>
 #include <string_view>
 #include <utility>
 
@@ -12,7 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 
-SoundSetLR2::SoundSetLR2()
+SoundSetLR2::SoundSetLR2() : SoundSetLR2(std::mt19937{std::random_device{}()})
 {
 	_type = eSoundSetType::LR2;
 }
@@ -20,6 +21,10 @@ SoundSetLR2::SoundSetLR2()
 SoundSetLR2::SoundSetLR2(Path p) : SoundSetLR2()
 {
 	loadCSV(std::move(p));
+}
+
+SoundSetLR2::SoundSetLR2(std::mt19937 gen) : _gen(gen)
+{
 }
 
 void SoundSetLR2::loadCSV(Path p)
@@ -163,12 +168,12 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
         {
             c.label.push_back(p.filename().u8string());
         }
-        c.label.emplace_back("RANDOM");
-
-        std::srand(std::time(NULL));
-        customizeRandom.push_back(c.label.empty() ? 0 : (std::rand() % c.label.size()));
 
         std::sort(c.label.begin(), c.label.end());
+        c.label.emplace_back("RANDOM");
+        customizeRandom.push_back(
+            c.label.size() < 2 ? 0 : std::uniform_int_distribution<size_t>{0, c.label.size() - 2}(_gen));
+
         c.defIdx = 0;
         for (size_t i = 0; i < c.label.size(); ++i)
         {
@@ -242,7 +247,6 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
         bool customFileFound = false;
 
         // Check if the wildcard path is specified by custom settings
-        std::srand(std::time(NULL));
         for (size_t idx = 0; idx < customfiles.size(); ++idx)
         {
             const auto& cf = customfiles[idx];
@@ -271,7 +275,9 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
             }
             else
             {
-                size_t ranidx = std::rand() % ls.size();
+                // Sort for determinism in tests.
+                std::sort(ls.begin(), ls.end());
+                const size_t ranidx = std::uniform_int_distribution<size_t>{0, ls.size() - 1}(_gen);
                 const Path& soundPath = ls[ranidx];
                 soundFilePath[key] = soundPath;
                 LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added random " << key << ": " << soundPath;
@@ -285,7 +291,8 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added " << key << ": " << path;
     }
 
-    return soundFilePath.find(key) != soundFilePath.end() && !soundFilePath[key].empty();
+    auto it = soundFilePath.find(key);
+    return it != soundFilePath.end() && !it->second.empty();
 }
 
 static Path getPathOrDefault(const std::map<std::string, Path>& soundFilePath, const std::string& key)

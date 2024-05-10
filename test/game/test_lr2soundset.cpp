@@ -1,10 +1,11 @@
 #include <gmock/gmock.h>
 
+#include <random>
 #include <vector>
 
 #include "game/sound/soundset_lr2.h"
 
-[[nodiscard]] inline StringPath operator""_pp(const char *s, size_t len)
+[[nodiscard]] inline StringPath operator""_pp(const char* s, size_t len)
 {
     return Path(std::string_view(s, len)).make_preferred();
 }
@@ -130,9 +131,9 @@ TEST(Lr2SoundSet, CustomFile)
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
         ASSERT_EQ(opt.entries.size(), 3);
-        EXPECT_EQ(opt.entries[0], "RANDOM");
-        EXPECT_EQ(opt.entries[1], "mybgm.1");
-        EXPECT_EQ(opt.entries[2], "mybgm.2");
+        EXPECT_EQ(opt.entries[0], "mybgm.1");
+        EXPECT_EQ(opt.entries[1], "mybgm.2");
+        EXPECT_EQ(opt.entries[2], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 0);
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_pp);
@@ -152,12 +153,75 @@ TEST(Lr2SoundSet, CustomFileDefaultEntry)
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
         ASSERT_EQ(opt.entries.size(), 3);
-        EXPECT_EQ(opt.entries[0], "RANDOM");
-        EXPECT_EQ(opt.entries[1], "mybgm.1");
-        EXPECT_EQ(opt.entries[2], "mybgm.2");
-        EXPECT_EQ(opt.defaultEntry, 2);
+        EXPECT_EQ(opt.entries[0], "mybgm.1");
+        EXPECT_EQ(opt.entries[1], "mybgm.2");
+        EXPECT_EQ(opt.entries[2], "RANDOM");
+        EXPECT_EQ(opt.defaultEntry, 1);
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.2/mybgm.2.wav"_pp);
 }
 
-// TODO: add auto tests for RANDOM
+TEST(Lr2SoundSet, CustomFileRandomOption)
+{
+    SoundSetLR2 ss{std::mt19937{1337}};
+    EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
+    EXPECT_TRUE(ss.parseHeader({"#CUSTOMFILE", "SELECT BGM", R"(lr2soundset\bgm\*)", "mybgm.2"}));
+    EXPECT_TRUE(ss.setCustomFileOptionForBodyParsing("SELECT BGM", "RANDOM"));
+    EXPECT_TRUE(ss.parseBody({"#SELECT", R"(lr2soundset\bgm\*\*.wav)", ""}));
+    ASSERT_EQ(ss.getCustomizeOptionCount(), 1);
+    {
+        auto opt = ss.getCustomizeOptionInfo(0);
+        EXPECT_EQ(opt.id, 0);
+        EXPECT_EQ(opt.displayName, "SELECT BGM");
+        EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
+        ASSERT_EQ(opt.entries.size(), 3);
+        EXPECT_EQ(opt.entries[0], "mybgm.1");
+        EXPECT_EQ(opt.entries[1], "mybgm.2");
+        EXPECT_EQ(opt.entries[2], "RANDOM");
+        EXPECT_EQ(opt.defaultEntry, 1);
+    }
+    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_pp);
+}
+
+TEST(Lr2SoundSet, CustomFileRandomOptionNoFiles)
+{
+    SoundSetLR2 ss;
+    EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
+    EXPECT_TRUE(ss.parseHeader({"#CUSTOMFILE", "SELECT BGM", R"(no\such\path\*)", "RANDOM"}));
+    EXPECT_TRUE(ss.setCustomFileOptionForBodyParsing("SELECT BGM", "RANDOM"));
+    EXPECT_TRUE(ss.parseBody({"#SELECT", R"(no\such\path\*.wav)", ""}));
+    ASSERT_EQ(ss.getCustomizeOptionCount(), 1);
+    {
+        auto opt = ss.getCustomizeOptionInfo(0);
+        EXPECT_EQ(opt.id, 0);
+        EXPECT_EQ(opt.displayName, "SELECT BGM");
+        EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
+        ASSERT_EQ(opt.entries.size(), 1);
+        EXPECT_EQ(opt.entries[0], "RANDOM");
+        EXPECT_EQ(opt.defaultEntry, 0);
+    }
+    // Probably not the best way to handle this.
+    EXPECT_EQ(ss.getPathBGMSelect(), "no/such/path/RANDOM.wav"_pp);
+}
+
+TEST(Lr2SoundSet, MissingCustomFileRandomFallbackNotFound)
+{
+    SoundSetLR2 ss;
+    EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
+    EXPECT_FALSE(ss.parseBody({"#SELECT", R"(no\such\path\*.wav)", ""}));
+    ASSERT_EQ(ss.getCustomizeOptionCount(), 0);
+    EXPECT_EQ(ss.getPathBGMSelect(), ""_pp);
+}
+
+TEST(Lr2SoundSet, MissingCustomFileRandomFallback)
+{
+    // Commented out lines is what should ideally be in this test, but using several globs in fallback is not
+    // implemented.
+    SoundSetLR2 ss{std::mt19937{1337}};
+    EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
+    // EXPECT_TRUE(ss.parseBody({"#SELECT", R"(lr2soundset\bgm\*\*.wav)", ""}));
+    EXPECT_TRUE(ss.parseBody({"#SELECT", R"(lr2soundset\bgm\*)", ""}));
+    ASSERT_EQ(ss.getCustomizeOptionCount(), 0);
+    // EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_pp);
+    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1"_pp);
+}

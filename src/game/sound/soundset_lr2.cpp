@@ -129,13 +129,13 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
     {
         if (tokens.size() <= 1)
         {
-            LOG_WARNING << "[SoundSetLR2] Missing #INFORMATION fields";
+            LOG_DEBUG << "[SoundSetLR2] Missing #INFORMATION fields";
             return false;
         }
 
         if (tokens[1] != "10")
         {
-            LOG_WARNING << "[SoundSetLR2] Invalid #INFORMATION type";
+            LOG_DEBUG << "[SoundSetLR2] Invalid #INFORMATION type";
             return false;
         }
         if (tokens.size() > 2) name = tokens[2];
@@ -150,7 +150,7 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
     {
         if (tokens.size() < 4)
         {
-            LOG_WARNING << "[SoundSetLR2] Missing #CUSTOMFILE fields";
+            LOG_DEBUG << "[SoundSetLR2] Missing #CUSTOMFILE fields";
             return false;
         }
 
@@ -235,7 +235,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
 {
     if (auto it = soundFilePath.find(key); it != soundFilePath.end())
     {
-        LOG_WARNING << "[SoundSetLR2] Ignoring duplicate key " << key;
+        LOG_DEBUG << "[SoundSetLR2] Ignoring duplicate key " << key;
         return false;
     }
 

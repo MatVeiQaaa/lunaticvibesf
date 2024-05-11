@@ -3177,7 +3177,7 @@ void SceneSelect::updatePreview()
         }
         if (previewChartPath.empty())
         {
-            // No chart path for current entry, e.g. not a song entry.
+            LOG_VERBOSE << "[Select] No chart path for current entry (not a song entry?)";
             std::unique_lock l(previewMutex);
             previewState = PREVIEW_FINISH;
             return;
@@ -3463,10 +3463,8 @@ void SceneSelect::updatePreview()
 
 void SceneSelect::postStartPreview()
 {
-    // TODO: print this less often.
-    LOG_DEBUG << "[Select] Preview start -> PREVIEW_START_CHART_LOADING";
+    LOG_VERBOSE << "[Select] Preview start posted -> PREVIEW_START_CHART_LOADING";
     std::unique_lock l(previewMutex);
-
     SoundMgr::stopNoteSamples();
     SoundMgr::setSysVolume(1.0, 400);
     previewState = PREVIEW_START_CHART_LOADING;

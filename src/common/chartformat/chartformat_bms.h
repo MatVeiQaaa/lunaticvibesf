@@ -1,26 +1,18 @@
 #pragma once
+
 #include <array>
 #include <list>
 #include <map>
 #include <optional>
 #include <set>
-#include <string>
 
 #include "chartformat.h"
 #include "common/types.h"
 
 namespace bms
 {
-    const unsigned BGMCHANNELS = 32;
     const unsigned MAXSAMPLEIDX = 36 * 36;
     const unsigned MAXBARIDX = 999;
-    enum GameMode {
-        MODE_5KEYS,
-        MODE_7KEYS,
-        MODE_9KEYS,
-        MODE_10KEYS,
-        MODE_14KEYS
-    };
     enum class ErrorCode
     {
         OK = 0,

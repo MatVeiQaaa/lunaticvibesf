@@ -463,13 +463,8 @@ void ScoreDB::updateStats(const ScoreBMS& score)
 {
     int ret;
     auto stats = getStats();
-    // TODO: how should NOPLAY be counted?
-    if (score.lamp == ScoreBMS::Lamp::NOPLAY)
-    {
-        LOG_DEBUG << "[ScoreDB] not counting NOPLAY score in stats";
-        return;
-    }
     stats.play_count += 1;
+    // NOTE: in course plays, NOPLAY is a clear, and FAILED is a fail.
     stats.clear_count += static_cast<int64_t>(score.lamp != ScoreBMS::Lamp::FAILED);
     stats.pgreat += score.pgreat;
     stats.great += score.great;

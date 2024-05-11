@@ -225,7 +225,7 @@ public:
     ScoreBMS() = default;
 
 public:
-    lunaticvibes::Time play_time{};
+    lunaticvibes::Time play_time{0};
 
     int exscore = 0;
 

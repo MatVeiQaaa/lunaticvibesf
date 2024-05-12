@@ -2478,7 +2478,7 @@ void ScenePlay::updateFadeout()
         // check quick retry (start+select / white+black)
         bool wantRetry = false;
         bool wantNewRandomSeed = false;
-        if (gPlayContext.canRetry && gChartContext.started && playInterrupted && !playFinished)
+        if (gPlayContext.canRetry && playInterrupted && !playFinished)
         {
             auto h = _input.Holding();
             using namespace Input;
@@ -2847,21 +2847,21 @@ void ScenePlay::requestExit()
 
     lunaticvibes::Time t;
 
+    playInterrupted = true;
+
     if (gChartContext.started)
     {
-        playInterrupted = true;
-
         if (!playerState[PLAYER_SLOT_PLAYER].finished)
         {
             gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->fail();
             gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->updateGlobals();
-            LOG_INFO << "[Play] 1P finished";
+            LOG_INFO << "[Play] 1P finished by exit";
         }
         if (!playerState[PLAYER_SLOT_TARGET].finished && gPlayContext.isBattle && gPlayContext.ruleset[PLAYER_SLOT_TARGET])
         {
             gPlayContext.ruleset[PLAYER_SLOT_TARGET]->fail();
             gPlayContext.ruleset[PLAYER_SLOT_TARGET]->updateGlobals();
-            LOG_INFO << "[Play] 2P finished";
+            LOG_INFO << "[Play] 2P finished by exit";
         }
 
         if (gArenaData.isOnline())

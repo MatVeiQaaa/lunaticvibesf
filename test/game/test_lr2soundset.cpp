@@ -200,15 +200,14 @@ TEST(Lr2SoundSet, CustomFileRandomOptionNoFiles)
         EXPECT_EQ(opt.entries[0], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 0);
     }
-    // Probably not the best way to handle this.
-    EXPECT_EQ(ss.getPathBGMSelect(), "no/such/path/RANDOM.wav"_pp);
+    EXPECT_EQ(ss.getPathBGMSelect(), ""_pp);
 }
 
 TEST(Lr2SoundSet, MissingCustomFileRandomFallbackNotFound)
 {
     SoundSetLR2 ss;
     EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
-    EXPECT_FALSE(ss.parseBody({"#SELECT", R"(no\such\path\*.wav)", ""}));
+    EXPECT_TRUE(ss.parseBody({"#SELECT", R"(no\such\path\*.wav)", ""}));
     ASSERT_EQ(ss.getCustomizeOptionCount(), 0);
     EXPECT_EQ(ss.getPathBGMSelect(), ""_pp);
 }

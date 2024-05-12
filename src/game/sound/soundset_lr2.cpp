@@ -1,6 +1,7 @@
 #include "soundset_lr2.h"
 
 #include <algorithm>
+#include <iterator>
 #include <random>
 #include <string_view>
 #include <utility>
@@ -252,7 +253,13 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
             const auto& cf = customfiles[idx];
             if (cf.filepath == pathU8StrView.substr(0, cf.filepath.length()))
             {
-                int value = (cf.label[cf.value] == "RANDOM") ? customizeRandom[idx] : cf.value;
+                const size_t value = (cf.label[cf.value] == "RANDOM") ? customizeRandom[idx] : cf.value;
+                // Last entry is always 'RANDOM'.
+                if (value == cf.label.size() - 1)
+                {
+                    LOG_DEBUG << "[SoundSetLR2] Random rolled 'RANDOM' (no files found?)";
+                    break;
+                }
 
                 std::string pathFile = pathU8Str;
                 boost::replace_all(pathFile, "*", cf.label[value]);
@@ -291,8 +298,8 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
         LOG_DEBUG << "[Skin] " << csvLineNumber << ": Added " << key << ": " << path;
     }
 
-    auto it = soundFilePath.find(key);
-    return it != soundFilePath.end() && !it->second.empty();
+    // Good even if it's empty, as that's not the problem with CSVs, it's missing files.
+    return soundFilePath.find(key) != soundFilePath.end();
 }
 
 static Path getPathOrDefault(const std::map<std::string, Path>& soundFilePath, const std::string& key)

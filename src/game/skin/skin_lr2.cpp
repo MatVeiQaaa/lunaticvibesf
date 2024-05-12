@@ -3412,7 +3412,7 @@ int SkinLR2::parseBody(const Tokens &raw)
         if (HELPFILE() != 0)
             return 9;
 
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid def \"" << parseKeyBuf;
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid def '" << parseKeyBuf << "'";
     }
     catch (const std::invalid_argument& e)
     {

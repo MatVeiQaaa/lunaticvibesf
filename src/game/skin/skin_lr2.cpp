@@ -437,16 +437,17 @@ static int flipTimer(int timer)
     {
         switch (blend)
         {
-        case 0: return BlendMode::NONE;
+        case 0: return BlendMode::NONE; // TRANSCLOLR
         case 1: return BlendMode::ALPHA;
         case 2: return BlendMode::ADD;
         case 3: return BlendMode::SUBTRACT;
-        case 4: return BlendMode::MOD;
+        case 4: return BlendMode::MOD; // MULTIPLY
+        case 5: // LR2SkinHelp - undocumented. Seems to be the same as 2, but not 6. See bomb in Girlish Cafe.
         case 6: return BlendMode::ADD; // LR2: XOR but implemented as ADD
         case 9: return BlendMode::MULTIPLY_INVERTED_BACKGROUND;
-        case 10: return BlendMode::INVERT;
+        case 10: return BlendMode::INVERT; // ANTI_COLOR
         case 11: return BlendMode::MULTIPLY_WITH_ALPHA;
-        default: return BlendMode::ALPHA;
+        default: LOG_DEBUG << "[SkinLR2] Invalid blend mode '" << blend << "'"; return BlendMode::ALPHA;
         };
     }
     } // namespace lr2skin

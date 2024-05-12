@@ -32,23 +32,6 @@ namespace LR2SkinDef
         WHITE_DOT
     };
 
-    enum blend
-    {
-        TRANSCOLOR = 0,
-
-        ALPHA = 1,
-        ADD,
-        SUBTRACT,
-        MULTIPLY,
-
-        XOR = 6,
-
-        MULTIPLY_INVERTED_BACKGROUND = 9,
-        ANTI_COLOR = 10,
-        MULTIPLY_WITH_ALPHA = 11
-
-    };
-
     // unsigned
     enum timer
     {

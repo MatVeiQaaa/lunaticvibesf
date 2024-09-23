@@ -39,10 +39,9 @@
             "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
         },
         {
-            "name": "linux-vcpkg",
+            "name": "linux",
             "generator": "Ninja Multi-Config",
-            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-            "displayName": "Linux Multi-Config +vcpkg",
+            "displayName": "Linux Multi-Config",
             "cacheVariables": {
                 "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
@@ -52,6 +51,21 @@
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
             }
+        },
+        {
+            "name": "linux-gcc",
+            "displayName": "Linux Multi-Config +GCC warnings",
+            "inherits": "linux",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -pedantic -Werror=catch-value -Werror=reorder -Werror=sequence-point -Werror=switch -Werror=unused-variable -Wall -Wextra -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter"
+            }
+        },
+        {
+            "name": "linux-vcpkg",
+            "inherits": "linux",
+            "displayName": "Linux Multi-Config +vcpkg",
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
         },
         {
             "name": "linux-vcpkg-gcc",

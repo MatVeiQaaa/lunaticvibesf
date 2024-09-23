@@ -1,3 +1,4 @@
+find_package(CURL REQUIRED)
 find_package(plog CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 find_package(taocpp-json CONFIG REQUIRED)
@@ -30,12 +31,17 @@ set_target_properties(common PROPERTIES
     CXX_STANDARD 17)
 
 target_link_libraries(common 
+    PUBLIC CURL::libcurl
     PUBLIC plog::plog
     PUBLIC re2::re2
     PUBLIC taocpp::json
 )
 
 if (LINUX)
+    target_compile_options(common
+        # Set by SDL2 pkg-config. Needed to fix -Winvalid-pch `not used because `_REENTRANT' is defined`.
+        PUBLIC -D_REENTRANT
+    )
     find_package(OpenSSL REQUIRED)
     target_link_libraries(common PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 endif()

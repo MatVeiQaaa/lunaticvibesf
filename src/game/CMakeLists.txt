@@ -1,12 +1,22 @@
+find_package(PkgConfig REQUIRED)
 if (${GRAPHICS_BACKEND} STREQUAL SDL2)
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(SDL2_image CONFIG REQUIRED)
-    find_package(SDL2_ttf CONFIG REQUIRED)
-    find_package(sdl2-gfx CONFIG REQUIRED)
+    pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2>=2.30.1)
+    pkg_check_modules(SDL2_gfx IMPORTED_TARGET SDL2_gfx>=1.0.2)
+    if (SDL2_gfx_FOUND)
+        set(LVF_SDL2_GFX_TARGET PkgConfig::SDL2_gfx)
+    else()
+        # vcpkg doesn't make pkg-config file for SDL2_gfx.
+        find_package(sdl2-gfx CONFIG REQUIRED)
+        set(LVF_SDL2_GFX_TARGET SDL2::SDL2_gfx)
+    endif()
+    pkg_check_modules(SDL2_image REQUIRED IMPORTED_TARGET SDL2_image>=2.8.2)
+    pkg_check_modules(SDL2_ttf REQUIRED IMPORTED_TARGET SDL2_ttf>=2.22.0)
 endif()
+pkg_check_modules(libavcodec REQUIRED IMPORTED_TARGET libavcodec)
+pkg_check_modules(libavformat REQUIRED IMPORTED_TARGET libavformat)
+pkg_check_modules(libavutil REQUIRED IMPORTED_TARGET libavutil)
 find_package(CURL REQUIRED)
-find_package(FFMPEG REQUIRED)
-find_package(cereal CONFIG REQUIRED)
+find_package(cereal 1.3.2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 
@@ -101,29 +111,28 @@ set_target_properties(gamelib PROPERTIES
 )
 
 target_link_libraries(gamelib
+    PUBLIC cereal::cereal
     PUBLIC common
     PUBLIC config
-    PUBLIC db
     PUBLIC CURL::libcurl
-    PUBLIC cereal::cereal
+    PUBLIC db
     PUBLIC fmod
     PUBLIC imgui::imgui
+    PUBLIC PkgConfig::libavcodec
+    PUBLIC PkgConfig::libavformat
+    PUBLIC PkgConfig::libavutil
     PUBLIC re2::re2
 )
 
 if (${GRAPHICS_BACKEND} STREQUAL SDL2)
     target_link_libraries(gamelib
-        PUBLIC $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-        PUBLIC $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
-        PUBLIC $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
-        PUBLIC SDL2::SDL2_gfx
-        PUBLIC SDL2::SDL2main
+        PUBLIC ${LVF_SDL2_GFX_TARGET}
+        PUBLIC PkgConfig::SDL2
+        PUBLIC PkgConfig::SDL2_image
+        PUBLIC PkgConfig::SDL2_ttf
+        PRIVATE $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> # vcpkg
     )
 endif()
-
-target_include_directories(gamelib PUBLIC ${FFMPEG_INCLUDE_DIRS})
-target_link_directories(gamelib PUBLIC ${FFMPEG_LIBRARY_DIRS})
-target_link_libraries(gamelib PUBLIC ${FFMPEG_LIBRARIES})
 
 target_precompile_headers(gamelib REUSE_FROM common)
 

@@ -101,18 +101,10 @@ int graphics_init()
             maxFPS = 30;
         graphics_set_maxfps(maxFPS);
 
-        if (ConfigMgr::get('V', cfg::V_VSYNC, 0))
-        {
-            gFrameRenderer = SDL_CreateRenderer(
-                gFrameWindow, -1,
-                SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-        }
-        else
-        {
-            gFrameRenderer = SDL_CreateRenderer(
-                gFrameWindow, -1,
-                SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-        }
+        unsigned renderer_flags = SDL_RENDERER_TARGETTEXTURE;
+        if (ConfigMgr::get('V', cfg::V_VSYNC, 0) != 0)
+            renderer_flags += SDL_RENDERER_PRESENTVSYNC;
+        gFrameRenderer = SDL_CreateRenderer(gFrameWindow, -1, renderer_flags);
         if (!gFrameRenderer)
         {
             LOG_FATAL << "[SDL2] Init renderer ERROR! " << SDL_GetError();

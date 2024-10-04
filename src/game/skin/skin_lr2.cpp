@@ -4451,35 +4451,27 @@ void SkinLR2::update()
         // update songlist position
         if (hasBarMotionInterpOrigin && gSelectContext.scrollDirection != 0 && !gSelectContext.entries.empty())
         {
+            const double posNow = State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size();
+            const double decimal = posNow - (int)posNow;
             for (size_t i = 1; i + 1 < barSprites.size(); ++i)
             {
                 if (!barSpriteAvailable[i]) continue;
-
-                double posNow = State::get(IndexSlider::SELECT_LIST) * gSelectContext.entries.size();
-
-                double decimal = posNow - (int)posNow;
                 if (decimal <= 0.5 && barSprites[i - 1]->isDraw())
                 {
-                    double factor = decimal;
-                    auto& rectStored = barMotionInterpOrigin[i - 1];
-                    auto& rectSprite = barSprites[i]->_current.rect;
-                    Rect dr{
-                        static_cast<int>(std::round((rectStored.x - rectSprite.x) * factor)),
-                        static_cast<int>(std::round((rectStored.y - rectSprite.y) * factor)),
-                        0, 0
-                    };
+                    const float factor = decimal;
+                    const RectF& rectStored = barMotionInterpOrigin[i - 1];
+                    const RectF& rectSprite = barSprites[i]->_current.rect;
+                    const RectF dr{std::round((rectStored.x - rectSprite.x) * factor),
+                                   std::round((rectStored.y - rectSprite.y) * factor), 0, 0};
                     barSprites[i]->setRectOffsetAnim(dr.x, dr.y);
                 }
                 else if (barSprites[i + 1]->isDraw())
                 {
-                    double factor = -decimal + 1.0;
-                    auto& rectStored = barMotionInterpOrigin[i + 1];
-                    auto& rectSprite = barSprites[i]->_current.rect;
-                    Rect dr{
-                        static_cast<int>(std::round((rectStored.x - rectSprite.x) * factor)),
-                        static_cast<int>(std::round((rectStored.y - rectSprite.y) * factor)),
-                        0, 0
-                    };
+                    const float factor = -decimal + 1.0;
+                    const RectF& rectStored = barMotionInterpOrigin[i + 1];
+                    const RectF& rectSprite = barSprites[i]->_current.rect;
+                    const RectF dr{std::round((rectStored.x - rectSprite.x) * factor),
+                                   std::round((rectStored.y - rectSprite.y) * factor), 0, 0};
                     barSprites[i]->setRectOffsetAnim(dr.x, dr.y);
                 }
             }
@@ -4490,17 +4482,17 @@ void SkinLR2::update()
 void SkinLR2::reset_bar_animation()
 {
     hasBarMotionInterpOrigin = false;
-    barMotionInterpOrigin.fill(Rect(0, 0, 0, 0));
+    // barMotionInterpOrigin; // Resetting it not necessary as it's not used when !hasBarMotionInterpOrigin.
 }
 
 void SkinLR2::start_bar_animation()
 {
     for (size_t i = 0; i < BAR_ENTRY_SPRITE_COUNT; ++i)
     {
-        barMotionInterpOrigin[i].x = (int)std::floor(barSprites[i]->_current.rect.x);
-        barMotionInterpOrigin[i].y = (int)std::floor(barSprites[i]->_current.rect.y);
-        barMotionInterpOrigin[i].w = (int)barSprites[i]->_current.rect.w;
-        barMotionInterpOrigin[i].h = (int)barSprites[i]->_current.rect.h;
+        barMotionInterpOrigin[i].x = std::floor(barSprites[i]->_current.rect.x);
+        barMotionInterpOrigin[i].y = std::floor(barSprites[i]->_current.rect.y);
+        barMotionInterpOrigin[i].w = barSprites[i]->_current.rect.w;
+        barMotionInterpOrigin[i].h = barSprites[i]->_current.rect.h;
     }
     hasBarMotionInterpOrigin = true;
 }

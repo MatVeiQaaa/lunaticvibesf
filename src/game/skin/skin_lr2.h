@@ -1405,7 +1405,7 @@ protected:
     unsigned barClickableFrom = 0;
     unsigned barClickableTo = 0;
     bool hasBarMotionInterpOrigin = false;
-    std::array<Rect, BAR_ENTRY_SPRITE_COUNT> barMotionInterpOrigin;
+    std::array<RectF, BAR_ENTRY_SPRITE_COUNT> barMotionInterpOrigin;
 
 protected:
     std::vector<std::pair<std::shared_ptr<SpriteLaneVertical>, std::shared_ptr<SpriteLaneVertical>>> laneSprites;  // { normal, auto }

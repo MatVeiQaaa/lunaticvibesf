@@ -109,8 +109,16 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql, st
     sql_bind_any(stmt, args);
 
     std::vector<std::vector<std::any>> out;
-    while (sqlite3_step(stmt) == SQLITE_ROW)
+    while (true)
     {
+        ret = sqlite3_step(stmt);
+        if (ret != SQLITE_ROW)
+        {
+            if (ret == SQLITE_DONE)
+                break;
+            LOG_ERROR << "[sqlite3] SQL query step failed: " << errmsg();
+            break;
+        }
         auto& row = out.emplace_back();
         row.resize(columnCount);
         for (int i = 0; i < columnCount; ++i)

@@ -3,6 +3,7 @@
 #include <iterator>
 #include <utility>
 
+#include <common/assert.h>
 #include "game/arena/arena_data.h"
 #include "game/chart/chart_bms.h"
 #include "game/runtime/state.h"
@@ -60,7 +61,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
 {
     if (_replayNew)
     {
-        assert(_replayNew->replay != nullptr);
+        LVF_DEBUG_ASSERT(_replayNew->replay != nullptr);
     }
 
     static const NoteLaneTimerMap bombTimer5k[] = {
@@ -247,9 +248,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     {
     case 5:
     case 10: {
-        assert(fiveKeyMapIndex >= 0);
-        assert(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5k)));
-        assert(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5kLN)));
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex >= 0);
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5k)));
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex < static_cast<int>(std::size(bombTimer5kLN)));
         _bombTimerMap = &bombTimer5k[fiveKeyMapIndex];
         _bombLNTimerMap = &bombTimer5kLN[fiveKeyMapIndex];
         break;

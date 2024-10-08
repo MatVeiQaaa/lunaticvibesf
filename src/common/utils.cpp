@@ -25,6 +25,7 @@
 #include <openssl/evp.h>
 #endif
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "common/hash.h"
 #include "common/types.h"
@@ -522,8 +523,8 @@ double normalizeLinearGrowth(double prev, double curr)
     if (prev == -1.0) return 0.0;
     if (curr == -1.0) return 0.0;
 
-    assert(prev >= 0.0 && prev <= 1.0);
-    assert(curr >= 0.0 && curr <= 1.0);
+    LVF_DEBUG_ASSERT(prev >= 0.0 && prev <= 1.0);
+    LVF_DEBUG_ASSERT(curr >= 0.0 && curr <= 1.0);
 
     double delta = curr - prev;
     if (prev > 0.8 && curr < 0.2)
@@ -531,7 +532,7 @@ double normalizeLinearGrowth(double prev, double curr)
     else if (prev < 0.2 && curr > 0.8)
         delta -= 1.0;
 
-    assert(delta >= -1.0 && delta <= 1.0);
+    LVF_DEBUG_ASSERT(delta >= -1.0 && delta <= 1.0);
     return delta;
 }
 

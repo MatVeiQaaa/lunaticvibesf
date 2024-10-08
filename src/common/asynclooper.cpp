@@ -1,5 +1,4 @@
 #include "asynclooper.h"
-#include <numeric>
 #include <chrono>
 
 #ifdef _WIN32
@@ -9,6 +8,7 @@
 #include <utility>
 #endif
 
+#include <common/assert.h>
 #include <common/utils.h>
 #include <common/sysutil.h>
 #include "log.h"
@@ -25,13 +25,13 @@ AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsi
         0,
         TIMER_ALL_ACCESS
     );
-    assert(handler != NULL);
+    LVF_DEBUG_ASSERT(handler != NULL);
 #endif
 }
 
 AsyncLooper::~AsyncLooper()
 {
-    assert(!_running);
+    LVF_DEBUG_ASSERT(!_running);
 
 #ifdef _WIN32
     if (handler)
@@ -167,7 +167,7 @@ void AsyncLooper::loopEnd()
                 {
                     dwError = GetLastError();
                 }
-                assert(dwError == 0);
+                LVF_DEBUG_ASSERT(dwError == 0);
             }
         }
         LOG_DEBUG << "[Looper] " << _tag << ": Ended " << _rate << "/s";

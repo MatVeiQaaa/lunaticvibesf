@@ -1,7 +1,8 @@
 #ifdef _WIN32
 
-#include "input_dinput8.h"
-#include "common/log.h"
+#include <common/assert.h>
+#include <common/log.h>
+#include <game/input/input_dinput8.h>
 
 InputDirectInput8::InputDirectInput8()
 {
@@ -244,13 +245,13 @@ const BYTE* InputDirectInput8::getKeyboardState() const
 
 const DIJOYSTATE& InputDirectInput8::getJoystickState(size_t idx) const
 {
-	assert(idx < deviceJoysticks.size());
+	LVF_DEBUG_ASSERT(idx < deviceJoysticks.size());
 	return deviceJoysticks[idx].state;
 }
 
 const InputDirectInput8::DeviceJoystick::Capabilities& InputDirectInput8::getJoystickCapabilities(size_t idx) const
 {
-	assert(idx < deviceJoysticks.size());
+	LVF_DEBUG_ASSERT(idx < deviceJoysticks.size());
 	return deviceJoysticks[idx].caps;
 }
 

@@ -1,7 +1,6 @@
 #include "ruleset_bms_auto.h"
 
-#include <utility>
-
+#include <common/assert.h>
 #include "game/scene/scene.h"
 #include "game/scene/scene_context.h"
 #include "game/chart/chart_types.h"
@@ -13,7 +12,7 @@ RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
     : RulesetBase(format, chart),
       RulesetBMS(format, chart, mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr)
 {
-    assert(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL);
+    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL);
     showJudge = (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P);
     isPressingLN.fill(false);
     setTargetRate(1.0);
@@ -103,7 +102,7 @@ void RulesetBMSAuto::setTargetRate(double rate)
         noteJudges.push_back(JudgeArea::EXACT_PERFECT);
     }
 
-    assert(noteJudges.size() == count);
+    LVF_DEBUG_ASSERT(noteJudges.size() == count);
 }
 
 void RulesetBMSAuto::update(const lunaticvibes::Time& t)

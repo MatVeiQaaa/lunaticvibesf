@@ -1,13 +1,12 @@
 #include "dxa.h"
 
-#include <cassert>
 #include <cstdio>
+#include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <vector>
-#include <filesystem>
 
-#include <string.h>
-
+#include <common/assert.h>
 #include <common/log.h>
 
 // Codes are from DXArchive (DX Library -> Tool -> DXArchive -> Source) , with some modification
@@ -282,7 +281,7 @@ int Decompress(void* Src, void* Dest)
 
 		default:
 			LOG_ERROR << "[dxa] Invalid indexsize " << indexsize;
-			assert(false && "Invalid indexsize");
+			LVF_DEBUG_ASSERT(false && "Invalid indexsize");
 			return 0;
 		}
 		index++;		// 保存時に－１しているので＋１する

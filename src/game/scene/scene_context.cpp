@@ -1,16 +1,17 @@
 #include "scene_context.h"
 
-#include "common/chartformat/chartformat_bms.h"
-#include "common/entry/entry_types.h"
-#include "config/config_mgr.h"
-#include "game/ruleset/ruleset_bms.h"
-#include "game/runtime/i18n.h"
-#include "game/runtime/state.h"
-
 #include <mutex>
 #include <random>
 
 #include <boost/algorithm/string.hpp>
+
+#include <common/assert.h>
+#include <common/chartformat/chartformat_bms.h>
+#include <common/entry/entry_types.h>
+#include <config/config_mgr.h>
+#include <game/ruleset/ruleset_bms.h>
+#include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
 
 bool gQuitOnFinish = false;
 bool gAppIsExiting = false;
@@ -1283,7 +1284,7 @@ void setPlayModeInfo()
         case Option::BATTLE_LOCAL: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_BATTLE); break;
         case Option::BATTLE_DB:    State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE_BATTLE); break;
         case Option::BATTLE_GHOST: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_SP_GHOST_BATTLE); break;
-        default: assert(false); break;
+        default: LVF_DEBUG_ASSERT(false); break;
         }
     }
     else
@@ -1294,7 +1295,7 @@ void setPlayModeInfo()
         case Option::BATTLE_LOCAL: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE); break;
         case Option::BATTLE_DB:    State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DOUBLE_BATTLE); break;
         case Option::BATTLE_GHOST: State::set(IndexOption::PLAY_MODE, Option::PLAY_MODE_DP_GHOST_BATTLE); break;
-        default: assert(false); break;
+        default: LVF_DEBUG_ASSERT(false); break;
         }
     }
 }

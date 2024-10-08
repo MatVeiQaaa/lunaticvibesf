@@ -1,6 +1,5 @@
 #include "skin_lr2_button_callbacks.h"
 
-#include <cassert>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -8,14 +7,15 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/sysutil.h"
-#include "config/config_mgr.h"
-#include "game/arena/arena_data.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
-#include "game/scene/scene_keyconfig.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
+#include <common/assert.h>
+#include <common/sysutil.h>
+#include <config/config_mgr.h>
+#include <game/arena/arena_data.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/scene/scene_keyconfig.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 namespace lr2skin::button
 {
@@ -1262,7 +1262,7 @@ void key_config_mode_rotate()
 // 150 - 159
 void key_config_slot(const int slot)
 {
-    assert(slot >= 0 && slot <= 9);
+    LVF_DEBUG_ASSERT(slot >= 0 && slot <= 9);
     auto& sel = gKeyconfigContext.selecting.second;
     const auto old = sel;
     if (old != slot)
@@ -1282,7 +1282,7 @@ void key_config_slot(const int slot)
             case 9: return IndexSwitch::KEY_CONFIG_SLOT9;
             }
             LOG_ERROR << "[SkinLR2] Invalid 'slot'";
-            assert(false && "Invalid 'slot'");
+            LVF_DEBUG_ASSERT(false && "Invalid 'slot'");
             return {};
         };
         State::set(getSwitch(old), false);
@@ -1295,7 +1295,7 @@ void key_config_slot(const int slot)
 
 void skinselect_mode(int mode)
 {
-    assert(mode >= 0 && mode <= 15);
+    LVF_DEBUG_ASSERT(mode >= 0 && mode <= 15);
     State::set(IndexSwitch::SKINSELECT_7KEYS, false);
     State::set(IndexSwitch::SKINSELECT_5KEYS, false);
     State::set(IndexSwitch::SKINSELECT_14KEYS, false);
@@ -1358,7 +1358,7 @@ static void open_ir_page()
     // TODO: dans
 
     const EntryList& e = gSelectContext.entries;
-    assert(!e.empty());
+    LVF_DEBUG_ASSERT(!e.empty());
     const size_t idx = gSelectContext.selectedEntryIndex;
     if(e[idx].first->type() != eEntryType::CHART && e[idx].first->type() != eEntryType::RIVAL_CHART)
     {
@@ -1367,9 +1367,9 @@ static void open_ir_page()
     }
     const auto& ps = std::reinterpret_pointer_cast<EntryChart>(e[idx].first);
     const auto& song = ps->getSongEntry();
-    assert(song != nullptr);
+    LVF_DEBUG_ASSERT(song != nullptr);
     const auto& chart = song->getCurrentChart();
-    assert(chart != nullptr);
+    LVF_DEBUG_ASSERT(chart != nullptr);
 
     // FIXME: unhardcode LR2IR
     std::string link = (boost::format("http://dream-pro.info/~lavalse/LR2IR/search.cgi?mode=ranking&bmsmd5=%s") %
@@ -1386,7 +1386,7 @@ static void open_ir_page()
 
 static void requestOpenHelpFile(const int index)
 {
-    assert(index >= 0 && index < 10);
+    LVF_DEBUG_ASSERT(index >= 0 && index < 10);
     std::unique_lock l(gSelectContext._mutex);
     gSelectContext.readmeOpenRequest = HelpFileOpenRequest{static_cast<unsigned>(index)};
 }

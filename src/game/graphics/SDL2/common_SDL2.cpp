@@ -1,15 +1,17 @@
-#include "common/utils.h"
-#include "game/graphics/graphics.h"
-#include "graphics_SDL2.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-
-#include <SDL2_gfxPrimitives.h>
+#include <game/graphics/SDL2/graphics_SDL2.h>
 
 #include <algorithm>
 #include <cmath>
 #include <memory>
 #include <string_view>
+
+#include <SDL2_gfxPrimitives.h>
+
+#include <common/assert.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <common/utils.h>
+#include <game/graphics/graphics.h>
 
 #define SDL_LOAD_NOAUTOFREE 0
 #define SDL_LOAD_AUTOFREE 1
@@ -150,7 +152,7 @@ Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _p
     }
     if (_path.empty())
         return;
-    assert(_pRWop);
+    LVF_DEBUG_ASSERT(_pRWop);
     const std::string_view pathView{path};
     if (isTGA(pathView))
     {
@@ -276,7 +278,7 @@ Texture::Texture(int w, int h, PixelFormat fmt, bool target)
 
 int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* V, int Vpitch)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
 
     if (!loaded) return -1;
     if (!Ypitch || !Upitch || !Vpitch) return -2;
@@ -382,7 +384,7 @@ void Texture::_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF,
             }
             }
             LOG_ERROR << "[SDL2] Invalid BlendMode";
-            assert(false);
+            LVF_DEBUG_ASSERT(false);
             return SDL_BLENDMODE_INVALID;
         };
 
@@ -517,7 +519,7 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect,
             }
             }
             LOG_ERROR << "[SDL2] Invalid BlendMode";
-            assert(false);
+            LVF_DEBUG_ASSERT(false);
             return SDL_BLENDMODE_INVALID;
         };
 

@@ -1,14 +1,12 @@
 #include "input_wrapper.h"
 
-#include <cassert>
 #include <mutex>
 #include <utility>
 
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "common/utils.h"
-#include "game/runtime/generic_info.h"
-#include "game/runtime/state.h"
+#include <common/assert.h>
+#include <common/sysutil.h>
+#include <common/utils.h>
+#include <game/runtime/generic_info.h>
 
 InputWrapper::InputWrapper(unsigned rate, bool background) : 
     AsyncLooper("InputLoop", std::bind(&InputWrapper::_loop, this), rate),
@@ -18,7 +16,7 @@ InputWrapper::InputWrapper(unsigned rate, bool background) :
 
 InputWrapper::~InputWrapper()
 {
-    assert(!isRunning());
+    LVF_DEBUG_ASSERT(!isRunning());
     {
         std::unique_lock _lock(_inputMutex);
         _pCallbackMap.clear();
@@ -261,7 +259,7 @@ double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, 
 
 double InputWrapper::getScratchAxis(int player)
 {
-    assert(player == 0 || player == 1);
+    LVF_DEBUG_ASSERT(player == 0 || player == 1);
     return scratchAxisCurr[player];
 }
 

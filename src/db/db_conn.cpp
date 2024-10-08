@@ -1,10 +1,11 @@
-#include <cassert>
 #include <string>
 #include <string_view>
 
-#include "sqlite3.h"
-#include "db_conn.h"
-#include "common/log.h"
+#include <sqlite3.h>
+
+#include <common/assert.h>
+#include <common/log.h>
+#include <db/db_conn.h>
 
 SQLite::SQLite(const char* path, std::string tag_) : tag(std::move(tag_))
 {
@@ -70,7 +71,7 @@ void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
     else
     {
         LOG_FATAL << "[sqlite3] Unsupported bind type";
-        assert(false && "Unsupported bind type");
+        LVF_DEBUG_ASSERT(false && "Unsupported bind type");
         return;
     }
     if (ret != SQLITE_OK)
@@ -201,7 +202,7 @@ void SQLite::transactionStart()
     if (inTransaction)
     {
         LOG_ERROR << "[sqlite3] [" << tag << "] Ignoring nested transactionStart";
-        assert(false && "nested transactionStart");
+        LVF_DEBUG_ASSERT(false && "nested transactionStart");
         return;
     }
     inTransaction = true;
@@ -238,7 +239,7 @@ void SQLite::commitOrRollback(const std::string_view sql)
     if (!inTransaction)
     {
         LOG_ERROR << "[sqlite3] [" << tag << "] commit or rollback outside of a transaction";
-        assert(false && "commit or rollback outside of a transaction");
+        LVF_DEBUG_ASSERT(false && "commit or rollback outside of a transaction");
         return;
     }
 
@@ -272,20 +273,20 @@ void SQLite::optimize()
 bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& migrate)
 {
     LOG_DEBUG << "[sqlite3] Applying migration '" << name << "'";
-    assert(name.length() == std::string_view{"YYYYMMDDTHHMMSS"}.length());
+    LVF_DEBUG_ASSERT(name.length() == std::string_view{"YYYYMMDDTHHMMSS"}.length());
 
     int ret = exec("CREATE TABLE IF NOT EXISTS __lvf_schema_migrations (name TEXT, date TEXT);");
     if (ret != SQLITE_OK)
     {
         LOG_FATAL << "[sqlite3] Creation of __lvf_schema_migrations failed: " << errmsg();
-        assert(false && "Creation of __lvf_schema_migrations failed");
+        LVF_DEBUG_ASSERT(false && "Creation of __lvf_schema_migrations failed");
         return false;
     }
 
     transactionStart();
 
     auto didAlreadyMigrate = query("SELECT EXISTS (SELECT 1 FROM __lvf_schema_migrations WHERE name=?);", {name});
-    assert(didAlreadyMigrate.size() == 1 && didAlreadyMigrate[0].size() == 1);
+    LVF_DEBUG_ASSERT(didAlreadyMigrate.size() == 1 && didAlreadyMigrate[0].size() == 1);
     if (ANY_INT(didAlreadyMigrate[0][0]) == 1)
     {
         LOG_VERBOSE << "[sqlite3] Migration has already been applied";
@@ -303,7 +304,7 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
     if (ret != SQLITE_OK)
     {
         LOG_FATAL << "[sqlite3] Insertion into __lvf_schema_migrations failed: " << errmsg();
-        assert(false && "Insertion into __lvf_schema_migrations failed");
+        LVF_DEBUG_ASSERT(false && "Insertion into __lvf_schema_migrations failed");
         rollback();
         return false;
     }

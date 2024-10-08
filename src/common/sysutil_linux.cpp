@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <common/assert.h>
 #include <common/utils.h>
 #include <common/log.h>
 
@@ -44,7 +45,7 @@ bool IsMainThread()
     out += s.substr(0, len / 2);
     out += '~';
     out += s.substr(s.size() - len / 2);
-    assert(out.size() <= len);
+    LVF_DEBUG_ASSERT(out.size() <= len);
     return out;
 }
 
@@ -59,7 +60,7 @@ void SetThreadName(const char* name)
         SetThreadName(name_.c_str());
         return;
     }
-    assert(name_view.size() <= max_name_len);
+    LVF_DEBUG_ASSERT(name_view.size() <= max_name_len);
     int ret = prctl(PR_SET_NAME, name);
     if (ret != 0)
     {

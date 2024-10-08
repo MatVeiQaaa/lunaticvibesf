@@ -2,6 +2,7 @@
 
 #include <SDL_ttf.h>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "common/sysutil.h"
 #include "common/types.h"
@@ -35,7 +36,7 @@ TTFFont::~TTFFont()
 
 void TTFFont::setStyle(TTFStyle style)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     if (!loaded) return;
 
     switch (style)
@@ -48,7 +49,7 @@ void TTFFont::setStyle(TTFStyle style)
 }
 void TTFFont::setOutline(int width, const Color& c)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     if (!loaded) return;
 
     if (width == 0)
@@ -74,7 +75,7 @@ void TTFFont::setOutline(int width, const Color& c)
 }
 void TTFFont::setHinting(TTFHinting mode)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     if (!loaded) return;
 
     switch (mode)
@@ -87,7 +88,7 @@ void TTFFont::setHinting(TTFHinting mode)
 }
 void TTFFont::setKerning(bool enabled)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     if (!loaded) return;
 
     TTF_SetFontKerning(_pFont, enabled);
@@ -95,7 +96,7 @@ void TTFFont::setKerning(bool enabled)
 
 std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     if (!loaded) return nullptr;
 
     SDL_Surface* surfaceText = TTF_RenderUTF8_Blended(_pFont, text, c);
@@ -125,7 +126,7 @@ std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
 
 Rect TTFFont::getRectUTF8(const char* text)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
     Rect r{ 0, 0, 0, 0 };
 
     if (!loaded) return r;

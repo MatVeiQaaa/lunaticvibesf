@@ -1,3 +1,4 @@
+#include <common/assert.h>
 #include "common/chartformat/chartformat_bms.h"
 #include "common/hash.h"
 #include "common/log.h"
@@ -327,7 +328,7 @@ void mainLoop()
         if (gInCustomize && sceneCustomize == nullptr)
         {
             sceneCustomize = lunaticvibes::buildScene(skinMgr, SceneType::CUSTOMIZE);
-            assert(sceneCustomize != nullptr);
+            LVF_DEBUG_ASSERT(sceneCustomize != nullptr);
             sceneCustomize->loopStart();
             sceneCustomize->inputLoopStart();
         }
@@ -363,7 +364,7 @@ void mainLoop()
                 State::set(IndexTimer::PLAY_READY, TIMER_NEVER);
                 State::set(IndexTimer::PLAY_START, TIMER_NEVER);
                 scene = lunaticvibes::buildScene(skinMgr, currentScene);
-                assert(scene != nullptr);
+                LVF_DEBUG_ASSERT(scene != nullptr);
                 lunaticvibes::Time t;
                 State::set(IndexTimer::SCENE_START, t.norm());
                 State::set(IndexTimer::START_INPUT, t.norm() + (scene ? scene->getSkinInfo().timeIntro : 0));

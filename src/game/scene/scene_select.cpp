@@ -8,31 +8,31 @@
 #include <tuple>
 #include <variant>
 
-#include "common/chartformat/chartformat_types.h"
-#include "common/entry/entry.h"
-#include "common/entry/entry_random_song.h"
-#include "common/entry/entry_song.h"
-#include "common/entry/entry_types.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_host.h"
-#include "game/chart/chart_bms.h"
-#include "game/ruleset/ruleset_bms_auto.h"
-#include "game/runtime/i18n.h"
-#include "game/runtime/index/number.h"
-#include "game/scene/scene_context.h"
-#include "game/scene/scene_customize.h"
-#include "game/scene/scene_mgr.h"
-#include "game/scene/scene_pre_select.h"
-#include "game/scene/scene_select.h"
-#include "game/skin/skin_lr2.h"
-#include "game/skin/skin_lr2_button_callbacks.h"
-#include "game/skin/skin_lr2_slider_callbacks.h"
-#include "game/skin/skin_mgr.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
+#include <common/assert.h>
+#include <common/chartformat/chartformat_types.h>
+#include <common/entry/entry.h>
+#include <common/entry/entry_random_song.h>
+#include <common/entry/entry_song.h>
+#include <common/entry/entry_types.h>
+#include <common/utils.h>
+#include <config/config_mgr.h>
+#include <game/arena/arena_client.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_host.h>
+#include <game/chart/chart_bms.h>
+#include <game/ruleset/ruleset_bms_auto.h>
+#include <game/runtime/i18n.h>
+#include <game/runtime/index/number.h>
+#include <game/scene/scene_context.h>
+#include <game/scene/scene_customize.h>
+#include <game/scene/scene_pre_select.h>
+#include <game/scene/scene_select.h>
+#include <game/skin/skin_lr2.h>
+#include <game/skin/skin_lr2_button_callbacks.h>
+#include <game/skin/skin_lr2_slider_callbacks.h>
+#include <game/skin/skin_mgr.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -351,7 +351,7 @@ void config_fx()
 SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
-    assert(pSkin != nullptr);
+    LVF_DEBUG_ASSERT(pSkin != nullptr);
     _type = SceneType::SELECT;
 
     _inputAvailable = INPUT_MASK_FUNC | INPUT_MASK_MOUSE;
@@ -1498,7 +1498,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
                 selectDownTimestamp = -1;
 
             // Make a virtual preload scene to rebuild song list. This is very tricky...
-            assert(_virtualSceneLoadSongs == nullptr);
+            LVF_DEBUG_ASSERT(_virtualSceneLoadSongs == nullptr);
             if (_virtualSceneLoadSongs == nullptr)
             {
                 _virtualSceneLoadSongs = std::make_shared<ScenePreSelect>();
@@ -2112,7 +2112,7 @@ void SceneSelect::decide()
                         case 9:
                         case 10:
                         case 14: return false;
-                        default: assert(false); return false;
+                        default: LVF_DEBUG_ASSERT(false); return false;
                         }
                     };
                     gPlayContext.isBattle = canBattleInGameMode(pBMS->gamemode);
@@ -2130,20 +2130,20 @@ void SceneSelect::decide()
         case SkinType::PLAY5:
         case SkinType::PLAY7:
         case SkinType::PLAY9:
-            assert(!gPlayContext.isBattle);
-            assert(!gChartContext.isDoubleBattle);
+            LVF_DEBUG_ASSERT(!gPlayContext.isBattle);
+            LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
             break;
 
         case SkinType::PLAY5_2:
         case SkinType::PLAY7_2:
         case SkinType::PLAY9_2:
-            assert(gPlayContext.isBattle);
-            assert(!gChartContext.isDoubleBattle);
+            LVF_DEBUG_ASSERT(gPlayContext.isBattle);
+            LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
             break;
 
         case SkinType::PLAY10:
         case SkinType::PLAY14:
-            assert(!gPlayContext.isBattle);
+            LVF_DEBUG_ASSERT(!gPlayContext.isBattle);
             break;
 
         default: break;
@@ -2237,7 +2237,7 @@ void SceneSelect::decide()
     case eEntryType::CHART_LINK:
     case eEntryType::REPLAY:
         LOG_ERROR << "[Select] decide() with wrong entry type";
-        assert(false && "decide() with wrong entry type");
+        LVF_DEBUG_ASSERT(false && "decide() with wrong entry type");
         break;
     }
 
@@ -3335,7 +3335,7 @@ void SceneSelect::updatePreview()
         }
 
         case eChartFormat::UNKNOWN:
-        case eChartFormat::BMSON: assert(false);
+        case eChartFormat::BMSON: LVF_DEBUG_ASSERT(false);
         }
 
         break;
@@ -3553,7 +3553,7 @@ void SceneSelect::arenaJoinLobbyPrompt()
 
 void SceneSelect::arenaJoinLobby()
 {
-    assert(!gArenaData.isOnline());
+    LVF_DEBUG_ASSERT(!gArenaData.isOnline());
 
     std::string address = imgui_arena_address_buf;
     createNotification((boost::format(i18n::c(i18nText::ARENA_JOINING)) % address).str());

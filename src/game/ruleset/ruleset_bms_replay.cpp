@@ -1,8 +1,9 @@
 #include "ruleset_bms_replay.h"
 
-#include <cassert>
 #include <iterator>
 #include <utility>
+
+#include <common/assert.h>
 
 RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,
                                    std::shared_ptr<ReplayChart> replay_, const PlayModifiers mods, GameModeKeys keys,
@@ -12,7 +13,7 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
       RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr),
       replay(std::move(replay_))
 {
-    assert(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL || side == PlaySide::MYBEST);
+    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL || side == PlaySide::MYBEST);
 
     if (fiveKeyMapIndex == -1)
     {
@@ -21,9 +22,9 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
     }
     else
     {
-        assert(fiveKeyMapIndex >= 0);
-        assert(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_DOWN_MAP_5K)));
-        assert(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_UP_MAP_5K)));
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex >= 0);
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_DOWN_MAP_5K)));
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex < static_cast<int>(std::size(REPLAY_CMD_INPUT_UP_MAP_5K)));
         _inputDownMap = &REPLAY_CMD_INPUT_DOWN_MAP_5K[fiveKeyMapIndex];
         _inputUpMap = &REPLAY_CMD_INPUT_UP_MAP_5K[fiveKeyMapIndex];
     }

@@ -3,6 +3,7 @@
 #include <map>
 #include <shared_mutex>
 
+#include <common/assert.h>
 #include "common/chartformat/chartformat_bms.h"
 #include "common/entry/entry_types.h"
 #include "common/log.h"
@@ -489,19 +490,19 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 void SpriteBarEntry::setMotionLoopTo(int t)
 {
     LOG_ERROR << "[Sprite] setMotionLoopTo(f) of SpriteBarEntry should not be used";
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
 }
 
 void SpriteBarEntry::setMotionStartTimer(IndexTimer t)
 {
     LOG_ERROR << "[Sprite] setMotionStartTimer(f) of SpriteBarEntry should not be used";
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
 }
 
 void SpriteBarEntry::appendMotionKeyFrame(const MotionKeyFrame& f)
 {
     LOG_ERROR << "[Sprite] appendMotionKeyFrame(f) of SpriteBarEntry should not be used";
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
 }
 
 void SpriteBarEntry::draw() const

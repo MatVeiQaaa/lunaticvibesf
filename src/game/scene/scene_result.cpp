@@ -1,17 +1,17 @@
-#include "scene_result.h"
-#include "scene_context.h"
-#include "common/types.h"
-#include "game/ruleset/ruleset.h"
-#include "game/ruleset/ruleset_bms.h"
+#include <game/scene/scene_result.h>
 
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
+#include <common/assert.h>
+#include <common/types.h>
+#include <config/config_mgr.h>
+#include <game/arena/arena_client.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_host.h>
+#include <game/ruleset/ruleset.h>
+#include <game/ruleset/ruleset_bms.h>
+#include <game/scene/scene_context.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
-
-#include "config/config_mgr.h"
 #include <boost/algorithm/string.hpp>
 
 ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
@@ -391,7 +391,7 @@ void SceneResult::updateFadeout()
         // save score
         if (saveScore && !gChartContext.hash.empty())
         {
-            assert(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
+            LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
             auto& format = gChartContext.chart;
             std::shared_ptr<ScoreBase> pScore = nullptr;
 
@@ -523,7 +523,7 @@ void SceneResult::updateFadeout()
 
 void SceneResult::updateWaitArena()
 {
-    assert(gArenaData.isOnline());
+    LVF_DEBUG_ASSERT(gArenaData.isOnline());
 
     lunaticvibes::Time t;
     if (!gArenaData.isOnline() || !gSelectContext.isArenaReady)

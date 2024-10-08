@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <re2/re2.h>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
@@ -465,7 +466,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
         {
         case PLAYER_SLOT_PLAYER: return GLOBAL_SPRITE_IDX_1PGAUGE;
         case PLAYER_SLOT_TARGET: return GLOBAL_SPRITE_IDX_2PGAUGE;
-        default: assert(false); return {};
+        default: LVF_DEBUG_ASSERT(false); return {};
         }
     };
     auto gaugeDisplayTypeToSpriteType = [](GaugeDisplayType type) -> SpriteGaugeGrid::GaugeType {
@@ -476,7 +477,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
         case GaugeDisplayType::EX_SURVIVAL: return SpriteGaugeGrid::GaugeType::EX_SURVIVAL;
         case GaugeDisplayType::ASSIST_EASY: return SpriteGaugeGrid::GaugeType::ASSIST_EASY;
         }
-        assert(false);
+        LVF_DEBUG_ASSERT(false);
         return {};
     };
     auto sprite = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[spriteIdxForSlot(slot)]);
@@ -1898,7 +1899,7 @@ ParseRet SkinLR2::SRC_NOWCOMBO2()
 
 chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchSide1P, unsigned scratchSide2P)
 {
-    assert(idx < 20);
+    LVF_DEBUG_ASSERT(idx < 20);
 
     using namespace chart;
     switch (gamemode)
@@ -3585,7 +3586,7 @@ SkinLR2::SkinLR2(std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_
                  int loadMode)
     : loadMode(loadMode), _sharedSprites(std::move(sharedSprites))
 {
-    assert(_sharedSprites != nullptr);
+    LVF_DEBUG_ASSERT(_sharedSprites != nullptr);
     _version = SkinVersion::LR2beta3;
 
     // load images from last skin

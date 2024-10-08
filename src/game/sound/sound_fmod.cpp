@@ -1,14 +1,14 @@
-#include "common/log.h"
-#include "sound_fmod_callback.h"
 #include "sound_fmod.h"
-#include "fmod_errors.h"
 #include <cstdlib>
 #include <type_traits>
 
-#include "common/log.h"
-#include "common/types.h"
-#include "common/utils.h"
-#include "config/config_mgr.h"
+#include <common/assert.h>
+#include <common/log.h>
+#include <common/types.h>
+#include <common/utils.h>
+#include <config/config_mgr.h>
+#include <fmod_errors.h>
+#include <game/sound/sound_fmod_callback.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -475,7 +475,7 @@ int SoundDriverFMOD::findDriver(const std::string& driverName, int driverIDUnkno
         {
 #ifdef _WIN32
             // ASIO
-            assert(fmodSystem == nullptr); // app must not using ASIO device when finding ASIO drivers
+            LVF_DEBUG_ASSERT(fmodSystem == nullptr && "app must not using ASIO device when finding ASIO drivers");
             f->setOutput(FMOD_OUTPUTTYPE_ASIO);
             [&]()
             {
@@ -983,7 +983,7 @@ static FMOD_DSP_TYPE dsp_type_to_fmd(DSPType type)
     case DSPType::DISTORTION: return FMOD_DSP_TYPE_DISTORTION;
     }
     LOG_ERROR << "[FMOD] invalid DSPType " << static_cast<std::underlying_type_t<DSPType>>(type);
-    assert(false && "invalid DSPType in dsp_type_to_fmd");
+    LVF_DEBUG_ASSERT(false && "invalid DSPType in dsp_type_to_fmd");
     return {};
 }
 

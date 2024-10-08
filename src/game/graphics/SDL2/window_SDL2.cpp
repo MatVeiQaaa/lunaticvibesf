@@ -14,6 +14,7 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
 
+#include <common/assert.h>
 #include "common/encoding.h"
 #include "common/log.h"
 #include "common/meta.h"
@@ -285,7 +286,7 @@ int graphics_free()
 
 void graphics_copy_screen_texture(Texture& texture)
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
 
     SDL_SetRenderTarget(gFrameRenderer, reinterpret_cast<SDL_Texture*>(texture.raw()));
     SDL_RenderClear(gFrameRenderer);
@@ -498,7 +499,7 @@ bool lunaticvibes::event_handle()
 
         case SDL_JOYBUTTONDOWN:
         {
-            assert(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
+            LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
             if (e.jbutton.button < buttons.size())
             {
@@ -513,7 +514,7 @@ bool lunaticvibes::event_handle()
 
         case SDL_JOYBUTTONUP:
         {
-            assert(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
+            LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
             if (e.jbutton.button < buttons.size())
             {

@@ -1,14 +1,15 @@
 #include "scene_course_result.h"
-#include "scene_context.h"
-#include "common/types.h"
-#include "game/ruleset/ruleset.h"
-#include "game/ruleset/ruleset_bms.h"
 
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-
-#include "config/config_mgr.h"
 #include <boost/algorithm/string.hpp>
+
+#include <common/assert.h>
+#include <common/log.h>
+#include <common/types.h>
+#include <game/ruleset/ruleset.h>
+#include <game/ruleset/ruleset_bms.h>
+#include <game/scene/scene_context.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::COURSE_RESULT, 1000), _inputAvailable(INPUT_MASK_FUNC)
@@ -349,7 +350,7 @@ void SceneCourseResult::updateFadeout()
         // save score
         if (!gInCustomize && !gPlayContext.isReplay && !gPlayContext.isBattle && !gChartContext.hash.empty())
         {
-            assert(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
+            LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
             ScoreBMS score;
             score.notes = summary[ARG_TOTAL_NOTES];
             score.rate = acc;

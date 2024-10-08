@@ -1,10 +1,11 @@
 #pragma once
 
-#include <cassert>
 #include <string_view>
 #include <string>
 
 #include <stddef.h>
+
+#include <common/assert.h>
 
 namespace Input
 {
@@ -442,10 +443,10 @@ public:
     DeviceType getType() const { return type; }
     std::string toString() const;
 
-    Input::Keyboard getKeyboard() const { assert(type == DeviceType::KEYBOARD); return keyboard; }
+    Input::Keyboard getKeyboard() const { LVF_DEBUG_ASSERT(type == DeviceType::KEYBOARD); return keyboard; }
     void setKeyboard(Input::Keyboard kb);
 
-    Input::Joystick getJoystick() const { assert(type == DeviceType::JOYSTICK); return joystick; }
+    Input::Joystick getJoystick() const { LVF_DEBUG_ASSERT(type == DeviceType::JOYSTICK); return joystick; }
     void setJoystick(size_t device, Input::Joystick::Type jtype, size_t index);
 
 private:

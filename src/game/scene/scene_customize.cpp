@@ -1,13 +1,14 @@
 #include "scene_customize.h"
 
-#include "common/hash.h"
-#include "common/types.h"
-#include "config/config_mgr.h"
-#include "game/skin/skin_lr2.h"
-#include "game/skin/skin_mgr.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/soundset_lr2.h"
-#include "scene_context.h"
+#include <common/assert.h>
+#include <common/hash.h>
+#include <common/types.h>
+#include <config/config_mgr.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2.h>
+#include <game/skin/skin_mgr.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/soundset_lr2.h>
 
 SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::THEME_SELECT, 240), _skinMgr(skinMgr), _state(lunaticvibes::CustomizeState::Start)
@@ -409,7 +410,7 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
     {
     case SkinVersion::LR2beta3:
     {
-        assert(idxOption < optionsKeyList.size());
+        LVF_DEBUG_ASSERT(idxOption < optionsKeyList.size());
         Option& op = optionsMap[optionsKeyList[idxOption]];
         if (op.id != 0)
         {

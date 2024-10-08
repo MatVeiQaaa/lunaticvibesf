@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <any>
-#include <cassert>
 #include <exception>
 #include <memory>
 #include <string>
@@ -11,6 +10,7 @@
 
 #include <stdint.h>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "common/types.h"
 #include "common/hash.h"
@@ -142,13 +142,13 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[ScoreDB] Upserting legacy score failed: " << errmsg();
-        assert(false && "upserting legacy score failed");
+        LVF_DEBUG_ASSERT(false && "upserting legacy score failed");
     }
 
     char sqlbuf[96] = { 0 };
     sprintf(sqlbuf, "SELECT * FROM %s WHERE md5=?", tableName);
     auto result = query(sqlbuf, { hashStr });
-    assert(!result.empty());
+    LVF_DEBUG_ASSERT(!result.empty());
     const auto& r = result[0];
     auto scoreRefetched = std::make_shared<ScoreBMS>();
     convert_score_bms(*scoreRefetched, r);
@@ -220,7 +220,7 @@ std::vector<std::pair<HashMD5, ScoreBMS>> ScoreDB::fetchCachedPbBMSImpl(const st
                                   params);
     for (const auto& raw_score : raw_scores)
     {
-        assert(raw_score.size() == 19);
+        LVF_DEBUG_ASSERT(raw_score.size() == 19);
 
         ScoreBMS score;
         score.notes = ANY_INT(raw_score[1]);
@@ -251,7 +251,7 @@ std::shared_ptr<ScoreBMS> ScoreDB::fetchCachedPbBMS(const HashMD5& hash) const
 {
     const auto scores = fetchCachedPbBMSImpl("WHERE md5 = ?", {hash.hexdigest()});
     if (scores.empty()) return nullptr;
-    assert(scores.size() == 1);
+    LVF_DEBUG_ASSERT(scores.size() == 1);
     return std::make_shared<ScoreBMS>(scores[0].second);
 }
 
@@ -269,7 +269,7 @@ void ScoreDB::saveChartScoreBmsToHistory(const HashMD5& hash, const ScoreBMS& sc
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[ScoreDB] Score saving failed: " << errmsg();
-        assert(false && "Score saving failed");
+        LVF_DEBUG_ASSERT(false && "Score saving failed");
     }
 }
 
@@ -378,7 +378,7 @@ catch (const std::exception& e)
 bool ScoreDB::isBmsPbCacheEmpty()
 {
     const auto resp = query("SELECT EXISTS (SELECT 1 FROM score_cache_bms)");
-    assert(resp.size() == 1);
+    LVF_DEBUG_ASSERT(resp.size() == 1);
     return ANY_INT(resp[0][0]) == 0;
 }
 
@@ -444,7 +444,7 @@ lunaticvibes::OverallStats ScoreDB::getStats()
     lunaticvibes::OverallStats stats;
     const auto stats_cache_all = query("SELECT play_count, clear_count, pgreat, great, good, bad, poor, running_combo, "
                                        "max_running_combo, playtime FROM stats");
-    assert(stats_cache_all.size() == 1);
+    LVF_DEBUG_ASSERT(stats_cache_all.size() == 1);
     const auto& stats_cache = stats_cache_all[0];
     stats.play_count = ANY_INT(stats_cache[0]);
     stats.clear_count = ANY_INT(stats_cache[1]);

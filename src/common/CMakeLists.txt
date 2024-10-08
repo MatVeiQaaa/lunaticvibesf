@@ -4,6 +4,7 @@ find_package(re2 CONFIG REQUIRED)
 find_package(taocpp-json CONFIG REQUIRED)
 
 add_library(common STATIC
+    assert.cpp
     asynclooper.cpp
     encoding.cpp
     fraction.cpp

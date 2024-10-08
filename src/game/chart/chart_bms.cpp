@@ -3,6 +3,7 @@
 #include <bitset>
 #include <random>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
@@ -173,7 +174,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
             case PlayModifierRandomType::DB_SYNCHRONIZE:
             {
-                assert(gChartContext.isDoubleBattle);
+                LVF_DEBUG_ASSERT(gChartContext.isDoubleBattle);
 
                 size_t count = (laneLeftEnd - laneLeftStart + 1);
                 std::vector<size_t> offsets(count);
@@ -190,7 +191,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
             case PlayModifierRandomType::DB_SYMMETRY:
             {
-                assert(gChartContext.isDoubleBattle);
+                LVF_DEBUG_ASSERT(gChartContext.isDoubleBattle);
 
                 size_t count = (laneLeftEnd - laneLeftStart + 1);
                 std::vector<size_t> offsets(count);
@@ -474,8 +475,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     NoteLane chartLane = idxToChannel(channelToIdx(NoteLaneCategory::LN, lane.index));
                     size_t gameLaneIdx = gameLaneMap[chartLane.second];
                     size_t gameLaneIdxLN = gameLaneLNIndex[gameLaneIdx];
-                    assert(gameLaneIdxLN != _); // duplicate LN tail found. Check chartformat parsing
-                    assert(laneOccupiedByLN[gameLaneIdxLN] == true);
+                    LVF_DEBUG_ASSERT(gameLaneIdxLN != _ && "duplicate LN tail found. Check chartformat parsing");
+                    LVF_DEBUG_ASSERT(laneOccupiedByLN[gameLaneIdxLN] == true);
                     if (gameLaneIdxLN == _ || !laneOccupiedByLN[gameLaneIdxLN])
                     {
                         LOG_ERROR << "[BMS] Parsing LN error! File: " << objBms.absolutePath;
@@ -505,7 +506,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         flags |= Note::Flags::MINE;
                         break;
                     default:
-                        assert(false);
+                        LVF_DEBUG_ASSERT(false);
                         break;
                     }
                     size_t gameLaneIdx = gameLaneMap[chartLane.second];
@@ -526,7 +527,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     }
                     else
                     {
-                        assert(false);
+                        LVF_DEBUG_ASSERT(false);
                         break;
                     }
 
@@ -607,7 +608,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                         placableMin.emplace_back(0, i);
                                     }
                                 }
-                                assert(!placableMin.empty());
+                                LVF_DEBUG_ASSERT(!placableMin.empty());
                                 std::sort(placableMin.begin(), placableMin.end());
                                 gameLaneIdxMod = placableMin.begin()->second;
                             }
@@ -723,7 +724,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                             placableMin.emplace_back(0, i);
                                         }
                                     }
-                                    assert(!placableMin.empty());
+                                    LVF_DEBUG_ASSERT(!placableMin.empty());
                                     std::sort(placableMin.begin(), placableMin.end());
                                     gameLaneIdxMod = placableMin.begin()->second;
                                 }

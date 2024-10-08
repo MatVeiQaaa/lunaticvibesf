@@ -1,15 +1,10 @@
-
-
 #include "skin_lr2_slider_callbacks.h"
 
-#include "game/runtime/state.h"
-
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-
-#include "game/scene/scene_context.h"
-
 #include "config/config_mgr.h"
+#include "game/runtime/state.h"
+#include "game/scene/scene_context.h"
+#include "game/sound/sound_mgr.h"
+#include <common/assert.h>
 
 namespace lr2skin::slider
 {
@@ -88,7 +83,7 @@ static SampleChannel get_sample_channel_for_target(unsigned int idx)
     case 2: return SampleChannel::BGM; break;
     }
     LOG_ERROR << "Invalid idx " << idx;
-    assert(false && "Invalid idx in get_sample_channel_for_target");
+    LVF_DEBUG_ASSERT(false && "Invalid idx in get_sample_channel_for_target");
     return {};
 };
 
@@ -106,7 +101,7 @@ static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
     case 7: return DSPType::DISTORTION;
     }
     LOG_ERROR << "Invalid idx " << idx;
-    assert(false && "Invalid idx in get_dsp_type_from_sound_fx");
+    LVF_DEBUG_ASSERT(false && "Invalid idx in get_dsp_type_from_sound_fx");
     return {};
 };
 

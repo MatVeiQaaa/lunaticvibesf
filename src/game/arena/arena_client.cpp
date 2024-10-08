@@ -102,7 +102,7 @@ bool ArenaClient::joinLobby(const std::string& address)
 		else
 		{
 			LOG_WARNING << "[Arena] ???";
-			assert(false);
+			LVF_DEBUG_ASSERT(false);
 			return false;
 		}
 	}

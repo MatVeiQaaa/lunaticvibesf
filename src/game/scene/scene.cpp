@@ -2,19 +2,20 @@
 
 #include <memory>
 
-#include "common/beat.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "config/config_mgr.h"
-#include "game/graphics/graphics.h"
-#include "game/runtime/generic_info.h"
-#include "game/runtime/i18n.h"
-#include "game/runtime/state.h"
-#include "game/skin/skin_lr2_debug.h"
-#include "game/skin/skin_mgr.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
-#include "scene_context.h"
+#include <common/assert.h>
+#include <common/beat.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <config/config_mgr.h>
+#include <game/graphics/graphics.h>
+#include <game/runtime/generic_info.h>
+#include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_debug.h>
+#include <game/skin/skin_mgr.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 #include <imgui.h>
 
@@ -112,8 +113,8 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
 
 SceneBase::~SceneBase() 
 {
-    assert(!_input.isRunning());
-    assert(!isRunning());
+    LVF_DEBUG_ASSERT(!_input.isRunning());
+    LVF_DEBUG_ASSERT(!isRunning());
     _input.unregister_r("SKIN_MOUSE_RELEASE");
     _input.unregister_h("SKIN_MOUSE_DRAG");
     _input.unregister_p("SKIN_MOUSE_CLICK");
@@ -306,7 +307,7 @@ void SceneBase::_updateAsync1()
 
 void SceneBase::updateImgui()
 {
-    assert(IsMainThread());
+    LVF_DEBUG_ASSERT(IsMainThread());
 
     bool showTextOverlay = showFPS;
     for (size_t i = 0; i < 4; ++i)

@@ -1,5 +1,6 @@
 #include "arena_host.h"
 
+#include <common/assert.h>
 #include "common/encoding.h"
 #include "common/hash.h"
 #include "common/log.h"
@@ -428,7 +429,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
 			if (length == 0)
 			{
 				LOG_WARNING << "[Arena] Pack SEEK_LOBBY resp payload failed";
-				assert(false);
+				LVF_DEBUG_ASSERT(false);
 				return;
 			}
 
@@ -597,7 +598,7 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
 	if (length == 0)
 	{
 		LOG_WARNING << "[Arena] Pack JOIN_LOBBY resp payload failed";
-		assert(false);
+		LVF_DEBUG_ASSERT(false);
 		return;
 	}
 	resp.payload.resize(length);

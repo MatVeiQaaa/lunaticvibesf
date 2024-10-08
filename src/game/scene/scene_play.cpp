@@ -1,24 +1,26 @@
+#include "scene_play.h"
+
 #include <array>
-#include <cassert>
 #include <future>
 #include <random>
-#include "scene_play.h"
-#include "scene_context.h"
-#include "game/sound/sound_mgr.h"
-#include "game/ruleset/ruleset_bms.h"
-#include "game/ruleset/ruleset_bms_auto.h"
-#include "game/ruleset/ruleset_bms_replay.h"
-#include "common/chartformat/chartformat_bms.h"
-#include "game/chart/chart_bms.h"
-#include "config/config_mgr.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "game/sound/sound_sample.h"
-#include "game/skin/skin_lr2_button_callbacks.h"
-#include "game/skin/skin_lr2_slider_callbacks.h"
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
+
+#include <common/assert.h>
+#include <common/chartformat/chartformat_bms.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <config/config_mgr.h>
+#include <game/arena/arena_client.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_host.h>
+#include <game/chart/chart_bms.h>
+#include <game/ruleset/ruleset_bms.h>
+#include <game/ruleset/ruleset_bms_auto.h>
+#include <game/ruleset/ruleset_bms_replay.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_button_callbacks.h>
+#include <game/skin/skin_lr2_slider_callbacks.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
 
 static constexpr lunaticvibes::Time USE_FIRST_KEYSOUNDS{-1234};
 
@@ -142,7 +144,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr): SceneBase(skinMgr
     _type = SceneType::PLAY;
     state = ePlayState::PREPARE;
 
-    assert(!isPlaymodeDP() || !gPlayContext.isBattle);
+    LVF_DEBUG_ASSERT(!isPlaymodeDP() || !gPlayContext.isBattle);
 
     // 2P inputs => 1P
     if (!isPlaymodeDP() && !gPlayContext.isBattle)
@@ -297,7 +299,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr): SceneBase(skinMgr
             case PlayModifierGaugeType::GRADE_HARD:
             case PlayModifierGaugeType::GRADE_DEATH: return GaugeDisplayType::EX_SURVIVAL;
             }
-            assert(false);
+            LVF_DEBUG_ASSERT(false);
             return {};
         };
         pSkin->setGaugeDisplayType(slot, playModifierGaugeTypeToDisplay(gPlayContext.mods[slot].gauge));
@@ -872,7 +874,7 @@ bool ScenePlay::createRuleset()
                     gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10));
 
             case REPLAY:
-                assert(gPlayContext.replayMybest != nullptr);
+                LVF_DEBUG_ASSERT(gPlayContext.replayMybest != nullptr);
                 gPlayContext.mods[slot].gauge = gPlayContext.replayMybest->gaugeType;
                 return std::make_shared<RulesetBMSReplay>(
                     gChartContext.chartMybest, gPlayContext.chartObj[slot], gPlayContext.replayMybest,
@@ -989,7 +991,7 @@ bool ScenePlay::createRuleset()
         }
         else
         {
-            assert(false);
+            LVF_DEBUG_ASSERT(false);
         }
 
         return true;
@@ -1986,7 +1988,7 @@ void ScenePlay::updatePlaying()
 	auto rt = t - State::get(IndexTimer::PLAY_START);
     State::set(IndexTimer::MUSIC_BEAT, int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
 
-    assert(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
+    LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
     {
         gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
         gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->update(t);
@@ -2209,7 +2211,7 @@ void ScenePlay::updatePlaying()
     {
         auto insertInterimPoints = [](unsigned playerSlot) {
             auto& r = gPlayContext.ruleset[playerSlot];
-            assert(r != nullptr);
+            LVF_DEBUG_ASSERT(r != nullptr);
             const auto h = static_cast<int>(r->getClearHealth() * 100);
             if (auto& g = gPlayContext.graphGauge[playerSlot]; !g.empty())
             {
@@ -2365,7 +2367,7 @@ void ScenePlay::updateFadeout()
 
     if (ft >= pSkin->info.timeOutro)
     {
-        assert(!sceneEnding);
+        LVF_DEBUG_ASSERT(!sceneEnding);
         sceneEnding = true;
         if (_loadChartFuture.valid())
             _loadChartFuture.wait();
@@ -2671,7 +2673,7 @@ void ScenePlay::updatePlayTime(const lunaticvibes::Time& rt)
 
 void ScenePlay::procCommonNotes()
 {
-    assert(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
+    LVF_DEBUG_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
     auto it = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->noteBgmExpired.begin();
     size_t max = std::min(_bgmSampleIdxBuf.size(), gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->noteBgmExpired.size());
     size_t i = 0;
@@ -2783,7 +2785,7 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
         }
     };
 
-    assert(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
+    LVF_DEBUG_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
     for (size_t i = Input::K11; i <= Input::K19; ++i)
     {
         if (_inputAvailable[i])
@@ -2815,7 +2817,7 @@ void ScenePlay::changeKeySampleMapping(const lunaticvibes::Time& rt)
     }
 	if (gPlayContext.isBattle)
 	{
-		assert(gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr);
+		LVF_DEBUG_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr);
 		for (size_t i = Input::K21; i <= Input::K29; ++i)
 		{
 			if (_inputAvailable[i])

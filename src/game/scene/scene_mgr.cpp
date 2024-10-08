@@ -2,19 +2,20 @@
 
 #include <memory>
 
-#include "game/scene/scene.h"
-#include "game/scene/scene_course_result.h"
-#include "game/scene/scene_customize.h"
-#include "game/scene/scene_decide.h"
-#include "game/scene/scene_exit_trans.h"
-#include "game/scene/scene_keyconfig.h"
-#include "game/scene/scene_play.h"
-#include "game/scene/scene_play_course_trans.h"
-#include "game/scene/scene_play_retry_trans.h"
-#include "game/scene/scene_pre_select.h"
-#include "game/scene/scene_result.h"
-#include "game/scene/scene_select.h"
-#include "game/skin/skin_mgr.h"
+#include <common/assert.h>
+#include <game/scene/scene.h>
+#include <game/scene/scene_course_result.h>
+#include <game/scene/scene_customize.h>
+#include <game/scene/scene_decide.h>
+#include <game/scene/scene_exit_trans.h>
+#include <game/scene/scene_keyconfig.h>
+#include <game/scene/scene_play.h>
+#include <game/scene/scene_play_course_trans.h>
+#include <game/scene/scene_play_retry_trans.h>
+#include <game/scene/scene_pre_select.h>
+#include <game/scene/scene_result.h>
+#include <game/scene/scene_select.h>
+#include <game/skin/skin_mgr.h>
 
 std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMgr>& skinMgr, SceneType type)
 {
@@ -34,6 +35,6 @@ std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMg
     case SceneType::COURSE_RESULT: return std::make_shared<SceneCourseResult>(skinMgr);
     case SceneType::EXIT_TRANS: return std::make_shared<SceneExitTrans>();
     }
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
     return nullptr;
 }

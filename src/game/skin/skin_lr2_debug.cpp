@@ -1,5 +1,6 @@
 #include "skin_lr2_debug.h"
 
+#include <common/assert.h>
 #include "common/sysutil.h"
 #include "game/runtime/state.h"
 #include "game/skin/skin_lr2.h"
@@ -7,7 +8,7 @@
 
 void imguiMonitorLR2DST()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorLR2DST) return;
 
 	if (ImGui::Begin("LR2 dst_option (F1)", &imguiShowMonitorLR2DST, ImGuiWindowFlags_NoCollapse))
@@ -40,7 +41,7 @@ void imguiMonitorLR2DST()
 
 void imguiMonitorNumber()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorNumber) return;
 
 	if (ImGui::Begin("Numbers (F2)", &imguiShowMonitorNumber, ImGuiWindowFlags_NoCollapse))
@@ -75,7 +76,7 @@ void imguiMonitorNumber()
 
 void imguiMonitorOption()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorOption) return;
 
 	if (ImGui::Begin("Options (F3)", &imguiShowMonitorOption, ImGuiWindowFlags_NoCollapse))
@@ -98,7 +99,7 @@ void imguiMonitorOption()
 
 void imguiMonitorSlider()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorSlider) return;
 
 	if (ImGui::Begin("Sliders (F4)", &imguiShowMonitorSlider, ImGuiWindowFlags_NoCollapse))
@@ -121,7 +122,7 @@ void imguiMonitorSlider()
 
 void imguiMonitorSwitch()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorSwitch) return;
 
 	if (ImGui::Begin("Switches (F5)", &imguiShowMonitorSwitch, ImGuiWindowFlags_NoCollapse))
@@ -154,7 +155,7 @@ void imguiMonitorSwitch()
 
 void imguiMonitorText()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorText) return;
 
 	if (ImGui::Begin("Text (F6)", &imguiShowMonitorText, ImGuiWindowFlags_NoCollapse))
@@ -177,7 +178,7 @@ void imguiMonitorText()
 
 void imguiMonitorBargraph()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorBargraph) return;
 
 	if (ImGui::Begin("Bar graphs (F7)", &imguiShowMonitorBargraph, ImGuiWindowFlags_NoCollapse))
@@ -200,7 +201,7 @@ void imguiMonitorBargraph()
 
 void imguiMonitorTimer()
 {
-	assert(IsMainThread());
+	LVF_DEBUG_ASSERT(IsMainThread());
 	if (!imguiShowMonitorTimer) return;
 
 	if (ImGui::Begin("Timers (F8)", &imguiShowMonitorTimer, ImGuiWindowFlags_NoCollapse))

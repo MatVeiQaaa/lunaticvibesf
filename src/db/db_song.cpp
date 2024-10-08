@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 
+#include <common/assert.h>
 #include "common/chartformat/chartformat_types.h"
 #include "common/hash.h"
 #include "common/log.h"
@@ -302,7 +303,7 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
         case eChartFormat::BMS:
         {
             auto bmsc = std::dynamic_pointer_cast<ChartFormatBMS>(c);
-            assert(bmsc != nullptr);
+            LVF_DEBUG_ASSERT(bmsc != nullptr);
             if (SQLITE_OK == exec("INSERT INTO song("
                 "md5,parent,type,file,title,title2,artist,artist2,genre,version,"
                 "level,bpm,minbpm,maxbpm,length,totalnotes,stagefile,bannerfile,gamemode,judgerank,"

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "common/utils.h"
 
@@ -15,7 +16,7 @@ std::string KeyMap::toString() const
     case DeviceType::MOUSE:    return toStringM();
     }
     LOG_ERROR << "[Keymap] Invalid KeyMap";
-    assert(false && "invalid KeyMap");
+    LVF_DEBUG_ASSERT(false && "invalid KeyMap");
     return "";
 }
 
@@ -153,7 +154,7 @@ void KeyMap::loadFromStringM(const std::string_view name)
 {
     if (name.substr(0, 2) != "M_") return;
     type = DeviceType::MOUSE;
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
 }
 
 std::string KeyMap::toStringK() const
@@ -193,6 +194,6 @@ std::string KeyMap::toStringJ() const
 
 std::string KeyMap::toStringM() const
 {
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
     return "M_"s + "NULL";
 }

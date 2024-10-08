@@ -6,6 +6,7 @@
 
 #include <SDL.h>
 
+#include <common/assert.h>
 #include "common/log.h"
 #include "game/graphics/SDL2/input.h"
 
@@ -107,7 +108,7 @@ bool isKeyPressed(Input::Keyboard key)
 
 bool isButtonPressed(Input::Joystick c, double deadzone)
 {
-	assert(c.device < sdl::state::g_joysticks.size());
+	LVF_DEBUG_ASSERT(c.device < sdl::state::g_joysticks.size());
 	const auto& buttons = sdl::state::g_joysticks[c.device];
 	if (c.type == Input::Joystick::Type::BUTTON)
 	{

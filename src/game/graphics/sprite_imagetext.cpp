@@ -1,8 +1,8 @@
 #include "sprite_imagetext.h"
 
-#include <cassert>
 #include <string>
 
+#include <common/assert.h>
 #include "common/beat.h"
 #include "common/encoding.h"
 
@@ -10,7 +10,7 @@ SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder) : Sprite
 {
     _type = SpriteTypes::IMAGE_TEXT;
     _textures = builder.charTextures;
-    assert(builder.charMappingList != nullptr);
+    LVF_DEBUG_ASSERT(builder.charMappingList != nullptr);
     _chrList = builder.charMappingList;
     textHeight = builder.height;
     _margin = builder.margin;

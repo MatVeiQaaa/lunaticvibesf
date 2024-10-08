@@ -10,6 +10,7 @@
 #include <numeric>
 #include <random>
 
+#include <common/assert.h>
 #include "common/encoding.h"
 #include "common/utils.h"
 #include "re2/re2.h"
@@ -1033,7 +1034,7 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
         }
     }
 
-    assert(false);
+    LVF_DEBUG_ASSERT(false);
     return emptyChannel;
 }
 

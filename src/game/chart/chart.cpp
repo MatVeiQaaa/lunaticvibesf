@@ -1,12 +1,12 @@
 #include "chart.h"
 #include "chart_types.h"
 #include "common/chartformat/chartformat.h"
-#include "common/log.h"
 #include "common/chartformat/chartformat_types.h"
+#include "common/log.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
+#include <common/assert.h>
 #include <iterator>
-
 
 using namespace chart;
 
@@ -14,7 +14,7 @@ using namespace chart;
 // from NoteLaneIndex to Input::Pad
 const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
 {
-    assert(idx < 26);
+    LVF_DEBUG_ASSERT(idx < 26);
     using namespace Input;
     switch (keys)
     {
@@ -90,7 +90,7 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
 // from Input::Pad to NoteLaneIndex
 chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
 {
-    assert(pad < Input::Pad::LANE_COUNT);
+    LVF_DEBUG_ASSERT(pad < Input::Pad::LANE_COUNT);
 
     using namespace chart;
     switch (keys)
@@ -118,8 +118,8 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
             },
         };
         const auto fiveKeyMapIndex = gPlayContext.shiftFiveKeyForSevenKeyIndex(true);
-        assert(fiveKeyMapIndex >= 0);
-        assert(fiveKeyMapIndex < static_cast<int>(std::size(lane)));
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex >= 0);
+        LVF_DEBUG_ASSERT(fiveKeyMapIndex < static_cast<int>(std::size(lane)));
         return lane[fiveKeyMapIndex][pad];
     }
     case 7:

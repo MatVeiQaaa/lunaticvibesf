@@ -93,7 +93,7 @@ try
 {
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
-        if (lunaticvibes::iequals(entry.path().extension().u8string(), ".txt"))
+        if (lunaticvibes::iequals(entry.path().extension().string(), ".txt"))
             return true;
     }
     return false;
@@ -112,7 +112,7 @@ try
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
         const auto& file = entry.path();
-        if (!lunaticvibes::iequals(file.extension().u8string(), ".txt"))
+        if (!lunaticvibes::iequals(file.extension().string(), ".txt"))
             continue;
         std::ifstream ifs{file};
         if (ifs.fail())

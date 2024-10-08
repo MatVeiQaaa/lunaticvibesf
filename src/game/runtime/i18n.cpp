@@ -50,7 +50,7 @@ void i18n::init()
     {
         if (fs::equivalent(f.path(), en)) continue;
 
-        if (lunaticvibes::iequals(f.path().extension().u8string(), ".txt"))
+        if (lunaticvibes::iequals(f.path().extension().string(), ".txt"))
         {
             languages.push_back(i18n(f.path()));
         }

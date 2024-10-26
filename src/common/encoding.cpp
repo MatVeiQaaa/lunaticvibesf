@@ -2,10 +2,13 @@
 
 #include <fstream>
 #include <istream>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
+#include "common/assert.h"
 #include "common/log.h"
 #include "common/sysutil.h"
 
@@ -301,16 +304,25 @@ using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
 static void convert(const std::string& input, eFileEncoding from, eFileEncoding to, std::string& out)
 {
-    const auto* source_encoding_name = get_iconv_encoding_name(from);
-    const auto* target_encoding_name = get_iconv_encoding_name(to);
+    thread_local std::map<std::pair<eFileEncoding, eFileEncoding>, IcdPtr> icds;
 
-    auto icd = IcdPtr(iconv_open(target_encoding_name, source_encoding_name));
-    if (reinterpret_cast<size_t>(icd.get()) == static_cast<size_t>(-1)) {
-        const int error = errno;
-        LOG_ERROR << "iconv_open() error: " << safe_strerror(error) << " (" << error << ")";
-        out = "(conversion descriptor opening error)";
-        return;
+    auto icd_it = icds.find({from, to});
+    if (icd_it == icds.end())
+    {
+        const auto* source_encoding_name = get_iconv_encoding_name(from);
+        const auto* target_encoding_name = get_iconv_encoding_name(to);
+        auto icd = IcdPtr(iconv_open(target_encoding_name, source_encoding_name));
+        if (reinterpret_cast<size_t>(icd.get()) == static_cast<size_t>(-1))
+        {
+            const int error = errno;
+            LOG_ERROR << "iconv_open() error: " << safe_strerror(error) << " (" << error << ")";
+            out = "(conversion descriptor opening error)";
+            return;
+        }
+        icd_it = icds.insert_or_assign({from, to}, std::move(icd)).first;
+        LVF_DEBUG_ASSERT(icd_it != icds.end());
     }
+    auto icd = icd_it->second.get();
 
     static constexpr size_t BUF_SIZE = 1024l * 32l;
     // I wanted to avoid manually allocating here so that we don't have
@@ -323,7 +335,7 @@ static void convert(const std::string& input, eFileEncoding from, eFileEncoding 
     char* out_ptr = static_cast<char*>(out_buf);
     std::size_t out_len = sizeof(out_buf);
 
-    std::size_t iconv_ret = iconv(icd.get(), &buf_ptr, &buf_len, &out_ptr, &out_len);
+    std::size_t iconv_ret = iconv(icd, &buf_ptr, &buf_len, &out_ptr, &out_len);
     if (iconv_ret == static_cast<size_t>(-1)) {
         const int error = errno;
         LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";

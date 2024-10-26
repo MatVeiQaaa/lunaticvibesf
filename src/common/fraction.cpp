@@ -43,8 +43,6 @@ fraction::fraction(long long numerator, long long denominator, bool t) : _numera
         trim(_numerator, _denominator);
 }
 
-fraction::~fraction() {}
-
 fraction fraction::operator+ (const fraction& rhs) const
 {
     long long g = std::lcm(_denominator, rhs._denominator);

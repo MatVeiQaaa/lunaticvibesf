@@ -1,22 +1,23 @@
 #pragma once
 
-#include "fraction.h"
+#include <common/fraction.h>
+#include <cstdint>
 #include <chrono>
 #include <limits>
 
-typedef unsigned Bar;
-typedef double BPM;
+using Bar = unsigned;
+using BPM = double;
+using uint8_t = std::uint8_t;
 
-class Metre : public fraction
+class Metre final : public fraction
 {
 protected:
 	operator double() const { return fraction::operator double(); }
 
 public:
-	Metre() : fraction() {}
+	Metre() = default;
 	Metre(long long division_level, long long multiple_level) : fraction(division_level, multiple_level, false) {}
 	Metre(double value) : fraction(static_cast<long long>(value * 1e12), 1'000'000'000'000, true) {}
-	~Metre() override {}
 
 	double toDouble() const { return operator double(); }
 	bool operator==(const Metre& rhs) const { return fraction(division_level(), multiple_level(), true) == fraction(rhs.division_level(), rhs.multiple_level(), true); }
@@ -93,11 +94,7 @@ public:
 
 struct Note
 {
-    Bar measure;        // Which measure the note is placed
-    Metre pos;        // Which metre the note is placed in visual (ignoring SV & STOP), can be above 1
-    lunaticvibes::Time time;             // Timestamp
-
-	enum Flags
+	enum Flags : std::uint8_t
 	{
 		LN_TAIL = 1 << 0,
 
@@ -111,8 +108,14 @@ struct Note
 		SCRATCH = 1 << 6,
 		KEY_6_7 = 1 << 7,
 	};
-	size_t flags = 0;			// used for distinguishing plain notes
-
-	long long dvalue;		// regular integer values
-	double fvalue;			// used by #BPM, bar length, etc 
+	Metre pos;					// Which metre the note is placed in visual (ignoring SV & STOP), can be above 1
+	lunaticvibes::Time time;	// Timestamp
+	long long dvalue;			// regular integer values
+	double fvalue;				// used by #BPM, bar length, etc 
+	Bar measure;				// Which measure the note is placed
+	uint8_t flags;				// used for distinguishing plain notes
+	Note(Bar measure, Metre pos, lunaticvibes::Time time, size_t flags, long long dvalue, double fvalue)
+		: pos(pos), time(time), dvalue(dvalue), fvalue(fvalue), measure(measure), flags(flags)
+	{
+	}
 };

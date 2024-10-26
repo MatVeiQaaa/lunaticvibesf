@@ -15,6 +15,11 @@ struct HitableNote: Note
 {
     bool expired = false;
     bool hit = false;
+    HitableNote(Bar measure, Metre pos, lunaticvibes::Time time, size_t flags, long long dvalue, double fvalue,
+                bool expired, bool hit)
+        : Note(measure, pos, time, flags, dvalue, fvalue), expired(expired), hit(hit)
+    {
+    }
 };
 
 namespace chart

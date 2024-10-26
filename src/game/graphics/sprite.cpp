@@ -2,7 +2,8 @@
 
 #include <algorithm>
 
-#include "common/sysutil.h"
+#include <common/assert.h>
+#include <common/sysutil.h>
 
 constexpr double grad(int dst, int src, double t)
 {
@@ -390,8 +391,11 @@ SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)
 }
 
 bool SpriteText::update(const lunaticvibes::Time& t)
-{   
-    return _draw = updateMotion(t);
+{
+    LVF_DEBUG_ASSERT(IsMainThread());
+    _draw = updateMotion(t);
+    updateText();
+    return _draw;
 }
 
 void SpriteText::updateText()

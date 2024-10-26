@@ -22,13 +22,15 @@
 #include <Windows.h>
 #include <wincrypt.h>
 #else
+#include <dirent.h>
 #include <openssl/evp.h>
 #endif
 
 #include <common/assert.h>
-#include "common/log.h"
-#include "common/hash.h"
-#include "common/types.h"
+#include <common/hash.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <common/types.h>
 
 static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]
 {
@@ -332,6 +334,17 @@ std::string toUpper(std::string_view s)
 
 #ifndef _WIN32
 
+struct DirDeleter {
+    void operator()(DIR* dir) {
+        int ret = closedir(dir);
+        if (ret == -1) {
+            const int error = errno;
+            LOG_ERROR << "closedir() error: " << safe_strerror(error) << " (" << error << ")";
+        }
+    }
+};
+using DirPtr = std::unique_ptr<DIR, DirDeleter>;
+
 std::string lunaticvibes::resolve_windows_path(std::string input)
 {
     std::replace(input.begin(), input.end(), '\\', '/');
@@ -385,14 +398,23 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
 
         bool found_entry = false;
 
-        for (const auto& dir_entry : std::filesystem::directory_iterator(out)) {
-            const auto dir_entry_name = dir_entry.path().filename().u8string();
-            if (lunaticvibes::iequals(dir_entry_name, segment)) {
+        // PERF: avoid std::directory_iterator as it allocates a lot,
+        // and this function scans a ton of files.
+        DirPtr dir{opendir(out.c_str())};
+        do
+        {
+            // NOTE: it also returns '.' and '..'. Let's pretend it doesn't.
+            // It's not mandated to be thread-safe by POSIX but glibc says "readdir..modern implementations..calls
+            // are..thread-safe".
+            dirent* read_dir = readdir(dir.get()); // NOLINT(concurrency-mt-unsafe)
+            if (read_dir == nullptr)
+                break;
+            if (lunaticvibes::iequals(read_dir->d_name, segment)) {
                 found_entry = true;
-                out += dir_entry_name;
+                out += read_dir->d_name;
                 break;
             }
-        }
+        } while (true);
 
         segments_traversed += 1;
         if (!found_entry) {

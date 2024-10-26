@@ -503,6 +503,9 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexTimer::ARENA_SHOW_LOBBY, lunaticvibes::Time().norm());
 
     imguiInit();
+
+    _config_enable_preview_dedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
+    _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
 }
 
 SceneSelect::~SceneSelect()
@@ -3155,9 +3158,7 @@ void SceneSelect::updatePreview()
     const EntryList& e = gSelectContext.entries;
     if (e.empty()) return;
 
-    const bool previewDedicatedEnabled = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
-    const bool previewDirectEnabled = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
-    if (!previewDedicatedEnabled && !previewDirectEnabled)
+    if (!_config_enable_preview_dedicated && !_config_enable_preview_direct)
     {
         std::unique_lock l(previewMutex);
         previewState = PREVIEW_FINISH;
@@ -3234,7 +3235,7 @@ void SceneSelect::updatePreview()
         {
             auto bms = std::reinterpret_pointer_cast<ChartFormatBMS>(previewChartTmp);
 
-            const bool loadedDedicatedPreview = previewDedicatedEnabled && tryLoadDedicatedPreview(*bms);
+            const bool loadedDedicatedPreview = _config_enable_preview_dedicated && tryLoadDedicatedPreview(*bms);
             if (loadedDedicatedPreview)
             {
                 LOG_DEBUG << "[Select] Preview dedicated -> PREVIEW_READY";
@@ -3242,7 +3243,7 @@ void SceneSelect::updatePreview()
                 previewState = PREVIEW_READY;
                 previewStandalone = true;
             }
-            else if (previewDirectEnabled)
+            else if (_config_enable_preview_direct)
             {
                 LOG_DEBUG << "[Select] Preview direct -> PREVIEW_LOADING_SAMPLES";
 

@@ -1393,12 +1393,14 @@ void SceneSelect::imguiCheckSettings()
         State::set(IndexNumber::NEW_ENTRY_SECONDS, ConfigMgr::get('P', cfg::P_NEW_SONG_DURATION, 0) * 60 * 60);
     }
 
-    if (imgui_adv_previewDedicated != ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, true))
+    if (imgui_adv_previewDedicated != _config_enable_preview_dedicated)
     {
+        _config_enable_preview_dedicated = imgui_adv_previewDedicated;
         ConfigMgr::set('P', cfg::P_PREVIEW_DEDICATED, imgui_adv_previewDedicated);
     }
-    if (imgui_adv_previewDirect != ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, true))
+    if (imgui_adv_previewDirect != _config_enable_preview_direct)
     {
+        _config_enable_preview_direct = imgui_adv_previewDirect;
         ConfigMgr::set('P', cfg::P_PREVIEW_DIRECT, imgui_adv_previewDirect);
     }
     if (imgui_adv_selectKeyBindings != old_adv_selectKeyBindings)

@@ -296,6 +296,8 @@ private:
 
     bool _imgui_show_demo_window = false;
 
+    bool _config_enable_preview_dedicated;
+    bool _config_enable_preview_direct;
     bool _show_random_any;
     bool _show_random_failed;
     bool _show_random_noplay;

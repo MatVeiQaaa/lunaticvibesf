@@ -2,8 +2,8 @@
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "lunaticvibesf",
   "version": "0.16.4",
-  "$builtin-baseline-git-tag": "2024.04.26",
-  "builtin-baseline": "943c5ef1c8f6b5e6ced092b242c8299caae2ff01",
+  "$builtin-baseline-git-tag": "2024.10.21",
+  "builtin-baseline": "10b7a178346f3f0abef60cecd5130e295afd8da4",
   "vcpkg-configuration": {
     "overlay-ports": ["./vcpkg-overlays"]
   },

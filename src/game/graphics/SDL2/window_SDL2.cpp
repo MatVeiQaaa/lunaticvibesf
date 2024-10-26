@@ -220,7 +220,7 @@ void graphics_flush()
         auto pData = ImGui::GetDrawData();
         if (pData != NULL)
         {
-            ImGui_ImplSDLRenderer2_RenderDrawData(pData);
+            ImGui_ImplSDLRenderer2_RenderDrawData(pData, gFrameRenderer);
         }
         // Save screenshot before presenting per SDL_RenderReadPixels docs.
         if (!screenshotPath.empty())

@@ -61,6 +61,8 @@ std::ostream& operator<<(std::ostream& os, const SkinType& mode);
 
 namespace lunaticvibes {
 
+class Time;
+
 [[nodiscard]] inline SkinType skinTypeForKeys(unsigned keys) {
     switch (keys)
     {

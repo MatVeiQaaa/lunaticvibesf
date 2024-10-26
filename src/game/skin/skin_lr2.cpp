@@ -699,9 +699,11 @@ int SkinLR2::HELPFILE()
     auto encoding = getFileEncoding(ifs);
 
     std::string help_file;
-    for (std::string line_; std::getline(ifs, line_);)
+    for (std::string line, line_; std::getline(ifs, line_);)
     {
-        help_file += lunaticvibes::trim(to_utf8(line_, encoding));
+        lunaticvibes::trim_in_place(line_);
+        lunaticvibes::to_utf8(line_, encoding, line);
+        help_file += line;
         help_file += '\n';
     }
 
@@ -823,11 +825,9 @@ int SkinLR2::LR2FONT()
 
         auto pf = std::make_shared<LR2Font>();
 
-        for (std::string raw; std::getline(lr2font, raw);)
+        for (std::string rawUTF8, raw_; std::getline(lr2font, raw_);)
         {
-
-            // convert codepage
-            std::string rawUTF8 = to_utf8(raw, encoding);
+            lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
             if (tokens.empty()) continue;
@@ -3443,11 +3443,11 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
     if (skipOnly)
     {
         // only look for #ENDIF, skip the whole sub #IF block
-        for (std::string raw; std::getline(lr2skin, raw);)
+        for (std::string rawUTF8, raw_; std::getline(lr2skin, raw_);)
         {
             ++csvLineNumber;
 
-            std::string rawUTF8 = to_utf8(raw, enc);
+            lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
             if (tokens.empty()) continue;
@@ -3495,11 +3495,11 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
     if (ifStmtTrue)
     {
         bool ifBlockEnded = false;
-        for (std::string raw; std::getline(lr2skin, raw);)
+        for (std::string rawUTF8, raw_; std::getline(lr2skin, raw_);)
         {
             ++csvLineNumber;
 
-            std::string rawUTF8 = to_utf8(raw, enc);
+            lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
             if (tokens.empty()) continue;
@@ -3688,12 +3688,11 @@ bool SkinLR2::loadCSV(Path p)
     LOG_INFO << "[Skin] File (" << getFileEncodingName(encoding) << "): " << p;
 
     bool haveEndOfHeader = false;
-    for (std::string raw; std::getline(csvFile, raw);)
+    for (std::string rawUTF8, raw_; std::getline(csvFile, raw_);)
     {
         ++csvLineNumber;
 
-        // convert codepage
-        std::string rawUTF8 = to_utf8(raw, encoding);
+        lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
         auto tokens = csvLineTokenize(rawUTF8);
         if (tokens.empty()) continue;
@@ -3824,11 +3823,11 @@ bool SkinLR2::loadCSV(Path p)
 
         // Add extra textures
 
-        for (std::string raw; std::getline(csvFile, raw);)
+        for (std::string rawUTF8, raw_; std::getline(csvFile, raw_);)
         {
             ++csvLineNumber;
 
-            std::string rawUTF8 = to_utf8(raw, encoding);
+            lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
             if (tokens.empty()) continue;

@@ -1,5 +1,8 @@
 #pragma once
-#include "types.h"
+
+#include <string>
+
+#include <common/types.h>
 
 enum class eFileEncoding : uint8_t
 {
@@ -8,18 +11,23 @@ enum class eFileEncoding : uint8_t
 	EUC_KR,
 	UTF8,
 };
-eFileEncoding getFileEncoding(const Path& path);
-eFileEncoding getFileEncoding(std::istream& is);
-const char* getFileEncodingName(eFileEncoding enc);
+[[nodiscard]] eFileEncoding getFileEncoding(const Path& path);
+[[nodiscard]] eFileEncoding getFileEncoding(std::istream& is);
+[[nodiscard]] const char* getFileEncodingName(eFileEncoding enc);
 
-std::string to_utf8(const std::string& str, eFileEncoding fromEncoding);
-std::string from_utf8(const std::string& input, eFileEncoding toEncoding);
-std::u32string to_utf32(const std::string& str, eFileEncoding fromEncoding);
-std::string from_utf32(const std::u32string& input, eFileEncoding toEncoding);
+[[nodiscard]] std::string to_utf8(const std::string& str, eFileEncoding fromEncoding);
+[[nodiscard]] std::string from_utf8(const std::string& input, eFileEncoding toEncoding);
 
 namespace lunaticvibes {
 void to_utf8(const std::string& str, eFileEncoding fromEncoding, std::string& out);
+void utf8_to_utf32(const std::string& str, std::u32string& out);
 } // namespace lunaticvibes
 
-std::u32string utf8_to_utf32(const std::string& input);
-std::string utf32_to_utf8(const std::u32string& str);
+[[nodiscard]] inline std::u32string utf8_to_utf32(const std::string& str)
+{
+    std::u32string buf;
+    lunaticvibes::utf8_to_utf32(str, buf);
+    return buf;
+}
+
+[[nodiscard]] std::string utf32_to_utf8(const std::u32string& str);

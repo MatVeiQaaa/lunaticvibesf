@@ -820,6 +820,8 @@ int SkinLR2::LR2FONT()
         ifsFile.close();
 
         auto encoding = getFileEncoding(path);
+        std::string strbuf;
+        std::u32string u32strbuf;
 
         auto pf = std::make_shared<LR2Font>();
 
@@ -879,7 +881,9 @@ int SkinLR2::LR2FONT()
                 }
                 else continue;
 
-                c_utf32 = to_utf32(s_sjis, eFileEncoding::SHIFT_JIS)[0];
+                lunaticvibes::to_utf8(s_sjis, eFileEncoding::SHIFT_JIS, strbuf);
+                lunaticvibes::utf8_to_utf32(strbuf, u32strbuf);
+                c_utf32 = u32strbuf.front();
 
                 Rect r;
                 r.x = toInt(tokens[3]);

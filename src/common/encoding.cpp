@@ -360,34 +360,21 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 
 #endif // _WIN32
 
-std::u32string to_utf32(const std::string& input, eFileEncoding fromEncoding)
-{
-    std::string inputUTF8 = to_utf8(input, fromEncoding);
-    return utf8_to_utf32(inputUTF8);
-}
-
-std::string from_utf32(const std::u32string& input, eFileEncoding toEncoding)
-{
-    std::string inputUTF8 = utf32_to_utf8(input);
-    return from_utf8(inputUTF8, toEncoding);
-}
-
-
-std::u32string utf8_to_utf32(const std::string& str)
+void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
 {
     static const auto locale = std::locale("");
     static const auto& facet_u32_u8 = std::use_facet<std::codecvt<char32_t, char, std::mbstate_t>>(locale);
-    std::u32string u32Text(str.size() * facet_u32_u8.max_length(), '\0');
+    out.resize(str.size() * facet_u32_u8.max_length(), '\0');
 
     std::mbstate_t s;
     const char* from_next = &str[0];
-    char32_t* to_next = &u32Text[0];
+    char32_t* to_next = &out[0];
 
     std::codecvt_base::result res;
     do {
         res = facet_u32_u8.in(s,
             from_next, &str[str.size()], from_next,
-            to_next, &u32Text[u32Text.size()], to_next);
+            to_next, &out[out.size()], to_next);
 
         // skip unconvertiable chars (which is impossible though)
         if (res == std::codecvt_base::error)
@@ -395,8 +382,7 @@ std::u32string utf8_to_utf32(const std::string& str)
 
     } while (res == std::codecvt_base::error);
 
-    u32Text.resize(to_next - &u32Text[0]);
-    return u32Text;
+    out.resize(to_next - &out[0]);
 }
 
 std::string utf32_to_utf8(const std::u32string& str)

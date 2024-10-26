@@ -33,7 +33,7 @@ inline T pushAndWaitMainThreadTask(std::function<T()> f)
 	if (CanHandleMainThreadTask())
 	{
 		std::promise<T> taskPromise;
-		pushMainThreadTask(std::bind([&]() { taskPromise.set_value(f()); }));
+		pushMainThreadTask([&]() { taskPromise.set_value(f()); });
 		std::future<T> taskFuture = taskPromise.get_future();
 		taskFuture.wait();
 		return taskFuture.get();
@@ -49,7 +49,7 @@ inline void pushAndWaitMainThreadTask(std::function<void()> f)
 	if (CanHandleMainThreadTask())
 	{
 		std::promise<void> taskPromise;
-		pushMainThreadTask(std::bind([&]() { f(); taskPromise.set_value(); }));
+		pushMainThreadTask([&]() { f(); taskPromise.set_value(); });
 		std::future<void> taskFuture = taskPromise.get_future();
 		taskFuture.wait();
 		return taskFuture.get();
@@ -60,6 +60,7 @@ inline T pushAndWaitMainThreadTask(std::function<T(Arg...)> f, Arg... arg)
 {
 	if (CanHandleMainThreadTask())
 	{
+		// TODO(C++20): bind_front
 		return pushAndWaitMainThreadTask<T>(std::bind(f, arg...));
 	}
 	else

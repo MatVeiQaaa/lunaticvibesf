@@ -1425,13 +1425,13 @@ std::function<void(int)> getButtonCallback(int type)
     case 10: return std::bind(select_difficulty_filter, _1, 0);
     case 11: return std::bind(select_keys_filter, _1, 0);
     case 12: return std::bind(select_sort_type, _1);
-    case 13: return std::bind(enter_key_config);
-    case 14: return std::bind(enter_skin_config);
+    case 13: return [](auto) { enter_key_config(); };
+    case 14: return [](auto) { enter_skin_config(); };
     case 15: return createUnsupportedCb(u8"プレイ開始");
-    case 16: return std::bind(autoplay);
+    case 16: return [](auto) { autoplay(); };
     case 17: return [](auto) { requestOpenChartReadme(); };
     case 18: return createUnsupportedCb(u8"タグのリセット");
-    case 19: return std::bind(replay);
+    case 19: return [](auto) { replay(); };
     case 20:
     case 21:
     case 22: return std::bind(fx_type, type - 20, _1);
@@ -1507,7 +1507,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 132: return std::bind(key_config_pad, Input::Pad::K2START, false);
     case 133: return std::bind(key_config_pad, Input::Pad::K2SELECT, false);
     case 136: return std::bind(key_config_pad, Input::Pad::S2A, false);
-    case 143: return std::bind(key_config_mode_rotate);
+    case 143: return [](auto) { key_config_mode_rotate(); };
     case 150:
     case 151:
     case 152:

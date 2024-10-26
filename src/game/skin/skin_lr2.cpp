@@ -523,11 +523,9 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     return std::pair{ val, notPref };
 }
 
-[[nodiscard]] std::string_view csvLineNormalize(const std::string& raw)
+[[nodiscard]] static std::string_view csvLineNormalize(std::string_view linecsv)
 {
-    if (raw.empty()) return {};
-
-    StringContentView linecsv(raw);
+    if (linecsv.empty()) return {};
 
     // remove leading spaces
     if (linecsv.find_first_not_of(' ') == linecsv.npos) return {};

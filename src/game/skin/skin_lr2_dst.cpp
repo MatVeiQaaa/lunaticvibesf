@@ -2,13 +2,20 @@
 #include "game/scene/scene_context.h"
 #include "game/arena/arena_data.h"
 
-#include "game/ruleset/ruleset_network.h"
 #include "game/ruleset/ruleset_bms.h"
 
 static std::shared_mutex _mutex;
 static std::bitset<900> _op;
 static std::bitset<100> _customOp;
-std::map<size_t, bool> _extendedOp;
+static std::map<size_t, bool> _extendedOp;
+
+static bool any_of(std::initializer_list<unsigned> entries, unsigned val)
+{
+    for (auto e : entries)
+        if (e == val)
+            return true;
+    return false;
+}
 
 inline bool dst(IndexOption option_entry, std::initializer_list<unsigned> entries)
 {
@@ -33,14 +40,14 @@ inline bool sw(IndexSwitch entry)
 	return State::get(entry);
 }
 
-inline void set(int idx, bool val = true)
+inline void set(unsigned idx, bool val = true)
 {
 	if (idx >= 1000)
 		_extendedOp[idx] = val;
 	else
 		_op.set(idx, val); 
 }
-inline void set(std::initializer_list<int> idx, bool val = true)
+inline void set(std::initializer_list<unsigned> idx, bool val = true)
 {
 	for (auto& i : idx)
 		set(i, val);
@@ -135,21 +142,14 @@ void updateDstOpt()
 	}
 
 	// 20 パネル起動していない
-	// 21 パネル1起動時
+	// 21-9 パネル1-9起動時
 	{
-		set(20, !sw({
-			IndexSwitch::SELECT_PANEL1,
-			IndexSwitch::SELECT_PANEL2,
-			IndexSwitch::SELECT_PANEL3,
-			IndexSwitch::SELECT_PANEL4,
-			IndexSwitch::SELECT_PANEL5,
-			IndexSwitch::SELECT_PANEL6,
-			IndexSwitch::SELECT_PANEL7,
-			IndexSwitch::SELECT_PANEL8,
-			IndexSwitch::SELECT_PANEL9,
-			}));
 		for (unsigned i = 21; i <= 29; ++i)
-			set(i, sw((IndexSwitch)(i - 21 + (unsigned)IndexSwitch::SELECT_PANEL1)));
+		{
+			const bool val = sw((IndexSwitch)(i - 21 + (unsigned)IndexSwitch::SELECT_PANEL1));
+			if(val)
+				set({i, 20});
+		}
 	}
 
 	// 30 BGA normal
@@ -161,10 +161,11 @@ void updateDstOpt()
 	case BGA_EXTEND: set(31); break;
 	}
 
+	const bool autoplay = State::get(IndexSwitch::SYSTEM_AUTOPLAY);
 	// 32 autoplay off
 	// 33 autoplay on
-	set(32, !State::get(IndexSwitch::SYSTEM_AUTOPLAY));
-	set(33, State::get(IndexSwitch::SYSTEM_AUTOPLAY));
+	set(32, !autoplay);
+	set(33, autoplay);
 
 	// 34 ghost off
 	// 35 ghost typeA
@@ -182,7 +183,7 @@ void updateDstOpt()
 	// 38 scoregraph off
 	// 39 scoregraph on
 	set(38, !sw(IndexSwitch::SYSTEM_SCOREGRAPH));
-	set(39, sw(IndexSwitch::SYSTEM_SCOREGRAPH));
+	set(39, !_op[38]);
 
 	// 40 BGA off
 	// 41 BGA on
@@ -199,12 +200,14 @@ void updateDstOpt()
 	// 49 New: 2P gauge is exhard / death
 	{
 		using namespace Option;
-		set(42, dst(IndexOption::PLAY_GAUGE_TYPE_1P, { GAUGE_ASSISTEASY, GAUGE_EASY, GAUGE_NORMAL }));
-		set(43, dst(IndexOption::PLAY_GAUGE_TYPE_1P, { GAUGE_HARD, GAUGE_EXHARD, GAUGE_DEATH }));
-		set(44, dst(IndexOption::PLAY_GAUGE_TYPE_2P, { GAUGE_ASSISTEASY, GAUGE_EASY, GAUGE_NORMAL }));
-		set(45, dst(IndexOption::PLAY_GAUGE_TYPE_2P, { GAUGE_HARD, GAUGE_EXHARD, GAUGE_DEATH }));
-		set(48, dst(IndexOption::PLAY_GAUGE_TYPE_1P, { GAUGE_EXHARD, GAUGE_DEATH }));
-		set(49, dst(IndexOption::PLAY_GAUGE_TYPE_2P, { GAUGE_EXHARD, GAUGE_DEATH }));
+		auto gp1 = State::get(IndexOption::PLAY_GAUGE_TYPE_1P);
+		auto gp2 = State::get(IndexOption::PLAY_GAUGE_TYPE_2P);
+		set(42, any_of({GAUGE_ASSISTEASY, GAUGE_EASY, GAUGE_NORMAL}, gp1));
+		set(43, any_of({GAUGE_HARD, GAUGE_EXHARD, GAUGE_DEATH}, gp1));
+		set(44, any_of({GAUGE_ASSISTEASY, GAUGE_EASY, GAUGE_NORMAL}, gp2));
+		set(45, any_of({GAUGE_HARD, GAUGE_EXHARD, GAUGE_DEATH}, gp2));
+		set(48, any_of({GAUGE_EXHARD, GAUGE_DEATH}, gp1));
+		set(49, any_of({GAUGE_EXHARD, GAUGE_DEATH}, gp2));
 	}
 
 	// 46 難易度フィルタが有効
@@ -218,26 +221,26 @@ void updateDstOpt()
 	// 50 オフライン
 	// 51 オンライン
 	set(50, !sw(IndexSwitch::NETWORK));
-	set(51, sw(IndexSwitch::NETWORK));
+	set(51, !_op[50]);
 
 	// 52 EXTRA MODE OFF
 	// 53 EXTRA MODE ON
 	set(52, !sw(IndexSwitch::PLAY_OPTION_EXTRA));
-	set(53, sw(IndexSwitch::PLAY_OPTION_EXTRA));
+	set(53, !_op[52]);
 
 	// 54 AUTOSCRATCH 1P OFF
 	// 55 AUTOSCRATCH 1P ON
 	// 56 AUTOSCRATCH 2P OFF
 	// 57 AUTOSCRATCH 2P ON
 	set(54, !sw(IndexSwitch::PLAY_OPTION_AUTOSCR_1P));
-	set(55, sw(IndexSwitch::PLAY_OPTION_AUTOSCR_1P));
+	set(55, !_op[54]);
 	set(56, !sw(IndexSwitch::PLAY_OPTION_AUTOSCR_2P));
-	set(57, sw(IndexSwitch::PLAY_OPTION_AUTOSCR_2P));
+	set(57, !_op[56]);
 
 	// 60 スコアセーブ不可能
 	// 61 スコアセーブ可能
 	set(60, !sw(IndexSwitch::CHART_CAN_SAVE_SCORE));
-	set(61, sw(IndexSwitch::CHART_CAN_SAVE_SCORE));
+	set(61, !_op[60]);
 
 	// 62 クリアセーブ不可能
 	// 63 EASYゲージ （仕様書では「イージーでセーブ」）
@@ -246,11 +249,12 @@ void updateDstOpt()
 	// 66 DEATH/P-ATTACKゲージ （仕様書では「フルコンのみ」）
 	{
 		using namespace Option;
-		set(62, dst(IndexOption::CHART_SAVE_LAMP_TYPE, { LAMP_NOPLAY, LAMP_FAILED }));
-		set(63, dst(IndexOption::CHART_SAVE_LAMP_TYPE, { LAMP_ASSIST, LAMP_EASY }));
-		set(64, dst(IndexOption::CHART_SAVE_LAMP_TYPE, LAMP_NORMAL));
-		set(65, dst(IndexOption::CHART_SAVE_LAMP_TYPE, { LAMP_HARD, LAMP_EXHARD }));
-		set(66, dst(IndexOption::CHART_SAVE_LAMP_TYPE, { LAMP_FULLCOMBO, LAMP_PERFECT, LAMP_MAX }));
+		const auto val = State::get(IndexOption::CHART_SAVE_LAMP_TYPE);
+		set(62, any_of({LAMP_NOPLAY, LAMP_FAILED}, val));
+		set(63, any_of({LAMP_ASSIST, LAMP_EASY}, val));
+		set(64, any_of({LAMP_NORMAL}, val));
+		set(65, any_of({LAMP_HARD, LAMP_EXHARD}, val));
+		set(66, any_of({LAMP_FULLCOMBO, LAMP_PERFECT, LAMP_MAX}, val));
 	}
 
 	// 70 同フォルダbeginnerのレベルが規定値を越えていない(5/10keysはLV9、7/14keysはLV12、9keysはLV42以内)
@@ -277,11 +281,11 @@ void updateDstOpt()
 		set(72, State::get(IndexNumber::MUSIC_HYPER_LEVEL) <= ceiling);
 		set(73, State::get(IndexNumber::MUSIC_ANOTHER_LEVEL) <= ceiling);
 		set(74, State::get(IndexNumber::MUSIC_INSANE_LEVEL) <= ceiling);
-		set(75, State::get(IndexNumber::MUSIC_BEGINNER_LEVEL) > ceiling);
-		set(76, State::get(IndexNumber::MUSIC_NORMAL_LEVEL) > ceiling);
-		set(77, State::get(IndexNumber::MUSIC_HYPER_LEVEL) > ceiling);
-		set(78, State::get(IndexNumber::MUSIC_ANOTHER_LEVEL) > ceiling);
-		set(79, State::get(IndexNumber::MUSIC_INSANE_LEVEL) > ceiling);
+		set(75, !_op[70]);
+		set(76, !_op[71]);
+		set(77, !_op[72]);
+		set(78, !_op[73]);
+		set(79, !_op[74]);
 	}
 
 
@@ -297,13 +301,13 @@ void updateDstOpt()
 	// 83 リプレイ録画中
 	// 84 リプレイ再生中
 	set(82, false);
-	set(83, !sw(IndexSwitch::SYSTEM_AUTOPLAY) && !gPlayContext.isReplay);
-	set(84, !sw(IndexSwitch::SYSTEM_AUTOPLAY) && gPlayContext.isReplay);
+	set(83, !autoplay && !gPlayContext.isReplay);
+	set(84, !autoplay && gPlayContext.isReplay);
 
 	// 90 リザ クリア
 	// 91 リザ ミス
 	set(90, sw(IndexSwitch::RESULT_CLEAR));
-	set(91, !sw(IndexSwitch::RESULT_CLEAR));
+	set(91, !_op[90]);
 
 
 	// /////////////////////////////////
@@ -325,7 +329,7 @@ void updateDstOpt()
         using namespace Option;
         switch (State::get(IndexOption::SELECT_ENTRY_LAMP))
         {
-        case LAMP_NOPLAY:    set(100, get(5));   break;
+        case LAMP_NOPLAY:    set(100, _op[5]);   break;
         case LAMP_FAILED:    set(101);           break;
         case LAMP_ASSIST:    set(102); set(109); break;
 		case LAMP_EASY:      set(102); set(146); break;
@@ -412,7 +416,7 @@ void updateDstOpt()
 	// 145 SP TO DP (もしかしたら今後DP TO SPや 9 TO 7と共有項目になるかも。
 
 	// 150 difficulty0 (未設定)
-	if (get(5))
+	if (_op[5])
 	{
 		switch (State::get(IndexOption::CHART_DIFFICULTY))
 		{
@@ -429,29 +433,29 @@ void updateDstOpt()
 	// 170 BGA無し
 	// 171 BGA有り
 	set(170, !sw(IndexSwitch::CHART_HAVE_BGA));
-	set(171, sw(IndexSwitch::CHART_HAVE_BGA));
+	set(171, !_op[170]);
 
 	// 172 ロングノート無し
 	// 173 ロングノート有り
 	set(172, !sw(IndexSwitch::CHART_HAVE_LN));
-	set(173, sw(IndexSwitch::CHART_HAVE_LN));
+	set(173, !_op[172]);
 
 	// 174 付属テキスト無し
 	// 175 付属テキスト有り
 	set(174, !sw(IndexSwitch::CHART_HAVE_README));
-	set(175, sw(IndexSwitch::CHART_HAVE_README));
+	set(175, !_op[174]);
 
 	// 176 BPM変化無し
 	// 177 BPM変化有り
 	set(176, !sw(IndexSwitch::CHART_HAVE_BPMCHANGE));
-	set(177, sw(IndexSwitch::CHART_HAVE_BPMCHANGE));
+	set(177, !_op[176]);
 
 	// 178 ランダム命令無し
 	// 179 ランダム命令有り
 	set(178, !sw(IndexSwitch::CHART_HAVE_RANDOM));
-	set(179, sw(IndexSwitch::CHART_HAVE_RANDOM));
+	set(179, !_op[178]);
 
-	if (get(5))	// is playable
+	if (_op[5])	// is playable
 	{
 
 		// //元データ
@@ -511,22 +515,22 @@ void updateDstOpt()
 	// 190 STAGEFILE無し
 	// 191 STAGEFILE有り
 	set(190, !sw(IndexSwitch::CHART_HAVE_STAGEFILE));
-	set(191, sw(IndexSwitch::CHART_HAVE_STAGEFILE));
+	set(191, !_op[190]);
 
 	// 192 BANNER無し
 	// 193 BANNER有り
 	set(192, !sw(IndexSwitch::CHART_HAVE_BANNER));
-	set(193, sw(IndexSwitch::CHART_HAVE_BANNER));
+	set(193, !_op[192]);
 
 	// 194 BACKBMP無し
 	// 195 BACKBMP有り
 	set(194, !sw(IndexSwitch::CHART_HAVE_BACKBMP));
-	set(195, sw(IndexSwitch::CHART_HAVE_BACKBMP));
+	set(195, !_op[194]);
 
 	// 196 リプレイ無し
 	// 197 リプレイ有り
 	set(196, !sw(IndexSwitch::CHART_HAVE_REPLAY));
-	set(197, sw(IndexSwitch::CHART_HAVE_REPLAY));
+	set(197, !_op[196]);
 
 	// /////////////////////////////////
 	// //プレイ中
@@ -674,22 +678,22 @@ void updateDstOpt()
 	// 270 1P SUD+変更中
 	// 271 2P SUD+変更中
 	set(270, sw(IndexSwitch::P1_SETTING_LANECOVER));
-	set(271, sw(IndexSwitch::P2_SETTING_LANECOVER));
+	set(271, !_op[270]);
 
 	// 272 1P Hi-Speed変更中
 	// 273 2P Hi-Speed変更中
 	set(272, sw(IndexSwitch::P1_SETTING_HISPEED));
-	set(273, sw(IndexSwitch::P2_SETTING_HISPEED));
+	set(273, !_op[272]);
 
 	// 274 1P SUD+
 	// 275 2P SUD+
 	set(274, sw(IndexSwitch::P1_HAS_LANECOVER_TOP));
-	set(275, sw(IndexSwitch::P2_HAS_LANECOVER_TOP));
+	set(275, !_op[274]);
 
 	// 276 1P HID+/LIFT
 	// 277 2P HID+/LIFT
 	set(276, sw(IndexSwitch::P1_HAS_LANECOVER_BOTTOM));
-	set(277, sw(IndexSwitch::P2_HAS_LANECOVER_BOTTOM));
+	set(277, !_op[276]);
 
 	// 280 コースステージ1
 	// 281 コースステージ2
@@ -718,10 +722,11 @@ void updateDstOpt()
 	// 293 段位認定
 	if (dst(IndexOption::SELECT_ENTRY_TYPE, Option::ENTRY_COURSE))
 	{
+		const unsigned course_type = State::get(IndexOption::COURSE_TYPE);
 		set(290);
-		set(291, dst(IndexOption::COURSE_TYPE, Option::COURSE_NONSTOP));
-		set(292, dst(IndexOption::COURSE_TYPE, Option::COURSE_EXPERT));
-		set(293, dst(IndexOption::COURSE_TYPE, Option::COURSE_GRADE));
+		set(291, course_type == Option::COURSE_NONSTOP);
+		set(292, course_type == Option::COURSE_EXPERT);
+		set(293, course_type == Option::COURSE_GRADE);
 	}
 
 	// //////////////////////////////////
@@ -817,7 +822,7 @@ void updateDstOpt()
 	// 350 リザルトフリップ無効(プレイスキンで#FLIPRESULT命令無し、もしくは#DISABLEFLIP命令以降
 	// 351 リザルトフリップ有効(プレイスキンで#FLIPRESULT命令有り
 	set(350, sw(IndexSwitch::FLIP_RESULT));
-	set(351, !sw(IndexSwitch::FLIP_RESULT));
+	set(351, !_op[350]);
 
 	// 352 1PWIN 2PLOSE
 	// 353 1PLOSE 2PWIN
@@ -853,7 +858,7 @@ void updateDstOpt()
 	// ///////////////////////////////////
 	// //その他
 
-	if (get(2))
+	if (_op[2])
 	{
 		// 500 同じフォルダにbeginner譜面が存在しない
 		// 501 同じフォルダにnormal譜面が存在しない
@@ -871,33 +876,39 @@ void updateDstOpt()
 		// 507 同じフォルダにhyper譜面が存在する
 		// 508 同じフォルダにanother譜面が存在する
 		// 509 同じフォルダにinsane譜面が存在する
-		set(505, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1));
-		set(506, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2));
-		set(507, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3));
-		set(508, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_4));
-		set(509, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_5));
+		set(505, !_op[500]);
+		set(506, !_op[501]);
+		set(507, !_op[502]);
+		set(508, !_op[503]);
+		set(509, !_op[504]);
+
+		const bool have_mult_1 = State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_1);
+		const bool have_mult_2 = State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_2);
+		const bool have_mult_3 = State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_3);
+		const bool have_mult_4 = State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_4);
+		const bool have_mult_5 = State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_5);
 
 		// 510 同じフォルダに一個のbeginner譜面が存在する
 		// 511 同じフォルダに一個のnormal譜面が存在する
 		// 512 同じフォルダに一個のhyper譜面が存在する
 		// 513 同じフォルダに一個のanother譜面が存在する
 		// 514 同じフォルダに一個のnsane譜面が存在する
-		set(510, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_1));
-		set(511, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_2));
-		set(512, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_3));
-		set(513, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_4) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_4));
-		set(514, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_5) && !State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_5));
+		set(510, _op[505] && !have_mult_1);
+		set(511, _op[506] && !have_mult_2);
+		set(512, _op[507] && !have_mult_3);
+		set(513, _op[508] && !have_mult_4);
+		set(514, _op[509] && !have_mult_5);
 
 		// 515 同じフォルダに複数のbeginner譜面が存在する
 		// 516 同じフォルダに複数のnormal譜面が存在する
 		// 517 同じフォルダに複数のhyper譜面が存在する
 		// 518 同じフォルダに複数のanother譜面が存在する
 		// 519 同じフォルダに複数のnsane譜面が存在する
-		set(515, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_1) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_1));
-		set(516, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_2) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_2));
-		set(517, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_3) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_3));
-		set(518, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_4) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_4));
-		set(519, State::get(IndexSwitch::CHART_HAVE_DIFFICULTY_5) && State::get(IndexSwitch::CHART_HAVE_MULTIPLE_DIFFICULTY_5));
+		set(515, _op[505] && have_mult_1);
+		set(516, _op[506] && have_mult_2);
+		set(517, _op[507] && have_mult_3);
+		set(518, _op[508] && have_mult_4);
+		set(519, _op[509] && have_mult_5);
 
 		switch (State::get(IndexOption::CHART_DIFFICULTY))
 		{
@@ -1013,12 +1024,13 @@ void updateDstOpt()
 	// 705 コースstage1 difficulty5
 	if (sw(IndexSwitch::COURSE_STAGE1_CHART_EXIST))
 	{
-		set(700, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 0));
-		set(701, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 1));
-		set(702, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 2));
-		set(703, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 3));
-		set(704, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 4));
-		set(705, dst(IndexOption::COURSE_STAGE1_DIFFICULTY, 5));
+		const unsigned val = State::get(IndexOption::COURSE_STAGE1_DIFFICULTY);
+		set(700, val == 0);
+		set(701, val == 1);
+		set(702, val == 2);
+		set(703, val == 3);
+		set(704, val == 4);
+		set(705, val == 5);
 	}
 
 	// //コースstage2
@@ -1030,12 +1042,13 @@ void updateDstOpt()
 	// 715 コースstage2 difficulty5
 	if (sw(IndexSwitch::COURSE_STAGE2_CHART_EXIST))
 	{
-		set(710, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 0));
-		set(711, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 1));
-		set(712, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 2));
-		set(713, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 3));
-		set(714, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 4));
-		set(715, dst(IndexOption::COURSE_STAGE2_DIFFICULTY, 5));
+		const unsigned val = State::get(IndexOption::COURSE_STAGE2_DIFFICULTY);
+		set(710, val == 0);
+		set(711, val == 1);
+		set(712, val == 2);
+		set(713, val == 3);
+		set(714, val == 4);
+		set(715, val == 5);
 	}
 
 	// //コースstage3
@@ -1047,12 +1060,13 @@ void updateDstOpt()
 	// 725 コースstage3 difficulty5
 	if (sw(IndexSwitch::COURSE_STAGE3_CHART_EXIST))
 	{
-		set(720, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 0));
-		set(721, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 1));
-		set(722, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 2));
-		set(723, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 3));
-		set(724, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 4));
-		set(725, dst(IndexOption::COURSE_STAGE3_DIFFICULTY, 5));
+		const unsigned val = State::get(IndexOption::COURSE_STAGE3_DIFFICULTY);
+		set(720, val == 0);
+		set(721, val == 1);
+		set(722, val == 2);
+		set(723, val == 3);
+		set(724, val == 4);
+		set(725, val == 5);
 	}
 	
 	// LR2HelperG DST_OPTION HS-FIX 720-724
@@ -1077,12 +1091,13 @@ void updateDstOpt()
 	// 735 コースstage4 difficulty5
 	if (sw(IndexSwitch::COURSE_STAGE4_CHART_EXIST))
 	{
-		set(730, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 0));
-		set(731, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 1));
-		set(732, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 2));
-		set(733, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 3));
-		set(734, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 4));
-		set(735, dst(IndexOption::COURSE_STAGE4_DIFFICULTY, 5));
+		const unsigned val = State::get(IndexOption::COURSE_STAGE4_DIFFICULTY);
+		set(730, val == 0);
+		set(731, val == 1);
+		set(732, val == 2);
+		set(733, val == 3);
+		set(734, val == 4);
+		set(735, val == 5);
 	}
 
 	// //コースstage5
@@ -1094,12 +1109,13 @@ void updateDstOpt()
 	// 745 コースstage5 difficulty5
 	if (sw(IndexSwitch::COURSE_STAGE5_CHART_EXIST))
 	{
-		set(740, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 0));
-		set(741, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 1));
-		set(742, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 2));
-		set(743, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 3));
-		set(744, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 4));
-		set(745, dst(IndexOption::COURSE_STAGE5_DIFFICULTY, 5));
+		const unsigned val = State::get(IndexOption::COURSE_STAGE5_DIFFICULTY);
+		set(740, val == 0);
+		set(741, val == 1);
+		set(742, val == 2);
+		set(743, val == 3);
+		set(744, val == 4);
+		set(745, val == 5);
 	}
 
 

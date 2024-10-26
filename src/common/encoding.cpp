@@ -190,13 +190,19 @@ const char* getFileEncodingName(eFileEncoding enc)
     }
 }
 
+std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
+{
+    std::string out;
+    lunaticvibes::to_utf8(input, fromEncoding, out);
+    return out;
+}
 
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
+void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& out)
 {
     int cp = CP_UTF8;
     switch (fromEncoding)
@@ -206,7 +212,11 @@ std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
     case eFileEncoding::LATIN1:     cp = CP_ACP; break;
     default:                        cp = CP_UTF8; break;
     }
-    if (cp == CP_UTF8) return input;
+    if (cp == CP_UTF8)
+    {
+        out = input;
+        return;
+    }
 
     DWORD dwNum;
 
@@ -218,11 +228,10 @@ std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
     char* ustr = new char[dwNum];
     WideCharToMultiByte(CP_UTF8, NULL, wstr, -1, ustr, dwNum, NULL, FALSE);
 
-    std::string ret(ustr);
+    out = ustr;
 
     delete[] wstr;
     delete[] ustr;
-    return ret;
 }
 
 
@@ -290,7 +299,7 @@ struct IcdDeleter {
 };
 using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
-static std::string convert(const std::string& input, eFileEncoding from, eFileEncoding to)
+static void convert(const std::string& input, eFileEncoding from, eFileEncoding to, std::string& out)
 {
     const auto* source_encoding_name = get_iconv_encoding_name(from);
     const auto* target_encoding_name = get_iconv_encoding_name(to);
@@ -299,7 +308,8 @@ static std::string convert(const std::string& input, eFileEncoding from, eFileEn
     if (reinterpret_cast<size_t>(icd.get()) == static_cast<size_t>(-1)) {
         const int error = errno;
         LOG_ERROR << "iconv_open() error: " << safe_strerror(error) << " (" << error << ")";
-        return "(conversion descriptor opening error)";
+        out = "(conversion descriptor opening error)";
+        return;
     }
 
     static constexpr size_t BUF_SIZE = 1024l * 32l;
@@ -317,20 +327,23 @@ static std::string convert(const std::string& input, eFileEncoding from, eFileEn
     if (iconv_ret == static_cast<size_t>(-1)) {
         const int error = errno;
         LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";
-        return "(conversion error)";
+        out = "(conversion error)";
+        return;
     }
 
-    return std::string{static_cast<char*>(out_buf)};
+    out = static_cast<char*>(out_buf);
 }
 
-std::string to_utf8(const std::string& input, eFileEncoding fromEncoding)
+void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding, std::string& buf)
 {
-    return convert(input, fromEncoding, eFileEncoding::UTF8);
+    convert(input, fromEncoding, eFileEncoding::UTF8, buf);
 }
 
 std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 {
-    return convert(input, eFileEncoding::UTF8, toEncoding);
+    std::string buf;
+    convert(input, eFileEncoding::UTF8, toEncoding, buf);
+    return buf;
 }
 
 #endif // _WIN32

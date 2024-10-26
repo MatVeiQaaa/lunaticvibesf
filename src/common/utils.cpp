@@ -351,7 +351,7 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
     std::string out;
     out.reserve(input.length() + CURRENT_PATH_RELATIVE_PREFIX.length());
 
-    std::vector<std::string> segments;
+    thread_local std::vector<std::string> segments;
     boost::split(segments, input, boost::is_any_of("/"));
 
     size_t segments_traversed = 0;

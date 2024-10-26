@@ -1,8 +1,8 @@
 #pragma once
 #include "sprite.h"
 #include "game/chart/chart.h"
-#include <list>
 #include <memory>
+#include <vector>
 
 // Draw the whole lane (on screen) with only one sprite per key.
 // Currently only handles normal notes. LN, mines or others are meant to be managed by other Sprite class.
@@ -15,7 +15,7 @@ protected:
     int _noteAreaHeight = 500;  // used to calculate note speed
     double _basespd;
     double _hispeed;
-    std::list<RectF> _outRect;
+    std::vector<RectF> _outRect;
     unsigned _currentMeasure = 0;
     bool _autoNotes = false;
 
@@ -70,7 +70,7 @@ protected:
 class SpriteLaneVerticalLN : public SpriteLaneVertical
 {
 protected:
-    std::list<RectF> _outRectBody, _outRectTail;
+    std::vector<RectF> _outRectBody, _outRectTail;
     bool headExpired = false;
     bool tailExpired = false;
     bool headHit = false;

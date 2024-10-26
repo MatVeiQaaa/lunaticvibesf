@@ -101,13 +101,13 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit parameters
     bool hasDifficulty = false;
 
-    for (StringContent lineBuf; std::getline(bmsFile, lineBuf);)
+    for (StringContent lineBuf, lineBuf_; std::getline(bmsFile, lineBuf_);)
     {
         srcLine++;
-        if (lineBuf.length() <= 1) continue;
+        if (lineBuf_.length() <= 1) continue;
 
-        // convert codepage
-        lineBuf = lunaticvibes::trim(to_utf8(lineBuf, encoding));
+        lunaticvibes::trim_in_place(lineBuf_);
+        lunaticvibes::to_utf8(lineBuf_, encoding, lineBuf);
 
         StringContentView buf(lineBuf);
         if (buf[0] != '#') continue;

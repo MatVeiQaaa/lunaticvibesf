@@ -109,6 +109,7 @@ try
 {
     using Pair = std::pair<std::string, std::string>;
     std::vector<Pair> out;
+    std::string line;
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
         const auto& file = entry.path();
@@ -124,7 +125,9 @@ try
         std::string utf8_text;
         for (std::string line_; std::getline(ifs, line_);)
         {
-            utf8_text += lunaticvibes::trim(to_utf8(line_, encoding));
+            lunaticvibes::trim_in_place(line_);
+            lunaticvibes::to_utf8(line_, encoding, line);
+            utf8_text += line;
             utf8_text += '\n';
         }
         out.emplace_back(file.filename().u8string(), std::move(utf8_text));

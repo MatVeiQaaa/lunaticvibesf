@@ -1370,8 +1370,9 @@ void SceneSelect::imguiCheckSettings()
         }
     }
 
-    if (imgui_adv_scrollSpeed[0] != ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300))
+    if (imgui_adv_scrollSpeed[0] != _config_list_scroll_time_initial)
     {
+        _config_list_scroll_time_initial = imgui_adv_scrollSpeed[0];
         ConfigMgr::set('P', cfg::P_LIST_SCROLL_TIME_INITIAL, imgui_adv_scrollSpeed[0]);
     }
     if (imgui_adv_scrollSpeed[1] != ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_HOLD, 150))

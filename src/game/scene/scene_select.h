@@ -33,7 +33,8 @@ public:
 private:
     eSelectState state;
     InputMask _inputAvailable;
-    
+
+    int _config_list_scroll_time_initial;
     // navigate input
     bool isHoldingUp = false;
     bool isHoldingDown = false;

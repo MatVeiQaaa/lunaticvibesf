@@ -506,6 +506,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
 
     _config_enable_preview_dedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
     _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
+    _config_list_scroll_time_initial = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
 }
 
 SceneSelect::~SceneSelect()
@@ -887,7 +888,7 @@ void SceneSelect::_updateAsync()
                 gSelectContext.scrollDirection = 0;
                 pSkin->reset_bar_animation();
                 State::set(IndexTimer::LIST_MOVE_STOP, t.norm());
-                gSelectContext.scrollTimeLength = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+                gSelectContext.scrollTimeLength = _config_list_scroll_time_initial;
             }
         }
         else if(gSelectContext.scrollDirection != 0 || scrollAccumulatorAddUnit < -0.003 || scrollAccumulatorAddUnit > 0.003)

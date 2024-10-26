@@ -201,76 +201,6 @@ void SoundDriverFMOD::createChannelGroups()
         channelGroup[e] = std::shared_ptr<FMOD::ChannelGroup>(pcg, [](FMOD::ChannelGroup* p) { p->release(); });
     }
 
-    for (int c = 0; c < 3; ++c)
-    {
-        // create dummy dsp
-        for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT);
-             ++i)
-        {
-            const auto e = static_cast<SoundChannelType>(i);
-            fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPMaster[c][e]);
-            DSPMaster[c][e]->setBypass(true);
-        }
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPBgm[c][SoundChannelType::BGM_NOTE]);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPBgm[c][SoundChannelType::BGM_SYS]);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPKey[c][SoundChannelType::KEY_SYS]);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPKey[c][SoundChannelType::KEY_LEFT]);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPKey[c][SoundChannelType::KEY_RIGHT]);
-        DSPBgm[c][SoundChannelType::BGM_NOTE]->setBypass(true);
-        DSPBgm[c][SoundChannelType::BGM_SYS]->setBypass(true);
-        DSPKey[c][SoundChannelType::KEY_SYS]->setBypass(true);
-        DSPKey[c][SoundChannelType::KEY_LEFT]->setBypass(true);
-        DSPKey[c][SoundChannelType::KEY_RIGHT]->setBypass(true);
-
-        channelGroup[SoundChannelType::BGM_NOTE]->addDSP(c * 2 + 0, DSPMaster[c][SoundChannelType::BGM_NOTE]);
-        channelGroup[SoundChannelType::BGM_NOTE]->addDSP(c * 2 + 1, DSPBgm[c][SoundChannelType::BGM_NOTE]);
-        channelGroup[SoundChannelType::BGM_SYS]->addDSP(c * 2 + 0, DSPMaster[c][SoundChannelType::BGM_SYS]);
-        channelGroup[SoundChannelType::BGM_SYS]->addDSP(c * 2 + 1, DSPBgm[c][SoundChannelType::BGM_SYS]);
-        channelGroup[SoundChannelType::KEY_SYS]->addDSP(c * 2 + 0, DSPMaster[c][SoundChannelType::KEY_SYS]);
-        channelGroup[SoundChannelType::KEY_SYS]->addDSP(c * 2 + 1, DSPKey[c][SoundChannelType::KEY_SYS]);
-        channelGroup[SoundChannelType::KEY_LEFT]->addDSP(c * 2 + 0, DSPMaster[c][SoundChannelType::KEY_LEFT]);
-        channelGroup[SoundChannelType::KEY_LEFT]->addDSP(c * 2 + 1, DSPKey[c][SoundChannelType::KEY_LEFT]);
-        channelGroup[SoundChannelType::KEY_RIGHT]->addDSP(c * 2 + 0, DSPMaster[c][SoundChannelType::KEY_RIGHT]);
-        channelGroup[SoundChannelType::KEY_RIGHT]->addDSP(c * 2 + 1, DSPKey[c][SoundChannelType::KEY_RIGHT]);
-    }
-
-    // create PITCHSHIFT dsp
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
-    {
-        const auto e = static_cast<SoundChannelType>(i);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_PITCHSHIFT, &PitchShiftFilter[e]);
-        PitchShiftFilter[e]->setParameterFloat(FMOD_DSP_PITCHSHIFT_FFTSIZE, 512.f);
-        channelGroup[e]->addDSP(6, PitchShiftFilter[e]);
-    }
-
-    // create MULTIBAND_EQ dsp
-    for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
-    {
-        const auto e = static_cast<SoundChannelType>(i);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &EQFilter[0][e]);
-        fmodSystem->createDSPByType(FMOD_DSP_TYPE_MULTIBAND_EQ, &EQFilter[1][e]);
-        EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_B_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_C_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_D_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[0][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_E_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[0][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, 62.5f);
-        EQFilter[0][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_B_FREQUENCY, 160.f);
-        EQFilter[0][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_C_FREQUENCY, 400.f);
-        EQFilter[0][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_D_FREQUENCY, 1000.f);
-        EQFilter[0][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_E_FREQUENCY, 2500.f);
-        EQFilter[1][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_A_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[1][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_B_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[1][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_C_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[1][e]->setParameterInt(FMOD_DSP_MULTIBAND_EQ_D_FILTER, FMOD_DSP_MULTIBAND_EQ_FILTER_PEAKING);
-        EQFilter[1][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_A_FREQUENCY, 1000.f);
-        EQFilter[1][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_B_FREQUENCY, 2500.f);
-        EQFilter[1][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_C_FREQUENCY, 6250.f);
-        EQFilter[1][e]->setParameterFloat(FMOD_DSP_MULTIBAND_EQ_D_FREQUENCY, 16000.f);
-        channelGroup[e]->addDSP(7, EQFilter[0][e]);
-        channelGroup[e]->addDSP(8, EQFilter[1][e]);
-    }
-
     for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
     {
         const auto e = static_cast<SoundChannelType>(i);
@@ -289,7 +219,8 @@ void SoundDriverFMOD::createChannelGroups()
     for (int c = 0; c < 3; ++c)
     {
         // create dummy dsp
-        for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT); ++i)
+        for (auto i = static_cast<int>(SoundChannelType::BGM_SYS); i != static_cast<int>(SoundChannelType::TYPE_COUNT);
+             ++i)
         {
             const auto e = static_cast<SoundChannelType>(i);
             fmodSystem->createDSPByType(FMOD_DSP_TYPE_MIXER, &DSPMaster[c][e]);

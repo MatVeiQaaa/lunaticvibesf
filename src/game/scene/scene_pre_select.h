@@ -20,6 +20,7 @@ protected:
     void updateUpdateScoreCache();
     void loadFinished();
 
+    bool shouldShowImgui() const override;
     void updateImgui() override;
 
 

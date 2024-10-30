@@ -200,6 +200,7 @@ void graphics_clear()
 }
 
 static int maxFPS = 0;
+static bool s_should_present_imgui = false;
 static std::chrono::nanoseconds desiredFrameTimeBetweenFrames;
 static std::chrono::high_resolution_clock::time_point frameTimestampPrev;
 static Path screenshotPath;
@@ -216,12 +217,13 @@ void graphics_flush()
         // render internal canvas texture
         SDL_RenderCopy(gFrameRenderer, gInternalRenderTarget, &ssRect, &windowRect);
 
-        // render imgui
-        auto pData = ImGui::GetDrawData();
-        if (pData != NULL)
+        if (s_should_present_imgui)
         {
-            ImGui_ImplSDLRenderer2_RenderDrawData(pData, gFrameRenderer);
+            if (auto* pData = ImGui::GetDrawData(); pData != nullptr)
+                ImGui_ImplSDLRenderer2_RenderDrawData(pData, gFrameRenderer);
+            s_should_present_imgui = false;
         }
+
         // Save screenshot before presenting per SDL_RenderReadPixels docs.
         if (!screenshotPath.empty())
         {
@@ -542,6 +544,7 @@ void ImGuiNewFrame()
     ImGui::NewFrame();
     SDL_SetRenderTarget(gFrameRenderer, gInternalRenderTarget);
     ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+    s_should_present_imgui = true;
 }
 
 static std::function<void(const std::string&)> funUpdateText;

@@ -158,6 +158,11 @@ void SceneSelect::imguiInit()
 }
 
 
+bool SceneSelect::shouldShowImgui() const
+{
+    return imguiShow || imgui_show_arenaJoinLobbyPrompt || SceneBase::shouldShowImgui();
+}
+
 void SceneSelect::updateImgui()
 {
     SceneBase::updateImgui();

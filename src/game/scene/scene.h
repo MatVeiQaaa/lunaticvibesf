@@ -113,6 +113,7 @@ protected:
         return true;
     };
 
+    virtual bool shouldShowImgui() const;
     virtual void updateImgui();
     void DebugToggle(InputMask& m, const lunaticvibes::Time& t);
 

@@ -4,6 +4,11 @@
 #include "game/skin/skin_lr2.h"
 #include <tuple>
 
+bool ScenePlay::shouldShowImgui() const
+{
+    return imguiShowAdjustMenu || SceneBase::shouldShowImgui();
+}
+
 void ScenePlay::updateImgui()
 {
     SceneBase::updateImgui();

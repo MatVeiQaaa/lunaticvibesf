@@ -485,6 +485,11 @@ void ScenePreSelect::loadFinished()
 }
 
 
+bool ScenePreSelect::shouldShowImgui() const
+{
+    return true;
+}
+
 void ScenePreSelect::updateImgui()
 {
     if (gInCustomize) return;

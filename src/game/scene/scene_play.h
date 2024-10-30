@@ -195,6 +195,7 @@ protected:
     bool imguiAdjustIsDP = false;
     bool imguiAdjustHas2P = false;
 
+    bool shouldShowImgui() const override;
     void updateImgui() override;
     void imguiInit();
     void imguiAdjustMenu();

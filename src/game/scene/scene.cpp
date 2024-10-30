@@ -193,13 +193,10 @@ void SceneBase::update()
         TextureVideo::updateAll();
     }
 
-    // ImGui
-    if (!gInCustomize || _type == SceneType::CUSTOMIZE)
+    if ((!gInCustomize || _type == SceneType::CUSTOMIZE) && shouldShowImgui())
     {
         ImGuiNewFrame();
-
         updateImgui();
-
         ImGui::Render();
     }
 }
@@ -305,21 +302,25 @@ void SceneBase::_updateAsync1()
         gFrameCount[FRAMECOUNT_IDX_SCENE]++;
 }
 
+static bool should_show_text_overlay()
+{
+    for (size_t i = 0; i < 4; ++i)
+        if (!State::get(IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i)).empty())
+            return true;
+    return false;
+}
+
+bool SceneBase::shouldShowImgui() const
+{
+    return showFPS || should_show_text_overlay() || lunaticvibes::g_enable_imgui_debug_monitor;
+}
+
 void SceneBase::updateImgui()
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
-    bool showTextOverlay = showFPS;
-    for (size_t i = 0; i < 4; ++i)
-    {
-        IndexText idx = IndexText(int(IndexText::_OVERLAY_TOPLEFT) + i);
-        if (!State::get(idx).empty())
-        {
-            showTextOverlay = true;
-            break;
-        }
-    }
-    if (showTextOverlay)
+    // TODO: implement showFPS without Imgui, as Imgui takes over 10% FPS.
+    if (showFPS || should_show_text_overlay())
     {
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
         ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.f, 0.f, 0.f, 0.4f });

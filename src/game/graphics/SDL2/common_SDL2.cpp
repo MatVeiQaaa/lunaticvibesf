@@ -523,71 +523,9 @@ TextureFull::~TextureFull() {}
 void TextureFull::draw(const Rect& ignored, RectF dstRect,
     const Color c, const BlendMode b, const bool filter, const double angle) const
 {
-
+    (void)ignored;
     copy_if_needed(filter, _textures, _didRenderOnce);
-    SDL_Texture* tex = _textures[static_cast<int>(filter)].get();
-
-    SDL_SetTextureColorMod(tex, c.r, c.g, c.b);
-
-    int ssLevel = graphics_get_supersample_level();
-    dstRect.x *= ssLevel;
-    dstRect.y *= ssLevel;
-    dstRect.w *= ssLevel;
-    dstRect.h *= ssLevel;
-
-    if (b == BlendMode::MULTIPLY_INVERTED_BACKGROUND)
-    {
-        if (c.a <= 1) return;   // do not draw
-
-        static const SDL_BlendMode blendMode = SDL_ComposeCustomBlendMode(
-            SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
-            SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-
-        SDL_SetTextureBlendMode(tex, blendMode);
-    }
-    else
-    {
-        SDL_SetTextureAlphaMod(tex, b == BlendMode::NONE ? 255 : c.a);
-
-        auto to_sdl_blend_mode = [](const BlendMode b) -> SDL_BlendMode {
-            switch (b)
-            {
-            case BlendMode::NONE: // Do not use SDL_BLENDMODE_NONE, set alpha=255 instead
-            case BlendMode::ALPHA: return SDL_BLENDMODE_BLEND;
-            case BlendMode::ADD: return SDL_BLENDMODE_ADD;
-            case BlendMode::MOD: return SDL_BLENDMODE_MOD;
-            case BlendMode::SUBTRACT: {
-                static const auto mode = SDL_ComposeCustomBlendMode(
-                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_REV_SUBTRACT,
-                    SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
-                return mode;
-            }
-            case BlendMode::INVERT: {
-                static const auto mode = SDL_ComposeCustomBlendMode(
-                    SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_REV_SUBTRACT,
-                    SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-                return mode;
-            }
-            case BlendMode::MULTIPLY_INVERTED_BACKGROUND: return SDL_BLENDMODE_INVALID; // unreachable
-            case BlendMode::MULTIPLY_WITH_ALPHA: {
-                static const auto mode = SDL_ComposeCustomBlendMode(
-                    SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD,
-                    SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
-                return mode;
-            }
-            }
-            LOG_ERROR << "[SDL2] Invalid BlendMode";
-            LVF_DEBUG_ASSERT(false);
-            return SDL_BLENDMODE_INVALID;
-        };
-
-        if (const auto blend_mode = to_sdl_blend_mode(b); blend_mode != SDL_BLENDMODE_INVALID)
-        {
-            SDL_SetTextureBlendMode(tex, blend_mode);
-        }
-    }
-
-    SDL_RenderCopyExF(gFrameRenderer, tex, &textureRect, &dstRect, angle, nullptr, SDL_FLIP_NONE);
+    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, filter, angle, nullptr);
 }
 
 void GraphLine::draw(Point p1, Point p2, Color c) const

@@ -1,4 +1,3 @@
-#include <common/assert.h>
 #include "common/chartformat/chartformat_bms.h"
 #include "common/hash.h"
 #include "common/log.h"
@@ -21,6 +20,7 @@
 #include "game/skin/skin_mgr.h"
 #include "game/sound/sound_mgr.h"
 #include "git_version.h"
+#include <common/assert.h>
 
 #include <memory>
 #include <string_view>
@@ -32,7 +32,7 @@
 #include <consoleapi2.h>
 #include <ole2.h>
 #include <timeapi.h>
-#endif //WIN32
+#endif // WIN32
 
 #include <curl/curl.h>
 #include <imgui.h>
@@ -65,7 +65,6 @@ int main(int argc, char* argv[])
         panic("Error", str.c_str());
     }
     LOG_INFO << "libcurl version: " << curl_version();
-    
 
     // load configs
     ConfigMgr::init();
@@ -96,28 +95,27 @@ int main(int argc, char* argv[])
         s.FrameBorderSize = 1.f;
 
         auto& c = s.Colors;
-        c[ImGuiCol_WindowBg] = { 0.f, 0.f, 0.f, 0.7f };
+        c[ImGuiCol_WindowBg] = {0.f, 0.f, 0.f, 0.7f};
 
-        c[ImGuiCol_FrameBg] = { 0.3f, 0.3f, 0.3f, 0.6f };
-        c[ImGuiCol_FrameBgHovered] = { 0.6f, 0.6f, 0.6f, 0.6f };
-        c[ImGuiCol_FrameBgActive] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        c[ImGuiCol_FrameBg] = {0.3f, 0.3f, 0.3f, 0.6f};
+        c[ImGuiCol_FrameBgHovered] = {0.6f, 0.6f, 0.6f, 0.6f};
+        c[ImGuiCol_FrameBgActive] = {0.5f, 0.5f, 0.5f, 1.0f};
 
-        c[ImGuiCol_CheckMark] = { 0.f, 1.f, 0.f, 0.8f };
+        c[ImGuiCol_CheckMark] = {0.f, 1.f, 0.f, 0.8f};
 
-        c[ImGuiCol_Button] = { 0.f, 0.f, 0.f, 0.6f };
-        c[ImGuiCol_ButtonHovered] = { 0.6f, 0.6f, 0.6f, 0.6f };
-        c[ImGuiCol_ButtonActive] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        c[ImGuiCol_Button] = {0.f, 0.f, 0.f, 0.6f};
+        c[ImGuiCol_ButtonHovered] = {0.6f, 0.6f, 0.6f, 0.6f};
+        c[ImGuiCol_ButtonActive] = {0.5f, 0.5f, 0.5f, 1.0f};
 
-        c[ImGuiCol_Header] = { 0.5f, 0.5f, 0.5f, 0.4f };
-        c[ImGuiCol_HeaderHovered] = { 0.6f, 0.6f, 0.6f, 0.6f };
-        c[ImGuiCol_HeaderActive] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        c[ImGuiCol_Header] = {0.5f, 0.5f, 0.5f, 0.4f};
+        c[ImGuiCol_HeaderHovered] = {0.6f, 0.6f, 0.6f, 0.6f};
+        c[ImGuiCol_HeaderActive] = {0.5f, 0.5f, 0.5f, 1.0f};
 
-        c[ImGuiCol_Tab] = { 0.f, 0.f, 0.f, 0.6f };
-        c[ImGuiCol_TabHovered] = { 0.6f, 0.6f, 0.6f, 0.6f };
-        c[ImGuiCol_TabActive] = { 0.5f, 0.5f, 0.5f, 1.0f };
-        c[ImGuiCol_TabUnfocused] = { 0.f, 0.f, 0.f, 0.6f };
-        c[ImGuiCol_TabUnfocusedActive] = { 0.5f, 0.5f, 0.5f, 0.8f };
-
+        c[ImGuiCol_Tab] = {0.f, 0.f, 0.f, 0.6f};
+        c[ImGuiCol_TabHovered] = {0.6f, 0.6f, 0.6f, 0.6f};
+        c[ImGuiCol_TabActive] = {0.5f, 0.5f, 0.5f, 1.0f};
+        c[ImGuiCol_TabUnfocused] = {0.f, 0.f, 0.f, 0.6f};
+        c[ImGuiCol_TabUnfocusedActive] = {0.5f, 0.5f, 0.5f, 0.8f};
     }
 
     // further operations present in graphics_init()
@@ -131,9 +129,9 @@ int main(int argc, char* argv[])
         return sinit;
     SoundMgr::startUpdate();
 
-	// load input bindings
+    // load input bindings
     InputMgr::init();
-	InputMgr::updateDevices();
+    InputMgr::updateDevices();
 
     // reset globals
     ConfigMgr::setGlobals();
@@ -153,18 +151,25 @@ int main(int argc, char* argv[])
     ImFontConfig fontConfig;
     fontConfig.FontNo = fontIndex;
     ImFontAtlas& fontAtlas = *ImGui::GetIO().Fonts;
-    fontAtlas.AddFontFromFileTTF(imguiFontPath.u8string().c_str(), 24, &fontConfig, fontAtlas.GetGlyphRangesChineseFull());
+    fontAtlas.AddFontFromFileTTF(imguiFontPath.u8string().c_str(), 24, &fontConfig,
+                                 fontAtlas.GetGlyphRangesChineseFull());
 
     // etc
     SoundMgr::setVolume(SampleChannel::MASTER, (float)State::get(IndexSlider::VOLUME_MASTER));
     SoundMgr::setVolume(SampleChannel::KEY, (float)State::get(IndexSlider::VOLUME_KEY));
     SoundMgr::setVolume(SampleChannel::BGM, (float)State::get(IndexSlider::VOLUME_BGM));
     if (State::get(IndexSwitch::SOUND_FX0))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX0), 0, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX0), State::get(IndexSlider::FX0_P1), State::get(IndexSlider::FX0_P2));
+        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX0), 0,
+                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX0), State::get(IndexSlider::FX0_P1),
+                         State::get(IndexSlider::FX0_P2));
     if (State::get(IndexSwitch::SOUND_FX1))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX1), 1, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX1), State::get(IndexSlider::FX1_P1), State::get(IndexSlider::FX1_P2));
+        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX1), 1,
+                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX1), State::get(IndexSlider::FX1_P1),
+                         State::get(IndexSlider::FX1_P2));
     if (State::get(IndexSwitch::SOUND_FX2))
-        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX2), 2, (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX2), State::get(IndexSlider::FX2_P1), State::get(IndexSlider::FX2_P2));
+        SoundMgr::setDSP((DSPType)State::get(IndexOption::SOUND_FX2), 2,
+                         (SampleChannel)State::get(IndexOption::SOUND_TARGET_FX2), State::get(IndexSlider::FX2_P1),
+                         State::get(IndexSlider::FX2_P2));
     lr2skin::slider::updatePitchState(State::get(IndexNumber::PITCH));
     if (State::get(IndexSwitch::SOUND_EQ))
     {
@@ -288,7 +293,6 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
 
 void mainLoop()
 {

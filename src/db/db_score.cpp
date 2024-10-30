@@ -10,16 +10,17 @@
 
 #include <stdint.h>
 
-#include <common/assert.h>
+#include "common/hash.h"
 #include "common/log.h"
 #include "common/types.h"
-#include "common/hash.h"
 #include "db/db_conn.h"
+#include <common/assert.h>
 
 bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
 {
     static constexpr size_t SCORE_BMS_PARAM_COUNT = 21;
-    if (in.size() < SCORE_BMS_PARAM_COUNT) return false;
+    if (in.size() < SCORE_BMS_PARAM_COUNT)
+        return false;
 
     // md5 = ANY_STR(in.at(0));
     out.notes = ANY_INT(in.at(1));
@@ -47,7 +48,7 @@ bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
     return true;
 }
 
-ScoreDB::ScoreDB(const char* path): SQLite(path, "SCORE")
+ScoreDB::ScoreDB(const char* path) : SQLite(path, "SCORE")
 {
     initTables();
 }
@@ -58,7 +59,7 @@ void ScoreDB::deleteLegacyScoreBMS(const char* tableName, const HashMD5& hash)
 
     const auto hashStr = hash.hexdigest();
 
-    char sqlbuf[128] = { 0 };
+    char sqlbuf[128] = {0};
     snprintf(static_cast<char*>(sqlbuf), sizeof(sqlbuf) - 1, "DELETE FROM %s WHERE md5=?", tableName);
     ret = exec(static_cast<char*>(sqlbuf), {hashStr});
     if (ret != SQLITE_OK)
@@ -103,7 +104,7 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
         }
         else if (score.exscore == record.exscore)
         {
-            if (score.maxcombo > record.maxcombo || score.bp < record.bp || (int)score.lamp >(int)record.lamp)
+            if (score.maxcombo > record.maxcombo || score.bp < record.bp || (int)score.lamp > (int)record.lamp)
                 record.replayFileName = score.replayFileName;
         }
 
@@ -119,25 +120,31 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
             record.lamp = score.lamp;
         }
 
-        char sqlbuf[224] = { 0 };
-        sprintf(sqlbuf, "UPDATE %s SET notes=?,score=?,rate=?,fast=?,slow=?,maxcombo=?,addtime=?,pc=?,clearcount=?,exscore=?,lamp=?,"
-            "pgreat=?,great=?,good=?,bad=?,bpoor=?,miss=?,bp=?,cb=?,replay=? WHERE md5=?", tableName);
-        ret = exec(sqlbuf,
-            { record.notes, record.score, record.rate, record.fast, record.slow,
-            record.maxcombo, score.addtime, record.playcount, record.clearcount, record.exscore, (int)record.lamp,
-            record.pgreat, record.great, record.good, record.bad, record.kpoor, record.miss, record.bp, record.combobreak, record.replayFileName,
-            hashStr });
+        char sqlbuf[224] = {0};
+        sprintf(sqlbuf,
+                "UPDATE %s SET "
+                "notes=?,score=?,rate=?,fast=?,slow=?,maxcombo=?,addtime=?,pc=?,clearcount=?,exscore=?,lamp=?,"
+                "pgreat=?,great=?,good=?,bad=?,bpoor=?,miss=?,bp=?,cb=?,replay=? WHERE md5=?",
+                tableName);
+        ret = exec(sqlbuf, {record.notes,     record.score,  record.rate,      record.fast,       record.slow,
+                            record.maxcombo,  score.addtime, record.playcount, record.clearcount, record.exscore,
+                            (int)record.lamp, record.pgreat, record.great,     record.good,       record.bad,
+                            record.kpoor,     record.miss,   record.bp,        record.combobreak, record.replayFileName,
+                            hashStr});
     }
     else
     {
-        char sqlbuf[224] = { 0 };
-        sprintf(sqlbuf, "INSERT INTO %s(md5,notes,score,rate,fast,slow,maxcombo,addtime,pc,clearcount,exscore,lamp,"
-            "pgreat,great,good,bad,bpoor,miss,bp,cb,replay) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", tableName);
-        ret = exec(sqlbuf,
-            { hashStr,
-            score.notes, score.score, score.rate, score.fast, score.slow,
-            score.maxcombo, score.addtime, score.playcount, score.clearcount, score.exscore, (int)score.lamp,
-            score.pgreat, score.great, score.good, score.bad, score.kpoor, score.miss, score.bp, score.combobreak, score.replayFileName });
+        char sqlbuf[224] = {0};
+        sprintf(sqlbuf,
+                "INSERT INTO %s(md5,notes,score,rate,fast,slow,maxcombo,addtime,pc,clearcount,exscore,lamp,"
+                "pgreat,great,good,bad,bpoor,miss,bp,cb,replay) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                tableName);
+        ret = exec(
+            sqlbuf,
+            {hashStr,        score.notes,      score.score,         score.rate,       score.fast,    score.slow,
+             score.maxcombo, score.addtime,    score.playcount,     score.clearcount, score.exscore, (int)score.lamp,
+             score.pgreat,   score.great,      score.good,          score.bad,        score.kpoor,   score.miss,
+             score.bp,       score.combobreak, score.replayFileName});
     }
     if (ret != SQLITE_OK)
     {
@@ -145,9 +152,9 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
         LVF_DEBUG_ASSERT(false && "upserting legacy score failed");
     }
 
-    char sqlbuf[96] = { 0 };
+    char sqlbuf[96] = {0};
     sprintf(sqlbuf, "SELECT * FROM %s WHERE md5=?", tableName);
-    auto result = query(sqlbuf, { hashStr });
+    auto result = query(sqlbuf, {hashStr});
     LVF_DEBUG_ASSERT(!result.empty());
     const auto& r = result[0];
     auto scoreRefetched = std::make_shared<ScoreBMS>();
@@ -250,7 +257,8 @@ std::vector<std::pair<HashMD5, ScoreBMS>> ScoreDB::fetchCachedPbBMSImpl(const st
 std::shared_ptr<ScoreBMS> ScoreDB::fetchCachedPbBMS(const HashMD5& hash) const
 {
     const auto scores = fetchCachedPbBMSImpl("WHERE md5 = ?", {hash.hexdigest()});
-    if (scores.empty()) return nullptr;
+    if (scores.empty())
+        return nullptr;
     LVF_DEBUG_ASSERT(scores.size() == 1);
     return std::make_shared<ScoreBMS>(scores[0].second);
 }
@@ -345,7 +353,8 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
 static bool convertHistoryScoreBms(ScoreBMS& out, const std::vector<std::any>& score) noexcept
 try
 {
-    if (score.size() < 19) return false;
+    if (score.size() < 19)
+        return false;
     // md5 = ANY_STR(score[0]);
     out.notes = ANY_INT(score[1]);
     out.score = ANY_INT(score[2]);

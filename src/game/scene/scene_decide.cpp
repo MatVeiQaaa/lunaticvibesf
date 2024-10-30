@@ -4,8 +4,8 @@
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
 
-#include "game/arena/arena_data.h"
 #include "common/log.h"
+#include "game/arena/arena_data.h"
 
 SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::DECIDE, 1000)
 {
@@ -40,7 +40,8 @@ SceneDecide::~SceneDecide()
 
 void SceneDecide::_updateAsync()
 {
-    if (gNextScene != SceneType::DECIDE) return;
+    if (gNextScene != SceneType::DECIDE)
+        return;
 
     if (gAppIsExiting)
     {
@@ -92,7 +93,8 @@ void SceneDecide::updateCancel()
 void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
     const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
-    if (rt < pSkin->info.timeIntro) return;
+    if (rt < pSkin->info.timeIntro)
+        return;
 
     const auto k = _inputAvailable & m;
     if ((k & INPUT_MASK_DECIDE).any() && rt >= pSkin->info.timeDecideSkip)
@@ -134,7 +136,8 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 {
     const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
-    if (rt < pSkin->info.timeIntro) return;
+    if (rt < pSkin->info.timeIntro)
+        return;
 
     const auto k = _inputAvailable & m;
 
@@ -162,5 +165,6 @@ void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 void SceneDecide::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 {
     const unsigned rt = (t - State::get(IndexTimer::SCENE_START)).norm();
-    if (rt < pSkin->info.timeIntro) return;
+    if (rt < pSkin->info.timeIntro)
+        return;
 }

@@ -50,11 +50,10 @@ void SkinBase::update()
         State::set(IndexNumber::_TEST3, (int)(gUpdateContext.metre * 1000));
     }
 
-    auto updateSpriteLambda = [](const std::shared_ptr<SpriteBase>& s)
-    {
+    auto updateSpriteLambda = [](const std::shared_ptr<SpriteBase>& s) {
         // reset
         s->_draw = false;
-		s->update(gUpdateContext.updateTime);
+        s->update(gUpdateContext.updateTime);
     };
 
     std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(), updateSpriteLambda);
@@ -65,11 +64,10 @@ void SkinBase::update_mouse(int x, int y)
     if (!handleMouseEvents)
     {
         x = -99999999;
-        y = -99999999;  // LUL
+        y = -99999999; // LUL
     }
 
-    auto clickSpriteLambda = [x, y](const std::shared_ptr<SpriteBase>& s)
-    {
+    auto clickSpriteLambda = [x, y](const std::shared_ptr<SpriteBase>& s) {
         if (s->isDraw() && !s->isHidden())
         {
             auto pS = std::dynamic_pointer_cast<iSpriteMouse>(s);
@@ -83,19 +81,20 @@ void SkinBase::update_mouse(int x, int y)
 
 void SkinBase::update_mouse_click(int x, int y)
 {
-    if (!handleMouseEvents) return;
+    if (!handleMouseEvents)
+        return;
 
     // sprite inserted last has priority
     bool invoked = false;
     pSpriteLastClicked = nullptr;
 
-    if(lunaticvibes::g_enable_show_clicked_sprite)
+    if (lunaticvibes::g_enable_show_clicked_sprite)
     {
         for (auto it = _sprites.rbegin(); it != _sprites.rend() && !invoked; ++it)
         {
             if ((*it)->type() != SpriteTypes::MOUSE_CURSOR && (*it)->isDraw() && !(*it)->isHidden())
             {
-                const RectF &rc = (*it)->_current.rect;
+                const RectF& rc = (*it)->_current.rect;
                 if (x >= rc.x && y >= rc.y && x < rc.x + rc.w && y < rc.y + rc.h)
                 {
                     createNotification((boost::format("Clicked sprite #%d (%d,%d)[%dx%d] (Line:%d)") %
@@ -137,7 +136,8 @@ void SkinBase::update_mouse_click(int x, int y)
 
 void SkinBase::update_mouse_drag(int x, int y)
 {
-    if (!handleMouseEvents) return;
+    if (!handleMouseEvents)
+        return;
 
     if (pSpriteDragging != nullptr)
     {

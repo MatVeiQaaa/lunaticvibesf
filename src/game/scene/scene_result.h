@@ -1,8 +1,8 @@
 #pragma once
-#include <memory>
-#include <mutex>
 #include "game/skin/skin_mgr.h"
 #include "scene.h"
+#include <memory>
+#include <mutex>
 
 class ScoreBase;
 enum class eResultState

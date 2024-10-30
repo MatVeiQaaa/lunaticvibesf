@@ -11,40 +11,41 @@
 
 namespace bms
 {
-    const unsigned MAXSAMPLEIDX = 36 * 36;
-    const unsigned MAXBARIDX = 999;
-    enum class ErrorCode
-    {
-        OK = 0,
-        FILE_ERROR = 1,
-        ALREADY_INITIALIZED,
-        VALUE_ERROR,
-        TYPE_MISMATCH,
-        NOTE_LINE_ERROR,
-    };
-    enum class LaneCode
-    {
-        BGM = 0,
-        BPM,
-        EXBPM,
-        STOP,
-        BGABASE,
-        BGALAYER,
-        BGAPOOR,
-        NOTE1,
-        NOTE2,
-        NOTEINV1,
-        NOTEINV2,
-        NOTELN1,
-        NOTELN2,
-        NOTEMINE1,
-        NOTEMINE2,
-    };
-}
+const unsigned MAXSAMPLEIDX = 36 * 36;
+const unsigned MAXBARIDX = 999;
+enum class ErrorCode
+{
+    OK = 0,
+    FILE_ERROR = 1,
+    ALREADY_INITIALIZED,
+    VALUE_ERROR,
+    TYPE_MISMATCH,
+    NOTE_LINE_ERROR,
+};
+enum class LaneCode
+{
+    BGM = 0,
+    BPM,
+    EXBPM,
+    STOP,
+    BGABASE,
+    BGALAYER,
+    BGAPOOR,
+    NOTE1,
+    NOTE2,
+    NOTEINV1,
+    NOTEINV2,
+    NOTELN1,
+    NOTELN2,
+    NOTEMINE1,
+    NOTEMINE2,
+};
+} // namespace bms
 
 using namespace bms;
 
-namespace lunaticvibes::parser_bms {
+namespace lunaticvibes::parser_bms
+{
 
 enum class JudgeDifficulty : uint8_t
 {
@@ -67,7 +68,7 @@ class ChartFormatBMSMeta : public ChartFormatBase
 public:
     // File properties.
     // Header.
-    int player = 0;                // 1: single, 2: couple, 3: double, 4: battle
+    int player = 0; // 1: single, 2: couple, 3: double, 4: battle
     int raw_rank = -1;
     int total = -1;
     double bpm = 130.0;
@@ -109,7 +110,7 @@ public:
 };
 
 // the size of parsing result is kinda large..
-class ChartFormatBMS: public ChartFormatBMSMeta
+class ChartFormatBMS : public ChartFormatBMSMeta
 {
     friend class SceneSelect;
     friend class SongDB;
@@ -127,7 +128,8 @@ protected:
     int errorLine;
 
 public:
-    struct channel {
+    struct channel
+    {
         struct NoteParseValue
         {
             unsigned segment;
@@ -148,8 +150,8 @@ public:
         void imbue(channel& c);
         void sortNotes();
     };
-    typedef std::map<unsigned, channel> LaneMap;    // bar -> channel
-    
+    typedef std::map<unsigned, channel> LaneMap; // bar -> channel
+
 protected:
     // Lanes.
     int seqToLane36(channel&, StringContentView str, unsigned flags = 0);
@@ -162,8 +164,8 @@ protected:
     LaneMap chBGABase{};
     LaneMap chBGALayer{};
     LaneMap chBGAPoor{};
-    
-    std::map<unsigned, LaneMap> chNotesRegular{};   // lane -> [bar -> channel]
+
+    std::map<unsigned, LaneMap> chNotesRegular{}; // lane -> [bar -> channel]
     std::map<unsigned, LaneMap> chNotesInvisible{};
     std::map<unsigned, LaneMap> chNotesLN{};
     std::map<unsigned, LaneMap> chMines{};

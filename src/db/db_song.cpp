@@ -4,13 +4,13 @@
 #include <thread>
 #include <vector>
 
-#include <common/assert.h>
 #include "common/chartformat/chartformat_types.h"
 #include "common/hash.h"
 #include "common/log.h"
 #include "common/sysutil.h"
 #include "common/utils.h"
 #include "game/chart/chart_types.h"
+#include <common/assert.h>
 
 #include <re2/re2.h>
 
@@ -19,52 +19,50 @@
 #include <boost/asio/thread_pool.hpp>
 
 // TODO: NOT NULL everything.
-const char* CREATE_FOLDER_TABLE_STR =
-"CREATE TABLE IF NOT EXISTS folder( "
-"pathmd5 TEXT PRIMARY KEY UNIQUE NOT NULL, "
-"parent TEXT, "
-"name TEXT, "
-"type INTEGER NOT NULL DEFAULT 0, "
-"path TEXT NOT NULL,"
-"modtime INTEGER"
-");";
+const char* CREATE_FOLDER_TABLE_STR = "CREATE TABLE IF NOT EXISTS folder( "
+                                      "pathmd5 TEXT PRIMARY KEY UNIQUE NOT NULL, "
+                                      "parent TEXT, "
+                                      "name TEXT, "
+                                      "type INTEGER NOT NULL DEFAULT 0, "
+                                      "path TEXT NOT NULL,"
+                                      "modtime INTEGER"
+                                      ");";
 
 // TODO: backbmp
 // TODO: NOT NULL everything.
-const char* CREATE_SONG_TABLE_STR =
-"CREATE TABLE IF NOT EXISTS song("
-"md5 TEXT NOT NULL, "           // 0
-"parent TEXT NOT NULL, "        // 1
-"file TEXT NOT NULL, "          // 2
-"type INTEGER NOT NULL, "       // 3
-"title TEXT NOT NULL, "         // 4
-"title2 TEXT NOT NULL, "        // 5
-"artist TEXT NOT NULL, "        // 6
-"artist2 TEXT NOT NULL, "       // 7
-"genre TEXT NOT NULL, "         // 8
-"version TEXT NOT NULL, "       // 9
-"level REAL NOT NULL, "         // 10
-"bpm REAL NOT NULL, "           // 11
-"minbpm REAL NOT NULL, "        // 12
-"maxbpm REAL NOT NULL, "        // 13
-"length INTEGER NOT NULL, "     // 14
-"totalnotes INTEGER NOT NULL, " // 15
-"stagefile TEXT, "             // 16
-"bannerfile TEXT, "            // 17
-"gamemode INTEGER, "           // 18
-"judgerank INTEGER, "          // 19
-"total INTEGER, "              // 20
-"playlevel INTEGER, "          // 21
-"difficulty INTEGER, "         // 22
-"longnote INTEGER, "           // 23
-"landmine INTEGER, "           // 24
-"metricmod INTEGER, "          // 25
-"stop INTEGER, "               // 26
-"bga INTEGER, "                // 27
-"random INTEGER, "             // 28
-"addtime INTEGER, "            // 29
-"CONSTRAINT pk_pf PRIMARY KEY (parent,file) "
-");";
+const char* CREATE_SONG_TABLE_STR = "CREATE TABLE IF NOT EXISTS song("
+                                    "md5 TEXT NOT NULL, "           // 0
+                                    "parent TEXT NOT NULL, "        // 1
+                                    "file TEXT NOT NULL, "          // 2
+                                    "type INTEGER NOT NULL, "       // 3
+                                    "title TEXT NOT NULL, "         // 4
+                                    "title2 TEXT NOT NULL, "        // 5
+                                    "artist TEXT NOT NULL, "        // 6
+                                    "artist2 TEXT NOT NULL, "       // 7
+                                    "genre TEXT NOT NULL, "         // 8
+                                    "version TEXT NOT NULL, "       // 9
+                                    "level REAL NOT NULL, "         // 10
+                                    "bpm REAL NOT NULL, "           // 11
+                                    "minbpm REAL NOT NULL, "        // 12
+                                    "maxbpm REAL NOT NULL, "        // 13
+                                    "length INTEGER NOT NULL, "     // 14
+                                    "totalnotes INTEGER NOT NULL, " // 15
+                                    "stagefile TEXT, "              // 16
+                                    "bannerfile TEXT, "             // 17
+                                    "gamemode INTEGER, "            // 18
+                                    "judgerank INTEGER, "           // 19
+                                    "total INTEGER, "               // 20
+                                    "playlevel INTEGER, "           // 21
+                                    "difficulty INTEGER, "          // 22
+                                    "longnote INTEGER, "            // 23
+                                    "landmine INTEGER, "            // 24
+                                    "metricmod INTEGER, "           // 25
+                                    "stop INTEGER, "                // 26
+                                    "bga INTEGER, "                 // 27
+                                    "random INTEGER, "              // 28
+                                    "addtime INTEGER, "             // 29
+                                    "CONSTRAINT pk_pf PRIMARY KEY (parent,file) "
+                                    ");";
 static constexpr size_t SONG_PARAM_COUNT = 30;
 struct song_all_params
 {
@@ -104,75 +102,76 @@ struct song_all_params
         if (queryResult.size() < SONG_PARAM_COUNT)
             return;
 
-        md5         = ANY_STR(queryResult[0]);
-        parent      = ANY_STR(queryResult[1]);
-        file        = ANY_STR(queryResult[2]);
-        type        = ANY_INT(queryResult[3]);
-        title       = ANY_STR(queryResult[4]);
-        title2      = ANY_STR(queryResult[5]);
-        artist      = ANY_STR(queryResult[6]);
-        artist2     = ANY_STR(queryResult[7]);
-        genre       = ANY_STR(queryResult[8]);
-        version     = ANY_STR(queryResult[9]);
-        level       = ANY_REAL(queryResult[10]);
-        bpm         = ANY_REAL(queryResult[11]);
-        minbpm      = ANY_REAL(queryResult[12]);
-        maxbpm      = ANY_REAL(queryResult[13]);
-        length      = ANY_INT(queryResult[14]);
-        totalnotes  = ANY_INT(queryResult[15]);
-        stagefile   = ANY_STR(queryResult[16]);
-        bannerfile  = ANY_STR(queryResult[17]);
-        gamemode    = ANY_INT(queryResult[18]);
-        judgerank   = ANY_INT(queryResult[19]);
-        total       = ANY_INT(queryResult[20]);
-        playlevel   = ANY_INT(queryResult[21]);
-        difficulty  = ANY_INT(queryResult[22]);
-        longnote    = ANY_INT(queryResult[23]);
-        landmine    = ANY_INT(queryResult[24]);
-        metricmod   = ANY_INT(queryResult[25]);
-        stop        = ANY_INT(queryResult[26]);
-        bga         = ANY_INT(queryResult[27]);
-        random      = ANY_INT(queryResult[28]);
-        addtime     = ANY_INT(queryResult[29]);
+        md5 = ANY_STR(queryResult[0]);
+        parent = ANY_STR(queryResult[1]);
+        file = ANY_STR(queryResult[2]);
+        type = ANY_INT(queryResult[3]);
+        title = ANY_STR(queryResult[4]);
+        title2 = ANY_STR(queryResult[5]);
+        artist = ANY_STR(queryResult[6]);
+        artist2 = ANY_STR(queryResult[7]);
+        genre = ANY_STR(queryResult[8]);
+        version = ANY_STR(queryResult[9]);
+        level = ANY_REAL(queryResult[10]);
+        bpm = ANY_REAL(queryResult[11]);
+        minbpm = ANY_REAL(queryResult[12]);
+        maxbpm = ANY_REAL(queryResult[13]);
+        length = ANY_INT(queryResult[14]);
+        totalnotes = ANY_INT(queryResult[15]);
+        stagefile = ANY_STR(queryResult[16]);
+        bannerfile = ANY_STR(queryResult[17]);
+        gamemode = ANY_INT(queryResult[18]);
+        judgerank = ANY_INT(queryResult[19]);
+        total = ANY_INT(queryResult[20]);
+        playlevel = ANY_INT(queryResult[21]);
+        difficulty = ANY_INT(queryResult[22]);
+        longnote = ANY_INT(queryResult[23]);
+        landmine = ANY_INT(queryResult[24]);
+        metricmod = ANY_INT(queryResult[25]);
+        stop = ANY_INT(queryResult[26]);
+        bga = ANY_INT(queryResult[27]);
+        random = ANY_INT(queryResult[28]);
+        addtime = ANY_INT(queryResult[29]);
     }
 };
 bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::vector<std::any>& in)
 {
-    if (in.size() < 30) return false;
+    if (in.size() < 30)
+        return false;
 
     song_all_params params(in);
     chart->fileHash = HashMD5{params.md5};
     chart->folderHash = HashMD5{params.parent};
-    chart->fileName       = PathFromUTF8(params.file);
+    chart->fileName = PathFromUTF8(params.file);
     //                        params.type       ;
-    chart->title          = params.title      ;
-    chart->title2         = params.title2     ;
-    chart->artist         = params.artist     ;
-    chart->artist2        = params.artist2    ;
-    chart->genre          = params.genre      ;
-    chart->version        = params.version    ;
-    chart->levelEstimated = params.level      ;
-    chart->startBPM       = params.bpm        ;
-    chart->minBPM         = params.minbpm     ;
-    chart->maxBPM         = params.maxbpm     ;
-    chart->totalLength    = params.length     ;
-    chart->totalNotes     = params.totalnotes ;
-    chart->stagefile      = params.stagefile  ;
-    chart->banner         = params.bannerfile ;
-    chart->gamemode       = params.gamemode   ;
-    chart->raw_rank       = params.judgerank;
-    chart->rank           = lunaticvibes::parser_bms::parse_rank(params.judgerank);
-    chart->total          = params.total      ;
-    chart->playLevel      = params.playlevel  ;
-    chart->difficulty     = params.difficulty ;
-    chart->haveLN         = params.longnote   ;
-    chart->haveMine       = params.landmine   ;
-    chart->haveMetricMod  = params.metricmod  ;
-    chart->haveStop       = params.stop       ;
-    chart->haveBPMChange  = params.maxbpm != params.minbpm;
-    chart->haveBGA        = params.bga        ;
-    chart->haveRandom     = params.random     ;
-    chart->addTime        = params.addtime    ;
+    chart->title = params.title;
+    chart->title2 = params.title2;
+    chart->artist = params.artist;
+    chart->artist2 = params.artist2;
+    chart->genre = params.genre;
+    chart->version = params.version;
+    chart->levelEstimated = params.level;
+    chart->startBPM = params.bpm;
+    chart->minBPM = params.minbpm;
+    chart->maxBPM = params.maxbpm;
+    chart->totalLength = params.length;
+    chart->totalNotes = params.totalnotes;
+    chart->stagefile = params.stagefile;
+    chart->banner = params.bannerfile;
+    chart->gamemode = params.gamemode;
+    chart->raw_rank = params.judgerank;
+    chart->rank = lunaticvibes::parser_bms::parse_rank(params.judgerank);
+    chart->total = params.total;
+    chart->playLevel = params.playlevel;
+    chart->difficulty = params.difficulty;
+    chart->haveLN = params.longnote;
+    chart->haveMine = params.landmine;
+    chart->haveMetricMod = params.metricmod;
+    chart->haveStop = params.stop;
+    chart->haveBPMChange = params.maxbpm != params.minbpm;
+    chart->haveBGA = params.bga;
+    chart->haveRandom = params.random;
+    chart->addTime = params.addtime;
 
     if (chart->totalNotes > 0)
     {
@@ -182,7 +181,6 @@ bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::ve
 
     return true;
 }
-
 
 SongDB::SongDB(const char* path) : SQLite(path, "SONG")
 {
@@ -198,16 +196,15 @@ SongDB::SongDB(const char* path) : SQLite(path, "SONG")
         LOG_ERROR << "[SongDB] Create table folder ERROR! " << errmsg();
         abort();
     }
-    if (query("SELECT parent FROM folder WHERE pathmd5=?", { ROOT_FOLDER_HASH.hexdigest()}).empty())
+    if (query("SELECT parent FROM folder WHERE pathmd5=?", {ROOT_FOLDER_HASH.hexdigest()}).empty())
     {
-        if (exec("INSERT INTO folder(pathmd5,parent,path,name,type,modtime) VALUES(?,?,?,?,?,?)", 
-            { ROOT_FOLDER_HASH.hexdigest(), nullptr, "", "ROOT", 0, 0}))
+        if (exec("INSERT INTO folder(pathmd5,parent,path,name,type,modtime) VALUES(?,?,?,?,?,?)",
+                 {ROOT_FOLDER_HASH.hexdigest(), nullptr, "", "ROOT", 0, 0}))
         {
             LOG_ERROR << "[SongDB] Insert root folder to table ERROR! " << errmsg();
             abort();
         }
     }
-    
 
     if (exec(CREATE_SONG_TABLE_STR) != SQLITE_OK)
     {
@@ -232,7 +229,6 @@ SongDB::SongDB(const char* path) : SQLite(path, "SONG")
     {
         LOG_ERROR << "[SongDB] Create gamemode index for song ERROR! " << errmsg();
     }
-
 }
 
 SongDB::~SongDB()
@@ -246,8 +242,7 @@ SongDB::~SongDB()
 
 bool SongDB::addChart(const HashMD5& folder, const Path& path)
 {
-    auto closure = [&]() -> bool
-    {
+    auto closure = [&]() -> bool {
         decltype(path.filename().u8string()) filename;
         try
         {
@@ -259,11 +254,11 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
             return false;
         }
 
-        if (auto result = query("SELECT md5 FROM song WHERE parent=? AND file=?",
-            { folder.hexdigest(), filename }); !result.empty() && !result[0].empty())
+        if (auto result = query("SELECT md5 FROM song WHERE parent=? AND file=?", {folder.hexdigest(), filename});
+            !result.empty() && !result[0].empty())
         {
             // check if file exists in db
-            const HashMD5 dbmd5 {ANY_STR(result[0][0])};
+            const HashMD5 dbmd5{ANY_STR(result[0][0])};
             const HashMD5 filemd5 = md5file(path);
             if (dbmd5 == filemd5)
             {
@@ -297,52 +292,47 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
 
         switch (c->type())
         {
-        case eChartFormat::UNKNOWN:
-            LOG_ERROR << "eChartFormat::UNKNOWN";
-            break;
-        case eChartFormat::BMS:
-        {
+        case eChartFormat::UNKNOWN: LOG_ERROR << "eChartFormat::UNKNOWN"; break;
+        case eChartFormat::BMS: {
             auto bmsc = std::dynamic_pointer_cast<ChartFormatBMS>(c);
             LVF_DEBUG_ASSERT(bmsc != nullptr);
             if (SQLITE_OK == exec("INSERT INTO song("
-                "md5,parent,type,file,title,title2,artist,artist2,genre,version,"
-                "level,bpm,minbpm,maxbpm,length,totalnotes,stagefile,bannerfile,gamemode,judgerank,"
-                "total,playlevel,difficulty,longnote,landmine,metricmod,stop,bga,random,addtime) "
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
-                {
-                    c->fileHash.hexdigest(),
-                    folder.hexdigest(),
-                    int(c->type()),
-                    c->fileName.filename().u8string(),
-                    c->title,
-                    c->title2,
-                    c->artist,
-                    c->artist2,
-                    c->genre,
-                    c->version,
+                                  "md5,parent,type,file,title,title2,artist,artist2,genre,version,"
+                                  "level,bpm,minbpm,maxbpm,length,totalnotes,stagefile,bannerfile,gamemode,judgerank,"
+                                  "total,playlevel,difficulty,longnote,landmine,metricmod,stop,bga,random,addtime) "
+                                  "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
+                                  {c->fileHash.hexdigest(),
+                                   folder.hexdigest(),
+                                   int(c->type()),
+                                   c->fileName.filename().u8string(),
+                                   c->title,
+                                   c->title2,
+                                   c->artist,
+                                   c->artist2,
+                                   c->genre,
+                                   c->version,
 
-                    c->levelEstimated,
-                    c->startBPM,
-                    c->minBPM,
-                    c->maxBPM,
-                    s->getTotalLength().norm() / 1000,
-                    static_cast<int>(s->getNoteTotalCount()),
-                    c->stagefile,
-                    c->banner,
-                    bmsc->gamemode,
-                    bmsc->raw_rank,
+                                   c->levelEstimated,
+                                   c->startBPM,
+                                   c->minBPM,
+                                   c->maxBPM,
+                                   s->getTotalLength().norm() / 1000,
+                                   static_cast<int>(s->getNoteTotalCount()),
+                                   c->stagefile,
+                                   c->banner,
+                                   bmsc->gamemode,
+                                   bmsc->raw_rank,
 
-                    bmsc->total,
-                    bmsc->playLevel,
-                    bmsc->difficulty,
-                    bmsc->haveLN,
-                    bmsc->haveMine,
-                    bmsc->haveMetricMod,
-                    bmsc->haveStop,
-                    bmsc->haveBGA,
-                    bmsc->haveRandom,
-                    getFileTimeNow()
-                }))
+                                   bmsc->total,
+                                   bmsc->playLevel,
+                                   bmsc->difficulty,
+                                   bmsc->haveLN,
+                                   bmsc->haveMine,
+                                   bmsc->haveMetricMod,
+                                   bmsc->haveStop,
+                                   bmsc->haveBGA,
+                                   bmsc->haveRandom,
+                                   getFileTimeNow()}))
             {
                 return true;
             }
@@ -353,16 +343,15 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
             }
             break;
         }
-        case eChartFormat::BMSON:
-            LOG_ERROR << "eChartFormat::BMSON";
-            break;
+        case eChartFormat::BMSON: LOG_ERROR << "eChartFormat::BMSON"; break;
         }
 
         return false;
     };
 
     bool ret = closure();
-    if (ret) addChartSuccess++;
+    if (ret)
+        addChartSuccess++;
 
     addChartTaskFinishCount++;
     return ret;
@@ -370,7 +359,8 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
 
 bool SongDB::removeChart(const Path& path, const HashMD5& parent)
 {
-    if (SQLITE_OK != exec("DELETE FROM song WHERE file=? AND parent=?", { path.filename().u8string(), parent.hexdigest()}))
+    if (SQLITE_OK !=
+        exec("DELETE FROM song WHERE file=? AND parent=?", {path.filename().u8string(), parent.hexdigest()}))
     {
         LOG_WARNING << "[SongDB] Delete chart from db error: " << path << ": " << errmsg();
         return false;
@@ -380,7 +370,7 @@ bool SongDB::removeChart(const Path& path, const HashMD5& parent)
 
 bool SongDB::removeChart(const HashMD5& md5, const HashMD5& parent)
 {
-    if (SQLITE_OK != exec("DELETE FROM song WHERE md5=? AND parent=?", { md5.hexdigest(), parent.hexdigest()}))
+    if (SQLITE_OK != exec("DELETE FROM song WHERE md5=? AND parent=?", {md5.hexdigest(), parent.hexdigest()}))
     {
         LOG_WARNING << "[SongDB] Delete chart from db error: " << md5.hexdigest() << ": " << errmsg();
         return false;
@@ -388,13 +378,13 @@ bool SongDB::removeChart(const HashMD5& md5, const HashMD5& parent)
     return true;
 }
 
-std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const HashMD5& folder, const std::string& tagRaw, unsigned limit) const
+std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const HashMD5& folder, const std::string& tagRaw,
+                                                                      unsigned limit) const
 {
     LOG_INFO << "[SongDB] Search for songs matching: " << tagRaw;
 
     std::string tag = tagRaw;
-    static const std::pair<RE2, re2::StringPiece> search_replace_pattern[]
-    {
+    static const std::pair<RE2, re2::StringPiece> search_replace_pattern[]{
         {"%", "\\\\%"},
         {"_", "\\\\_"},
     };
@@ -405,15 +395,15 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
 
     std::stringstream ss;
     ss << "SELECT * FROM song WHERE ";
-    if (folder != ROOT_FOLDER_HASH) 
+    if (folder != ROOT_FOLDER_HASH)
         ss << "parent=" << folder.hexdigest() << " AND ";
     ss << "(title   LIKE '%' || ? || '%' ESCAPE '\\' OR "
-        << "title2  LIKE '%' || ? || '%' ESCAPE '\\' OR "
-        << "artist  LIKE '%' || ? || '%' ESCAPE '\\' OR "
-        << "artist2 LIKE '%' || ? || '%' ESCAPE '\\' OR "
-        << "genre   LIKE '%' || ? || '%' ESCAPE '\\' OR "
-        << "version LIKE '%' || ? || '%' ESCAPE '\\' )";
-    if (limit > 0) 
+       << "title2  LIKE '%' || ? || '%' ESCAPE '\\' OR "
+       << "artist  LIKE '%' || ? || '%' ESCAPE '\\' OR "
+       << "artist2 LIKE '%' || ? || '%' ESCAPE '\\' OR "
+       << "genre   LIKE '%' || ? || '%' ESCAPE '\\' OR "
+       << "version LIKE '%' || ? || '%' ESCAPE '\\' )";
+    if (limit > 0)
         ss << " LIMIT " << limit;
 
     std::string strSql = ss.str();
@@ -424,8 +414,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByName(const Hash
     {
         switch (eChartFormat(ANY_INT(r[3])))
         {
-        case eChartFormat::BMS:
-        {
+        case eChartFormat::BMS: {
             auto p = std::make_shared<ChartFormatBMSMeta>();
             if (convert_bms(p, r))
             {
@@ -466,42 +455,41 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
         return ret;
     }
     for (const auto& index : songQueryHashMap.at(target))
-    try
-    {
-        const auto& r = songQueryPool[index];
-        switch (eChartFormat(ANY_INT(r[3])))
+        try
         {
-        case eChartFormat::BMS:
-        {
-            auto p = std::make_shared<ChartFormatBMSMeta>();
-            if (convert_bms(p, r))
+            const auto& r = songQueryPool[index];
+            switch (eChartFormat(ANY_INT(r[3])))
             {
-                if (p->fileName.is_absolute())
+            case eChartFormat::BMS: {
+                auto p = std::make_shared<ChartFormatBMSMeta>();
+                if (convert_bms(p, r))
                 {
-                    p->absolutePath = p->fileName;
-                    ret.push_back(p);
-                }
-                else
-                {
-                    const auto [hasFolderPath, folderPath] = getFolderPath(p->folderHash);
-                    if (hasFolderPath)
+                    if (p->fileName.is_absolute())
                     {
-                        p->absolutePath = folderPath / p->fileName;
+                        p->absolutePath = p->fileName;
                         ret.push_back(p);
                     }
+                    else
+                    {
+                        const auto [hasFolderPath, folderPath] = getFolderPath(p->folderHash);
+                        if (hasFolderPath)
+                        {
+                            p->absolutePath = folderPath / p->fileName;
+                            ret.push_back(p);
+                        }
+                    }
                 }
+                break;
             }
-            break;
-        }
 
-        default: break;
+            default: break;
+            }
         }
-    }
-    // TODO: remove after adding NOT NULL to every table field.
-    catch (const std::bad_any_cast& e)
-    {
-        LOG_ERROR << "std::bad_any_cast: " << e.what();
-    }
+        // TODO: remove after adding NOT NULL to every table field.
+        catch (const std::bad_any_cast& e)
+        {
+            LOG_ERROR << "std::bad_any_cast: " << e.what();
+        }
 
     if (checksum)
     {
@@ -527,7 +515,8 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
 }
 
 // chart may duplicate, return all found
-std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const HashMD5& folder, unsigned long long addTime) const
+std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const HashMD5& folder,
+                                                                        unsigned long long addTime) const
 {
     LOG_DEBUG << "[SongDB] Search from epoch time " << addTime;
 
@@ -538,15 +527,14 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
     ss << "addtime>=?";
 
     std::string strSql = ss.str();
-    auto result = query(strSql.c_str(), { (long long)addTime });
+    auto result = query(strSql.c_str(), {(long long)addTime});
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
     for (const auto& r : result)
     {
         switch (eChartFormat(ANY_INT(r[3])))
         {
-        case eChartFormat::BMS:
-        {
+        case eChartFormat::BMS: {
             auto p = std::make_shared<ChartFormatBMSMeta>();
             if (convert_bms(p, r))
             {
@@ -574,9 +562,7 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartFromTime(const Ha
 
     LOG_DEBUG << "[SongDB] Found " << ret.size() << " songs";
     return ret;
-
 }
-
 
 void SongDB::prepareCache()
 {
@@ -598,7 +584,7 @@ void SongDB::prepareCache()
     for (auto& row : query("SELECT * FROM folder"))
     {
         folderQueryHashMap[HashMD5(ANY_STR(row[0]))].push_back(count);
-        if (row[1].has_value()) 
+        if (row[1].has_value())
             folderQueryParentMap[HashMD5(ANY_STR(row[1]))].push_back(count);
         folderQueryPool.push_back(std::move(row));
         count++;
@@ -626,20 +612,19 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
 
     bool inAddFolderSession = true;
     transactionStart();
-    sessionFuture = std::async(std::launch::async, [&]()
+    sessionFuture = std::async(std::launch::async, [&]() {
+        SetThreadName("SongFolderInit");
+        while (inAddFolderSession)
         {
-            SetThreadName("SongFolderInit");
-            while (inAddFolderSession)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (inAddFolderSession && std::chrono::system_clock::now() - sessionTimestamp >= std::chrono::seconds(10))
             {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                if (inAddFolderSession && std::chrono::system_clock::now() - sessionTimestamp >= std::chrono::seconds(10))
-                {
-                    sessionTimestamp = std::chrono::system_clock::now();
-                    commit();
-                    transactionStart();
-                }
+                sessionTimestamp = std::chrono::system_clock::now();
+                commit();
+                transactionStart();
             }
-        });
+        }
+    });
 
     int count = 0;
     for (const auto& p : paths)
@@ -692,7 +677,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
     HashMD5 folderHash = md5(path.u8string());
     long long folderModifyTime = getFileLastWriteTime(path);
 
-    if (auto q = query("SELECT pathmd5,path,type,modtime FROM folder WHERE path=?", { path.u8string() }); !q.empty())
+    if (auto q = query("SELECT pathmd5,path,type,modtime FROM folder WHERE path=?", {path.u8string()}); !q.empty())
     {
         LOG_VERBOSE << "[SongDB] Sub folder already exists (" << path << ")";
 
@@ -731,13 +716,13 @@ int SongDB::removeFolder(const HashMD5& hash, bool removeSong)
 {
     if (removeSong)
     {
-        if (SQLITE_OK != exec("DELETE FROM song WHERE parent=?", { hash.hexdigest() }))
+        if (SQLITE_OK != exec("DELETE FROM song WHERE parent=?", {hash.hexdigest()}))
         {
             LOG_WARNING << "[SongDB] remove song from db error: " << errmsg();
         }
     }
 
-    return exec("DELETE FROM folder WHERE pathmd5=?", { hash.hexdigest() });
+    return exec("DELETE FROM folder WHERE pathmd5=?", {hash.hexdigest()});
 }
 
 void SongDB::waitLoadingFinish()
@@ -768,7 +753,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
         if (analyzeChartType(f) == eChartFormat::BMS)
         {
             type = FolderType::SONG_BMS;
-            break;  // break for
+            break; // break for
         }
         // else ...
     }
@@ -778,23 +763,14 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     long long folderModifyTime = getFileLastWriteTime(path);
     if (!parentHash.empty())
     {
-        ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)", {
-            hash.hexdigest(),
-            parentHash.hexdigest(),
-            folderName.u8string(),
-            (int)type,
-            path.u8string(),
-            folderModifyTime });
+        ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
+                   {hash.hexdigest(), parentHash.hexdigest(), folderName.u8string(), (int)type, path.u8string(),
+                    folderModifyTime});
     }
     else
     {
-        ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)", {
-            hash.hexdigest(),
-            nullptr,
-            folderName.u8string(),
-            (int)type,
-            path.u8string(),
-            folderModifyTime });
+        ret = exec("INSERT INTO folder VALUES(?,?,?,?,?,?)",
+                   {hash.hexdigest(), nullptr, folderName.u8string(), (int)type, path.u8string(), folderModifyTime});
     }
     if (SQLITE_OK != ret)
     {
@@ -807,7 +783,8 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     bool isSongFolder = false;
     for (const auto& f : fs::directory_iterator(path))
     {
-        if (stopRequested) break;
+        if (stopRequested)
+            break;
 
         if (analyzeChartType(f) != eChartFormat::UNKNOWN)
         {
@@ -819,7 +796,8 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
     std::vector<Path> subFolderList;
     for (const auto& f : fs::directory_iterator(path))
     {
-        if (stopRequested) break;
+        if (stopRequested)
+            break;
 
         if (!isSongFolder && fs::is_directory(f))
         {
@@ -841,7 +819,8 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
 
     for (const auto& sub : subFolderList)
     {
-        if (stopRequested) break;
+        if (stopRequested)
+            break;
 
         int addedCount = addSubFolder(sub, hash);
         if (addedCount > 0)
@@ -856,7 +835,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
     LOG_DEBUG << "[SongDB] Refreshing contents of " << path;
 
     bool isSongFolder = false;
-    for (auto& f: fs::directory_iterator(path))
+    for (auto& f : fs::directory_iterator(path))
     {
         if (analyzeChartType(f) != eChartFormat::UNKNOWN)
         {
@@ -950,14 +929,16 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
 
                 // remove modified files from existedFiles, and add again below
                 std::vector<Path> existedFilesReal;
-                std::set_difference(existedFiles.begin(), existedFiles.end(), modifiedFiles.begin(), modifiedFiles.end(), std::back_inserter(existedFilesReal));
+                std::set_difference(existedFiles.begin(), existedFiles.end(), modifiedFiles.begin(),
+                                    modifiedFiles.end(), std::back_inserter(existedFilesReal));
                 std::swap(existedFiles, existedFilesReal);
             }
         }
 
         // only add new entries
         std::vector<Path> newFiles;
-        std::set_difference(bmsFiles.begin(), bmsFiles.end(), existedFiles.begin(), existedFiles.end(), std::back_inserter(newFiles));
+        std::set_difference(bmsFiles.begin(), bmsFiles.end(), existedFiles.begin(), existedFiles.end(),
+                            std::back_inserter(newFiles));
         for (auto& p : newFiles)
         {
             if (stopRequested)
@@ -980,13 +961,16 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
             // update modification time
             // saving current time here is OK.
             long long nowTime = getFileTimeNow();
-            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", { nowTime, hash.hexdigest() }); ret != SQLITE_OK)
+            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
+                ret != SQLITE_OK)
             {
-                LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path << ")";
+                LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path
+                            << ")";
             }
-    }
+        }
 
-        LOG_DEBUG << "[SongDB] Folder originally has " << existedFiles.size() << " entries, added " << count << " (" << path << ")";
+        LOG_DEBUG << "[SongDB] Folder originally has " << existedFiles.size() << " entries, added " << count << " ("
+                  << path << ")";
         return count;
     }
     else
@@ -1013,8 +997,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
                 {
                     if (!fs::exists(existedList->getEntry(i)->getPath()))
                     {
-                        LOG_DEBUG << "[SongDB] Deleting file-not-found folder: "
-                                  << existedList->getEntry(i)->getPath();
+                        LOG_DEBUG << "[SongDB] Deleting file-not-found folder: " << existedList->getEntry(i)->getPath();
                         deletedFiles.push_back(existedList->getEntry(i)->md5);
                     }
                 }
@@ -1049,9 +1032,11 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
             // update modification time
             // saving current time here is OK.
             long long nowTime = getFileTimeNow();
-            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", { nowTime, hash.hexdigest() }); ret != SQLITE_OK)
+            if (int ret = exec("UPDATE folder SET modtime=? WHERE pathmd5=?", {nowTime, hash.hexdigest()});
+                ret != SQLITE_OK)
             {
-                LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path << ")";
+                LOG_WARNING << "[SongDB] Update modification time fail: [" << ret << "] " << errmsg() << " (" << path
+                            << ")";
             }
         }
 
@@ -1060,14 +1045,14 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
     }
 }
 
-
 HashMD5 SongDB::getFolderParent(const Path& path) const
 {
-    if (!fs::is_directory(path)) return {};
+    if (!fs::is_directory(path))
+        return {};
 
     auto parent = (path / "..").lexically_normal();
     HashMD5 parentHash = md5(parent.u8string());
-    auto result = query("SELECT type FROM folder WHERE parent=?", { parentHash.hexdigest() });
+    auto result = query("SELECT type FROM folder WHERE parent=?", {parentHash.hexdigest()});
     for (const auto& leaf : result)
         if (ANY_INT(leaf[0]) == FOLDER)
             return parentHash;
@@ -1077,14 +1062,14 @@ HashMD5 SongDB::getFolderParent(const Path& path) const
 
 HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
 {
-    auto result = query("SELECT type,parent FROM folder WHERE path=?", { folder.hexdigest() });
+    auto result = query("SELECT type,parent FROM folder WHERE path=?", {folder.hexdigest()});
     if (!result.empty())
     {
         auto leaf = result[0];
         if (ANY_INT(leaf[0]) != FOLDER)
         {
-            LOG_WARNING << "[SongDB] Get folder parent type error: excepted " << FOLDER << ", get " << ANY_INT(leaf[0]) <<
-                " (" << folder.hexdigest() << ")";
+            LOG_WARNING << "[SongDB] Get folder parent type error: excepted " << FOLDER << ", get " << ANY_INT(leaf[0])
+                        << " (" << folder.hexdigest() << ")";
             return {};
         }
         return HashMD5{ANY_STR(leaf[1])};
@@ -1093,7 +1078,6 @@ HashMD5 SongDB::getFolderParent(const HashMD5& folder) const
     return {};
 }
 
-
 std::pair<bool, Path> SongDB::getFolderPath(const HashMD5& folder) const
 {
     if (!folderQueryHashMap.empty())
@@ -1101,26 +1085,27 @@ std::pair<bool, Path> SongDB::getFolderPath(const HashMD5& folder) const
         if (folderQueryHashMap.find(folder) != folderQueryHashMap.end())
         {
             auto cols = folderQueryPool[folderQueryHashMap.at(folder)[0]];
-            return { true, PathFromUTF8(ANY_STR(cols[4])) };
+            return {true, PathFromUTF8(ANY_STR(cols[4]))};
         }
     }
     else
     {
-        auto result = query("SELECT type,path FROM folder WHERE pathmd5=?", { folder.hexdigest() });
+        auto result = query("SELECT type,path FROM folder WHERE pathmd5=?", {folder.hexdigest()});
         if (!result.empty())
         {
             auto leaf = result[0];
-            //if (ANY_INT(leaf[0]) != FOLDER)
+            // if (ANY_INT(leaf[0]) != FOLDER)
             //{
-            //    LOG_WARNING << "[SongDB] Get folder path type error: excepted " << FOLDER << ", get " << ANY_INT(leaf[0]) <<
-            //        " (" << folder << ")";
-            //    return Path();
-            //}
-            return { true, PathFromUTF8(ANY_STR(leaf[1])) };
+            //     LOG_WARNING << "[SongDB] Get folder path type error: excepted " << FOLDER << ", get " <<
+            //     ANY_INT(leaf[0]) <<
+            //         " (" << folder << ")";
+            //     return Path();
+            // }
+            return {true, PathFromUTF8(ANY_STR(leaf[1]))};
         }
     }
     LOG_INFO << "[SongDB] Get folder path fail: target " << folder.hexdigest() << " not found";
-    return { false, Path() };
+    return {false, Path()};
 }
 
 HashMD5 SongDB::getFolderHash(Path path) const
@@ -1145,8 +1130,6 @@ HashMD5 SongDB::getFolderHash(Path path) const
     }
     return md5(path.u8string());
 }
-
-
 
 std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool recursive)
 {
@@ -1174,8 +1157,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
 
             switch (type)
             {
-            case FOLDER:
-            {
+            case FOLDER: {
                 if (recursive)
                 {
                     auto sub = browse(md5, false);
@@ -1194,8 +1176,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
                 }
                 break;
             }
-            case SONG_BMS:
-            {
+            case SONG_BMS: {
                 auto bmsList = browseSong(md5);
                 // name is set inside browseSong
                 if (bmsList && !bmsList->empty())
@@ -1207,8 +1188,7 @@ std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool rec
             }
             case CUSTOM_FOLDER:
             case COURSE:
-            case CLASS:
-                break;
+            case CLASS: break;
             }
         }
     }
@@ -1232,48 +1212,45 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
     if (songQueryParentMap.find(root) != songQueryParentMap.end())
     {
         for (const auto& index : songQueryParentMap.at(root))
-        try
-        {
-            const auto& c = songQueryPool[index];
-            auto type = (eChartFormat)ANY_INT(c[3]);
-            switch (type)
+            try
             {
-            case eChartFormat::BMS:
-            {
-                auto p = std::make_shared<ChartFormatBMSMeta>();
-                if (convert_bms(p, c))
+                const auto& c = songQueryPool[index];
+                auto type = (eChartFormat)ANY_INT(c[3]);
+                switch (type)
                 {
-                    if (p->fileName.is_absolute())
-                        p->absolutePath = p->fileName;
-                    else
-                        p->absolutePath = path / p->fileName;
+                case eChartFormat::BMS: {
+                    auto p = std::make_shared<ChartFormatBMSMeta>();
+                    if (convert_bms(p, c))
+                    {
+                        if (p->fileName.is_absolute())
+                            p->absolutePath = p->fileName;
+                        else
+                            p->absolutePath = path / p->fileName;
 
-                    list->pushChart(p);
+                        list->pushChart(p);
+                    }
+                    if (!isNameSet)
+                    {
+                        isNameSet = true;
+                        list->_name = p->title;
+                        list->_name2 = p->title2;
+                    }
+                    break;
                 }
-                if (!isNameSet)
-                {
-                    isNameSet = true;
-                    list->_name = p->title;
-                    list->_name2 = p->title2;
+                default: break;
                 }
-                break;
             }
-            default:
-                break;
+            // TODO: remove after adding NOT NULL to every table field.
+            catch (const std::bad_any_cast& e)
+            {
+                LOG_ERROR << "std::bad_any_cast: " << e.what();
             }
-        }
-        // TODO: remove after adding NOT NULL to every table field.
-        catch (const std::bad_any_cast& e)
-        {
-            LOG_ERROR << "std::bad_any_cast: " << e.what();
-        }
     }
 
     LOG_VERBOSE << "[SongDB] browsed song: " << list->getContentsCount() << " entries";
 
     return list;
 }
-
 
 std::shared_ptr<EntryFolderRegular> SongDB::search(const HashMD5& root, const std::string& key)
 {

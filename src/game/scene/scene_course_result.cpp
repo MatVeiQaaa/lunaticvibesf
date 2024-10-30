@@ -20,7 +20,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
     {
         _inputAvailable |= INPUT_MASK_1P;
     }
-        
+
     if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
     {
         _inputAvailable |= INPUT_MASK_2P;
@@ -88,7 +88,6 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
             param["1pbdrate"] = int(100 * param["1pbd"] / summary[ARG_TOTAL_NOTES]);
             param["1pprrate"] = int(100 * param["1ppr"] / summary[ARG_TOTAL_NOTES]);
         }
-
 
         if (gPlayContext.isBattle && !gPlayContext.courseStageRulesetCopy[1].empty())
         {
@@ -199,7 +198,7 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexNumber::PLAY_1P_EXSCORE_DIFF, param["1ptarget"]);
         State::set(IndexNumber::PLAY_2P_EXSCORE_DIFF, param["2ptarget"]);
         State::set(IndexOption::RESULT_BATTLE_WIN_LOSE, param["winlose"]);
-        
+
         State::set(IndexNumber::PLAY_1P_EXSCORE, param["1pexscore"]);
         State::set(IndexNumber::PLAY_1P_PERFECT, param["1ppg"]);
         State::set(IndexNumber::PLAY_1P_GREAT, param["1pgr"]);
@@ -258,7 +257,6 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexSwitch::RESULT_UPDATED_BP, param["updatedbp"]);
     }
 
-
     using namespace std::placeholders;
     _input.register_p("SCENE_PRESS", std::bind(&SceneCourseResult::inputGamePress, this, _1, _2));
     _input.register_h("SCENE_HOLD", std::bind(&SceneCourseResult::inputGameHold, this, _1, _2));
@@ -289,7 +287,8 @@ SceneCourseResult::~SceneCourseResult()
 
 void SceneCourseResult::_updateAsync()
 {
-    if (gNextScene != SceneType::COURSE_RESULT) return;
+    if (gNextScene != SceneType::COURSE_RESULT)
+        return;
 
     if (gAppIsExiting)
     {
@@ -298,18 +297,10 @@ void SceneCourseResult::_updateAsync()
 
     switch (state)
     {
-    case eCourseResultState::DRAW:
-        updateDraw();
-        break;
-    case eCourseResultState::STOP:
-        updateStop();
-        break;
-    case eCourseResultState::RECORD:
-        updateRecord();
-        break;
-    case eCourseResultState::FADEOUT:
-        updateFadeout();
-        break;
+    case eCourseResultState::DRAW: updateDraw(); break;
+    case eCourseResultState::STOP: updateStop(); break;
+    case eCourseResultState::RECORD: updateRecord(); break;
+    case eCourseResultState::FADEOUT: updateFadeout(); break;
     }
 }
 
@@ -327,9 +318,7 @@ void SceneCourseResult::updateDraw()
     }
 }
 
-void SceneCourseResult::updateStop()
-{
-}
+void SceneCourseResult::updateStop() {}
 
 void SceneCourseResult::updateRecord()
 {
@@ -362,7 +351,8 @@ void SceneCourseResult::updateFadeout()
             std::stringstream dbReplayFile;
             for (size_t i = 0; i < gPlayContext.courseStageReplayPathNew.size(); ++i)
             {
-                if (i != 0) dbReplayFile << "|";
+                if (i != 0)
+                    dbReplayFile << "|";
                 dbReplayFile << gPlayContext.courseStageReplayPathNew[i];
             }
             score.replayFileName = dbReplayFile.str();
@@ -405,10 +395,10 @@ void SceneCourseResult::updateFadeout()
                 score.lamp = ScoreBMS::Lamp::FAILED;
             }
 
-            // 
+            //
             g_pScoreDB->updateCourseScoreBMS(gPlayContext.courseHash, score);
         }
-        
+
         clearContextPlay();
         gPlayContext.courseStageRulesetCopy[0].clear();
         gPlayContext.courseStageRulesetCopy[1].clear();
@@ -424,7 +414,8 @@ void SceneCourseResult::updateFadeout()
 // CALLBACK
 void SceneCourseResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 
     if ((_inputAvailable & m & (INPUT_MASK_DECIDE | INPUT_MASK_CANCEL)).any() || m[Input::ESC])
     {
@@ -467,11 +458,9 @@ void SceneCourseResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t
             }
             break;
 
-        case eCourseResultState::FADEOUT:
-            break;
+        case eCourseResultState::FADEOUT: break;
 
-        default:
-            break;
+        default: break;
         }
     }
 }
@@ -479,18 +468,19 @@ void SceneCourseResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t
 // CALLBACK
 void SceneCourseResult::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 
     if (state == eCourseResultState::FADEOUT)
     {
         _retryRequested =
-            (_inputAvailable & m & INPUT_MASK_DECIDE).any() && 
-            (_inputAvailable & m & INPUT_MASK_CANCEL).any();
+            (_inputAvailable & m & INPUT_MASK_DECIDE).any() && (_inputAvailable & m & INPUT_MASK_CANCEL).any();
     }
 }
 
 // CALLBACK
 void SceneCourseResult::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 }

@@ -8,7 +8,7 @@ TEST(DbConn, MigrationSystemWorks)
 {
     struct TestSQLite : public SQLite
     {
-        TestSQLite() : SQLite(IN_MEMORY_DB_PATH, "MigrationSystemWorks"){};
+        TestSQLite() : SQLite(IN_MEMORY_DB_PATH, "MigrationSystemWorks") {};
         void runTest()
         {
             auto createDb = [this]() { return exec("CREATE TABLE some_data(id INTEGER);", {}) == SQLITE_OK; };

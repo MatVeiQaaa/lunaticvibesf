@@ -6,7 +6,8 @@
 
 #include "game/input/input_mgr.h"
 
-namespace sdl::state {
+namespace sdl::state
+{
 
 inline constexpr size_t SDL_MOUSE_BUTTON_COUNT = 256;
 
@@ -19,8 +20,7 @@ inline int g_mouse_y = 0;
 // Reset this to `0` after use.
 inline short g_mouse_wheel_delta = 0;
 // `true` for buttons currently being pressed down.
-inline std::array<std::array<bool, InputMgr::MAX_JOYSTICK_BUTTON_COUNT>, InputMgr::MAX_JOYSTICK_COUNT>
-    g_joysticks{};
+inline std::array<std::array<bool, InputMgr::MAX_JOYSTICK_BUTTON_COUNT>, InputMgr::MAX_JOYSTICK_COUNT> g_joysticks{};
 
 } // namespace sdl::state
 

@@ -3,10 +3,10 @@
 #include <climits>
 
 /*
-* !!! WARNING !!!
-* These indices are currently DIRECTLY casted to LR2skin indices.
-* When adding new value, do not modify existing values.
-*/
+ * !!! WARNING !!!
+ * These indices are currently DIRECTLY casted to LR2skin indices.
+ * When adding new value, do not modify existing values.
+ */
 enum class IndexTimer : unsigned
 {
     SCENE_START = 0,
@@ -87,7 +87,6 @@ enum class IndexTimer : unsigned
     K28_LN_BOMB,
     K29_LN_BOMB,
 
-
     S1_DOWN = 100,
     K11_DOWN,
     K12_DOWN,
@@ -132,14 +131,14 @@ enum class IndexTimer : unsigned
     K28_UP,
     K29_UP,
 
-    MUSIC_BEAT = 140,     // Special timer: [0, 1000), referring beat progress
+    MUSIC_BEAT = 140, // Special timer: [0, 1000), referring beat progress
 
     PLAY_P1_FINISHED = 143,
     PLAY_P2_FINISHED,
 
     RESULT_GRAPH_START = 150,
-    RESULT_RANK_START,          // graph end
-    RESULT_HIGHSCORE_START,     // push any key from RESULT_RANK_START
+    RESULT_RANK_START,      // graph end
+    RESULT_HIGHSCORE_START, // push any key from RESULT_RANK_START
 
     // new
     S1L_DOWN = 200,
@@ -171,8 +170,8 @@ enum class IndexTimer : unsigned
     S2A_MOVE,
 
     ARENA_SHOW_LOBBY = 240,
-        ARENA_PLAY_WAIT,
-        ARENA_RESULT_WAIT,
+    ARENA_PLAY_WAIT,
+    ARENA_RESULT_WAIT,
 
     // internal timers
     _CURRENT = 250,

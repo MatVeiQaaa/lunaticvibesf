@@ -12,7 +12,6 @@
 #include <boost/algorithm/string/split.hpp>
 #include <re2/re2.h>
 
-#include <common/assert.h>
 #include "common/log.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
@@ -25,6 +24,7 @@
 #include "skin_lr2_button_callbacks.h"
 #include "skin_lr2_converters.h"
 #include "skin_lr2_slider_callbacks.h"
+#include <common/assert.h>
 
 using uint8_t = std::uint8_t;
 using namespace std::placeholders;
@@ -61,13 +61,15 @@ size_t convertLine(const Tokens& tokens, int* pData, size_t start, size_t count)
 
 size_t convertOpsToInt(const Tokens& tokens, int* pData, size_t offset, size_t size)
 {
-    if (tokens.size() < offset) return 0;
+    if (tokens.size() < offset)
+        return 0;
 
     size_t i;
     for (i = 0; i < size && offset + i < tokens.size(); ++i)
     {
         auto ops = tokens[offset + i];
-        if (ops.empty()) continue;
+        if (ops.empty())
+            continue;
 
         if (ops[0] == '!' || ops[0] == '-')
             pData[offset + i] = -toInt(ops.substr(1));
@@ -78,7 +80,7 @@ size_t convertOpsToInt(const Tokens& tokens, int* pData, size_t offset, size_t s
 }
 
 static bool flipSideFlag = false;
-static bool flipResultFlag = false;      // Set in play skin
+static bool flipResultFlag = false; // Set in play skin
 static bool flipSide = false;
 
 static int flipTimer(int timer)
@@ -107,351 +109,365 @@ static int flipTimer(int timer)
     return timer;
 }
 
-    struct s_basic
+struct s_basic
+{
+    int _null = 0;
+    int gr = 0;
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+    int div_x = 0;
+    int div_y = 0;
+    int cycle = 0;
+    int timer = 0;
+    s_basic(const Tokens& tokens, size_t csvLineNumber = 0)
     {
-        int _null = 0;
-        int gr = 0;
-        int x = 0;
-        int y = 0;
-        int w = 0;
-        int h = 0;
-        int div_x = 0;
-        int div_y = 0;
-        int cycle = 0;
-        int timer = 0;
-        s_basic(const Tokens& tokens, size_t csvLineNumber = 0)
+        int count = sizeof(s_basic) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+
+        if (w == -1)
+            w = RECT_FULL.w;
+        if (h == -1)
+            h = RECT_FULL.h;
+
+        if (div_x == 0)
         {
-            int count = sizeof(s_basic) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-
-            if (w == -1) w = RECT_FULL.w;
-            if (h == -1) h = RECT_FULL.h;
-
-            if (div_x == 0)
-            {
-                LOG_DEBUG << "[Skin] " << csvLineNumber << ": div_x is 0";
-                div_x = 1;
-            }
-            if (div_y == 0)
-            {
-                LOG_DEBUG << "[Skin] " << csvLineNumber << ": div_y is 0";
-                div_y = 1;
-            }
-
-            if (flipSide)
-                timer = flipTimer(timer);
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": div_x is 0";
+            div_x = 1;
         }
-    };
-
-    struct s_image : s_basic
-    {
-        int op1 = 0;
-        int op2 = 0;
-        int op3 = 0;
-        s_image(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+        if (div_y == 0)
         {
-            convertOpsToInt(tokens, (int*)this, &op1 - &_null, 3);
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": div_y is 0";
+            div_y = 1;
         }
-    };
 
-    struct s_number : s_basic
-    {
-        int num = 0;
-        int align = 0;
-        int keta = 0;
-        s_number(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            convertLine(tokens, (int*)this, &num - &_null, 3);
-
-            if (flipSide)
-            {
-                if      (100 <= num && num <= 119) num += 20;
-                else if (302 <= num && num <= 306) num += 40;
-                else if (320 <= num && num <= 329) num += 10;
-                else if (360 <= num && num <= 369) num += 10;
-                else if (120 <= num && num <= 139) num -= 20;
-                else if (342 <= num && num <= 346) num -= 40;
-                else if (330 <= num && num <= 339) num -= 10;
-                else if (370 <= num && num <= 379) num -= 10;
-                else
-                {
-                    switch (num)
-                    {
-                    case 10:  num = 11; break;
-                    case 11:  num = 10; break;
-                    case 14:  num = 15; break;
-                    case 15:  num = 14; break;
-                    case 201: num = 213; break;
-                    case 210: num = 211; break;
-                    case 211: num = 210; break;
-                    case 212: num = 371; break;
-                    case 213: num = 213; break;
-                    case 214: num = 372; break;
-                    }
-                }
-            }
-        }
-    };
-
-    struct s_slider : s_basic
-    {
-        int muki = 0;
-        int range = 0;
-        int type = 0;
-        int disable = 0;
-        s_slider(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            convertLine(tokens, (int*)this, &muki - &_null, 4);
-
-            if (flipSide)
-            {
-                switch (type)
-                {
-                case 2: type = 3; break;
-                case 3: type = 2; break;
-                case 4: type = 5; break;
-                case 5: type = 4; break;
-                case 8: type = 9; break;
-                case 9: type = 8; break;
-                }
-            }
-        }
-    };
-
-    struct s_bargraph : s_basic
-    {
-        int type = 0;
-        int muki = 0;
-        s_bargraph(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            convertLine(tokens, (int*)this, &type - &_null, 2);
-            
-            if (flipSide)
-            {
-                if      (10 <= type && type <= 11) type += 4;
-                else if (20 <= type && type <= 29) type += 10;
-                else if (14 <= type && type <= 15) type -= 4;
-                else if (30 <= type && type <= 39) type -= 10;
-            }
-        }
-    };
-
-    struct s_button : s_basic
-    {
-        int type = 0;
-        int click = 0;
-        int panel = 0;
-        int plusonly = 0;
-        s_button(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            convertLine(tokens, (int*)this, &type - &_null, 4);
-        }
-    };
-
-    struct s_onmouse : s_basic
-    {
-        int panel = 0;
-        int x2 = 0;
-        int y2 = 0;
-        int w2 = 0;
-        int h2 = 0;
-        s_onmouse(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            convertLine(tokens, (int*)this, &panel - &_null, 5);
-        }
-    };
-
-    struct s_text
-    {
-        int _null = 0;
-        int font = 0;
-        int st = 0;
-        int align = 0;
-        int edit = 0;
-        int panel = 0;
-        s_text(const Tokens& tokens)
-        {
-            int count = sizeof(s_text) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-
-            if (flipSide)
-            {
-                switch (st)
-                {
-                case 1:  st = 2; break;
-                case 2:  st = 1; break;
-                case 63: st = 64; break;
-                case 64: st = 63; break;
-                case 65: st = 66; break;
-                case 66: st = 65; break;
-                case 67: st = 68; break;
-                case 68: st = 67; break;
-                case 84: st = 85; break;
-                case 85: st = 84; break;
-                }
-            }
-        }
-    };
-
-    struct s_bga
-    {
-        int _null[10] = { 0 };
-        int nobase = 0;
-        int nolayer = 0;
-        int nopoor = 0;
-        s_bga(const Tokens& tokens)
-        {
-            int count = sizeof(s_bga) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-        }
-    };
-
-    using s_judgeline = s_basic;
-    using s_barline = s_basic;
-    using s_note = s_basic;
-
-    struct s_nowjudge : s_basic
-    {
-        int noshift = 0;
-        s_nowjudge(const Tokens& tokens, size_t csvLineNumber = 0): s_basic(tokens, csvLineNumber)
-        {
-            size_t offset = sizeof(s_basic) / sizeof(int);
-            size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-            convertLine(tokens, (int*)this, offset, count);
-
-            // DO not flip index here; there are two separate definitions called SRC_NOWJUDGE_1P / SRC_NOWJUDGE_2P
-        }
-    };
-
-    struct s_nowcombo : s_basic
-    {
-        int _null2 = 0;
-        int align = 0;
-        int keta = 0;
-        s_nowcombo(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            size_t offset = sizeof(s_basic) / sizeof(int);
-            size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-            convertLine(tokens, (int*)this, offset, count);
-
-            // DO not flip index here; there are two separate definitions called SRC_NOWCOMBO_1P / SRC_NOWCOMBO_2P
-        }
-    };
-
-    struct s_groovegauge : s_basic
-    {
-        int add_x = 0;
-        int add_y = 0;
-        s_groovegauge(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            size_t offset = sizeof(s_basic) / sizeof(int);
-            size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-            convertLine(tokens, (int*)this, offset, count);
-
-            switch (_null)
-            {
-            case 0: _null = lr2skin::flipSide ? 1 : 0; break;
-            case 1: _null = lr2skin::flipSide ? 0 : 1; break;
-            }
-        }
-    };
-
-    using s_barbody = s_basic;
-    using s_barflash = s_basic;
-    using s_barlevel = s_nowcombo;
-    using s_barlamp = s_basic;
-    struct s_bartitle
-    {
-        int _null = 0;
-        int font = 0;
-        int st = 0;
-        int align = 0;
-        s_bartitle(const Tokens& tokens)
-        {
-            int count = sizeof(s_bartitle) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-        }
-    };
-    using s_barrank = s_basic;
-    using s_barrival = s_basic;
-    struct s_readme
-    {
-        int _null = 0;
-        int font = 0;
-        int _null2[2] = { 0 };
-        int kankaku = 0;
-        s_readme(const Tokens& tokens)
-        {
-            int count = sizeof(s_readme) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-        }
-    };
-    using s_mousecursor = s_basic;
-
-    struct s_gaugechart : s_basic
-    {
-        int field_w = 0;
-        int field_h = 0;
-        int start = 0;
-        int end = 0;
-        s_gaugechart(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
-        {
-            size_t offset = sizeof(s_basic) / sizeof(int);
-            size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
-            convertLine(tokens, (int*)this, offset, count);
-        }
-    };
-    using s_scorechart = s_gaugechart;
-
-    struct dst
-    {
-        int _null = 0;      //0
-        int time = 0;       //1
-        int x = 0;
-        int y = 0;
-        int w = 0;
-        int h = 0;
-        int acc = 0;        //6
-        int a = 0;
-        int r = 0;
-        int g = 0;
-        int b = 0;
-        int blend = 0;      //11
-        int filter = 0;     //12
-        int angle = 0;      //13
-        int center = 0;     //14
-        int loop = -1;       //15
-        int timer = -1;      //16    
-        int op[4]{DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE};
-        dst(const Tokens& tokens)
-        {
-            int count = sizeof(dst) / sizeof(int);
-            convertLine(tokens, (int*)this, 0, count);
-            convertOpsToInt(tokens, (int*)this, &op[0] - &_null, sizeof(op) / sizeof(op[0]));
-
-            if (flipSide)
-                timer = flipTimer(timer);
-        }
-    };
-
-    BlendMode convertBlend(int blend)
-    {
-        switch (blend)
-        {
-        case 0: return BlendMode::NONE; // TRANSCLOLR
-        case 1: return BlendMode::ALPHA;
-        case 2: return BlendMode::ADD;
-        case 3: return BlendMode::SUBTRACT;
-        case 4: return BlendMode::MOD; // MULTIPLY
-        case 5: // LR2SkinHelp - undocumented. Seems to be the same as 2, but not 6. See bomb in Girlish Cafe.
-        case 6: return BlendMode::ADD; // LR2: XOR but implemented as ADD
-        case 9: return BlendMode::MULTIPLY_INVERTED_BACKGROUND;
-        case 10: return BlendMode::INVERT; // ANTI_COLOR
-        case 11: return BlendMode::MULTIPLY_WITH_ALPHA;
-        default: LOG_DEBUG << "[SkinLR2] Invalid blend mode '" << blend << "'"; return BlendMode::ALPHA;
-        };
+        if (flipSide)
+            timer = flipTimer(timer);
     }
-    } // namespace lr2skin
+};
+
+struct s_image : s_basic
+{
+    int op1 = 0;
+    int op2 = 0;
+    int op3 = 0;
+    s_image(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertOpsToInt(tokens, (int*)this, &op1 - &_null, 3);
+    }
+};
+
+struct s_number : s_basic
+{
+    int num = 0;
+    int align = 0;
+    int keta = 0;
+    s_number(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertLine(tokens, (int*)this, &num - &_null, 3);
+
+        if (flipSide)
+        {
+            if (100 <= num && num <= 119)
+                num += 20;
+            else if (302 <= num && num <= 306)
+                num += 40;
+            else if (320 <= num && num <= 329)
+                num += 10;
+            else if (360 <= num && num <= 369)
+                num += 10;
+            else if (120 <= num && num <= 139)
+                num -= 20;
+            else if (342 <= num && num <= 346)
+                num -= 40;
+            else if (330 <= num && num <= 339)
+                num -= 10;
+            else if (370 <= num && num <= 379)
+                num -= 10;
+            else
+            {
+                switch (num)
+                {
+                case 10: num = 11; break;
+                case 11: num = 10; break;
+                case 14: num = 15; break;
+                case 15: num = 14; break;
+                case 201: num = 213; break;
+                case 210: num = 211; break;
+                case 211: num = 210; break;
+                case 212: num = 371; break;
+                case 213: num = 213; break;
+                case 214: num = 372; break;
+                }
+            }
+        }
+    }
+};
+
+struct s_slider : s_basic
+{
+    int muki = 0;
+    int range = 0;
+    int type = 0;
+    int disable = 0;
+    s_slider(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertLine(tokens, (int*)this, &muki - &_null, 4);
+
+        if (flipSide)
+        {
+            switch (type)
+            {
+            case 2: type = 3; break;
+            case 3: type = 2; break;
+            case 4: type = 5; break;
+            case 5: type = 4; break;
+            case 8: type = 9; break;
+            case 9: type = 8; break;
+            }
+        }
+    }
+};
+
+struct s_bargraph : s_basic
+{
+    int type = 0;
+    int muki = 0;
+    s_bargraph(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertLine(tokens, (int*)this, &type - &_null, 2);
+
+        if (flipSide)
+        {
+            if (10 <= type && type <= 11)
+                type += 4;
+            else if (20 <= type && type <= 29)
+                type += 10;
+            else if (14 <= type && type <= 15)
+                type -= 4;
+            else if (30 <= type && type <= 39)
+                type -= 10;
+        }
+    }
+};
+
+struct s_button : s_basic
+{
+    int type = 0;
+    int click = 0;
+    int panel = 0;
+    int plusonly = 0;
+    s_button(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertLine(tokens, (int*)this, &type - &_null, 4);
+    }
+};
+
+struct s_onmouse : s_basic
+{
+    int panel = 0;
+    int x2 = 0;
+    int y2 = 0;
+    int w2 = 0;
+    int h2 = 0;
+    s_onmouse(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        convertLine(tokens, (int*)this, &panel - &_null, 5);
+    }
+};
+
+struct s_text
+{
+    int _null = 0;
+    int font = 0;
+    int st = 0;
+    int align = 0;
+    int edit = 0;
+    int panel = 0;
+    s_text(const Tokens& tokens)
+    {
+        int count = sizeof(s_text) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+
+        if (flipSide)
+        {
+            switch (st)
+            {
+            case 1: st = 2; break;
+            case 2: st = 1; break;
+            case 63: st = 64; break;
+            case 64: st = 63; break;
+            case 65: st = 66; break;
+            case 66: st = 65; break;
+            case 67: st = 68; break;
+            case 68: st = 67; break;
+            case 84: st = 85; break;
+            case 85: st = 84; break;
+            }
+        }
+    }
+};
+
+struct s_bga
+{
+    int _null[10] = {0};
+    int nobase = 0;
+    int nolayer = 0;
+    int nopoor = 0;
+    s_bga(const Tokens& tokens)
+    {
+        int count = sizeof(s_bga) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+    }
+};
+
+using s_judgeline = s_basic;
+using s_barline = s_basic;
+using s_note = s_basic;
+
+struct s_nowjudge : s_basic
+{
+    int noshift = 0;
+    s_nowjudge(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        size_t offset = sizeof(s_basic) / sizeof(int);
+        size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
+        convertLine(tokens, (int*)this, offset, count);
+
+        // DO not flip index here; there are two separate definitions called SRC_NOWJUDGE_1P / SRC_NOWJUDGE_2P
+    }
+};
+
+struct s_nowcombo : s_basic
+{
+    int _null2 = 0;
+    int align = 0;
+    int keta = 0;
+    s_nowcombo(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        size_t offset = sizeof(s_basic) / sizeof(int);
+        size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
+        convertLine(tokens, (int*)this, offset, count);
+
+        // DO not flip index here; there are two separate definitions called SRC_NOWCOMBO_1P / SRC_NOWCOMBO_2P
+    }
+};
+
+struct s_groovegauge : s_basic
+{
+    int add_x = 0;
+    int add_y = 0;
+    s_groovegauge(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        size_t offset = sizeof(s_basic) / sizeof(int);
+        size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
+        convertLine(tokens, (int*)this, offset, count);
+
+        switch (_null)
+        {
+        case 0: _null = lr2skin::flipSide ? 1 : 0; break;
+        case 1: _null = lr2skin::flipSide ? 0 : 1; break;
+        }
+    }
+};
+
+using s_barbody = s_basic;
+using s_barflash = s_basic;
+using s_barlevel = s_nowcombo;
+using s_barlamp = s_basic;
+struct s_bartitle
+{
+    int _null = 0;
+    int font = 0;
+    int st = 0;
+    int align = 0;
+    s_bartitle(const Tokens& tokens)
+    {
+        int count = sizeof(s_bartitle) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+    }
+};
+using s_barrank = s_basic;
+using s_barrival = s_basic;
+struct s_readme
+{
+    int _null = 0;
+    int font = 0;
+    int _null2[2] = {0};
+    int kankaku = 0;
+    s_readme(const Tokens& tokens)
+    {
+        int count = sizeof(s_readme) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+    }
+};
+using s_mousecursor = s_basic;
+
+struct s_gaugechart : s_basic
+{
+    int field_w = 0;
+    int field_h = 0;
+    int start = 0;
+    int end = 0;
+    s_gaugechart(const Tokens& tokens, size_t csvLineNumber = 0) : s_basic(tokens, csvLineNumber)
+    {
+        size_t offset = sizeof(s_basic) / sizeof(int);
+        size_t count = (sizeof(*this) - sizeof(s_basic)) / sizeof(int);
+        convertLine(tokens, (int*)this, offset, count);
+    }
+};
+using s_scorechart = s_gaugechart;
+
+struct dst
+{
+    int _null = 0; // 0
+    int time = 0;  // 1
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+    int acc = 0; // 6
+    int a = 0;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    int blend = 0;  // 11
+    int filter = 0; // 12
+    int angle = 0;  // 13
+    int center = 0; // 14
+    int loop = -1;  // 15
+    int timer = -1; // 16
+    int op[4]{DST_TRUE, DST_TRUE, DST_TRUE, DST_TRUE};
+    dst(const Tokens& tokens)
+    {
+        int count = sizeof(dst) / sizeof(int);
+        convertLine(tokens, (int*)this, 0, count);
+        convertOpsToInt(tokens, (int*)this, &op[0] - &_null, sizeof(op) / sizeof(op[0]));
+
+        if (flipSide)
+            timer = flipTimer(timer);
+    }
+};
+
+BlendMode convertBlend(int blend)
+{
+    switch (blend)
+    {
+    case 0: return BlendMode::NONE; // TRANSCLOLR
+    case 1: return BlendMode::ALPHA;
+    case 2: return BlendMode::ADD;
+    case 3: return BlendMode::SUBTRACT;
+    case 4: return BlendMode::MOD; // MULTIPLY
+    case 5: // LR2SkinHelp - undocumented. Seems to be the same as 2, but not 6. See bomb in Girlish Cafe.
+    case 6: return BlendMode::ADD; // LR2: XOR but implemented as ADD
+    case 9: return BlendMode::MULTIPLY_INVERTED_BACKGROUND;
+    case 10: return BlendMode::INVERT; // ANTI_COLOR
+    case 11: return BlendMode::MULTIPLY_WITH_ALPHA;
+    default: LOG_DEBUG << "[SkinLR2] Invalid blend mode '" << blend << "'"; return BlendMode::ALPHA;
+    };
+}
+} // namespace lr2skin
 
 std::map<std::string, Path> SkinLR2::LR2SkinFontPathCache;
 std::map<Path, std::shared_ptr<SkinLR2::LR2Font>> SkinLR2::LR2FontCache;
@@ -487,7 +503,6 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     }
 }
 
-
 [[nodiscard]] static bool matchToken(std::string_view str1, std::string_view str2) noexcept
 {
     if (str1.length() < str2.length())
@@ -520,29 +535,35 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     if (val < 0)
         return {};
 
-    return std::pair{ val, notPref };
+    return std::pair{val, notPref};
 }
 
 [[nodiscard]] static std::string_view csvLineNormalize(std::string_view linecsv)
 {
-    if (linecsv.empty()) return {};
+    if (linecsv.empty())
+        return {};
 
     // remove leading spaces
-    if (linecsv.find_first_not_of(' ') == linecsv.npos) return {};
-    if (linecsv.find_first_not_of('\t') == linecsv.npos) return {};
+    if (linecsv.find_first_not_of(' ') == linecsv.npos)
+        return {};
+    if (linecsv.find_first_not_of('\t') == linecsv.npos)
+        return {};
     while (!linecsv.empty() && (linecsv[0] == ' ' || linecsv[0] == '\t'))
     {
         linecsv = linecsv.substr(linecsv.find_first_not_of(' '));
         linecsv = linecsv.substr(linecsv.find_first_not_of('\t'));
     }
     // skip comments
-    if (linecsv.substr(0, 2) == "//") return {};
+    if (linecsv.substr(0, 2) == "//")
+        return {};
     // skip empty line
-    if (linecsv.empty() || linecsv[0] == '\r') return {};
+    if (linecsv.empty() || linecsv[0] == '\r')
+        return {};
     // remove trailing \r
     if (size_t pos = linecsv.find_last_not_of('\r'); pos != linecsv.npos)
         linecsv = linecsv.substr(0, pos + 1);
-    if (linecsv.empty()) return {};
+    if (linecsv.empty())
+        return {};
 
     return linecsv;
 }
@@ -550,7 +571,8 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 [[nodiscard]] Tokens csvLineTokenizeSimple(const std::string& raw)
 {
     StringContentView linecsv = csvLineNormalize(raw);
-    if (linecsv.empty()) return {};
+    if (linecsv.empty())
+        return {};
 
     Tokens res;
     res.reserve(32);
@@ -563,10 +585,11 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     Tokens res;
     res.reserve(32);
     StringContentView linecsv = csvLineNormalize(raw);
-    if (linecsv.empty()) return {};
+    if (linecsv.empty())
+        return {};
 
     auto lineBuf = re2::StringPiece(linecsv.data(), linecsv.length());
-    static const LazyRE2 re{ R"(((?:(?:\\,)|[^,])*?)(?:,|$))" };
+    static const LazyRE2 re{R"(((?:(?:\\,)|[^,])*?)(?:,|$))"};
     std::string token;
     while (!lineBuf.empty() && RE2::Consume(&lineBuf, *re, &token))
     {
@@ -581,17 +604,17 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
     double h = (double)hi;
     switch (numpadCenter)
     {
-    case 1: return { 0, h };
-    case 2: return { w / 2.0, h };
-    case 3: return { w, h };
-    case 4: return { 0, h / 2.0 };
-    case 6: return { w, h / 2.0 };
-    case 7: return { 0, 0 };
-    case 8: return { w / 2.0, 0 };
-    case 9: return { w, 0 };
+    case 1: return {0, h};
+    case 2: return {w / 2.0, h};
+    case 3: return {w, h};
+    case 4: return {0, h / 2.0};
+    case 6: return {w, h / 2.0};
+    case 7: return {0, 0};
+    case 8: return {w / 2.0, 0};
+    case 9: return {w, 0};
     case 0:
-    case 5: 
-    default: return { w / 2.0, h / 2.0 };
+    case 5:
+    default: return {w / 2.0, h / 2.0};
     }
 }
 
@@ -640,7 +663,6 @@ Path SkinLR2::getCustomizePath(StringContentView input)
     return path;
 }
 
-
 Tokens SkinLR2::csvLineTokenize(const std::string& raw)
 {
     Tokens res;
@@ -666,9 +688,11 @@ Tokens SkinLR2::csvLineTokenize(const std::string& raw)
     }
 
     // last param
-    if (!res.empty() && (lunaticvibes::iequals(res[0], "#IF") || lunaticvibes::iequals(res[0], "#ELSEIF")) && res.back().length() == 1)
+    if (!res.empty() && (lunaticvibes::iequals(res[0], "#IF") || lunaticvibes::iequals(res[0], "#ELSEIF")) &&
+        res.back().length() == 1)
     {
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Ignored last parameter with 1 character long. Don't forget the trailing comma!";
+        LOG_DEBUG << "[Skin] " << csvLineNumber
+                  << ": Ignored last parameter with 1 character long. Don't forget the trailing comma!";
         res.pop_back();
     }
 
@@ -677,7 +701,8 @@ Tokens SkinLR2::csvLineTokenize(const std::string& raw)
 
 int SkinLR2::HELPFILE()
 {
-    if (!matchToken(parseKeyBuf, "#HELPFILE")) return 0;
+    if (!matchToken(parseKeyBuf, "#HELPFILE"))
+        return 0;
 
     if (_helpFiles.size() > (HELP_10 - HELP_1))
     {
@@ -714,7 +739,8 @@ int SkinLR2::HELPFILE()
 
 int SkinLR2::IMAGE()
 {
-    if (!matchToken(parseKeyBuf, "#IMAGE")) return 0;
+    if (!matchToken(parseKeyBuf, "#IMAGE"))
+        return 0;
 
     if (lunaticvibes::iequals(parseParamBuf[0], "CONTINUE"))
     {
@@ -758,7 +784,8 @@ int SkinLR2::IMAGE()
 
 int SkinLR2::LR2FONT()
 {
-    if (!matchToken(parseKeyBuf, "#LR2FONT")) return 0;
+    if (!matchToken(parseKeyBuf, "#LR2FONT"))
+        return 0;
 
     if (loadMode >= 1)
     {
@@ -830,7 +857,8 @@ int SkinLR2::LR2FONT()
             lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
-            if (tokens.empty()) continue;
+            if (tokens.empty())
+                continue;
             auto key = tokens[0];
 
             if (matchToken(key, "#S"))
@@ -854,10 +882,11 @@ int SkinLR2::LR2FONT()
             else if (matchToken(key, "#R"))
             {
                 int imgId = toInt(tokens[2]);
-                if (pf->T_id.find(imgId) == pf->T_id.end()) continue;
+                if (pf->T_id.find(imgId) == pf->T_id.end())
+                    continue;
 
                 int chrId = toInt(tokens[1]);
-                char s_sjis[3]{ 0 };
+                char s_sjis[3]{0};
                 char32_t c_utf32 = '\0';
                 if (chrId >= 0 && chrId <= 255)
                 {
@@ -870,7 +899,6 @@ int SkinLR2::LR2FONT()
                     int i = chrId + 32832;
                     s_sjis[0] = (i >> 8) & 0xFF;
                     s_sjis[1] = i & 0xFF;
-
                 }
                 else if (chrId >= 8127 && chrId <= 15306)
                 {
@@ -879,7 +907,8 @@ int SkinLR2::LR2FONT()
                     s_sjis[0] = (i >> 8) & 0xFF;
                     s_sjis[1] = i & 0xFF;
                 }
-                else continue;
+                else
+                    continue;
 
                 lunaticvibes::to_utf8(s_sjis, eFileEncoding::SHIFT_JIS, strbuf);
                 lunaticvibes::utf8_to_utf32(strbuf, u32strbuf);
@@ -894,11 +923,11 @@ int SkinLR2::LR2FONT()
                 if (c_utf32 == U' ')
                 {
                     // ID = space, LR2 displays a blank texture instead of actually texture file for spaces
-                    pf->R[c_utf32] = { size_t(-1), r };
+                    pf->R[c_utf32] = {size_t(-1), r};
                 }
                 else
                 {
-                    pf->R[c_utf32] = { pf->T_id.at(imgId), r };
+                    pf->R[c_utf32] = {pf->T_id.at(imgId), r};
                 }
             }
         }
@@ -924,9 +953,9 @@ int SkinLR2::SYSTEMFONT()
         }
 
         int ptsize = toInt(parseParamBuf[0]);
-        //int thick = toInt(parseParamBuf[1]);
-        //int fonttype = toInt(parseParamBuf[2]);
-        //StringContent name = parseParamBuf[3];
+        // int thick = toInt(parseParamBuf[1]);
+        // int fonttype = toInt(parseParamBuf[2]);
+        // StringContent name = parseParamBuf[3];
         int faceIndex;
         Path fontPath = getSysMonoFontPath(NULL, &faceIndex, i18n::getCurrentLanguage());
         size_t idx = fontNameMap.size();
@@ -966,9 +995,12 @@ int SkinLR2::TIMEOPTION()
         {
             int rank = toInt(parseParamBuf[1]);
             int update = toInt(parseParamBuf[2]);
-            if (rank > 0) info.timeResultRank = rank;
-            if (update > 0) info.timeResultRecord = update;
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": STARTINPUT " << info.timeIntro << " " << rank << " " << update;
+            if (rank > 0)
+                info.timeResultRank = rank;
+            if (update > 0)
+                info.timeResultRecord = update;
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": STARTINPUT " << info.timeIntro << " " << rank << " "
+                      << update;
         }
         return 1;
     }
@@ -1031,39 +1063,41 @@ int SkinLR2::others()
         reloadBanner = true;
         return 1;
     }
-    if (matchToken(parseKeyBuf, "#TRANSCOLOR") ||
-        matchToken(parseKeyBuf, "#TRANSCLOLR") ||   // why
-        matchToken(parseKeyBuf, "#TRANSCLOLOR"))    // why
+    if (matchToken(parseKeyBuf, "#TRANSCOLOR") || matchToken(parseKeyBuf, "#TRANSCLOLR") || // why
+        matchToken(parseKeyBuf, "#TRANSCLOLOR"))                                            // why
     {
         int r, g, b;
         r = toInt(parseParamBuf[0]);
         g = toInt(parseParamBuf[1]);
         b = toInt(parseParamBuf[2]);
-        if (r < 0) r = 0;
-        if (g < 0) g = 0;
-        if (b < 0) b = 0;
+        if (r < 0)
+            r = 0;
+        if (g < 0)
+            g = 0;
+        if (b < 0)
+            b = 0;
         info.hasTransparentColor = true;
         info.transparentColor = Color(r, g, b, 255);
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set transparent color: " 
-            << std::hex << r << ' ' << g << ' ' << b << std::dec;
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Set transparent color: " << std::hex << r << ' ' << g << ' ' << b
+                  << std::dec;
         return 2;
     }
     // tested with several skins on LR2 but seems to do nothing
     if (matchToken(parseKeyBuf, "#FLIPSIDE"))
     {
-        //switch (info.mode)
+        // switch (info.mode)
         //{
-        //case SkinType::PLAY5:
-        //case SkinType::PLAY5_2:
-        //case SkinType::PLAY7:
-        //case SkinType::PLAY7_2:
-        //case SkinType::PLAY9:
-        //case SkinType::PLAY10:
-        //case SkinType::PLAY14:
-        //    flipSide = true;
-        //    lr2skin::flipSideFlag = flipSide;
-        //    break;
-        //}
+        // case SkinType::PLAY5:
+        // case SkinType::PLAY5_2:
+        // case SkinType::PLAY7:
+        // case SkinType::PLAY7_2:
+        // case SkinType::PLAY9:
+        // case SkinType::PLAY10:
+        // case SkinType::PLAY14:
+        //     flipSide = true;
+        //     lr2skin::flipSideFlag = flipSide;
+        //     break;
+        // }
 
         return 3;
     }
@@ -1164,7 +1198,7 @@ bool SkinLR2::SRC()
     {
     case DefType::UNDEF:
     case DefType::BAR_BODY_OFF:
-    case DefType::BAR_BODY_ON:      return false;
+    case DefType::BAR_BODY_ON: return false;
 
     case DefType::README:
     case DefType::TEXT:
@@ -1178,10 +1212,9 @@ bool SkinLR2::SRC()
     case DefType::AUTO_MINE:
     case DefType::AUTO_LN_END:
     case DefType::AUTO_LN_BODY:
-    case DefType::AUTO_LN_START:    break;
+    case DefType::AUTO_LN_START: break;
 
-    default:
-    {
+    default: {
         // Find texture from map by gr
         int gr = toInt(parseParamBuf[1]);
         std::string gr_key;
@@ -1228,53 +1261,53 @@ bool SkinLR2::SRC()
 
     switch (type)
     {
-        case DefType::IMAGE:          SRC_IMAGE();               break;
-        case DefType::NUMBER:         SRC_NUMBER();              break;
-        case DefType::SLIDER:         SRC_SLIDER();              break;
-        case DefType::BARGRAPH:       SRC_BARGRAPH();            break;
-        case DefType::BUTTON:         SRC_BUTTON();              break;
-        case DefType::ONMOUSE:        SRC_ONMOUSE();             break;
-        case DefType::JUDGELINE:      SRC_JUDGELINE();           break;
-        case DefType::README:         SRC_README();              break;
-        case DefType::TEXT:           SRC_TEXT();                break;
-        case DefType::GROOVEGAUGE:    SRC_GROOVEGAUGE();         break;
-        case DefType::NOWJUDGE_1P:    flipSide ? SRC_NOWJUDGE2() : SRC_NOWJUDGE1(); break;
-        case DefType::NOWJUDGE_2P:    flipSide ? SRC_NOWJUDGE1() : SRC_NOWJUDGE2(); break;
-        case DefType::NOWCOMBO_1P:    flipSide ? SRC_NOWCOMBO2() : SRC_NOWCOMBO1(); break;
-        case DefType::NOWCOMBO_2P:    flipSide ? SRC_NOWCOMBO1() : SRC_NOWCOMBO2(); break;
-        case DefType::BGA:            SRC_BGA();                 break;
-        case DefType::MOUSECURSOR:    SRC_MOUSECURSOR();         break;
-        case DefType::GAUGECHART_1P:  SRC_GAUGECHART(flipSide ? PLAYER_SLOT_TARGET : PLAYER_SLOT_PLAYER); break;
-        case DefType::GAUGECHART_2P:  SRC_GAUGECHART(flipSide ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET); break;
-        case DefType::SCORECHART:     SRC_SCORECHART();          break;
-        case DefType::BAR_BODY:       SRC_BAR_BODY();            break;
-        case DefType::BAR_FLASH:      SRC_BAR_FLASH();           break;
-        case DefType::BAR_LEVEL:      SRC_BAR_LEVEL();           break;
-        case DefType::BAR_LAMP:       SRC_BAR_LAMP();            break;
-        case DefType::BAR_TITLE:      SRC_BAR_TITLE();           break;
-        case DefType::BAR_RANK:       SRC_BAR_RANK();            break;
-        case DefType::BAR_RIVAL:      SRC_BAR_RIVAL();           break;
-        case DefType::BAR_MY_LAMP:    SRC_BAR_RIVAL_MYLAMP();    break;
-        case DefType::BAR_RIVAL_LAMP: SRC_BAR_RIVAL_RIVALLAMP(); break;
+    case DefType::IMAGE: SRC_IMAGE(); break;
+    case DefType::NUMBER: SRC_NUMBER(); break;
+    case DefType::SLIDER: SRC_SLIDER(); break;
+    case DefType::BARGRAPH: SRC_BARGRAPH(); break;
+    case DefType::BUTTON: SRC_BUTTON(); break;
+    case DefType::ONMOUSE: SRC_ONMOUSE(); break;
+    case DefType::JUDGELINE: SRC_JUDGELINE(); break;
+    case DefType::README: SRC_README(); break;
+    case DefType::TEXT: SRC_TEXT(); break;
+    case DefType::GROOVEGAUGE: SRC_GROOVEGAUGE(); break;
+    case DefType::NOWJUDGE_1P: flipSide ? SRC_NOWJUDGE2() : SRC_NOWJUDGE1(); break;
+    case DefType::NOWJUDGE_2P: flipSide ? SRC_NOWJUDGE1() : SRC_NOWJUDGE2(); break;
+    case DefType::NOWCOMBO_1P: flipSide ? SRC_NOWCOMBO2() : SRC_NOWCOMBO1(); break;
+    case DefType::NOWCOMBO_2P: flipSide ? SRC_NOWCOMBO1() : SRC_NOWCOMBO2(); break;
+    case DefType::BGA: SRC_BGA(); break;
+    case DefType::MOUSECURSOR: SRC_MOUSECURSOR(); break;
+    case DefType::GAUGECHART_1P: SRC_GAUGECHART(flipSide ? PLAYER_SLOT_TARGET : PLAYER_SLOT_PLAYER); break;
+    case DefType::GAUGECHART_2P: SRC_GAUGECHART(flipSide ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET); break;
+    case DefType::SCORECHART: SRC_SCORECHART(); break;
+    case DefType::BAR_BODY: SRC_BAR_BODY(); break;
+    case DefType::BAR_FLASH: SRC_BAR_FLASH(); break;
+    case DefType::BAR_LEVEL: SRC_BAR_LEVEL(); break;
+    case DefType::BAR_LAMP: SRC_BAR_LAMP(); break;
+    case DefType::BAR_TITLE: SRC_BAR_TITLE(); break;
+    case DefType::BAR_RANK: SRC_BAR_RANK(); break;
+    case DefType::BAR_RIVAL: SRC_BAR_RIVAL(); break;
+    case DefType::BAR_MY_LAMP: SRC_BAR_RIVAL_MYLAMP(); break;
+    case DefType::BAR_RIVAL_LAMP: SRC_BAR_RIVAL_RIVALLAMP(); break;
 
-        case DefType::LINE:
-        case DefType::NOTE:           
-        case DefType::MINE:           
-        case DefType::LN_END:         
-        case DefType::LN_BODY:        
-        case DefType::LN_START:       
-        case DefType::AUTO_NOTE:      
-        case DefType::AUTO_MINE:      
-        case DefType::AUTO_LN_END:    
-        case DefType::AUTO_LN_BODY:   
-        case DefType::AUTO_LN_START:  SRC_NOTE(type); break;
+    case DefType::LINE:
+    case DefType::NOTE:
+    case DefType::MINE:
+    case DefType::LN_END:
+    case DefType::LN_BODY:
+    case DefType::LN_START:
+    case DefType::AUTO_NOTE:
+    case DefType::AUTO_MINE:
+    case DefType::AUTO_LN_END:
+    case DefType::AUTO_LN_BODY:
+    case DefType::AUTO_LN_START: SRC_NOTE(type); break;
 
-        case DefType::LVF_EXPERIMENTAL_GAUGECHART_MYBEST: SRC_GAUGECHART(PLAYER_SLOT_MYBEST); break;
+    case DefType::LVF_EXPERIMENTAL_GAUGECHART_MYBEST: SRC_GAUGECHART(PLAYER_SLOT_MYBEST); break;
 
-        case DefType::UNDEF:
-        case DefType::BAR_BODY_OFF:
-        case DefType::BAR_BODY_ON: break;
-        };
+    case DefType::UNDEF:
+    case DefType::BAR_BODY_OFF:
+    case DefType::BAR_BODY_ON: break;
+    };
 
     return true;
 }
@@ -1301,7 +1334,7 @@ ParseRet SkinLR2::SRC_IMAGE()
         builder.textureSheetCols = d.div_x;
         _sprites.push_back(builder.build());
     }
-    
+
     return ParseRet::OK;
 }
 
@@ -1313,14 +1346,19 @@ ParseRet SkinLR2::SRC_NUMBER()
 
     // get NumType from div_x, div_y
     unsigned f = d.div_y * d.div_x;
-    if (f % NumberType::NUM_TYPE_NORMAL == 0) f = f / NumberType::NUM_TYPE_NORMAL;
-    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0) f = f / NumberType::NUM_TYPE_BLANKZERO;
+    if (f % NumberType::NUM_TYPE_NORMAL == 0)
+        f = f / NumberType::NUM_TYPE_NORMAL;
+    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0)
+        f = f / NumberType::NUM_TYPE_BLANKZERO;
     else if (f % NumberType::NUM_TYPE_FULL == 0)
     {
         f = f / NumberType::NUM_TYPE_FULL;
-        d.keta++;   //LR2SkinHelp: スキン関連ドキュメントには「ketaは+-文字を含めた桁数です」と記述されていますが、正しくは「 + -符号を含まない桁数」指定です。
+        d.keta++; // LR2SkinHelp:
+                  // スキン関連ドキュメントには「ketaは+-文字を含めた桁数です」と記述されていますが、正しくは「 +
+                  // -符号を含まない桁数」指定です。
     }
-    else f = 0;
+    else
+        f = 0;
 
     SpriteNumber::SpriteNumberBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1350,18 +1388,14 @@ ParseRet SkinLR2::SRC_NUMBER()
     case IndexNumber::PLAY_2P_FAST_COUNT:
     case IndexNumber::PLAY_2P_SLOW_COUNT:
     case IndexNumber::PLAY_1P_JUDGE_TIME_ERROR_MS:
-    case IndexNumber::PLAY_2P_JUDGE_TIME_ERROR_MS:
-        isSupportFastSlow = true;
-        break;
+    case IndexNumber::PLAY_2P_JUDGE_TIME_ERROR_MS: isSupportFastSlow = true; break;
 
     case IndexNumber::GREEN_NUMBER_1P:
     case IndexNumber::GREEN_NUMBER_2P:
     case IndexNumber::GREEN_NUMBER_MAXBPM_1P:
     case IndexNumber::GREEN_NUMBER_MAXBPM_2P:
     case IndexNumber::GREEN_NUMBER_MINBPM_1P:
-    case IndexNumber::GREEN_NUMBER_MINBPM_2P:
-        isSupportGreenNumber = true;
-        break;
+    case IndexNumber::GREEN_NUMBER_MINBPM_2P: isSupportGreenNumber = true; break;
 
     default: break;
     }
@@ -1391,9 +1425,7 @@ ParseRet SkinLR2::SRC_SLIDER()
     switch ((IndexSlider)d.type)
     {
     case IndexSlider::HID_1P:
-    case IndexSlider::HID_2P:
-        isSupportLift = true;
-        break;
+    case IndexSlider::HID_2P: isSupportLift = true; break;
     default: break;
     }
 
@@ -1423,7 +1455,7 @@ ParseRet SkinLR2::SRC_BARGRAPH()
 ParseRet SkinLR2::SRC_BUTTON()
 {
     lr2skin::s_button d(parseParamBuf, csvLineNumber);
-    
+
     std::shared_ptr<SpriteOption> s;
 
     SpriteButton::SpriteButtonBuilder builder;
@@ -1445,12 +1477,11 @@ ParseRet SkinLR2::SRC_BUTTON()
         {
             switch (d.type)
             {
-            case 72:	// bga off/on/autoplay only, special
-            case 73:	// bga normal/extend, special
-            case 80:	// window mode, windowed/fullscreen
-            case 82:	// vsync
-            default:
-                break;
+            case 72: // bga off/on/autoplay only, special
+            case 73: // bga normal/extend, special
+            case 80: // window mode, windowed/fullscreen
+            case 82: // vsync
+            default: break;
             }
         }
         builder.optionType = SpriteOption::opType::SWITCH;
@@ -1552,7 +1583,8 @@ ParseRet SkinLR2::SRC_MOUSECURSOR()
 
 ParseRet SkinLR2::SRC_README()
 {
-    if (loadMode >= 1) return ParseRet::OK;
+    if (loadMode >= 1)
+        return ParseRet::OK;
 
     lr2skin::s_readme d(parseParamBuf);
 
@@ -1585,7 +1617,8 @@ ParseRet SkinLR2::SRC_README()
 
 ParseRet SkinLR2::SRC_TEXT()
 {
-    if (loadMode >= 1) return ParseRet::OK;
+    if (loadMode >= 1)
+        return ParseRet::OK;
 
     lr2skin::s_text d(parseParamBuf);
 
@@ -1615,20 +1648,12 @@ ParseRet SkinLR2::SRC_TEXT()
     switch (d.st)
     {
     case 63:
-    case 64:
-        isSupportNewRandom = true;
-        break;
+    case 64: isSupportNewRandom = true; break;
     case 65:
-    case 66:
-        isSupportExHardAndAssistEasy = true;
-        break;
-    case 74:
-        isSupportHsFixInitialAndMain = true;
-        break;
+    case 66: isSupportExHardAndAssistEasy = true; break;
+    case 74: isSupportHsFixInitialAndMain = true; break;
     case 84:
-    case 85:
-        isSupportLift = true;
-        break;
+    case 85: isSupportLift = true; break;
     }
 
     return ParseRet::OK;
@@ -1674,9 +1699,18 @@ ParseRet SkinLR2::SRC_SCORECHART()
 
     switch (d._null)
     {
-    case 0: builder.lineType = LineType::SCORE;        builder.color = { 20, 20, 255, 255 }; break;
-    case 1: builder.lineType = LineType::SCORE_MYBEST; builder.color = { 20, 255, 20, 255 }; break;
-    case 2: builder.lineType = LineType::SCORE_TARGET; builder.color = { 255, 20, 20, 255 }; break;
+    case 0:
+        builder.lineType = LineType::SCORE;
+        builder.color = {20, 20, 255, 255};
+        break;
+    case 1:
+        builder.lineType = LineType::SCORE_MYBEST;
+        builder.color = {20, 255, 20, 255};
+        break;
+    case 2:
+        builder.lineType = LineType::SCORE_TARGET;
+        builder.color = {255, 20, 20, 255};
+        break;
     default: break;
     }
 
@@ -1684,7 +1718,6 @@ ParseRet SkinLR2::SRC_SCORECHART()
 
     return ParseRet::OK;
 }
-
 
 #pragma region SRC: Play skin specified
 
@@ -1763,10 +1796,14 @@ ParseRet SkinLR2::SRC_NOWCOMBO(size_t idx)
 
     // get NumType from div_x, div_y
     unsigned f = d.div_y * d.div_x;
-    if (f % NumberType::NUM_TYPE_NORMAL == 0) f = f / NumberType::NUM_TYPE_NORMAL;
-    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0) f = f / NumberType::NUM_TYPE_BLANKZERO;
-    else if (f % NumberType::NUM_TYPE_FULL == 0) f = f / NumberType::NUM_TYPE_FULL;
-    else f = 0;
+    if (f % NumberType::NUM_TYPE_NORMAL == 0)
+        f = f / NumberType::NUM_TYPE_NORMAL;
+    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0)
+        f = f / NumberType::NUM_TYPE_BLANKZERO;
+    else if (f % NumberType::NUM_TYPE_FULL == 0)
+        f = f / NumberType::NUM_TYPE_FULL;
+    else
+        f = 0;
 
     SpriteNumber::SpriteNumberBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -1819,7 +1856,6 @@ ParseRet SkinLR2::SRC_GROOVEGAUGE()
 
     return ParseRet::OK;
 }
-
 
 ParseRet SkinLR2::SRC_NOWJUDGE1()
 {
@@ -1906,80 +1942,61 @@ chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchS
     using namespace chart;
     switch (gamemode)
     {
-    case SkinType::PLAY5:
-    {
-        static const NoteLaneIndex lane[] =
-        {
-            Sc1, N11, N12, N13, N14, N15, _, _, _, _,
-            _, _, _, _, _, _, _, _, _, _,
+    case SkinType::PLAY5: {
+        static const NoteLaneIndex lane[] = {
+            Sc1, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
         };
         return lane[idx];
     }
-    case SkinType::PLAY7:
-    {
-        if (State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_5 || State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_10)
+    case SkinType::PLAY7: {
+        if (State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_5 ||
+            State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_10)
         {
-            static const NoteLaneIndex lane[][20] =
-            {
+            static const NoteLaneIndex lane[][20] = {
                 {
-                    Sc1, N11, N12, N13, N14, N15, _, _, _, _,
-                    _, _, _, _, _, _, _, _, _, _,
+                    Sc1, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
                 },
                 {
-                    Sc1, _, _, N11, N12, N13, N14, N15, _, _,
-                    _, _, _, _, _, _, _, _, _, _,
+                    Sc1, _, _, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _, _, _, _, _,
                 },
             };
             return (scratchSide1P == 1) ? lane[1][idx] : lane[0][idx];
         }
-        static const NoteLaneIndex lane[] =
-        {
-            Sc1, N11, N12, N13, N14, N15, N16, N17, _, _,
-            _, _, _, _, _, _, _, _, _, _,
+        static const NoteLaneIndex lane[] = {
+            Sc1, N11, N12, N13, N14, N15, N16, N17, _, _, _, _, _, _, _, _, _, _, _, _,
         };
         return lane[idx];
     }
-    case SkinType::PLAY9:
-    {
-        static const NoteLaneIndex lane[] =
-        {
-            _, N11, N12, N13, N14, N15, N16, N17, N18, N19,
-            _, _, _, _, _, _, _, _, _, _,
+    case SkinType::PLAY9: {
+        static const NoteLaneIndex lane[] = {
+            _, N11, N12, N13, N14, N15, N16, N17, N18, N19, _, _, _, _, _, _, _, _, _, _,
         };
         return lane[idx];
     }
     case SkinType::PLAY5_2:
-    case SkinType::PLAY10:
-    {
-        static const NoteLaneIndex lane[] =
-        {
-            Sc1, N11, N12, N13, N14, N15, _, _, _, _,
-            Sc2, N21, N22, N23, N24, N25, _, _, _, _,
+    case SkinType::PLAY10: {
+        static const NoteLaneIndex lane[] = {
+            Sc1, N11, N12, N13, N14, N15, _, _, _, _, Sc2, N21, N22, N23, N24, N25, _, _, _, _,
         };
         return lane[idx];
     }
     case SkinType::PLAY7_2:
-    case SkinType::PLAY14:
-    {
-        if (State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_5 || State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_10)
+    case SkinType::PLAY14: {
+        if (State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_5 ||
+            State::get(IndexOption::CHART_PLAY_KEYS) == Option::KEYS_10)
         {
-            static const NoteLaneIndex lane[][20] =
-            {
+            static const NoteLaneIndex lane[][20] = {
                 {
-                    Sc1, N11, N12, N13, N14, N15, _, _, _, _,
-                    Sc2, N21, N22, N23, N24, N25, _, _, _, _,
+                    Sc1, N11, N12, N13, N14, N15, _, _, _, _, Sc2, N21, N22, N23, N24, N25, _, _, _, _,
                 },
                 {
-                    Sc1, N11, N12, N13, N14, N15, _, _, _, _,
-                    Sc2, _, _, N21, N22, N23, N24, N25, _, _,
+                    Sc1, N11, N12, N13, N14, N15, _, _, _, _, Sc2, _, _, N21, N22, N23, N24, N25, _, _,
                 },
                 {
-                    Sc1, _, _, N11, N12, N13, N14, N15, _, _,
-                    Sc2, N21, N22, N23, N24, N25, _, _, _, _,
+                    Sc1, _, _, N11, N12, N13, N14, N15, _, _, Sc2, N21, N22, N23, N24, N25, _, _, _, _,
                 },
                 {
-                    Sc1, _, _, N11, N12, N13, N14, N15, _, _,
-                    Sc2, _, _, N21, N22, N23, N24, N25, _, _,
+                    Sc1, _, _, N11, N12, N13, N14, N15, _, _, Sc2, _, _, N21, N22, N23, N24, N25, _, _,
                 },
             };
             if (scratchSide1P == 1)
@@ -1988,10 +2005,8 @@ chart::NoteLaneIndex NoteIdxToLane(SkinType gamemode, int idx, unsigned scratchS
             }
             return (scratchSide2P == 1) ? lane[1][idx] : lane[0][idx];
         }
-        static const NoteLaneIndex lane[] =
-        {
-            Sc1, N11, N12, N13, N14, N15, N16, N17, _, _,
-            Sc2, N21, N22, N23, N24, N25, N26, N27, _, _,
+        static const NoteLaneIndex lane[] = {
+            Sc1, N11, N12, N13, N14, N15, N16, N17, _, _, Sc2, N21, N22, N23, N24, N25, N26, N27, _, _,
         };
         return lane[idx];
     }
@@ -2079,8 +2094,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
         autoNotes = true;
         break;
 
-    default:
-        return ParseRet::SRC_DEF_INVALID;
+    default: return ParseRet::SRC_DEF_INVALID;
     }
 
     size_t i = channelToIdx(cat, idx);
@@ -2103,8 +2117,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     std::shared_ptr<SpriteAnimated> pSpriteNote = nullptr;
     switch (type)
     {
-    case DefType::LINE:
-    {
+    case DefType::LINE: {
         SpriteLaneVertical::SpriteLaneVerticalBuilder builder;
         builder.srcLine = csvLineNumber;
         builder.player = d._null == 0 ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET;
@@ -2124,8 +2137,7 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     case DefType::NOTE:
     case DefType::MINE:
     case DefType::AUTO_NOTE:
-    case DefType::AUTO_MINE:
-    {
+    case DefType::AUTO_MINE: {
         SpriteLaneVertical::SpriteLaneVerticalBuilder builder;
         builder.srcLine = csvLineNumber;
         builder.player = !!(d._null >= 10);
@@ -2155,10 +2167,9 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
     case DefType::LN_START:
     case DefType::AUTO_LN_END:
     case DefType::AUTO_LN_BODY:
-    case DefType::AUTO_LN_START:
-    {
-        std::shared_ptr<SpriteLaneVerticalLN> pSpriteLane = std::dynamic_pointer_cast<SpriteLaneVerticalLN>(
-            !autoNotes ? laneSprites[i].first : laneSprites[i].second);
+    case DefType::AUTO_LN_START: {
+        std::shared_ptr<SpriteLaneVerticalLN> pSpriteLane =
+            std::dynamic_pointer_cast<SpriteLaneVerticalLN>(!autoNotes ? laneSprites[i].first : laneSprites[i].second);
         if (!pSpriteLane)
         {
             SpriteLaneVerticalLN::SpriteLaneVerticalLNBuilder builder;
@@ -2202,13 +2213,12 @@ ParseRet SkinLR2::SRC_NOTE(DefType type)
         }
         break;
     }
-    default:
-        break;
+    default: break;
     }
     if (pSpriteNote)
     {
-        pSpriteNote->appendMotionKeyFrame({ 0, {Rect(),
-            RenderParams::accelType::CONSTANT, Color(0xffffffff), BlendMode::ALPHA, 0, 0.0 } });
+        pSpriteNote->appendMotionKeyFrame(
+            {0, {Rect(), RenderParams::accelType::CONSTANT, Color(0xffffffff), BlendMode::ALPHA, 0, 0.0}});
         pSpriteNote->setMotionLoopTo(0);
     }
 
@@ -2227,7 +2237,6 @@ ParseRet SkinLR2::SRC_BGA()
     return ParseRet::OK;
 }
 
-
 #pragma endregion
 
 #pragma region SRC: Select skin specified
@@ -2239,17 +2248,19 @@ ParseRet SkinLR2::SRC_BAR_BODY()
     BarType type;
     switch (d._null & 0xFFFFFFFF)
     {
-    case 0:  type = BarType::SONG; break;
+    case 0:
+        type = BarType::SONG;
+        break;
         //   type = BarType::NEW_SONG; break;
-    case 1:  type = BarType::FOLDER; break;
-    case 2:  type = BarType::CUSTOM_FOLDER; break;
-    case 3:  type = BarType::NEW_SONG_FOLDER; break;
-    case 4:  type = BarType::RIVAL; break;
-    case 5:  type = BarType::SONG_RIVAL; break;
-    case 6:  type = BarType::COURSE_FOLDER; break;
-    case 7:  type = BarType::NEW_COURSE; break;
-    case 8:  type = BarType::COURSE; break;
-    case 9:  type = BarType::RANDOM_COURSE; break;
+    case 1: type = BarType::FOLDER; break;
+    case 2: type = BarType::CUSTOM_FOLDER; break;
+    case 3: type = BarType::NEW_SONG_FOLDER; break;
+    case 4: type = BarType::RIVAL; break;
+    case 5: type = BarType::SONG_RIVAL; break;
+    case 6: type = BarType::COURSE_FOLDER; break;
+    case 7: type = BarType::NEW_COURSE; break;
+    case 8: type = BarType::COURSE; break;
+    case 9: type = BarType::RANDOM_COURSE; break;
     case 10: type = BarType::TYPE_COUNT; break;
     default: return ParseRet::PARAM_INVALID;
     }
@@ -2305,10 +2316,14 @@ ParseRet SkinLR2::SRC_BAR_LEVEL()
 
     // get NumType from div_x, div_y
     unsigned f = d.div_y * d.div_x;
-    if (f % NumberType::NUM_TYPE_NORMAL == 0) f = f / NumberType::NUM_TYPE_NORMAL;
-    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0) f = f / NumberType::NUM_TYPE_BLANKZERO;
-    else if (f % NumberType::NUM_TYPE_FULL == 0) f = f / NumberType::NUM_TYPE_FULL;
-    else f = 0;
+    if (f % NumberType::NUM_TYPE_NORMAL == 0)
+        f = f / NumberType::NUM_TYPE_NORMAL;
+    else if (f % NumberType::NUM_TYPE_BLANKZERO == 0)
+        f = f / NumberType::NUM_TYPE_BLANKZERO;
+    else if (f % NumberType::NUM_TYPE_FULL == 0)
+        f = f / NumberType::NUM_TYPE_FULL;
+    else
+        f = 0;
 
     SpriteNumber::SpriteNumberBuilder builder;
     builder.srcLine = csvLineNumber;
@@ -2483,7 +2498,6 @@ ParseRet SkinLR2::SRC_BAR_RIVAL_RIVALLAMP()
     return ParseRet::OK;
 }
 
-
 #pragma endregion
 
 bool SkinLR2::DST()
@@ -2516,29 +2530,28 @@ bool SkinLR2::DST()
     case DefType::AUTO_MINE:
     case DefType::AUTO_LN_END:
     case DefType::AUTO_LN_BODY:
-    case DefType::AUTO_LN_START:  return false;
+    case DefType::AUTO_LN_START: return false;
 
-    case DefType::BAR_BODY_OFF:   
-    case DefType::BAR_BODY_ON:    DST_BAR_BODY();            break;
-    case DefType::BAR_FLASH:      DST_BAR_FLASH();           break;
-    case DefType::BAR_LEVEL:      DST_BAR_LEVEL();           break;
-    case DefType::BAR_LAMP:       DST_BAR_LAMP();            break;
-    case DefType::BAR_TITLE:      DST_BAR_TITLE();           break;
-    case DefType::BAR_RANK:       DST_BAR_RANK();            break;
-    case DefType::BAR_RIVAL:      DST_BAR_RIVAL();           break;
-    case DefType::BAR_MY_LAMP:    DST_BAR_RIVAL_MYLAMP();    break;
+    case DefType::BAR_BODY_OFF:
+    case DefType::BAR_BODY_ON: DST_BAR_BODY(); break;
+    case DefType::BAR_FLASH: DST_BAR_FLASH(); break;
+    case DefType::BAR_LEVEL: DST_BAR_LEVEL(); break;
+    case DefType::BAR_LAMP: DST_BAR_LAMP(); break;
+    case DefType::BAR_TITLE: DST_BAR_TITLE(); break;
+    case DefType::BAR_RANK: DST_BAR_RANK(); break;
+    case DefType::BAR_RIVAL: DST_BAR_RIVAL(); break;
+    case DefType::BAR_MY_LAMP: DST_BAR_RIVAL_MYLAMP(); break;
     case DefType::BAR_RIVAL_LAMP: DST_BAR_RIVAL_RIVALLAMP(); break;
 
-    case DefType::LINE:           DST_LINE();                break;
-    case DefType::NOTE:           DST_NOTE();                break;
+    case DefType::LINE: DST_LINE(); break;
+    case DefType::NOTE: DST_NOTE(); break;
 
     case DefType::README:
     case DefType::TEXT:
         if (loadMode >= 1)
             return true;
-        [[ fallthrough ]];
-    default:
-    {
+        [[fallthrough]];
+    default: {
         // load raw into data struct
         lr2skin::dst d(parseParamBuf);
 
@@ -2571,22 +2584,22 @@ bool SkinLR2::DST()
         bool typeMatch = true;
         switch (type)
         {
-        case DefType::IMAGE:         typeMatch = (sType == SpriteTypes::ANIMATED || sType == SpriteTypes::VIDEO); break;
-        case DefType::NUMBER:        typeMatch = sType == SpriteTypes::NUMBER; break;
-        case DefType::SLIDER:        typeMatch = sType == SpriteTypes::SLIDER; break;
-        case DefType::BARGRAPH:      typeMatch = sType == SpriteTypes::BARGRAPH; break;
-        case DefType::BUTTON:        typeMatch = (sType == SpriteTypes::BUTTON || sType == SpriteTypes::OPTION); break;
-        case DefType::ONMOUSE:       typeMatch = sType == SpriteTypes::ONMOUSE; break;
+        case DefType::IMAGE: typeMatch = (sType == SpriteTypes::ANIMATED || sType == SpriteTypes::VIDEO); break;
+        case DefType::NUMBER: typeMatch = sType == SpriteTypes::NUMBER; break;
+        case DefType::SLIDER: typeMatch = sType == SpriteTypes::SLIDER; break;
+        case DefType::BARGRAPH: typeMatch = sType == SpriteTypes::BARGRAPH; break;
+        case DefType::BUTTON: typeMatch = (sType == SpriteTypes::BUTTON || sType == SpriteTypes::OPTION); break;
+        case DefType::ONMOUSE: typeMatch = sType == SpriteTypes::ONMOUSE; break;
         case DefType::README:
-        case DefType::TEXT:          typeMatch = (sType == SpriteTypes::TEXT || sType == SpriteTypes::IMAGE_TEXT); break;
-        case DefType::JUDGELINE:     typeMatch = sType == SpriteTypes::ANIMATED; break;
-        case DefType::GROOVEGAUGE:   typeMatch = sType == SpriteTypes::GAUGE; break;
-        case DefType::NOWJUDGE_1P:   typeMatch = sType == SpriteTypes::ANIMATED; break;
-        case DefType::NOWCOMBO_1P:   typeMatch = sType == SpriteTypes::NUMBER; break;
-        case DefType::NOWJUDGE_2P:   typeMatch = sType == SpriteTypes::ANIMATED; break;
-        case DefType::NOWCOMBO_2P:   typeMatch = sType == SpriteTypes::NUMBER; break;
-        case DefType::BGA:           typeMatch = sType == SpriteTypes::STATIC; break;
-        case DefType::MOUSECURSOR:   typeMatch = sType == SpriteTypes::MOUSE_CURSOR; break;
+        case DefType::TEXT: typeMatch = (sType == SpriteTypes::TEXT || sType == SpriteTypes::IMAGE_TEXT); break;
+        case DefType::JUDGELINE: typeMatch = sType == SpriteTypes::ANIMATED; break;
+        case DefType::GROOVEGAUGE: typeMatch = sType == SpriteTypes::GAUGE; break;
+        case DefType::NOWJUDGE_1P: typeMatch = sType == SpriteTypes::ANIMATED; break;
+        case DefType::NOWCOMBO_1P: typeMatch = sType == SpriteTypes::NUMBER; break;
+        case DefType::NOWJUDGE_2P: typeMatch = sType == SpriteTypes::ANIMATED; break;
+        case DefType::NOWCOMBO_2P: typeMatch = sType == SpriteTypes::NUMBER; break;
+        case DefType::BGA: typeMatch = sType == SpriteTypes::STATIC; break;
+        case DefType::MOUSECURSOR: typeMatch = sType == SpriteTypes::MOUSE_CURSOR; break;
         case DefType::GAUGECHART_1P:
         case DefType::GAUGECHART_2P:
         case DefType::LVF_EXPERIMENTAL_GAUGECHART_MYBEST:
@@ -2655,7 +2668,7 @@ bool SkinLR2::DST()
                     default: break;
                     }
                     break;
-                    default: break;
+                default: break;
                 }
             }
             else
@@ -2694,19 +2707,32 @@ bool SkinLR2::DST()
             }
 
             std::vector<dst_option> dstOpt;
-            if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
-            if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
-            if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
+            if (d.op[0] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[2]));
             if (type == DefType::NUMBER)
             {
                 auto p = std::reinterpret_pointer_cast<SpriteNumber>(e);
                 switch (p->numInd)
                 {
-                case IndexNumber::MUSIC_BEGINNER_LEVEL:  dstOpt.push_back(dst_option::SELECT_HAVE_BEGINNER_IN_SAME_FOLDER); break;
-                case IndexNumber::MUSIC_NORMAL_LEVEL:    dstOpt.push_back(dst_option::SELECT_HAVE_NORMAL_IN_SAME_FOLDER);   break;
-                case IndexNumber::MUSIC_HYPER_LEVEL:     dstOpt.push_back(dst_option::SELECT_HAVE_HYPER_IN_SAME_FOLDER);    break;
-                case IndexNumber::MUSIC_ANOTHER_LEVEL:   dstOpt.push_back(dst_option::SELECT_HAVE_ANOTHER_IN_SAME_FOLDER);  break;
-                case IndexNumber::MUSIC_INSANE_LEVEL:    dstOpt.push_back(dst_option::SELECT_HAVE_INSANE_IN_SAME_FOLDER);   break;
+                case IndexNumber::MUSIC_BEGINNER_LEVEL:
+                    dstOpt.push_back(dst_option::SELECT_HAVE_BEGINNER_IN_SAME_FOLDER);
+                    break;
+                case IndexNumber::MUSIC_NORMAL_LEVEL:
+                    dstOpt.push_back(dst_option::SELECT_HAVE_NORMAL_IN_SAME_FOLDER);
+                    break;
+                case IndexNumber::MUSIC_HYPER_LEVEL:
+                    dstOpt.push_back(dst_option::SELECT_HAVE_HYPER_IN_SAME_FOLDER);
+                    break;
+                case IndexNumber::MUSIC_ANOTHER_LEVEL:
+                    dstOpt.push_back(dst_option::SELECT_HAVE_ANOTHER_IN_SAME_FOLDER);
+                    break;
+                case IndexNumber::MUSIC_INSANE_LEVEL:
+                    dstOpt.push_back(dst_option::SELECT_HAVE_INSANE_IN_SAME_FOLDER);
+                    break;
                 default: break;
                 }
             }
@@ -2716,19 +2742,18 @@ bool SkinLR2::DST()
             e->setMotionStartTimer((IndexTimer)d.timer);
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
-        //e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
-        //LOG_DEBUG << "[Skin] " << raw << ": Set sprite Keyframe (time: " << d.time << ")";
-
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
+        // e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
+        // LOG_DEBUG << "[Skin] " << raw << ": Set sprite Keyframe (time: " << d.time << ")";
     }
     break;
-
     }
 
     return true;
 }
-
 
 ParseRet SkinLR2::DST_NOTE()
 {
@@ -2738,8 +2763,10 @@ ParseRet SkinLR2::DST_NOTE()
     lr2skin::dst d(parseParamBuf);
     if (flipSide)
     {
-        if (0 <= d._null && d._null <= 9) d._null += 10;
-        else if (10 <= d._null && d._null <= 19) d._null -= 10;
+        if (0 <= d._null && d._null <= 9)
+            d._null += 10;
+        else if (10 <= d._null && d._null <= 19)
+            d._null -= 10;
     }
 
     if (d._null >= 20)
@@ -2749,35 +2776,45 @@ ParseRet SkinLR2::DST_NOTE()
 
     NoteLaneIndex idx = NoteIdxToLane(info.mode, d._null, info.scratchSide1P, info.scratchSide2P);
 
-    auto setDstNoteSprite = [&](NoteLaneCategory i, const std::shared_ptr<SpriteLaneVertical>& e)
-    {
+    auto setDstNoteSprite = [&](NoteLaneCategory i, const std::shared_ptr<SpriteLaneVertical>& e) {
         if (e->isMotionKeyFramesEmpty())
         {
             std::vector<dst_option> dstOpt;
-            if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
-            if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
-            if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
+            if (d.op[0] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[0]));
+            if (d.op[1] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[1]));
+            if (d.op[2] != DST_TRUE)
+                dstOpt.push_back(dst_option(d.op[2]));
             drawQueue.push_back({e, dstOpt, d.op[3]});
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
         }
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     };
 
     auto& [e1, e1a] = laneSprites[channelToIdx(NoteLaneCategory::Note, idx)];
-    if (e1) setDstNoteSprite(NoteLaneCategory::Note, e1);
-    if (e1a) setDstNoteSprite(NoteLaneCategory::Note, e1a);
+    if (e1)
+        setDstNoteSprite(NoteLaneCategory::Note, e1);
+    if (e1a)
+        setDstNoteSprite(NoteLaneCategory::Note, e1a);
 
     auto& [e2, e2a] = laneSprites[channelToIdx(NoteLaneCategory::Mine, idx)];
-    if (e2) setDstNoteSprite(NoteLaneCategory::Mine, e2);
-    if (e2a) setDstNoteSprite(NoteLaneCategory::Mine, e2a);
+    if (e2)
+        setDstNoteSprite(NoteLaneCategory::Mine, e2);
+    if (e2a)
+        setDstNoteSprite(NoteLaneCategory::Mine, e2a);
 
     auto& [e3, e3a] = laneSprites[channelToIdx(NoteLaneCategory::LN, idx)];
-    if (e3) setDstNoteSprite(NoteLaneCategory::LN, e3);
-    if (e3a) setDstNoteSprite(NoteLaneCategory::LN, e3a);
+    if (e3)
+        setDstNoteSprite(NoteLaneCategory::LN, e3);
+    if (e3a)
+        setDstNoteSprite(NoteLaneCategory::LN, e3a);
 
-    if (d._null == 3)       // 1P 3
+    if (d._null == 3) // 1P 3
     {
         info.noteLaneHeight1PSub = d.y + d.h;
     }
@@ -2786,7 +2823,6 @@ ParseRet SkinLR2::DST_NOTE()
         info.noteLaneHeight2PSub = d.y + d.h;
     }
 
-
     return ParseRet::OK;
 }
 
@@ -2794,7 +2830,7 @@ ParseRet SkinLR2::DST_LINE()
 {
     // load raw into data struct
     lr2skin::dst d(parseParamBuf);
-    
+
     auto e = _sprites.back();
     if (e == nullptr)
     {
@@ -2824,19 +2860,26 @@ ParseRet SkinLR2::DST_LINE()
     }
 
     p->pNote->clearMotionKeyFrames();
-    p->pNote->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-        lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+    p->pNote->appendMotionKeyFrame(
+        {0,
+         {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a), lr2skin::convertBlend(d.blend),
+          !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
 
     std::vector<dst_option> dstOpt;
-    if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
-    if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
-    if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
+    if (d.op[0] != DST_TRUE)
+        dstOpt.push_back(dst_option(d.op[0]));
+    if (d.op[1] != DST_TRUE)
+        dstOpt.push_back(dst_option(d.op[1]));
+    if (d.op[2] != DST_TRUE)
+        dstOpt.push_back(dst_option(d.op[2]));
     drawQueue.push_back({e, dstOpt, d.op[3]});
-    e->appendMotionKeyFrame({ 0, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-        lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+    e->appendMotionKeyFrame(
+        {0,
+         {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a), lr2skin::convertBlend(d.blend),
+          !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     e->setMotionLoopTo(0);
-    //e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
-    //LOG_DEBUG << "[Skin] " << raw << ": Set Lane sprite (Barline) Keyframe (time: " << d.time << ")";
+    // e->pushKeyFrame(time, x, y, w, h, acc, r, g, b, a, blend, filter, angle, center);
+    // LOG_DEBUG << "[Skin] " << raw << ": Set Lane sprite (Barline) Keyframe (time: " << d.time << ")";
 
     if (idx == chart::EXTRA_BARLINE_1P)
     {
@@ -2850,7 +2893,6 @@ ParseRet SkinLR2::DST_LINE()
     return ParseRet::OK;
 }
 
-
 ParseRet SkinLR2::DST_BAR_BODY()
 {
     bool bodyOn = parseKeyBuf == "#DST_BAR_BODY_ON";
@@ -2860,7 +2902,7 @@ ParseRet SkinLR2::DST_BAR_BODY()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     unsigned idx = unsigned(d._null);
 
     for (uint8_t i = 0; i != static_cast<uint8_t>(BarType::TYPE_COUNT); ++i)
@@ -2885,9 +2927,12 @@ ParseRet SkinLR2::DST_BAR_BODY()
                 barSpriteAvailable[idx] = true;
 
                 std::vector<dst_option> dstOpt;
-                if (d.op[0] != DST_TRUE) dstOpt.push_back(dst_option(d.op[0]));
-                if (d.op[1] != DST_TRUE) dstOpt.push_back(dst_option(d.op[1]));
-                if (d.op[2] != DST_TRUE) dstOpt.push_back(dst_option(d.op[2]));
+                if (d.op[0] != DST_TRUE)
+                    dstOpt.push_back(dst_option(d.op[0]));
+                if (d.op[1] != DST_TRUE)
+                    dstOpt.push_back(dst_option(d.op[1]));
+                if (d.op[2] != DST_TRUE)
+                    dstOpt.push_back(dst_option(d.op[2]));
                 drawQueue.push_back({barSprites[idx], dstOpt, d.op[3]});
             }
 
@@ -2895,8 +2940,10 @@ ParseRet SkinLR2::DST_BAR_BODY()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -2929,8 +2976,10 @@ ParseRet SkinLR2::DST_BAR_FLASH()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -2943,12 +2992,12 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     BarLevelType type = BarLevelType(d._null);
     if (d._null >= (int)BarLevelType::LEVEL_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry level type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -2957,7 +3006,8 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
         auto e = bar->getSpriteLevel(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LEVEL " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LEVEL " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -2971,10 +3021,11 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
-
 
     return ParseRet::OK;
 }
@@ -2986,12 +3037,12 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     auto type = BarLampType(d._null);
     if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry mylamp type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3000,7 +3051,8 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
         auto e = bar->getSpriteRivalLampSelf(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_MY_LAMP " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_MY_LAMP " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3014,8 +3066,10 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3027,12 +3081,12 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     auto type = BarLampType(d._null);
     if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry rivallamp type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3041,7 +3095,8 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
         auto e = bar->getSpriteRivalLampRival(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL_LAMP " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL_LAMP " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3055,8 +3110,10 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3069,12 +3126,12 @@ ParseRet SkinLR2::DST_BAR_LAMP()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     auto type = BarLampType(d._null);
     if (d._null >= (int)BarLampType::LAMP_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry lamp type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3083,7 +3140,8 @@ ParseRet SkinLR2::DST_BAR_LAMP()
         auto e = bar->getSpriteLamp(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LAMP " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_LAMP " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3097,8 +3155,10 @@ ParseRet SkinLR2::DST_BAR_LAMP()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3116,7 +3176,7 @@ ParseRet SkinLR2::DST_BAR_TITLE()
     if (d._null >= (int)BarTitleType::TITLE_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry title type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3139,8 +3199,10 @@ ParseRet SkinLR2::DST_BAR_TITLE()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3158,7 +3220,7 @@ ParseRet SkinLR2::DST_BAR_RANK()
     if (d._null >= (int)BarRankType::RANK_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry rank type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3167,7 +3229,8 @@ ParseRet SkinLR2::DST_BAR_RANK()
         auto e = bar->getSpriteRank(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RANK " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RANK " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3181,8 +3244,10 @@ ParseRet SkinLR2::DST_BAR_RANK()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
@@ -3195,12 +3260,12 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
 
     // timers are ignored for bars
     d.timer = 0;
-    
+
     auto type = BarRivalType(d._null);
     if (d._null >= (int)BarRivalType::RIVAL_TYPE_COUNT)
     {
         LOG_DEBUG << "[SkinLR2] BarEntry rival type (" << int(type) << ") Invalid!"
-            << " (Line " << csvLineNumber << ")";
+                  << " (Line " << csvLineNumber << ")";
         return ParseRet::PARAM_INVALID;
     }
 
@@ -3209,7 +3274,8 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
         auto e = bar->getSpriteRivalWinLose(type);
         if (e == nullptr)
         {
-            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL " << std::to_string(size_t(type)) << " undefined";
+            LOG_DEBUG << "[Skin] " << csvLineNumber << ": SRC_BAR_RIVAL " << std::to_string(size_t(type))
+                      << " undefined";
             return ParseRet::SRC_DEF_INVALID;
         }
 
@@ -3223,14 +3289,14 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
             drawQueue.push_back({e});
         }
 
-        e->appendMotionKeyFrame({ d.time, {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
-            lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center) } });
+        e->appendMotionKeyFrame(
+            {d.time,
+             {Rect(d.x, d.y, d.w, d.h), parseAccelType(d.acc), Color(d.r, d.g, d.b, d.a),
+              lr2skin::convertBlend(d.blend), !!d.filter, (double)d.angle, getCenterPoint(d.w, d.h, d.center)}});
     }
 
     return ParseRet::OK;
 }
-
-
 
 #pragma endregion
 
@@ -3240,10 +3306,13 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
 
 int SkinLR2::parseHeader(const Tokens& raw)
 {
-    if (raw.empty()) return 0;
-    for (auto& s : parseParamBuf) s.clear();
+    if (raw.empty())
+        return 0;
+    for (auto& s : parseParamBuf)
+        s.clear();
     parseKeyBuf = raw[0];
-    if (parseKeyBuf.empty()) return 0;
+    if (parseKeyBuf.empty())
+        return 0;
     for (size_t idx = 0; idx < 24 && idx < raw.size() - 1; ++idx)
     {
         parseParamBuf[idx] = lunaticvibes::trim(raw[idx + 1]);
@@ -3251,7 +3320,8 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
     if (matchToken(parseKeyBuf, "#INFORMATION"))
     {
-        while (parseParamBuf.size() < 4) parseParamBuf.emplace_back("");
+        while (parseParamBuf.size() < 4)
+            parseParamBuf.emplace_back("");
 
         int type = toInt(parseParamBuf[0]);
         const auto title = StringContent(parseParamBuf[1]);
@@ -3260,23 +3330,23 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
         switch (type)
         {
-        case 0:		info.mode = SkinType::PLAY7;	break;
-        case 1:		info.mode = SkinType::PLAY5;	break;
-        case 2:		info.mode = SkinType::PLAY14;	break;
-        case 3:		info.mode = SkinType::PLAY10;	break;
-        case 4:		info.mode = SkinType::PLAY9;	break;
-        case 5:		info.mode = SkinType::MUSIC_SELECT;	break;
-        case 6:		info.mode = SkinType::DECIDE;	break;
-        case 7:		info.mode = SkinType::RESULT;	break;
-        case 8:		info.mode = SkinType::KEY_CONFIG;	break;
-        case 9:		info.mode = SkinType::THEME_SELECT;	break;
-        case 10:	info.mode = SkinType::SOUNDSET;	break;
-        case 12:	info.mode = SkinType::PLAY7_2;	break;
-        case 13:	info.mode = SkinType::PLAY5_2;	break;
-        case 14:	info.mode = SkinType::PLAY9_2;	break;
-        case 15:	info.mode = SkinType::COURSE_RESULT;	break;
+        case 0: info.mode = SkinType::PLAY7; break;
+        case 1: info.mode = SkinType::PLAY5; break;
+        case 2: info.mode = SkinType::PLAY14; break;
+        case 3: info.mode = SkinType::PLAY10; break;
+        case 4: info.mode = SkinType::PLAY9; break;
+        case 5: info.mode = SkinType::MUSIC_SELECT; break;
+        case 6: info.mode = SkinType::DECIDE; break;
+        case 7: info.mode = SkinType::RESULT; break;
+        case 8: info.mode = SkinType::KEY_CONFIG; break;
+        case 9: info.mode = SkinType::THEME_SELECT; break;
+        case 10: info.mode = SkinType::SOUNDSET; break;
+        case 12: info.mode = SkinType::PLAY7_2; break;
+        case 13: info.mode = SkinType::PLAY5_2; break;
+        case 14: info.mode = SkinType::PLAY9_2; break;
+        case 15: info.mode = SkinType::COURSE_RESULT; break;
 
-        case 17:	info.mode = SkinType::TITLE;	break;
+        case 17: info.mode = SkinType::TITLE; break;
         }
         info.name = title;
         info.maker = maker;
@@ -3289,7 +3359,8 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
     else if (matchToken(parseKeyBuf, "#CUSTOMOPTION"))
     {
-        while (parseParamBuf.size() < 2) parseParamBuf.emplace_back("");
+        while (parseParamBuf.size() < 2)
+            parseParamBuf.emplace_back("");
 
         auto& title(parseParamBuf[0]);
         int dst_op = toInt(parseParamBuf[1]);
@@ -3317,7 +3388,8 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
     else if (matchToken(parseKeyBuf, "#CUSTOMFILE"))
     {
-        while (parseParamBuf.size() < 3) parseParamBuf.emplace_back("");
+        while (parseParamBuf.size() < 3)
+            parseParamBuf.emplace_back("");
 
         auto& title(parseParamBuf[0]);
         auto& path(parseParamBuf[1]);
@@ -3361,9 +3433,10 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
     else if (matchToken(parseKeyBuf, "#RESOLUTION"))
     {
-        while (parseParamBuf.size() < 1) parseParamBuf.emplace_back("");
+        while (parseParamBuf.size() < 1)
+            parseParamBuf.emplace_back("");
 
-        switch(toInt(parseParamBuf[0], -1))
+        switch (toInt(parseParamBuf[0], -1))
         {
         case 0: info.resolution = {640, 480}; break;
         case 1: info.resolution = {1280, 720}; break;
@@ -3384,18 +3457,22 @@ int SkinLR2::parseHeader(const Tokens& raw)
     return 0;
 }
 
-int SkinLR2::parseBody(const Tokens &raw)
+int SkinLR2::parseBody(const Tokens& raw)
 {
-    if (raw.empty()) return 0;
-    for (auto& s : parseParamBuf) s.clear();
+    if (raw.empty())
+        return 0;
+    for (auto& s : parseParamBuf)
+        s.clear();
     parseKeyBuf = raw[0];
-    if (parseKeyBuf.empty()) return 0;
+    if (parseKeyBuf.empty())
+        return 0;
     for (size_t idx = 0; idx < 24 && idx < raw.size() - 1; ++idx)
     {
         parseParamBuf[idx] = lunaticvibes::trim(raw[idx + 1]);
     }
 
-    try {
+    try
+    {
         if (IMAGE())
             return 1;
         if (LR2FONT())
@@ -3428,7 +3505,7 @@ int SkinLR2::parseBody(const Tokens &raw)
     return 0;
 }
 
-void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool ifUnsatisfied, bool skipOnly)
+void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool ifUnsatisfied, bool skipOnly)
 {
     if (t.size() <= 1 && !matchToken(*t.begin(), "#ELSEIF") && matchToken(*t.begin(), "#ENDIF"))
     {
@@ -3452,7 +3529,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
             lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
-            if (tokens.empty()) continue;
+            if (tokens.empty())
+                continue;
 
             if (matchToken(*tokens.begin(), "#IF"))
             {
@@ -3479,17 +3557,20 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
         size_t argCount = 0;
         for (auto it = ++t.begin(); it != t.end() && argCount < 9 && ifStmtTrue; ++it, argCount++)
         {
-            if (it->empty()) continue;
+            if (it->empty())
+                continue;
 
             auto res = toPairUIntBool(*it);
             if (!res.has_value())
             {
-                LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid DST_OPTION Index, deal as false (Line " << csvLineNumber << ")";
+                LOG_DEBUG << "[Skin] " << csvLineNumber << ": Invalid DST_OPTION Index, deal as false (Line "
+                          << csvLineNumber << ")";
                 ifStmtTrue = false;
                 break;
             }
             bool dst = getDstOpt(res->first);
-            if (res->second) dst = !dst;
+            if (res->second)
+                dst = !dst;
             ifStmtTrue = ifStmtTrue && dst;
         }
     }
@@ -3504,7 +3585,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
             lunaticvibes::to_utf8(raw_, enc, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
-            if (tokens.empty()) continue;
+            if (tokens.empty())
+                continue;
 
             if (!ifBlockEnded)
             {
@@ -3555,7 +3637,8 @@ void SkinLR2::IF(const Tokens &t, std::istream& lr2skin, eFileEncoding enc, bool
         {
             ++csvLineNumber;
             auto tokens = csvLineTokenize(raw);
-            if (tokens.empty()) continue;
+            if (tokens.empty())
+                continue;
 
             if (matchToken(*tokens.begin(), "#IF"))
             {
@@ -3631,7 +3714,8 @@ SkinLR2::~SkinLR2()
 
     if (getSceneFromSkinType(info.mode) == SceneType::PLAY)
     {
-        Path pCustomize = ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
+        Path pCustomize =
+            ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
         try
         {
             auto yaml = YAML::LoadFile(pCustomize.u8string());
@@ -3701,7 +3785,8 @@ bool SkinLR2::loadCSV(Path p)
         lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
         auto tokens = csvLineTokenize(rawUTF8);
-        if (tokens.empty()) continue;
+        if (tokens.empty())
+            continue;
 
         if (parseHeader(tokens) == -1)
         {
@@ -3720,9 +3805,7 @@ bool SkinLR2::loadCSV(Path p)
     case SkinType::PLAY7_2:
     case SkinType::PLAY9:
     case SkinType::PLAY10:
-    case SkinType::PLAY14:
-        lr2skin::flipSide = false;
-        break;
+    case SkinType::PLAY14: lr2skin::flipSide = false; break;
     case SkinType::RESULT:
     case SkinType::COURSE_RESULT:
         lr2skin::flipSide = (lr2skin::flipSideFlag || lr2skin::flipResultFlag) && !disableFlipResult;
@@ -3748,7 +3831,8 @@ bool SkinLR2::loadCSV(Path p)
         // load skin customization from profile
         if (p == filePath)
         {
-            Path pCustomize = ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
+            Path pCustomize =
+                ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
             try
             {
                 std::map<size_t, StringContent> opDstMap;
@@ -3794,7 +3878,8 @@ bool SkinLR2::loadCSV(Path p)
                     {
                         if (itDst.first == itOp.dst_op)
                         {
-                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itDst.second); itEntry != itOp.label.end())
+                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itDst.second);
+                                itEntry != itOp.label.end())
                             {
                                 itOp.value = std::distance(itOp.label.begin(), itEntry);
                             }
@@ -3804,7 +3889,8 @@ bool SkinLR2::loadCSV(Path p)
                     {
                         if (itOp.title == itFile.first && itOp.dst_op == 0)
                         {
-                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itFile.second); itEntry != itOp.label.end())
+                            if (const auto itEntry = std::find(itOp.label.begin(), itOp.label.end(), itFile.second);
+                                itEntry != itOp.label.end())
                             {
                                 itOp.value = std::distance(itOp.label.begin(), itEntry);
                             }
@@ -3838,7 +3924,8 @@ bool SkinLR2::loadCSV(Path p)
             lunaticvibes::to_utf8(raw_, encoding, rawUTF8);
 
             auto tokens = csvLineTokenize(rawUTF8);
-            if (tokens.empty()) continue;
+            if (tokens.empty())
+                continue;
 
             if (matchToken(*tokens.begin(), "#IF"))
             {
@@ -3850,11 +3937,13 @@ bool SkinLR2::loadCSV(Path p)
             }
             else if (matchToken(*tokens.begin(), "#ELSEIF"))
             {
-                LOG_DEBUG << "[Skin] Unexcepted #ELSEIF found without precedent #IF " << "(Line " << csvLineNumber << ")";
+                LOG_DEBUG << "[Skin] Unexcepted #ELSEIF found without precedent #IF " << "(Line " << csvLineNumber
+                          << ")";
             }
             else if (matchToken(*tokens.begin(), "#ENDIF"))
             {
-                LOG_DEBUG << "[Skin] Unexcepted #ENDIF found without precedent #IF " << "(Line " << csvLineNumber << ")";
+                LOG_DEBUG << "[Skin] Unexcepted #ENDIF found without precedent #IF " << "(Line " << csvLineNumber
+                          << ")";
             }
             else
             {
@@ -3879,7 +3968,8 @@ void SkinLR2::postLoad()
         size_t countFHD = 0;
         for (auto& s : _sprites)
         {
-            if (s->isMotionKeyFramesEmpty()) continue;
+            if (s->isMotionKeyFramesEmpty())
+                continue;
 
             const Rect& rc = s->motionKeyFrames.rbegin()->param.rect;
             if (rc.x > 1920 || rc.y > 1080 || rc.x + rc.w > 1920 || rc.y + rc.h > 1080)
@@ -3970,39 +4060,47 @@ void SkinLR2::postLoad()
         }
     }
 
-    auto setLaneHeight = [&](size_t begin, size_t end, int height)
-    {
+    auto setLaneHeight = [&](size_t begin, size_t end, int height) {
         using namespace chart;
         for (size_t i = begin; i <= end; ++i)
         {
             NoteLaneIndex lane = NoteIdxToLane(info.mode, i, info.scratchSide1P, info.scratchSide2P);
-            if (lane == _) continue;
+            if (lane == _)
+                continue;
             size_t idx;
 
             idx = channelToIdx(NoteLaneCategory::Note, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHeight(height);
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHeight(height);
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHeight(height);
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHeight(height);
             }
             idx = channelToIdx(NoteLaneCategory::Mine, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHeight(height);
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHeight(height);
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHeight(height);
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHeight(height);
             }
             idx = channelToIdx(NoteLaneCategory::LN, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHeight(height);
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHeight(height);
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHeight(height);
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHeight(height);
             }
         }
     };
     if (info.noteLaneHeight1PSub != 0 &&
         (info.noteLaneHeight1P == 0 || std::abs((int)info.noteLaneHeight1P - (int)info.noteLaneHeight1PSub) > 50))
     {
-        LOG_WARNING << "[Skin] 1P Bar line position (" << info.noteLaneHeight1P << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight1PSub << ") for calculating lane speed";
+        LOG_WARNING << "[Skin] 1P Bar line position (" << info.noteLaneHeight1P
+                    << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight1PSub
+                    << ") for calculating lane speed";
         info.noteLaneHeight1P = info.noteLaneHeight1PSub;
     }
     if (info.noteLaneHeight1P != 0)
@@ -4013,18 +4111,22 @@ void SkinLR2::postLoad()
         constexpr size_t idx = channelToIdx(NoteLaneCategory::EXTRA, NoteLaneExtra::EXTRA_BARLINE_1P);
         if (idx != LANE_INVALID)
         {
-            if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHeight(info.noteLaneHeight1P);
-            if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHeight(info.noteLaneHeight1P);
+            if (laneSprites[idx].first != nullptr)
+                laneSprites[idx].first->setHeight(info.noteLaneHeight1P);
+            if (laneSprites[idx].second != nullptr)
+                laneSprites[idx].second->setHeight(info.noteLaneHeight1P);
         }
 
         if (info.noteLaneHeight2P == 0)
             info.noteLaneHeight2P = info.noteLaneHeight1P;
     }
 
-    if (info.noteLaneHeight2PSub != 0 && 
+    if (info.noteLaneHeight2PSub != 0 &&
         (info.noteLaneHeight2P == 0 || std::abs((int)info.noteLaneHeight2P - (int)info.noteLaneHeight2PSub) > 50))
     {
-        LOG_WARNING << "[Skin] 2P Bar line position (" << info.noteLaneHeight2P << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight2PSub << ") for calculating lane speed";
+        LOG_WARNING << "[Skin] 2P Bar line position (" << info.noteLaneHeight2P
+                    << ") is suspiciously wrong. Using Note position (" << info.noteLaneHeight2PSub
+                    << ") for calculating lane speed";
         info.noteLaneHeight2P = info.noteLaneHeight2PSub;
     }
     if (info.noteLaneHeight2P != 0)
@@ -4035,8 +4137,10 @@ void SkinLR2::postLoad()
         constexpr size_t idx = channelToIdx(NoteLaneCategory::EXTRA, NoteLaneExtra::EXTRA_BARLINE_2P);
         if (idx != LANE_INVALID)
         {
-            if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHeight(info.noteLaneHeight2P);
-            if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHeight(info.noteLaneHeight2P);
+            if (laneSprites[idx].first != nullptr)
+                laneSprites[idx].first->setHeight(info.noteLaneHeight2P);
+            if (laneSprites[idx].second != nullptr)
+                laneSprites[idx].second->setHeight(info.noteLaneHeight2P);
         }
     }
 
@@ -4047,59 +4151,88 @@ void SkinLR2::postLoad()
         for (size_t i = 0; i < 20; ++i)
         {
             NoteLaneIndex lane = NoteIdxToLane(info.mode, i, info.scratchSide1P, info.scratchSide2P);
-            if (lane == _) continue;
+            if (lane == _)
+                continue;
 
             idx = channelToIdx(NoteLaneCategory::Note, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHIDDENCompatible();
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHIDDENCompatible();
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHIDDENCompatible();
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHIDDENCompatible();
             }
             idx = channelToIdx(NoteLaneCategory::Mine, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHIDDENCompatible();
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHIDDENCompatible();
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHIDDENCompatible();
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHIDDENCompatible();
             }
             idx = channelToIdx(NoteLaneCategory::LN, lane);
             if (idx != LANE_INVALID)
             {
-                if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHIDDENCompatible();
-                if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHIDDENCompatible();
+                if (laneSprites[idx].first != nullptr)
+                    laneSprites[idx].first->setHIDDENCompatible();
+                if (laneSprites[idx].second != nullptr)
+                    laneSprites[idx].second->setHIDDENCompatible();
             }
         }
         idx = channelToIdx(NoteLaneCategory::EXTRA, NoteLaneExtra::EXTRA_BARLINE_1P);
         if (idx != LANE_INVALID)
         {
-            if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHIDDENCompatible();
-            if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHIDDENCompatible();
+            if (laneSprites[idx].first != nullptr)
+                laneSprites[idx].first->setHIDDENCompatible();
+            if (laneSprites[idx].second != nullptr)
+                laneSprites[idx].second->setHIDDENCompatible();
         }
         idx = channelToIdx(NoteLaneCategory::EXTRA, NoteLaneExtra::EXTRA_BARLINE_2P);
         if (idx != LANE_INVALID)
         {
-            if (laneSprites[idx].first != nullptr) laneSprites[idx].first->setHIDDENCompatible();
-            if (laneSprites[idx].second != nullptr) laneSprites[idx].second->setHIDDENCompatible();
+            if (laneSprites[idx].first != nullptr)
+                laneSprites[idx].first->setHIDDENCompatible();
+            if (laneSprites[idx].second != nullptr)
+                laneSprites[idx].second->setHIDDENCompatible();
         }
     }
 
-    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE] && !(*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.empty())
+    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE] &&
+        !(*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.empty())
     {
         Rect d = (*_sharedSprites)[GLOBAL_SPRITE_IDX_1PJUDGELINE]->motionKeyFrames.back().param.rect;
         judgeLineRect1P = d;
-        if (d.w < 0) { judgeLineRect1P.x += d.w; judgeLineRect1P.w = -d.w; }
-        if (d.h < 0) { judgeLineRect1P.y += d.h; judgeLineRect1P.h = -d.h; }
+        if (d.w < 0)
+        {
+            judgeLineRect1P.x += d.w;
+            judgeLineRect1P.w = -d.w;
+        }
+        if (d.h < 0)
+        {
+            judgeLineRect1P.y += d.h;
+            judgeLineRect1P.h = -d.h;
+        }
     }
-    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE] && !(*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.empty())
+    if ((*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE] &&
+        !(*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.empty())
     {
         Rect d = (*_sharedSprites)[GLOBAL_SPRITE_IDX_2PJUDGELINE]->motionKeyFrames.back().param.rect;
         judgeLineRect2P = d;
-        if (d.w < 0) { judgeLineRect2P.x += d.w; judgeLineRect2P.w = -d.w; }
-        if (d.h < 0) { judgeLineRect2P.y += d.h; judgeLineRect2P.h = -d.h; }
+        if (d.w < 0)
+        {
+            judgeLineRect2P.x += d.w;
+            judgeLineRect2P.w = -d.w;
+        }
+        if (d.h < 0)
+        {
+            judgeLineRect2P.y += d.h;
+            judgeLineRect2P.h = -d.h;
+        }
     }
 
     // LIFT:
     // the following conditions are based on black box testing on LR2
-    // 
+    //
     // SRC_IMAGE (background):
     //  JUDGELINE.x - 5  <= x <= JUDGELINE.x + 5
     //  JUDGELINE.w - 10 <= w <= JUDGELINE.w + 10
@@ -4107,12 +4240,12 @@ void SkinLR2::postLoad()
     //
     // SRC_IMAGE with bomb timers:
     //  did not found any obvious conditions
-    // 
+    //
     // SRC_IMAGE with key input timers (laser):
     //  h >= 100
     //
     // the following conditions are added by Lunatic Vibes
-    // 
+    //
     // SRC_NUMBER0:
     // num=108/128 (target score): timer=40/46, y <= JUDGELINE.y
     // num=210/211 (F/S): timer=40/46, y <= JUDGELINE.y
@@ -4120,21 +4253,24 @@ void SkinLR2::postLoad()
     for (auto& e : drawQueue)
     {
         auto& s = e.ps;
-        if (s->isMotionKeyFramesEmpty()) continue;
+        if (s->isMotionKeyFramesEmpty())
+            continue;
         if (s->type() == SpriteTypes::ANIMATED)
         {
             const Rect& rcFirst = s->motionKeyFrames.front().param.rect;
             const Rect& rcLast = s->motionKeyFrames.back().param.rect;
             int timer = (int)s->motionStartTimer;
             if ((timer >= 100 && timer <= 109) || (timer >= 120 && timer <= 129) ||
-                timer == (int)IndexTimer::S1L_DOWN || timer == (int)IndexTimer::S1L_UP || timer == (int)IndexTimer::S1R_DOWN || timer == (int)IndexTimer::S1R_UP)
+                timer == (int)IndexTimer::S1L_DOWN || timer == (int)IndexTimer::S1L_UP ||
+                timer == (int)IndexTimer::S1R_DOWN || timer == (int)IndexTimer::S1R_UP)
             {
                 // 1P laser
                 if (rcFirst.h <= -100 || rcFirst.h >= 100 || rcLast.h <= -100 || rcLast.h >= 100)
                     spritesMoveWithLift1P.push_back(s);
             }
             else if ((timer >= 110 && timer <= 119) || (timer >= 130 && timer <= 139) ||
-                timer == (int)IndexTimer::S2L_DOWN || timer == (int)IndexTimer::S2L_UP || timer == (int)IndexTimer::S2R_DOWN || timer == (int)IndexTimer::S2R_UP)
+                     timer == (int)IndexTimer::S2L_DOWN || timer == (int)IndexTimer::S2L_UP ||
+                     timer == (int)IndexTimer::S2R_DOWN || timer == (int)IndexTimer::S2R_UP)
             {
                 // 2P laser
                 if (rcFirst.h <= -100 || rcFirst.h >= 100 || rcLast.h <= -100 || rcLast.h >= 100)
@@ -4162,8 +4298,8 @@ void SkinLR2::postLoad()
                     spritesMoveWithLift1P.push_back(s);
                 }
                 else if (judgeLineRect2P.x - 5 <= rcLast.x && rcLast.x <= judgeLineRect2P.x + 5 &&
-                    judgeLineRect2P.w - 10 <= rcLast.w && rcLast.w <= judgeLineRect2P.w + 10 &&
-                    rcLast.y <= judgeLineRect2P.y + judgeLineRect2P.h)
+                         judgeLineRect2P.w - 10 <= rcLast.w && rcLast.w <= judgeLineRect2P.w + 10 &&
+                         rcLast.y <= judgeLineRect2P.y + judgeLineRect2P.h)
                 {
                     // 2P background
                     spritesMoveWithLift2P.push_back(s);
@@ -4178,12 +4314,16 @@ void SkinLR2::postLoad()
             int timer = (int)s->motionStartTimer;
             if (timer == 40 || timer == 46 || timer == 47)
             {
-                if ((rcFirst.y <= judgeLineRect1P.y + judgeLineRect1P.h || rcLast.y <= judgeLineRect1P.y + judgeLineRect1P.h) && (num == 108 || num == 210))
+                if ((rcFirst.y <= judgeLineRect1P.y + judgeLineRect1P.h ||
+                     rcLast.y <= judgeLineRect1P.y + judgeLineRect1P.h) &&
+                    (num == 108 || num == 210))
                 {
                     // 2P target score, F/S
                     spritesMoveWithLift1P.push_back(s);
                 }
-                else if ((rcFirst.y <= judgeLineRect2P.y + judgeLineRect2P.h || rcLast.y <= judgeLineRect2P.y + judgeLineRect2P.h) && (num == 128 || num == 211))
+                else if ((rcFirst.y <= judgeLineRect2P.y + judgeLineRect2P.h ||
+                          rcLast.y <= judgeLineRect2P.y + judgeLineRect2P.h) &&
+                         (num == 128 || num == 211))
                 {
                     // 2P target score, F/S
                     spritesMoveWithLift2P.push_back(s);
@@ -4247,7 +4387,8 @@ void SkinLR2::findAndExtractDXA(const Path& path)
                 extractDxaToFile(dxa);
                 break;
             }
-        } while (folderStr.length() >= lr2skinFolderStr.length() && folderStr.substr(0, lr2skinFolderStr.length()) == lr2skinFolderStr);
+        } while (folderStr.length() >= lr2skinFolderStr.length() &&
+                 folderStr.substr(0, lr2skinFolderStr.length()) == lr2skinFolderStr);
     }
 }
 
@@ -4266,7 +4407,7 @@ void SkinLR2::update()
     {
         const int ttAngle1P = State::get(IndexNumber::_ANGLE_TT_1P);
         const int ttAngle2P = State::get(IndexNumber::_ANGLE_TT_2P);
-        auto updateSprite = [ttAngle1P, ttAngle2P](element &e) {
+        auto updateSprite = [ttAngle1P, ttAngle2P](element& e) {
             e.ps->setHideExternal(std::any_of(e.dstOpt.begin(), e.dstOpt.end(), std::not_fn(&getDstOpt)));
 
             switch (e.op4)
@@ -4307,9 +4448,7 @@ void SkinLR2::update()
                     case 0:
                         comboShiftUnitCount += (combo->maxDigits - combo->digitCount) * 2 - combo->digitCount + 1;
                         break;
-                    case 1:
-                        comboShiftUnitCount -= combo->digitCount - 1;
-                        break;
+                    case 1: comboShiftUnitCount -= combo->digitCount - 1; break;
                     case 2:
                         // FIXME: MSVC 'unary minus operator applied to unsigned type, result still unsigned'
                         comboShiftUnitCount += (-combo->maxDigits - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
@@ -4347,7 +4486,7 @@ void SkinLR2::update()
         if (gPlayContext.mode == SkinType::PLAY10 || gPlayContext.mode == SkinType::PLAY14)
             lift2P = (State::get(IndexNumber::LANECOVER_BOTTOM_1P) / 1000.0) * info.noteLaneHeight2P;
     }
-    if (gPlayContext.isBattle && 
+    if (gPlayContext.isBattle &&
         (gPlayContext.mods[PLAYER_SLOT_TARGET].laneEffect == PlayModifierLaneEffectType::LIFT ||
          gPlayContext.mods[PLAYER_SLOT_TARGET].laneEffect == PlayModifierLaneEffectType::LIFTSUD))
     {
@@ -4421,7 +4560,7 @@ void SkinLR2::update()
     if (move1PX != 0 || move1PY != 0 || move2PX != 0 || move2PY != 0 || adjustPlayNote1PW != 0 ||
         adjustPlayNote1PH != 0 || adjustPlayNote2PW != 0 || adjustPlayNote2PH != 0)
     {
-        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), [&](element &e) {
+        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), [&](element& e) {
             auto pS = std::dynamic_pointer_cast<SpriteLaneVertical>(e.ps);
             if (pS != nullptr)
             {
@@ -4463,7 +4602,8 @@ void SkinLR2::update()
             const double decimal = posNow - (int)posNow;
             for (size_t i = 1; i + 1 < barSprites.size(); ++i)
             {
-                if (!barSpriteAvailable[i]) continue;
+                if (!barSpriteAvailable[i])
+                    continue;
                 if (decimal <= 0.5 && barSprites[i - 1]->isDraw())
                 {
                     const float factor = decimal;
@@ -4546,7 +4686,6 @@ SkinBase::CustomizeOption SkinLR2::getCustomizeOptionInfo(size_t idx) const
     }
     return ret;
 }
-
 
 StringContent SkinLR2::getName() const
 {

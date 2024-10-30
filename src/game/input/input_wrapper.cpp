@@ -8,9 +8,8 @@
 #include <common/utils.h>
 #include <game/runtime/generic_info.h>
 
-InputWrapper::InputWrapper(unsigned rate, bool background) : 
-    AsyncLooper("InputLoop", std::bind(&InputWrapper::_loop, this), rate),
-    _background(background)
+InputWrapper::InputWrapper(unsigned rate, bool background)
+    : AsyncLooper("InputLoop", std::bind(&InputWrapper::_loop, this), rate), _background(background)
 {
 }
 
@@ -41,7 +40,7 @@ void InputWrapper::_loop()
     lunaticvibes::Time now;
 
     // detect key / button
-    InputMask p{ 0 }, h{ 0 }, r{ 0 };
+    InputMask p{0}, h{0}, r{0};
     auto curr = _curr;
     if (!_background && !IsWindowForeground())
     {
@@ -85,7 +84,7 @@ void InputWrapper::_loop()
     scratchAxisPrev[0] = scratchAxisCurr[0];
     scratchAxisPrev[1] = scratchAxisCurr[1];
     InputMgr::getScratchPos(scratchAxisCurr[0], scratchAxisCurr[1]);
-    double aDelta[2] = { 0., 0. };
+    double aDelta[2] = {0., 0.};
     if (scratchAxisSet)
     {
         aDelta[0] = normalizeLinearGrowth(scratchAxisPrev[0], scratchAxisCurr[0]) * InputMgr::getDeadzone(Input::S1A);
@@ -107,7 +106,8 @@ void InputWrapper::_loop()
                  i != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++i)
             {
                 const auto k = static_cast<Input::Keyboard>(i);
-                if (isKeyPressed(k)) mask.set(i);
+                if (isKeyPressed(k))
+                    mask.set(i);
             }
             _kbcurr = mask;
 
@@ -115,7 +115,8 @@ void InputWrapper::_loop()
             for (auto ki = static_cast<unsigned>(Input::Keyboard::K_ESC);
                  ki != static_cast<unsigned>(Input::Keyboard::K_COUNT); ++ki)
             {
-                if (_kbcurr[ki] && !_kbprev[ki]) p.set(ki);
+                if (_kbcurr[ki] && !_kbprev[ki])
+                    p.set(ki);
             }
             if (p.any())
             {
@@ -140,7 +141,8 @@ void InputWrapper::_loop()
                 j.type = Input::Joystick::Type::BUTTON;
                 for (j.index = 0; j.index < InputMgr::MAX_JOYSTICK_BUTTON_COUNT; ++j.index)
                 {
-                    if (isButtonPressed(j)) mask.set(base + j.index);
+                    if (isButtonPressed(j))
+                        mask.set(base + j.index);
                 }
                 base += InputMgr::MAX_JOYSTICK_BUTTON_COUNT;
 
@@ -148,13 +150,17 @@ void InputWrapper::_loop()
                 for (size_t idxPOV = 0; idxPOV < InputMgr::MAX_JOYSTICK_POV_COUNT; ++idxPOV)
                 {
                     j.index = idxPOV | (1ul << 31);
-                    if (isButtonPressed(j)) mask.set(base + idxPOV * 4 + 0);
+                    if (isButtonPressed(j))
+                        mask.set(base + idxPOV * 4 + 0);
                     j.index = idxPOV | (1ul << 30);
-                    if (isButtonPressed(j)) mask.set(base + idxPOV * 4 + 1);
+                    if (isButtonPressed(j))
+                        mask.set(base + idxPOV * 4 + 1);
                     j.index = idxPOV | (1ul << 29);
-                    if (isButtonPressed(j)) mask.set(base + idxPOV * 4 + 2);
+                    if (isButtonPressed(j))
+                        mask.set(base + idxPOV * 4 + 2);
                     j.index = idxPOV | (1ul << 28);
-                    if (isButtonPressed(j)) mask.set(base + idxPOV * 4 + 3);
+                    if (isButtonPressed(j))
+                        mask.set(base + idxPOV * 4 + 3);
                 }
                 base += InputMgr::MAX_JOYSTICK_POV_COUNT * 4;
 
@@ -180,7 +186,8 @@ void InputWrapper::_loop()
                 for (size_t k = 0; k < MAX_JOYSTICK_MASK_BIT_COUNT; ++k)
                 {
                     size_t ki = static_cast<size_t>(k);
-                    if (_joycurr[device][ki] && !_joyprev[device][ki]) p.set(ki);
+                    if (_joycurr[device][ki] && !_joyprev[device][ki])
+                        p.set(ki);
                 }
                 if (p.any())
                 {
@@ -191,7 +198,7 @@ void InputWrapper::_loop()
                 }
             }
         }
-    
+
         if (!_absaxisCallbackMap.empty())
         {
             _joyaxisprev = _joyaxiscurr;
@@ -239,7 +246,7 @@ void InputWrapper::_loop()
             if (r != 0)
                 for (auto& [cbname, callback] : _rCallbackMap)
                     callback(r, now);
-            
+
             if (aDelta[0] != 0.0 || aDelta[1] != 0.0)
                 for (auto& [cbname, callback] : _aCallbackMap)
                 {
@@ -297,7 +304,6 @@ bool InputWrapper::_unregister(unsigned type, const std::string& key)
 
     return true;
 }
-
 
 bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)
 {

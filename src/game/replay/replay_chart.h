@@ -2,15 +2,14 @@
 
 // FIXME: cereal is not meant for persistent storage.
 
-#include <vector>
 #include "common/hash.h"
-#include "common/types.h"
 #include "common/keymap.h"
+#include "common/types.h"
 #include <cereal/access.hpp>
 #include <cereal/types/vector.hpp>
+#include <vector>
 
-template <class Archive, size_t bytes>
-void serialize(Archive& ar, Hash<bytes>& hash)
+template <class Archive, size_t bytes> void serialize(Archive& ar, Hash<bytes>& hash)
 {
     unsigned char* hashBytes = const_cast<unsigned char*>(hash.hex());
     for (size_t i = 0; i < bytes; ++i)
@@ -23,7 +22,7 @@ public:
     struct Commands
     {
         int64_t ms = -1;
-        enum class Type: uint32_t
+        enum class Type : uint32_t
         {
             UNDEF,
             RESERVED_1,
@@ -92,45 +91,45 @@ public:
             S2A_MINUS,
             S2A_STOP,
 
-            JUDGE_LEFT_EXACT_0,  // PGREAT
-            JUDGE_LEFT_EARLY_0,  // PGREAT
-            JUDGE_LEFT_EARLY_1,  // GREAT
-            JUDGE_LEFT_EARLY_2,  // GOOD
-            JUDGE_LEFT_EARLY_3,  // BAD
-            JUDGE_LEFT_EARLY_4,  // POOR
-            JUDGE_LEFT_EARLY_5,  // KPOOR
+            JUDGE_LEFT_EXACT_0, // PGREAT
+            JUDGE_LEFT_EARLY_0, // PGREAT
+            JUDGE_LEFT_EARLY_1, // GREAT
+            JUDGE_LEFT_EARLY_2, // GOOD
+            JUDGE_LEFT_EARLY_3, // BAD
+            JUDGE_LEFT_EARLY_4, // POOR
+            JUDGE_LEFT_EARLY_5, // KPOOR
             JUDGE_LEFT_EARLY_6,
             JUDGE_LEFT_EARLY_7,
             JUDGE_LEFT_EARLY_8,
             JUDGE_LEFT_EARLY_9,
-            JUDGE_LEFT_LATE_0,   // PGREAT
-            JUDGE_LEFT_LATE_1,   // GREAT
-            JUDGE_LEFT_LATE_2,   // GOOD
-            JUDGE_LEFT_LATE_3,   // BAD
-            JUDGE_LEFT_LATE_4,   // POOR
-            JUDGE_LEFT_LATE_5,   // KPOOR
+            JUDGE_LEFT_LATE_0, // PGREAT
+            JUDGE_LEFT_LATE_1, // GREAT
+            JUDGE_LEFT_LATE_2, // GOOD
+            JUDGE_LEFT_LATE_3, // BAD
+            JUDGE_LEFT_LATE_4, // POOR
+            JUDGE_LEFT_LATE_5, // KPOOR
             JUDGE_LEFT_LATE_6,
             JUDGE_LEFT_LATE_7,
             JUDGE_LEFT_LATE_8,
             JUDGE_LEFT_LATE_9,
 
-            JUDGE_RIGHT_EXACT_0,  // PGREAT
-            JUDGE_RIGHT_EARLY_0,  // PGREAT
-            JUDGE_RIGHT_EARLY_1,  // GREAT
-            JUDGE_RIGHT_EARLY_2,  // GOOD
-            JUDGE_RIGHT_EARLY_3,  // BAD
-            JUDGE_RIGHT_EARLY_4,  // POOR
-            JUDGE_RIGHT_EARLY_5,  // KPOOR
+            JUDGE_RIGHT_EXACT_0, // PGREAT
+            JUDGE_RIGHT_EARLY_0, // PGREAT
+            JUDGE_RIGHT_EARLY_1, // GREAT
+            JUDGE_RIGHT_EARLY_2, // GOOD
+            JUDGE_RIGHT_EARLY_3, // BAD
+            JUDGE_RIGHT_EARLY_4, // POOR
+            JUDGE_RIGHT_EARLY_5, // KPOOR
             JUDGE_RIGHT_EARLY_6,
             JUDGE_RIGHT_EARLY_7,
             JUDGE_RIGHT_EARLY_8,
             JUDGE_RIGHT_EARLY_9,
-            JUDGE_RIGHT_LATE_0,   // PGREAT
-            JUDGE_RIGHT_LATE_1,   // GREAT
-            JUDGE_RIGHT_LATE_2,   // GOOD
-            JUDGE_RIGHT_LATE_3,   // BAD
-            JUDGE_RIGHT_LATE_4,   // POOR
-            JUDGE_RIGHT_LATE_5,   // KPOOR
+            JUDGE_RIGHT_LATE_0, // PGREAT
+            JUDGE_RIGHT_LATE_1, // GREAT
+            JUDGE_RIGHT_LATE_2, // GOOD
+            JUDGE_RIGHT_LATE_3, // BAD
+            JUDGE_RIGHT_LATE_4, // POOR
+            JUDGE_RIGHT_LATE_5, // KPOOR
             JUDGE_RIGHT_LATE_6,
             JUDGE_RIGHT_LATE_7,
             JUDGE_RIGHT_LATE_8,
@@ -150,8 +149,7 @@ public:
 
         static Type leftSideCmdToRightSide(Type);
 
-        template<class Archive>
-        void serialize(Archive& ar)
+        template <class Archive> void serialize(Archive& ar)
         {
             ar(ms);
             ar(type);
@@ -162,26 +160,26 @@ public:
 private:
     // FIXME: this should not use cereal for the calculation. You can't even update CEREAL_CLASS_VERSION because of
     // this.
-    uint32_t    checksum = 0;           // md5(serirization of this, checksum=0)
+    uint32_t checksum = 0; // md5(serirization of this, checksum=0)
 
 public:
-    HashMD5     chartHash;
-    uint64_t    randomSeed = 0;
+    HashMD5 chartHash;
+    uint64_t randomSeed = 0;
 
-    PlayModifierGaugeType   gaugeType = PlayModifierGaugeType::NORMAL;  
-    PlayModifierRandomType  randomTypeLeft = PlayModifierRandomType::NONE; 
-    PlayModifierRandomType  randomTypeRight = PlayModifierRandomType::NONE; 
-    int8_t      laneEffectType = 0;     // OFF/HID/SUD/SUDHID/LIFT/LIFTSUD
-    int8_t      pitchType = 0;          // FREQ/PITCH/SPEED
-    int8_t      pitchValue = 0;         // -12 ~ +12 (value below 0 may invalid)
-    uint8_t     assistMask = 0;
-    PlayModifierHispeedFixType      hispeedFix = PlayModifierHispeedFixType::NONE;
-    bool        DPFlip = false;
-    bool        DPBattle = false;
-    double      hispeed = 0;
-    int16_t     lanecoverTop = 0;
-    int16_t     lanecoverBottom = 0;
-    bool        lanecoverEnabled = false;
+    PlayModifierGaugeType gaugeType = PlayModifierGaugeType::NORMAL;
+    PlayModifierRandomType randomTypeLeft = PlayModifierRandomType::NONE;
+    PlayModifierRandomType randomTypeRight = PlayModifierRandomType::NONE;
+    int8_t laneEffectType = 0; // OFF/HID/SUD/SUDHID/LIFT/LIFTSUD
+    int8_t pitchType = 0;      // FREQ/PITCH/SPEED
+    int8_t pitchValue = 0;     // -12 ~ +12 (value below 0 may invalid)
+    uint8_t assistMask = 0;
+    PlayModifierHispeedFixType hispeedFix = PlayModifierHispeedFixType::NONE;
+    bool DPFlip = false;
+    bool DPBattle = false;
+    double hispeed = 0;
+    int16_t lanecoverTop = 0;
+    int16_t lanecoverBottom = 0;
+    bool lanecoverEnabled = false;
 
     std::vector<Commands> commands;
 
@@ -192,8 +190,7 @@ public:
 private:
     friend class cereal::access;
 
-    template<class Archive>
-    void serialize(Archive& ar, const std::uint32_t version)
+    template <class Archive> void serialize(Archive& ar, const std::uint32_t version)
     {
         ar(checksum);
         ar(chartHash);
@@ -218,11 +215,9 @@ private:
         // more parameters goes below
         if (version >= 3)
         {
-
         }
     }
     void updateChecksum();
-
 
 public:
     bool loadFile(const Path& path);

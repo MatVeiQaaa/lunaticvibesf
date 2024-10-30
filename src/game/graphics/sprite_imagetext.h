@@ -37,16 +37,14 @@ public:
 
         std::shared_ptr<SpriteImageText> build() const { return std::make_shared<SpriteImageText>(*this); }
     };
+
 public:
     SpriteImageText() = delete;
     SpriteImageText(const SpriteImageTextBuilder& builder);
     ~SpriteImageText() override = default;
 
     // Inject after construction.
-    void setMaxHeight(float maxHeight)
-    {
-        _maxHeight = maxHeight;
-    };
+    void setMaxHeight(float maxHeight) { _maxHeight = maxHeight; };
 
 public:
     void updateTextRect() override;

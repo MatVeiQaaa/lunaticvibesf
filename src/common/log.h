@@ -5,7 +5,8 @@
 #define PLOG_CAPTURE_FILE
 #include <plog/Log.h> // IWYU pragma: export
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 void InitLogger(const char* logFileName);
 

@@ -1,22 +1,22 @@
 #pragma once
-#include <memory>
-#include <boost/format.hpp>
-#include <utility>
-#include "entry_folder.h"
 #include "common/chartformat/chartformat.h"
+#include "entry_folder.h"
+#include <boost/format.hpp>
+#include <memory>
+#include <utility>
 
 // entry for individual song, e.g. jukebox/bms/L9
 class EntryFolderSong : public EntryFolderBase
 {
 public:
     EntryFolderSong() = delete;
-    EntryFolderSong(const HashMD5& md5, const Path& path, StringContentView name = "", StringContentView name2 = "") :
-        EntryFolderBase(md5, name, name2), _path(path)
+    EntryFolderSong(const HashMD5& md5, const Path& path, StringContentView name = "", StringContentView name2 = "")
+        : EntryFolderBase(md5, name, name2), _path(path)
     {
         _type = eEntryType::SONG;
     }
-    EntryFolderSong(std::shared_ptr<ChartFormatBase> pChart):
-        EntryFolderBase(pChart->fileHash, pChart->title, pChart->title2), _path(pChart->fileName)
+    EntryFolderSong(std::shared_ptr<ChartFormatBase> pChart)
+        : EntryFolderBase(pChart->fileHash, pChart->title, pChart->title2), _path(pChart->fileName)
     {
         pushChart(std::move(pChart));
         _type = eEntryType::SONG;
@@ -43,6 +43,7 @@ public:
 
 protected:
     std::map<int, std::map<unsigned, std::vector<std::shared_ptr<ChartFormatBase>>>> chartMap;
+
 public:
     const std::vector<std::shared_ptr<ChartFormatBase>>& getDifficultyList(int gamemode, unsigned difficulty) const;
 };
@@ -56,10 +57,7 @@ public:
     // extend info
     std::shared_ptr<EntryFolderSong> _song = nullptr;
 
-    Path getPath() override
-    {
-        return _file->absolutePath;
-    }
+    Path getPath() override { return _file->absolutePath; }
 
 public:
     EntryChart() = default;
@@ -83,8 +81,8 @@ class EntryFolderRegular : public EntryFolderBase
 {
 public:
     EntryFolderRegular() = delete;
-    EntryFolderRegular(const HashMD5& md5, const Path& path, StringContentView name = "", StringContentView name2 = "") :
-        EntryFolderBase(md5, name, name2), _path(path)
+    EntryFolderRegular(const HashMD5& md5, const Path& path, StringContentView name = "", StringContentView name2 = "")
+        : EntryFolderBase(md5, name, name2), _path(path)
     {
         _type = eEntryType::FOLDER;
     }
@@ -101,8 +99,8 @@ class EntryFolderNewSong : public EntryFolderRegular
 {
 public:
     EntryFolderNewSong() = delete;
-    EntryFolderNewSong(StringContentView name, StringContentView name2 = "") :
-        EntryFolderRegular(HashMD5{}, "", name, name2)
+    EntryFolderNewSong(StringContentView name, StringContentView name2 = "")
+        : EntryFolderRegular(HashMD5{}, "", name, name2)
     {
         _type = eEntryType::NEW_SONG_FOLDER;
     }

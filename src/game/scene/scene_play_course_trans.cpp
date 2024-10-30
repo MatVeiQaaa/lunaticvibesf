@@ -5,9 +5,9 @@
 
 ScenePlayCourseTrans::ScenePlayCourseTrans() : SceneBase(nullptr, SkinType::COURSE_TRANS, 240)
 {
-	_type = SceneType::COURSE_TRANS;
+    _type = SceneType::COURSE_TRANS;
 
-	LOG_DEBUG << "[PlayCourseTrans]";
-	clearContextPlayForRetry();
-	gNextScene = SceneType::PLAY;
+    LOG_DEBUG << "[PlayCourseTrans]";
+    clearContextPlayForRetry();
+    gNextScene = SceneType::PLAY;
 }

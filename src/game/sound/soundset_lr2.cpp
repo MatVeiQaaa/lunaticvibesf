@@ -16,22 +16,20 @@
 
 SoundSetLR2::SoundSetLR2() : SoundSetLR2(std::mt19937{std::random_device{}()})
 {
-	_type = eSoundSetType::LR2;
+    _type = eSoundSetType::LR2;
 }
 
 SoundSetLR2::SoundSetLR2(Path p) : SoundSetLR2()
 {
-	loadCSV(std::move(p));
+    loadCSV(std::move(p));
 }
 
-SoundSetLR2::SoundSetLR2(std::mt19937 gen) : _gen(gen)
-{
-}
+SoundSetLR2::SoundSetLR2(std::mt19937 gen) : _gen(gen) {}
 
 void SoundSetLR2::loadCSV(Path p)
 {
-	if (filePath.empty())
-		filePath = p;
+    if (filePath.empty())
+        filePath = p;
 
     auto srcLineNumberParent = csvLineNumber;
     csvLineNumber = 0;
@@ -68,7 +66,8 @@ void SoundSetLR2::loadCSV(Path p)
 
         static const boost::char_separator<char> sep(",");
         boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);
-        if (tokens.begin() == tokens.end()) continue;
+        if (tokens.begin() == tokens.end())
+            continue;
         tokenBuf.assign(tokens.begin(), tokens.end());
 
         parseHeader(tokenBuf);
@@ -109,7 +108,8 @@ void SoundSetLR2::loadCSV(Path p)
 
         static boost::char_separator<char> sep(",");
         boost::tokenizer<boost::char_separator<char>> tokens(rawUTF8, sep);
-        if (tokens.begin() == tokens.end()) continue;
+        if (tokens.begin() == tokens.end())
+            continue;
         tokenBuf.assign(tokens.begin(), tokens.end());
 
         parseBody(tokenBuf);
@@ -139,8 +139,10 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
             LOG_DEBUG << "[SoundSetLR2] Invalid #INFORMATION type";
             return false;
         }
-        if (tokens.size() > 2) name = tokens[2];
-        if (tokens.size() > 3) maker = tokens[3];
+        if (tokens.size() > 2)
+            name = tokens[2];
+        if (tokens.size() > 3)
+            maker = tokens[3];
         if (tokens.size() > 4)
             thumbnailPath =
                 PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), lunaticvibes::trim(tokens[4])));
@@ -200,26 +202,10 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
 
     StringContentView key = tokens[0];
 
-    static const std::set<std::string> soundKeys =
-    {
-        "#SELECT",
-        "#DECIDE",
-        "#EXSELECT",
-        "#EXDECIDE",
-        "#FOLDER_OPEN",
-        "#FOLDER_CLOSE",
-        "#PANEL_OPEN",
-        "#PANEL_CLOSE",
-        "#OPTION_CHANGE",
-        "#DIFFICULTY",
-        "#SCREENSHOT",
-        "#CLEAR",
-        "#FAIL",
-        "#STOP",
-        "#MINE",
-        "#SCRATCH",
-        "#COURSECLEAR",
-        "#COURSEFAIL",
+    static const std::set<std::string> soundKeys = {
+        "#SELECT",     "#DECIDE",      "#EXSELECT",      "#EXDECIDE",   "#FOLDER_OPEN", "#FOLDER_CLOSE",
+        "#PANEL_OPEN", "#PANEL_CLOSE", "#OPTION_CHANGE", "#DIFFICULTY", "#SCREENSHOT",  "#CLEAR",
+        "#FAIL",       "#STOP",        "#MINE",          "#SCRATCH",    "#COURSECLEAR", "#COURSEFAIL",
     };
     for (auto& k : soundKeys)
     {
@@ -230,7 +216,6 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
     }
     return false;
 }
-
 
 bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
 {
@@ -304,7 +289,8 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
 
 static Path getPathOrDefault(const std::map<std::string, Path>& soundFilePath, const std::string& key)
 {
-    if (auto it = soundFilePath.find(key); it != soundFilePath.end()) return it->second;
+    if (auto it = soundFilePath.find(key); it != soundFilePath.end())
+        return it->second;
     return {};
 }
 
@@ -388,7 +374,6 @@ Path SoundSetLR2::getPathBGMCourseFailed() const
     return getPathOrDefault(soundFilePath, "#COURSEFAIL");
 }
 
-
 size_t SoundSetLR2::getCustomizeOptionCount() const
 {
     return customfiles.size();
@@ -431,8 +416,7 @@ bool SoundSetLR2::setCustomFileOptionForBodyParsing(const std::string_view title
                 customFile.value = std::distance(customFile.label.begin(), entry);
                 return true;
             }
-            LOG_WARNING << "[SoundSetLR2] Config value for option '" << title << "' '" << value
-                        << "' is not available";
+            LOG_WARNING << "[SoundSetLR2] Config value for option '" << title << "' '" << value << "' is not available";
             return false;
         }
     }

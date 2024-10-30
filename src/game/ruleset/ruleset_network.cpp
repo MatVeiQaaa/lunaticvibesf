@@ -3,19 +3,18 @@
 
 std::vector<unsigned char> vRulesetNetwork::packInit(const std::shared_ptr<RulesetBase>& local)
 {
-	if (auto p = std::dynamic_pointer_cast<RulesetBMS>(local); p != nullptr)
-	{
-		return RulesetBMSNetwork::packInit(p);
-	}
-	return {};
+    if (auto p = std::dynamic_pointer_cast<RulesetBMS>(local); p != nullptr)
+    {
+        return RulesetBMSNetwork::packInit(p);
+    }
+    return {};
 }
 
 std::vector<unsigned char> vRulesetNetwork::packFrame(const std::shared_ptr<RulesetBase>& local)
 {
-	if (auto p = std::dynamic_pointer_cast<RulesetBMS>(local); p != nullptr)
-	{
-		return RulesetBMSNetwork::packFrame(p);
-	}
-	return {};
+    if (auto p = std::dynamic_pointer_cast<RulesetBMS>(local); p != nullptr)
+    {
+        return RulesetBMSNetwork::packFrame(p);
+    }
+    return {};
 }
-

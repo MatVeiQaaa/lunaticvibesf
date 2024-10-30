@@ -21,9 +21,13 @@ private:
 public:
     static constexpr std::size_t MAX_JOYSTICK_COUNT = 8;
     static constexpr std::size_t MAX_JOYSTICK_BUTTON_COUNT = 32;
-    static constexpr std::size_t MAX_JOYSTICK_POV_COUNT = 4;    // 4 directions each pov
-    static constexpr std::size_t MAX_JOYSTICK_AXIS_COUNT = 8;       // 2 directions each axis
-    enum class eAxisMode { AXIS_NORMAL, AXIS_ABSOLUTE };
+    static constexpr std::size_t MAX_JOYSTICK_POV_COUNT = 4;  // 4 directions each pov
+    static constexpr std::size_t MAX_JOYSTICK_AXIS_COUNT = 8; // 2 directions each axis
+    enum class eAxisMode
+    {
+        AXIS_NORMAL,
+        AXIS_ABSOLUTE
+    };
 
     // Game keys param / functions
 private:
@@ -46,11 +50,10 @@ public:
 
     std::bitset<Input::KEY_COUNT> _detect();
     static std::bitset<Input::KEY_COUNT> detect();
-	static bool getMousePos(int& x, int& y);
+    static bool getMousePos(int& x, int& y);
     static bool getScratchPos(double& s1, double& s2);
 
     static void setDebounceTime(int ms);
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -75,4 +78,3 @@ bool isMouseButtonPressed(int idx);
 short getLastMouseWheelState();
 
 // absolute axis
-

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <functional>
 #include "common/keymap.h"
+#include <functional>
 
 namespace lr2skin::button
 {
@@ -30,4 +30,4 @@ void key_config_mode_rotate();
 void skinselect_mode(int mode);
 void skinselect_skin(int plus);
 void skinselect_option(int index, int plus);
-}
+} // namespace lr2skin::button

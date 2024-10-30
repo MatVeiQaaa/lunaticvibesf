@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ruleset_bms.h"
 #include "game/scene/scene_context.h"
+#include "ruleset_bms.h"
 
 class RulesetBMSReplay : public RulesetBMS
 {
@@ -23,7 +23,6 @@ private:
     bool isSkippingToEnd = false;
 
 public:
-
     // Register to InputWrapper
     void updatePress(InputMask& pg, const lunaticvibes::Time& t) override {}
     // Register to InputWrapper

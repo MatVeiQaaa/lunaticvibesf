@@ -1,6 +1,7 @@
 #pragma once
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 #ifdef NDEBUG
 inline bool g_enable_imgui_debug_monitor = false;
 inline bool g_enable_show_clicked_sprite = false;

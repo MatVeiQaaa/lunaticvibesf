@@ -1,14 +1,14 @@
 #pragma once
 
+#include <array>
+#include <list>
+#include <memory>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <vector>
-#include <array>
-#include <list>
-#include <memory>
-#include <optional>
 
 #include "scene.h"
 #include "scene_context.h"
@@ -47,7 +47,7 @@ private:
     lunaticvibes::Time selectDownTimestamp;
 
     // preview
-    std::thread _previewLoading; // TODO(C++20): use std::jthread
+    std::thread _previewLoading;      // TODO(C++20): use std::jthread
     std::thread _previewChartLoading; // TODO(C++20): use std::jthread
     std::shared_mutex previewMutex;
     enum
@@ -92,7 +92,7 @@ private:
     bool isHoldingK27 = false;
 
     // 9K
-    bool bindings9K = false;    // yellow buttons (2, 8) navigate, red button (5) enter, blue buttons (4, 6) back
+    bool bindings9K = false; // yellow buttons (2, 8) navigate, red button (5) enter, blue buttons (4, 6) back
 
     // imgui
     bool imguiShow = false;
@@ -157,7 +157,7 @@ protected:
     void updatePreview();
     void postStartPreview();
 
-/// //////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////
 protected:
     void arenaCommand();
     void arenaHostLobby();
@@ -165,7 +165,7 @@ protected:
     void arenaJoinLobbyPrompt();
     void arenaJoinLobby();
 
-/// //////////////////////////////////////////////////////
+    /// //////////////////////////////////////////////////////
 
 private:
     void imguiInit();
@@ -218,10 +218,10 @@ private:
 
     bool imgui_add_profile_popup = false;
     int imgui_add_profile_popup_error = 0;
-    char imgui_add_profile_buf[256] = { 0 };
+    char imgui_add_profile_buf[256] = {0};
     bool imgui_add_profile_copy_from_current = true;
 
-    char imgui_player_name_buf[256] = { 0 };
+    char imgui_player_name_buf[256] = {0};
 
     std::list<std::string> imgui_languages;
     std::vector<const char*> imgui_languages_display;
@@ -233,8 +233,8 @@ private:
     std::vector<const char*> imgui_folders_display;
     int imgui_folder_index;
 
-    char imgui_folder_path_buf[256] = { 0 };
-    char imgui_table_url_buf[256] = { 0 };
+    char imgui_folder_path_buf[256] = {0};
+    char imgui_table_url_buf[256] = {0};
     std::list<std::string> imgui_tables;
     std::vector<const char*> imgui_tables_display;
     int imgui_table_index;
@@ -244,7 +244,7 @@ private:
     std::vector<const char*> imgui_video_display_resolution_display;
     int old_video_display_resolution_index, imgui_video_display_resolution_index;
 
-    int old_video_mode, imgui_video_mode;   // 0:windowed 1:fullscreen 2:borderless
+    int old_video_mode, imgui_video_mode; // 0:windowed 1:fullscreen 2:borderless
     int imgui_video_ssLevel;
 
     int imgui_video_vsync_index;
@@ -288,7 +288,7 @@ private:
 
     bool imgui_show_arenaJoinLobbyPrompt = false;
     bool imgui_arena_joinLobby = false;
-    char imgui_arena_address_buf[256] = { 0 };
+    char imgui_arena_address_buf[256] = {0};
 
     bool imgui_play_adjustHispeedWithUpDown = false;
     bool imgui_play_adjustHispeedWithSelect = false;
@@ -305,7 +305,8 @@ private:
     bool _show_random_noplay;
 };
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 struct BadCommand
 {
@@ -329,11 +330,12 @@ struct PathResult
     std::string path;
 };
 
-using SearchQueryResult = std::variant<std::shared_ptr<EntryFolderRegular>, DeleteScoreResult, HashResult, PathResult, BadCommand>;
+using SearchQueryResult =
+    std::variant<std::shared_ptr<EntryFolderRegular>, DeleteScoreResult, HashResult, PathResult, BadCommand>;
 
 std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, ScoreDB& score_db,
                                                   const SelectContextParams& select_context);
 [[nodiscard]] SearchQueryResult execute_search_query(SelectContextParams& select_context, SongDB& song_db,
-                                                   ScoreDB& score_db, const std::string& text);
+                                                     ScoreDB& score_db, const std::string& text);
 
-} // lunaticvibes
+} // namespace lunaticvibes

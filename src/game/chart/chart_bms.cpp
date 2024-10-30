@@ -3,15 +3,16 @@
 #include <bitset>
 #include <random>
 
-#include <common/assert.h>
 #include "common/log.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
+#include <common/assert.h>
 
 using namespace chart;
 
-ChartObjectBMS::ChartObjectBMS(int slot) : ChartObjectBase(slot, BGM_LANE_COUNT, (size_t)eNoteExt::EXT_COUNT),
-    _currentStopNote(_specialNoteLists.front().begin())
+ChartObjectBMS::ChartObjectBMS(int slot)
+    : ChartObjectBase(slot, BGM_LANE_COUNT, (size_t)eNoteExt::EXT_COUNT),
+      _currentStopNote(_specialNoteLists.front().begin())
 {
 }
 
@@ -22,9 +23,9 @@ ChartObjectBMS::ChartObjectBMS(int slot, const ChartFormatBMS& b) : ChartObjectB
 
 void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 {
-	_noteCount_total = objBms.notes_total;
-	_noteCount_regular = objBms.notes_scratch + objBms.notes_key;
-	_noteCount_ln = objBms.notes_scratch_ln + objBms.notes_key_ln;
+    _noteCount_total = objBms.notes_total;
+    _noteCount_regular = objBms.notes_scratch + objBms.notes_key;
+    _noteCount_ln = objBms.notes_scratch_ln + objBms.notes_key_ln;
     _noteCount_scratch = objBms.notes_scratch;
     _noteCount_scratch_ln = objBms.notes_scratch_ln;
 
@@ -61,17 +62,17 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         _noteCount_ln *= 2;
     }
 
-	lunaticvibes::Time basetime{ 0 };
-	Metre basemetre{ 0, 1 };
+    lunaticvibes::Time basetime{0};
+    Metre basemetre{0, 1};
 
     BPM bpm = objBms.startBPM * gSelectContext.pitchSpeed;
     _currentBPM = bpm;
-    _bpmNoteList.push_back({ 0, {0, 1}, 0, 0, 0, bpm });
+    _bpmNoteList.push_back({0, {0, 1}, 0, 0, 0, bpm});
     bool bpmfucked = false; // set to true when BPM is changed to zero or negative value
-    std::bitset<NOTELANEINDEX_COUNT> isLnTail{ 0 };
+    std::bitset<NOTELANEINDEX_COUNT> isLnTail{0};
 
     std::array<NoteLaneIndex, NOTELANEINDEX_COUNT> gameLaneMap;
-    for (size_t i = Sc1; i < NOTELANEINDEX_COUNT; ++i) 
+    for (size_t i = Sc1; i < NOTELANEINDEX_COUNT; ++i)
         gameLaneMap[i] = (NoteLaneIndex)i;
 
     uint64_t seed = gPlayContext.randomSeed;
@@ -93,9 +94,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         case PlayModifierRandomType::MIRROR:
             std::reverse(gameLaneMap.begin() + laneRightStart, gameLaneMap.begin() + laneRightEnd + 1);
             break;
-        
-        case PlayModifierRandomType::RRAN:
-        {
+
+        case PlayModifierRandomType::RRAN: {
             size_t count = (laneRightEnd - laneRightStart + 1);
             size_t lane = rng() % count;
             for (size_t c = laneRightStart; c <= laneRightEnd; ++c, lane = (lane + 1) % count)
@@ -127,8 +127,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             std::reverse(gameLaneMap.begin() + laneLeftStart, gameLaneMap.begin() + laneLeftEnd + 1);
             break;
 
-        case PlayModifierRandomType::RRAN:
-        {
+        case PlayModifierRandomType::RRAN: {
             size_t count = (laneLeftEnd - laneLeftStart + 1);
             size_t lane = rng() % count;
             for (size_t c = laneLeftStart; c <= laneLeftEnd; ++c, lane = (lane + 1) % count)
@@ -159,8 +158,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 std::reverse(gameLaneMap.begin() + laneRightStart, gameLaneMap.begin() + laneRightEnd + 1);
                 break;
 
-            case PlayModifierRandomType::RRAN:
-            {
+            case PlayModifierRandomType::RRAN: {
                 size_t count = (laneRightEnd - laneRightStart + 1);
                 size_t lane = rng() % count;
                 for (size_t c = laneRightStart; c <= laneRightEnd; ++c, lane = (lane + 1) % count)
@@ -172,8 +170,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 break;
             }
 
-            case PlayModifierRandomType::DB_SYNCHRONIZE:
-            {
+            case PlayModifierRandomType::DB_SYNCHRONIZE: {
                 LVF_DEBUG_ASSERT(gChartContext.isDoubleBattle);
 
                 size_t count = (laneLeftEnd - laneLeftStart + 1);
@@ -189,8 +186,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 break;
             }
 
-            case PlayModifierRandomType::DB_SYMMETRY:
-            {
+            case PlayModifierRandomType::DB_SYMMETRY: {
                 LVF_DEBUG_ASSERT(gChartContext.isDoubleBattle);
 
                 size_t count = (laneLeftEnd - laneLeftStart + 1);
@@ -214,7 +210,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         }
     }
 
-    std::bitset<NOTELANEINDEX_COUNT> laneOccupiedByLN{ 0 };
+    std::bitset<NOTELANEINDEX_COUNT> laneOccupiedByLN{0};
 
     std::array<NoteLaneIndex, NOTELANEINDEX_COUNT> gameLaneLNIndex;
     gameLaneLNIndex.fill(_);
@@ -225,13 +221,13 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
     for (unsigned m = 0; m <= objBms.lastBarIdx; m++)
     {
-		barMetreLength.push_back(objBms.metres[m]);
-		_barMetrePos.push_back(basemetre);
+        barMetreLength.push_back(objBms.metres[m]);
+        _barMetrePos.push_back(basemetre);
         _barTimestamp.push_back(basetime);
 
         // In case the channels from the file are shuffled, store the data into buffer and sort it out first
         // The following patterns must be arranged to keep process order by [Notes > BPM > Stop]
-        enum class eLanePriority: unsigned
+        enum class eLanePriority : unsigned
         {
             // Notes
             NOTE,
@@ -257,7 +253,10 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
         {
             eLanePriority type;
             unsigned index;
-            bool operator< (const Lane& rhs) const { return std::make_pair(type, index) < std::make_pair(rhs.type, rhs.index); }
+            bool operator<(const Lane& rhs) const
+            {
+                return std::make_pair(type, index) < std::make_pair(rhs.type, rhs.index);
+            }
         };
 
         // notes [] {metre, {lane, sample/val}}
@@ -265,8 +264,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
         // add notes
         {
-            auto push_notes = [&objBms, m](decltype(notes)& notes, eLanePriority priority, LaneCode code, int area)
-            {
+            auto push_notes = [&objBms, m](decltype(notes)& notes, eLanePriority priority, LaneCode code, int area) {
                 for (unsigned i = 0; i < 10; i++)
                 {
                     const auto& ch = objBms.getLane(code, i, m);
@@ -278,12 +276,11 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     for (const auto& n : ch.notes)
                     {
                         //              { metre,                               { { lane,              val     } }
-                        notes.push_back({ Segment(n.segment, ch.resolution), { { priority, index }, n.value } });
+                        notes.push_back({Segment(n.segment, ch.resolution), {{priority, index}, n.value}});
                     }
                 }
             };
-            auto push_notes_ln = [&objBms, m, &isLnTail](decltype(notes)& notes, LaneCode code, int area)
-            {
+            auto push_notes_ln = [&objBms, m, &isLnTail](decltype(notes)& notes, LaneCode code, int area) {
                 for (unsigned i = 0; i < 10; i++)
                 {
                     const auto& ch = objBms.getLane(code, i, m);
@@ -295,7 +292,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     for (const auto& n : ch.notes)
                     {
                         eLanePriority priority = isLnTail[index] ? eLanePriority::LNTAIL : eLanePriority::LNHEAD;
-                        notes.push_back({ fraction(n.segment, ch.resolution),{ { priority, index }, n.value } });
+                        notes.push_back({fraction(n.segment, ch.resolution), {{priority, index}, n.value}});
                         isLnTail[index].flip();
                     }
                 }
@@ -307,7 +304,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             if (gPlayContext.isBattle && _playerSlot == PLAYER_SLOT_TARGET)
             {
                 // load notes into 2P area
-                
+
                 // Regular Notes
                 push_notes(notes, eLanePriority::NOTE, LaneCode::NOTE1, 1);
 
@@ -373,7 +370,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 const auto& ch = objBms.getLane(LaneCode::BGM, i, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                       val     } }
-                    notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGM, i }, n.value } });
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGM, i}, n.value}});
             }
 
             // BGA
@@ -382,20 +379,20 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 {
                     const auto& ch = objBms.getLane(LaneCode::BGABASE, 0, m);
                     for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val     } }
-                        notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGABASE, 0 }, n.value } });
+                        //              { metre,                               { { lane,                        val } }
+                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGABASE, 0}, n.value}});
                 }
                 {
                     const auto& ch = objBms.getLane(LaneCode::BGALAYER, 0, m);
                     for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val     } }
-                        notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGALAYER, 0 }, n.value } });
+                        //              { metre,                               { { lane,                        val } }
+                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGALAYER, 0}, n.value}});
                 }
                 {
                     const auto& ch = objBms.getLane(LaneCode::BGAPOOR, 0, m);
                     for (const auto& n : ch.notes)
-                        //              { metre,                               { { lane,                        val     } }
-                        notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BGAPOOR, 0 }, n.value } });
+                        //              { metre,                               { { lane,                        val } }
+                        notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BGAPOOR, 0}, n.value}});
                 }
             }
 
@@ -404,7 +401,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 const auto& ch = objBms.getLane(LaneCode::BPM, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::BPM, 0 }, n.value } });
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::BPM, 0}, n.value}});
             }
 
             // EX BPM
@@ -412,7 +409,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 const auto& ch = objBms.getLane(LaneCode::EXBPM, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::EXBPM, 0 }, n.value } });
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::EXBPM, 0}, n.value}});
             }
 
             // Stop
@@ -420,24 +417,25 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                 const auto& ch = objBms.getLane(LaneCode::STOP, 0, m);
                 for (const auto& n : ch.notes)
                     //              { metre,                               { { lane,                        val     } }
-                    notes.push_back({ fraction(n.segment, ch.resolution), { { eLanePriority::STOP, 0 }, n.value } });
+                    notes.push_back({fraction(n.segment, ch.resolution), {{eLanePriority::STOP, 0}, n.value}});
             }
         }
 
         // Sort by time / lane value
-        std::stable_sort(notes.begin(), notes.end(), [](const std::pair<Segment, std::pair<Lane, unsigned>>& lhs, const std::pair<Segment, std::pair<Lane, unsigned>>& rhs)
-            {
-                // only compare Segment; Lane and sample must keep original order
-                return lhs.first < rhs.first;
-            });
+        std::stable_sort(notes.begin(), notes.end(),
+                         [](const std::pair<Segment, std::pair<Lane, unsigned>>& lhs,
+                            const std::pair<Segment, std::pair<Lane, unsigned>>& rhs) {
+                             // only compare Segment; Lane and sample must keep original order
+                             return lhs.first < rhs.first;
+                         });
 
         ///////////////////////////////////////////////////////////////////////
 
         // Calculate note times and push to note list
         Segment lastBPMChangedSegment(0, 1);
         [[maybe_unused]] double stopMetre = 0; // FIXME: unused-but-set-variable
-        Metre barMetre = objBms.metres[m];      // visual metre
-		lunaticvibes::Time beatLength = lunaticvibes::Time::singleBeatLengthFromBPM(bpm);
+        Metre barMetre = objBms.metres[m];     // visual metre
+        lunaticvibes::Time beatLength = lunaticvibes::Time::singleBeatLengthFromBPM(bpm);
 
         for (const auto& note : notes)
         {
@@ -445,9 +443,10 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             const auto& [lane, val] = noteinfo;
             double metreFromBPMChange = (noteSegment - lastBPMChangedSegment) * barMetre;
             auto notemetre = static_cast<Metre>(basemetre + noteSegment * barMetre);
-			lunaticvibes::Time notetime = bpmfucked ? LLONG_MAX : basetime + beatLength * (metreFromBPMChange * 4);
+            lunaticvibes::Time notetime = bpmfucked ? LLONG_MAX : basetime + beatLength * (metreFromBPMChange * 4);
 
-            if (!leadInTimeSet && (lane.type == eLanePriority::NOTE || lane.type == eLanePriority::LNHEAD || lane.type == eLanePriority::BGM))
+            if (!leadInTimeSet && (lane.type == eLanePriority::NOTE || lane.type == eLanePriority::LNHEAD ||
+                                   lane.type == eLanePriority::BGM))
             {
                 leadInTimeSet = true;
                 _leadInTime = notetime;
@@ -456,13 +455,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
             decltype(Note::flags) flags = 0;
             switch (lane.index)
             {
-            case 0:
-                flags |= Note::SCRATCH;
-                break;
+            case 0: flags |= Note::SCRATCH; break;
             case 6:
-            case 7:
-                flags |= Note::KEY_6_7;
-                break;
+            case 7: flags |= Note::KEY_6_7; break;
             }
 
             if (lane.type >= eLanePriority::NOTE && lane.type <= eLanePriority::MINE)
@@ -492,9 +487,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     NoteLane chartLane;
                     switch (lane.type)
                     {
-                    case eLanePriority::NOTE:
-                        chartLane = idxToChannel(lane.index);
-                        break;
+                    case eLanePriority::NOTE: chartLane = idxToChannel(lane.index); break;
                     case eLanePriority::LNHEAD:
                         chartLane = idxToChannel(channelToIdx(NoteLaneCategory::LN, lane.index));
                         break;
@@ -506,9 +499,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         chartLane = idxToChannel(channelToIdx(NoteLaneCategory::Mine, lane.index));
                         flags |= Note::Flags::MINE;
                         break;
-                    default:
-                        LVF_DEBUG_ASSERT(false);
-                        break;
+                    default: LVF_DEBUG_ASSERT(false); break;
                     }
                     size_t gameLaneIdx = gameLaneMap[chartLane.second];
                     size_t gameLaneIdxMod = gameLaneIdx;
@@ -532,7 +523,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         break;
                     }
 
-                    switch (laneArea == 0 ? gPlayContext.mods[_playerSlot].randomLeft : gPlayContext.mods[_playerSlot].randomRight)
+                    switch (laneArea == 0 ? gPlayContext.mods[_playerSlot].randomLeft
+                                          : gPlayContext.mods[_playerSlot].randomRight)
                     {
                     case PlayModifierRandomType::SRAN:
                         if (gameLaneIdx != Sc1 && gameLaneIdx != Sc2)
@@ -558,7 +550,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                         placable.push_back(i);
                                 }
                             }
-                            gameLaneIdxMod = placable.empty() ? (N11 + rng() % laneCountOneSide) : placable[rng() % placable.size()];
+                            gameLaneIdxMod =
+                                placable.empty() ? (N11 + rng() % laneCountOneSide) : placable[rng() % placable.size()];
                         }
                         break;
 
@@ -616,10 +609,9 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         }
                         break;
 
-                    case PlayModifierRandomType::ALLSCR:
-                    {
-                        constexpr int threshold_scr_ms = 33;    // threshold of moving notes to keyboard lanes
-                        constexpr int threshold_ms = 250;       // try not to make keyboard jacks
+                    case PlayModifierRandomType::ALLSCR: {
+                        constexpr int threshold_scr_ms = 33; // threshold of moving notes to keyboard lanes
+                        constexpr int threshold_ms = 250;    // try not to make keyboard jacks
                         size_t laneScratch = Sc1;
                         if (isChartDP)
                         {
@@ -640,7 +632,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
 
                             auto laneIdxScratch = channelToIdx(NoteLaneCategory::Note, laneScratch);
                             if (laneOccupiedByLN[laneScratch] ||
-                                (!_noteLists[laneIdxScratch].empty() && notetime - _noteLists[laneIdxScratch].back().time >= threshold_scr_ms))
+                                (!_noteLists[laneIdxScratch].empty() &&
+                                 notetime - _noteLists[laneIdxScratch].back().time >= threshold_scr_ms))
                             {
                                 bool availableLaneFound = false;
                                 for (size_t i = laneMin; i != laneMax + laneStep; i += laneStep)
@@ -678,7 +671,8 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         {
                             auto laneIdxScratch = channelToIdx(NoteLaneCategory::Note, laneScratch);
                             if (laneOccupiedByLN[laneScratch] ||
-                                (!_noteLists[laneIdxScratch].empty() && notetime - _noteLists[laneIdxScratch].back().time >= threshold_scr_ms))
+                                (!_noteLists[laneIdxScratch].empty() &&
+                                 notetime - _noteLists[laneIdxScratch].back().time >= threshold_scr_ms))
                             {
                                 std::vector<NoteLaneIndex> placable;
                                 for (size_t ii = laneMin; ii != laneMax + 1; ++ii)
@@ -739,8 +733,7 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                         break;
                     }
 
-                    default:
-                        break;
+                    default: break;
                     }
 
                     _noteLists[channelToIdx(chartLane.first, gameLaneIdxMod)].emplace_back(
@@ -788,36 +781,42 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                     break;
 
                 case eLanePriority::BPM:
-                    if (bpm == static_cast<BPM>(val)) break;
+                    if (bpm == static_cast<BPM>(val))
+                        break;
                     lastBarIdx = m;
                     basetime = notetime;
                     lastBPMChangedSegment = noteSegment;
                     bpm = static_cast<BPM>(val) * gSelectContext.pitchSpeed;
                     beatLength = lunaticvibes::Time::singleBeatLengthFromBPM(bpm);
                     _bpmNoteList.emplace_back(m, notemetre, notetime, 0, 0, bpm);
-                    if (bpm <= 0) bpmfucked = true;
+                    if (bpm <= 0)
+                        bpmfucked = true;
                     break;
 
                 case eLanePriority::EXBPM:
-                    if (bpm == objBms.exBPM[val]) break;
+                    if (bpm == objBms.exBPM[val])
+                        break;
                     lastBarIdx = m;
                     basetime = notetime;
                     lastBPMChangedSegment = noteSegment;
                     bpm = objBms.exBPM[val] * gSelectContext.pitchSpeed;
                     beatLength = lunaticvibes::Time::singleBeatLengthFromBPM(bpm);
                     _bpmNoteList.emplace_back(m, notemetre, notetime, 0, 0, bpm);
-                    if (bpm <= 0) bpmfucked = true;
+                    if (bpm <= 0)
+                        bpmfucked = true;
                     break;
 
-                case eLanePriority::STOP:
-                {
+                case eLanePriority::STOP: {
                     lastBarIdx = m;
                     double noteStopMetre = objBms.stop[val] / 192.0;
-                    if (noteStopMetre <= 0) break;
-                    lunaticvibes::Time noteStopTime{ (long long)std::floor(beatLength.hres() * noteStopMetre * 4), true };
-                    _specialNoteLists[(size_t)eNoteExt::STOP].emplace_back( m, notemetre, notetime, 0, noteStopTime.hres(), noteStopMetre );
+                    if (noteStopMetre <= 0)
+                        break;
+                    lunaticvibes::Time noteStopTime{(long long)std::floor(beatLength.hres() * noteStopMetre * 4), true};
+                    _specialNoteLists[(size_t)eNoteExt::STOP].emplace_back(m, notemetre, notetime, 0,
+                                                                           noteStopTime.hres(), noteStopMetre);
                     //_chartingSpeedList.push_back({ m, notemetre, noteht, 0.0 });
-                    //_chartingSpeedList.push_back({ m, notemetre + d2fr(noteStopBeat), noteht + noteStopTime, currentSpd });
+                    //_chartingSpeedList.push_back({ m, notemetre + d2fr(noteStopBeat), noteht + noteStopTime,
+                    // currentSpd });
                     stopMetre += noteStopMetre;
                     basetime += noteStopTime;
                     break;
@@ -843,8 +842,16 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
                                                                                          false, 0.0, false, false);
     }
 
-    _totalLength = lastBarIdx + 1 < _barTimestamp.size() ? _barTimestamp[lastBarIdx + 1] : basetime +
-        lunaticvibes::Time(std::min(2000'000'000ll, std::max(500'000'000ll, static_cast<long long>(lunaticvibes::Time::singleBeatLengthFromBPM(bpm).hres()) * 4)), true);    // last measure + 1
+    _totalLength =
+        lastBarIdx + 1 < _barTimestamp.size()
+            ? _barTimestamp[lastBarIdx + 1]
+            : basetime +
+                  lunaticvibes::Time(
+                      std::min(2000'000'000ll,
+                               std::max(500'000'000ll, static_cast<long long>(
+                                                           lunaticvibes::Time::singleBeatLengthFromBPM(bpm).hres()) *
+                                                           4)),
+                      true); // last measure + 1
 
     // get average BPM
     if (_totalLength.norm() > 0)
@@ -902,7 +909,6 @@ void ChartObjectBMS::loadBMS(const ChartFormatBMS& objBms)
     resetNoteListsIterators();
     _currentStopNote = incomingNoteSpecial(size_t(eNoteExt::STOP));
 }
-
 
 NoteLaneIndex ChartObjectBMS::getLaneFromKey(NoteLaneCategory cat, Input::Pad input)
 {

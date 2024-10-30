@@ -32,42 +32,30 @@
 #include <common/sysutil.h>
 #include <common/types.h>
 
-static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]
-{
-    {R"(\\)", R"(\\\\)"},
-    {R"(\.)", R"(\\.)"},
-    {R"(\^)", R"(\\^)"},
-    {R"(\$)", R"(\\$)"},
-    {R"(\|)", R"(\\|)"},
-    {R"(\()", R"(\\()"},
-    {R"(\))", R"(\\))"},
-    {R"(\{)", R"(\\{)"},
-    {R"(\{)", R"(\\{)"},
-    {R"(\[)", R"(\\[)"},
-    {R"(\])", R"(\\])"},
-    {R"(\+)", R"(\\+)"},
-    {R"(\/)", R"(\\/)"},
-    {R"(\?)", R"([^\\\\])"},
-    {R"(\*)", R"([^\\\\]*)"},
+static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]{
+    {R"(\\)", R"(\\\\)"}, {R"(\.)", R"(\\.)"}, {R"(\^)", R"(\\^)"}, {R"(\$)", R"(\\$)"},     {R"(\|)", R"(\\|)"},
+    {R"(\()", R"(\\()"},  {R"(\))", R"(\\))"}, {R"(\{)", R"(\\{)"}, {R"(\{)", R"(\\{)"},     {R"(\[)", R"(\\[)"},
+    {R"(\])", R"(\\])"},  {R"(\+)", R"(\\+)"}, {R"(\/)", R"(\\/)"}, {R"(\?)", R"([^\\\\])"}, {R"(\*)", R"([^\\\\]*)"},
 };
 
 std::vector<Path> findFiles(Path p, bool recursive)
 {
-	auto pstr = p.make_preferred().native();
-	size_t offset = pstr.find('*');
+    auto pstr = p.make_preferred().native();
+    size_t offset = pstr.find('*');
 
-	std::vector<Path> res;
-	if (offset == pstr.npos)
-	{
-		if (!pstr.empty())
-			res.push_back(std::move(p));
-		return res;
-	}
+    std::vector<Path> res;
+    if (offset == pstr.npos)
+    {
+        if (!pstr.empty())
+            res.push_back(std::move(p));
+        return res;
+    }
 
     StringPath folder = pstr.substr(0, offset).substr(0, pstr.find_last_of(Path::preferred_separator));
     if (fs::is_directory(folder))
     {
-        pstr = pstr.substr(pstr[folder.length() - 1] == Path::preferred_separator ? folder.length() : folder.length() + 1);
+        pstr =
+            pstr.substr(pstr[folder.length() - 1] == Path::preferred_separator ? folder.length() : folder.length() + 1);
 
         std::string str = Path(pstr).u8string();
         for (const auto& [in, out] : path_replace_pattern)
@@ -81,7 +69,8 @@ std::vector<Path> findFiles(Path p, bool recursive)
         {
             for (auto& f : fs::recursive_directory_iterator(pathFolder))
             {
-                if (f.path().filename().u8string().substr(0, 2) != u8"._" && RE2::FullMatch(f.path().filename().u8string(), pathRegex))
+                if (f.path().filename().u8string().substr(0, 2) != u8"._" &&
+                    RE2::FullMatch(f.path().filename().u8string(), pathRegex))
                 {
                     res.push_back(f.path());
                 }
@@ -92,7 +81,8 @@ std::vector<Path> findFiles(Path p, bool recursive)
             for (auto& f : fs::directory_iterator(pathFolder))
             {
                 auto relativeFilePath = fs::relative(f, pathFolder);
-                if (relativeFilePath.u8string().substr(0, 2) != u8"._" && RE2::FullMatch(relativeFilePath.u8string(), pathRegex))
+                if (relativeFilePath.u8string().substr(0, 2) != u8"._" &&
+                    RE2::FullMatch(relativeFilePath.u8string(), pathRegex))
                 {
                     res.push_back(f.path());
                 }
@@ -100,7 +90,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
         }
     }
 
-	return res;
+    return res;
 }
 
 bool isParentPath(Path parent, Path dir)
@@ -140,7 +130,7 @@ double toDouble(std::string_view str, double defVal) noexcept
 bool lunaticvibes::iequals(std::string_view lhs, std::string_view rhs) noexcept
 {
     return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
-        [](unsigned char l, unsigned char r) { return std::tolower(l) == std::tolower(r); });
+                      [](unsigned char l, unsigned char r) { return std::tolower(l) == std::tolower(r); });
 }
 
 // TODO(C++20): use std::span.
@@ -164,7 +154,7 @@ void hex2bin(std::string_view hex, unsigned char* buf)
 {
     for (size_t i = 0, j = 0; i < hex.length() - 1; i += 2, j++)
     {
-        unsigned char &c = buf[j];
+        unsigned char& c = buf[j];
         unsigned char c1 = tolower(hex[i]);
         unsigned char c2 = tolower(hex[i + 1]);
         c += (c1 + ((c1 >= 'a') ? (10 - 'a') : (-'0'))) << 4;
@@ -223,7 +213,8 @@ HashMD5 md5file(const Path& filePath)
         DWORD cbRead = 0;
         ifs.read(rgbFile, BUFSIZE);
         cbRead = ifs.gcount();
-        if (cbRead == 0) break;
+        if (cbRead == 0)
+            break;
         CryptHashData(hHash, (const BYTE*)rgbFile, cbRead, 0);
     }
 
@@ -247,9 +238,9 @@ static HashMD5 format_hash(const unsigned char* digest, size_t digest_size)
     for (size_t i = 0; i < digest_size; ++i)
     {
         unsigned char high = digest[i] >> 4 & 0xF;
-        unsigned char low  = digest[i] & 0xF;
+        unsigned char low = digest[i] & 0xF;
         ret += (high <= 9 ? ('0' + high) : ('A' - 10 + high));
-        ret += (low  <= 9 ? ('0' + low)  : ('A' - 10 + low));
+        ret += (low <= 9 ? ('0' + low) : ('A' - 10 + low));
     }
     return HashMD5{ret};
 }
@@ -258,10 +249,7 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
 {
     struct MdCtxDeleter
     {
-        void operator()(EVP_MD_CTX *ctx)
-        {
-            EVP_MD_CTX_free(ctx);
-        }
+        void operator()(EVP_MD_CTX* ctx) { EVP_MD_CTX_free(ctx); }
     };
     auto ctx = std::unique_ptr<EVP_MD_CTX, MdCtxDeleter>(EVP_MD_CTX_new());
     unsigned char digest[EVP_MAX_MD_SIZE];
@@ -289,10 +277,10 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
 // TODO(C++20): take std::span instead
 HashMD5 md5(std::string_view s)
 {
-    return md5_impl([&](EVP_MD_CTX *context) { return EVP_DigestUpdate(context, s.data(), s.size()) != 0; });
+    return md5_impl([&](EVP_MD_CTX* context) { return EVP_DigestUpdate(context, s.data(), s.size()) != 0; });
 }
 
-HashMD5 md5file(const Path &filePath)
+HashMD5 md5file(const Path& filePath)
 {
     if (!fs::exists(filePath) || !fs::is_regular_file(filePath))
     {
@@ -300,7 +288,7 @@ HashMD5 md5file(const Path &filePath)
         return {};
     }
     std::ifstream ifs{filePath, std::ios::binary};
-    return md5_impl([&](EVP_MD_CTX *context) {
+    return md5_impl([&](EVP_MD_CTX* context) {
         std::array<char, 1024> buf;
         while (!ifs.eof())
         {
@@ -316,28 +304,31 @@ HashMD5 md5file(const Path &filePath)
 
 std::string toLower(std::string_view s)
 {
-	std::string ret(s);
-	for (auto& c : ret)
-		if (c >= 'A' && c <= 'Z')
-			c = c - 'A' + 'a';
-	return ret;
+    std::string ret(s);
+    for (auto& c : ret)
+        if (c >= 'A' && c <= 'Z')
+            c = c - 'A' + 'a';
+    return ret;
 }
 
 std::string toUpper(std::string_view s)
 {
-	std::string ret(s);
-	for (auto& c : ret)
-		if (c >= 'a' && c <= 'z')
-			c = c - 'a' + 'A';
-	return ret;
+    std::string ret(s);
+    for (auto& c : ret)
+        if (c >= 'a' && c <= 'z')
+            c = c - 'a' + 'A';
+    return ret;
 }
 
 #ifndef _WIN32
 
-struct DirDeleter {
-    void operator()(DIR* dir) {
+struct DirDeleter
+{
+    void operator()(DIR* dir)
+    {
         int ret = closedir(dir);
-        if (ret == -1) {
+        if (ret == -1)
+        {
             const int error = errno;
             LOG_ERROR << "closedir() error: " << safe_strerror(error) << " (" << error << ")";
         }
@@ -349,7 +340,8 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
 {
     std::replace(input.begin(), input.end(), '\\', '/');
 
-    if (input == "/" || input == "." || input.empty()) {
+    if (input == "/" || input == "." || input.empty())
+    {
         return input;
     }
 
@@ -368,20 +360,27 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
     boost::split(segments, input, boost::is_any_of("/"));
 
     size_t segments_traversed = 0;
-    for (const auto& segment : segments) {
-        if (segment.empty()) {
+    for (const auto& segment : segments)
+    {
+        if (segment.empty())
+        {
             segments_traversed += 1;
             continue;
         }
 
         std::string_view prefix;
-        if (segment == ".") {
+        if (segment == ".")
+        {
             prefix = CURRENT_PATH_RELATIVE_PREFIX;
-        } else if (segment == "..") {
+        }
+        else if (segment == "..")
+        {
             prefix = "../";
         }
-        if (!prefix.empty()) {
-            if (!out.empty() && out.back() != '/') {
+        if (!prefix.empty())
+        {
+            if (!out.empty() && out.back() != '/')
+            {
                 out += '/';
             }
             out += prefix;
@@ -390,9 +389,12 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
         }
 
         const bool is_empty = out.empty();
-        if (is_empty && !has_path_prefix) {
+        if (is_empty && !has_path_prefix)
+        {
             out = CURRENT_PATH_RELATIVE_PREFIX;
-        } else if (is_empty || out.back() != '/') {
+        }
+        else if (is_empty || out.back() != '/')
+        {
             out += '/';
         }
 
@@ -409,7 +411,8 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
             dirent* read_dir = readdir(dir.get()); // NOLINT(concurrency-mt-unsafe)
             if (read_dir == nullptr)
                 break;
-            if (lunaticvibes::iequals(read_dir->d_name, segment)) {
+            if (lunaticvibes::iequals(read_dir->d_name, segment))
+            {
                 found_entry = true;
                 out += read_dir->d_name;
                 break;
@@ -417,18 +420,21 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
         } while (true);
 
         segments_traversed += 1;
-        if (!found_entry) {
+        if (!found_entry)
+        {
             out += segment;
             break;
         }
     }
 
-    for (; segments_traversed < segments.size(); ++segments_traversed) {
+    for (; segments_traversed < segments.size(); ++segments_traversed)
+    {
         out += '/';
         out += segments[segments_traversed];
     }
 
-    if (!has_path_prefix) {
+    if (!has_path_prefix)
+    {
         out.erase(0, CURRENT_PATH_RELATIVE_PREFIX.length());
     }
 
@@ -498,7 +504,8 @@ Path PathFromUTF8(std::string_view s)
 
 void preciseSleep(long long sleep_ns)
 {
-    if (sleep_ns <= 0) return;
+    if (sleep_ns <= 0)
+        return;
 
     using namespace std::chrono;
     using namespace std::chrono_literals;
@@ -510,7 +517,7 @@ void preciseSleep(long long sleep_ns)
     while (sleep_ns > nsInMs)
     {
         LARGE_INTEGER due{};
-        due.QuadPart = -int64_t((sleep_ns - sleep_ns % nsInMs) / 100);  // wrap to 1ms
+        due.QuadPart = -int64_t((sleep_ns - sleep_ns % nsInMs) / 100); // wrap to 1ms
 
         const auto start = high_resolution_clock::now();
         SetWaitableTimerEx(timer, &due, 0, NULL, NULL, NULL, 0);
@@ -542,8 +549,10 @@ void preciseSleep(long long sleep_ns)
 
 double normalizeLinearGrowth(double prev, double curr)
 {
-    if (prev == -1.0) return 0.0;
-    if (curr == -1.0) return 0.0;
+    if (prev == -1.0)
+        return 0.0;
+    if (curr == -1.0)
+        return 0.0;
 
     LVF_DEBUG_ASSERT(prev >= 0.0 && prev <= 1.0);
     LVF_DEBUG_ASSERT(curr >= 0.0 && curr <= 1.0);
@@ -562,11 +571,13 @@ double normalizeLinearGrowth(double prev, double curr)
 // E.g. isspace(), tolower(), etc can only handle ASCII characters.
 static unsigned char limit_to_ascii(int c)
 {
-    if (c < 0 || c > 127) return 0u;
+    if (c < 0 || c > 127)
+        return 0u;
     return static_cast<unsigned char>(c);
 }
 
-void lunaticvibes::trim_in_place(std::string& s) {
+void lunaticvibes::trim_in_place(std::string& s)
+{
     static auto not_space = [](int c) { return !std::isspace(limit_to_ascii(c)); };
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), not_space));
     s.erase(std::find_if(s.rbegin(), s.rend(), not_space).base(), s.end());

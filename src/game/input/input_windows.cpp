@@ -1,6 +1,6 @@
 #ifdef _WIN32
-#include "input_mgr.h"
 #include "input_dinput8.h"
+#include "input_mgr.h"
 #include <cmath>
 
 void initInput()
@@ -23,8 +23,7 @@ bool isKeyPressed(Input::Keyboard key)
     // these are mappings toward enum Input::Keyboard
     // refer to virtual key definitions in MSDN
     // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-    static const int vkMap[] =
-    {
+    static const int vkMap[] = {
         0,
         DIK_ESCAPE,
 
@@ -87,7 +86,7 @@ bool isKeyPressed(Input::Keyboard key)
         DIK_SLASH,
         DIK_RSHIFT,
 
-        0,  // PRTSC
+        0, // PRTSC
         DIK_LMENU,
         DIK_SPACE,
         DIK_CAPITAL,
@@ -158,7 +157,7 @@ bool isKeyPressed(Input::Keyboard key)
 
 bool isButtonPressed(Input::Joystick c, double deadzone)
 {
-    if (deadzone < 0.01) 
+    if (deadzone < 0.01)
         deadzone = 0.01;
 
     if (c.device < InputDirectInput8::inst().getJoystickCount())
@@ -166,18 +165,21 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
         auto& stat = InputDirectInput8::inst().getJoystickState(c.device);
         switch (c.type)
         {
-        case Input::Joystick::Type::BUTTON:
-            return stat.rgbButtons[c.index];
+        case Input::Joystick::Type::BUTTON: return stat.rgbButtons[c.index];
         case Input::Joystick::Type::POV:
             if (LOWORD(stat.rgdwPOV[LOWORD(c.index)]) != 0xFFFF)
             {
                 float x = std::sinf(stat.rgdwPOV[c.index & 0xFFFFFFF] / 100.0f * 0.0174532925f);
                 float y = std::cosf(stat.rgdwPOV[c.index & 0xFFFFFFF] / 100.0f * 0.0174532925f);
 
-                if      (x < -0.01f && (c.index & (1ul << 31))) return true;
-                else if (y < -0.01f && (c.index & (1ul << 30))) return true;
-                else if (y > 0.01f && (c.index & (1ul << 29))) return true;
-                else if (x > 0.01f && (c.index & (1ul << 28))) return true;
+                if (x < -0.01f && (c.index & (1ul << 31)))
+                    return true;
+                else if (y < -0.01f && (c.index & (1ul << 30)))
+                    return true;
+                else if (y > 0.01f && (c.index & (1ul << 29)))
+                    return true;
+                else if (x > 0.01f && (c.index & (1ul << 28)))
+                    return true;
             }
             return false;
         case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE:
@@ -264,9 +266,9 @@ bool isMouseButtonPressed(int idx)
 {
     switch (idx)
     {
-    case 1: 
-    case 2: 
-    case 3: 
+    case 1:
+    case 2:
+    case 3:
     case 4: return InputDirectInput8::inst().getMouseState().rgbButtons[idx - 1] & 0x80;
     default: return false;
     }

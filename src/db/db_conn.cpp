@@ -20,21 +20,36 @@ SQLite::SQLite(const char* path, std::string tag_) : tag(std::move(tag_))
     exec("PRAGMA mmap_size = 536870912"); // 512MB
 }
 
-SQLite::~SQLite() { sqlite3_close(_db); }
-const char* SQLite::errmsg() const { return sqlite3_errmsg(_db); }
+SQLite::~SQLite()
+{
+    sqlite3_close(_db);
+}
+const char* SQLite::errmsg() const
+{
+    return sqlite3_errmsg(_db);
+}
 
 std::string any_to_str(const std::any& a)
 {
     std::stringstream ss;
-    if (a.type() == typeid(int))              ss << std::any_cast<int>(a);
-    else if (a.type() == typeid(bool))        ss << std::any_cast<bool>(a);
-    else if (a.type() == typeid(long long))   ss << std::any_cast<long long>(a);
-    else if (a.type() == typeid(unsigned))    ss << std::any_cast<unsigned>(a);
-    else if (a.type() == typeid(time_t))      ss << std::any_cast<time_t>(a);
-    else if (a.type() == typeid(double))      ss << std::any_cast<double>(a);
-    else if (a.type() == typeid(std::string)) ss << "'" << std::any_cast<std::string>(a) << "'";
-    else if (a.type() == typeid(const char*)) ss << "'" << std::any_cast<const char*>(a) << "'";
-    else if (a.type() == typeid(nullptr))     ss << "NULL";
+    if (a.type() == typeid(int))
+        ss << std::any_cast<int>(a);
+    else if (a.type() == typeid(bool))
+        ss << std::any_cast<bool>(a);
+    else if (a.type() == typeid(long long))
+        ss << std::any_cast<long long>(a);
+    else if (a.type() == typeid(unsigned))
+        ss << std::any_cast<unsigned>(a);
+    else if (a.type() == typeid(time_t))
+        ss << std::any_cast<time_t>(a);
+    else if (a.type() == typeid(double))
+        ss << std::any_cast<double>(a);
+    else if (a.type() == typeid(std::string))
+        ss << "'" << std::any_cast<std::string>(a) << "'";
+    else if (a.type() == typeid(const char*))
+        ss << "'" << std::any_cast<const char*>(a) << "'";
+    else if (a.type() == typeid(nullptr))
+        ss << "NULL";
     return ss.str();
 }
 
@@ -88,7 +103,8 @@ void sql_bind_any(sqlite3_stmt* stmt, const std::initializer_list<std::any>& arg
     }
 }
 
-std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql, std::initializer_list<std::any> args) const
+std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
+                                                 std::initializer_list<std::any> args) const
 {
     _lastSql = zsql;
 
@@ -125,7 +141,8 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql, st
         for (int i = 0; i < columnCount; ++i)
         {
             const int c = sqlite3_column_type(stmt, i);
-            switch (c) {
+            switch (c)
+            {
             case SQLITE_INTEGER: row[i] = sqlite3_column_int64(stmt, i); break;
             case SQLITE_FLOAT: row[i] = sqlite3_column_double(stmt, i); break;
             case SQLITE_TEXT:

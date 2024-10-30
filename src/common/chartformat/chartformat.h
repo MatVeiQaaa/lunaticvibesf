@@ -23,10 +23,11 @@ enum class eChartFormat
 };
 eChartFormat analyzeChartType(const Path& p);
 
-class ChartFormatBase: public std::enable_shared_from_this<ChartFormatBase>
+class ChartFormatBase : public std::enable_shared_from_this<ChartFormatBase>
 {
 protected:
     eChartFormat _type = eChartFormat::UNKNOWN;
+
 public:
     constexpr eChartFormat type() { return _type; }
 
@@ -37,29 +38,30 @@ public:
 
 protected:
     bool loaded = false;
+
 public:
     constexpr bool isLoaded() { return loaded; }
 
-// following fields are generic info, which are stored in db
+    // following fields are generic info, which are stored in db
 public:
     Path fileName;
     Path absolutePath;
     HashMD5 fileHash;
     HashMD5 folderHash;
-    long long addTime = 0;  // from epoch time
-    unsigned gamemode = 7;  // 5, 7, 9, 10, 14, 24?, 48?
+    long long addTime = 0; // from epoch time
+    unsigned gamemode = 7; // 5, 7, 9, 10, 14, 24?, 48?
 
     StringContent title;
     StringContent title2;
     StringContent artist;
     StringContent artist2;
     StringContent genre;
-    StringContent version;     // mostly known as difficulty name
+    StringContent version; // mostly known as difficulty name
     int playLevel = 0;
     unsigned difficulty = 3; // N/H/A
     double levelEstimated = 0.0;
 
-    int totalLength = 0;// in seconds
+    int totalLength = 0; // in seconds
     int totalNotes = 0;
 
     StringContent stagefile;
@@ -78,15 +80,16 @@ public:
     BPM maxBPM = 0.0;
     BPM startBPM = 130.0;
 
-// following fields are filled during loading
+    // following fields are filled during loading
 public:
     std::vector<StringContent> wavFiles;
     std::vector<StringContent> bgaFiles;
 
     std::vector<Metre> metres;
-    //std::vector<_Inherit_SpriteStatic_with_playbegin_timer_> _BGAsprites;
+    // std::vector<_Inherit_SpriteStatic_with_playbegin_timer_> _BGAsprites;
 
-    bool resourceStable = true;    // Some BMS come with WAV/BGA resources defined inside a #RANDOM block; This variable is to prevent incorrect caching.
+    bool resourceStable = true; // Some BMS come with WAV/BGA resources defined inside a #RANDOM block; This variable is
+                                // to prevent incorrect caching.
 
 public:
     Path getDirectory() const;

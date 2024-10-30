@@ -5,16 +5,15 @@
 #include <string>
 #include <utility>
 
-#include <SDL_syswm.h>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_syswm.h>
 #include <SDL_ttf.h>
 
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
 
-#include <common/assert.h>
 #include "common/encoding.h"
 #include "common/log.h"
 #include "common/meta.h"
@@ -23,6 +22,7 @@
 #include "game/graphics/video.h"
 #include "graphics_SDL2.h"
 #include "window_SDL2.h"
+#include <common/assert.h>
 #include <game/graphics/SDL2/input.h>
 #include <game/graphics/graphics.h>
 
@@ -59,12 +59,13 @@ int graphics_init()
         // opengles2: does not support virtual textures created by hand (e.g. black dot)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, "direct3d11");
 #else
-        //SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+        // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 #endif
 
         SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 
-        Uint32 flags = SDL_WINDOW_HIDDEN;   // window created with opengles2 will destroy itself when creating Renderer, resulting in flashes
+        Uint32 flags = SDL_WINDOW_HIDDEN; // window created with opengles2 will destroy itself when creating Renderer,
+                                          // resulting in flashes
         flags |= SDL_WINDOW_RESIZABLE;
         auto mode = ConfigMgr::get('V', cfg::V_WINMODE, cfg::V_WINMODE_WINDOWED);
         if (lunaticvibes::iequals(mode, cfg::V_WINMODE_BORDERLESS))
@@ -75,23 +76,23 @@ int graphics_init()
         {
             flags |= SDL_WINDOW_FULLSCREEN;
         }
-        else 
+        else
         {
             // fallback to windowed
         }
         windowRect.w = ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH);
         windowRect.h = ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT);
-        gFrameWindow = SDL_CreateWindow(title.c_str(),
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowRect.w, windowRect.h, flags);
+        gFrameWindow = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowRect.w,
+                                        windowRect.h, flags);
         if (!gFrameWindow)
         {
             LOG_FATAL << "[SDL2] Init window ERROR! " << SDL_GetError();
             return -1;
         }
 
-        //canvasRect.w = ConfigMgr::get('V', cfg::V_RES_X, CANVAS_WIDTH);
-        //canvasRect.h = ConfigMgr::get('V', cfg::V_RES_Y, CANVAS_HEIGHT);
-        //graphics_resize_canvas(canvasRect.w, canvasRect.h);
+        // canvasRect.w = ConfigMgr::get('V', cfg::V_RES_X, CANVAS_WIDTH);
+        // canvasRect.h = ConfigMgr::get('V', cfg::V_RES_Y, CANVAS_HEIGHT);
+        // graphics_resize_canvas(canvasRect.w, canvasRect.h);
         graphics_resize_canvas(windowRect.w, windowRect.h);
 
         int ss = ConfigMgr::get('V', cfg::V_RES_SUPERSAMPLE, 1);
@@ -131,7 +132,7 @@ int graphics_init()
         }
 
         gInternalRenderTarget = SDL_CreateTexture(gFrameRenderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_TARGET,
-            CANVAS_WIDTH_MAX, CANVAS_HEIGHT_MAX);
+                                                  CANVAS_WIDTH_MAX, CANVAS_HEIGHT_MAX);
         if (!gInternalRenderTarget)
         {
             LOG_FATAL << "[SDL2] Init Target Texture Error! " << SDL_GetError();
@@ -159,7 +160,8 @@ int graphics_init()
             LOG_FATAL << "[SDL2] SDL2_Image init failed. " << IMG_GetError();
             return 1;
         }
-        LOG_INFO << "[SDL2] SDL2_Image init finished. Version " << SDL_IMAGE_MAJOR_VERSION << '.' << SDL_IMAGE_MINOR_VERSION << "." << SDL_IMAGE_PATCHLEVEL;
+        LOG_INFO << "[SDL2] SDL2_Image init finished. Version " << SDL_IMAGE_MAJOR_VERSION << '.'
+                 << SDL_IMAGE_MINOR_VERSION << "." << SDL_IMAGE_PATCHLEVEL;
     }
     // SDL_ttf
     {
@@ -171,11 +173,12 @@ int graphics_init()
             LOG_FATAL << "[SDL2] SDL2_TTF init failed. " << TTF_GetError();
             return 2;
         }
-        LOG_INFO << "[SDL2] SDL2_TTF init finished. Version " << SDL_TTF_MAJOR_VERSION << '.' << SDL_TTF_MINOR_VERSION << "." << SDL_TTF_PATCHLEVEL;
+        LOG_INFO << "[SDL2] SDL2_TTF init finished. Version " << SDL_TTF_MAJOR_VERSION << '.' << SDL_TTF_MINOR_VERSION
+                 << "." << SDL_TTF_PATCHLEVEL;
     }
 
-	// libav
-	video_init();
+    // libav
+    video_init();
 
     // imgui
     LOG_INFO << "Initializing ImGui for SDL renderer...";
@@ -253,8 +256,10 @@ void graphics_flush()
 
     if (maxFPS != 0)
     {
-        long long sleep_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            frameTimestampPrev + desiredFrameTimeBetweenFrames - std::chrono::high_resolution_clock::now()).count();
+        long long sleep_ns =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(frameTimestampPrev + desiredFrameTimeBetweenFrames -
+                                                                 std::chrono::high_resolution_clock::now())
+                .count();
         preciseSleep(sleep_ns);
     }
     frameTimestampPrev = std::chrono::high_resolution_clock::now();
@@ -309,7 +314,7 @@ std::pair<int, int> graphics_get_desktop_resolution()
     int index = graphics_get_monitor_index();
     SDL_DisplayMode mode{};
     SDL_GetDesktopDisplayMode(index, &mode);
-    return { mode.w, mode.h };
+    return {mode.w, mode.h};
 }
 
 std::vector<std::tuple<int, int, int>> graphics_get_resolution_list()
@@ -336,9 +341,7 @@ void graphics_change_window_mode(int mode)
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_TRUE);
         break;
-    case 1:
-        SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN);
-        break;
+    case 1: SDL_SetWindowFullscreen(gFrameWindow, SDL_WINDOW_FULLSCREEN); break;
     case 2:
         SDL_SetWindowFullscreen(gFrameWindow, 0);
         SDL_SetWindowBordered(gFrameWindow, SDL_FALSE);
@@ -379,7 +382,7 @@ static int superSampleLevel = 1;
 void graphics_set_supersample_level(int level)
 {
     LOG_WARNING << "Setting supersample level to " << level;
-    //assert(canvasRect.w * level <= 3840);
+    // assert(canvasRect.w * level <= 3840);
     superSampleLevel = level;
 }
 int graphics_get_supersample_level()
@@ -395,9 +398,14 @@ void graphics_resize_canvas(int x, int y)
     canvasScaleX = (double)windowRect.w / x;
     canvasScaleY = (double)windowRect.h / y;
 }
-double graphics_get_canvas_scale_x() { return canvasScaleX; }
-double graphics_get_canvas_scale_y() { return canvasScaleY; }
-
+double graphics_get_canvas_scale_x()
+{
+    return canvasScaleX;
+}
+double graphics_get_canvas_scale_y()
+{
+    return canvasScaleY;
+}
 
 void graphics_set_maxfps(int fps)
 {
@@ -417,12 +425,18 @@ void funEditing(const SDL_TextEditingEvent& e);
 void funInput(const SDL_TextInputEvent& e);
 void funKeyDown(const SDL_KeyboardEvent& e);
 
-static std::int16_t i16_from_i32(std::int32_t value) {
-    if (value > SHRT_MAX) {
+static std::int16_t i16_from_i32(std::int32_t value)
+{
+    if (value > SHRT_MAX)
+    {
         return SHRT_MAX;
-    } else if (value < SHRT_MIN) {
+    }
+    else if (value < SHRT_MIN)
+    {
         return SHRT_MIN;
-    } else {
+    }
+    else
+    {
         return static_cast<std::int16_t>(value);
     }
 }
@@ -445,12 +459,8 @@ bool lunaticvibes::event_handle()
         case SDL_WINDOWEVENT:
             switch (e.window.event)
             {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-                SetWindowForeground(true);
-                break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-                SetWindowForeground(false);
-                break;
+            case SDL_WINDOWEVENT_FOCUS_GAINED: SetWindowForeground(true); break;
+            case SDL_WINDOWEVENT_FOCUS_LOST: SetWindowForeground(false); break;
             case SDL_WINDOWEVENT_SIZE_CHANGED:
             case SDL_WINDOWEVENT_RESIZED: {
                 const auto height = static_cast<unsigned>(e.window.data2);
@@ -458,49 +468,41 @@ bool lunaticvibes::event_handle()
                 lunaticvibes::graphics::save_new_window_size(width, height);
                 break;
             }
-            default:
-                break;
+            default: break;
             }
             break;
 
         case SDL_TEXTINPUT:
-            if (isEditing) funInput(e.text);
+            if (isEditing)
+                funInput(e.text);
             break;
 
         case SDL_TEXTEDITING:
-            if (isEditing) funEditing(e.edit);
+            if (isEditing)
+                funEditing(e.edit);
             break;
 
         case SDL_KEYDOWN:
             sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = true;
 
-            if (isEditing) funKeyDown(e.key);
+            if (isEditing)
+                funKeyDown(e.key);
             break;
 
-        case SDL_KEYUP:
-            sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = false;
-
-            break;
+        case SDL_KEYUP: sdl::state::g_keyboard_scancodes[e.key.keysym.scancode] = false; break;
 
         case SDL_MOUSEMOTION:
             sdl::state::g_mouse_x = e.motion.x;
             sdl::state::g_mouse_y = e.motion.y;
             break;
 
-        case SDL_MOUSEBUTTONDOWN:
-            sdl::state::g_mouse_buttons[e.button.button] = true;
-            break;
+        case SDL_MOUSEBUTTONDOWN: sdl::state::g_mouse_buttons[e.button.button] = true; break;
 
-        case SDL_MOUSEBUTTONUP:
-            sdl::state::g_mouse_buttons[e.button.button] = false;
-            break;
+        case SDL_MOUSEBUTTONUP: sdl::state::g_mouse_buttons[e.button.button] = false; break;
 
-        case SDL_MOUSEWHEEL:
-            sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y);
-            break;
+        case SDL_MOUSEWHEEL: sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y); break;
 
-        case SDL_JOYBUTTONDOWN:
-        {
+        case SDL_JOYBUTTONDOWN: {
             LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
             if (e.jbutton.button < buttons.size())
@@ -514,8 +516,7 @@ bool lunaticvibes::event_handle()
             break;
         }
 
-        case SDL_JOYBUTTONUP:
-        {
+        case SDL_JOYBUTTONUP: {
             LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
             if (e.jbutton.button < buttons.size())
@@ -529,8 +530,7 @@ bool lunaticvibes::event_handle()
             break;
         }
 
-        default:
-            break;
+        default: break;
         }
     }
     return quit;
@@ -548,7 +548,8 @@ void ImGuiNewFrame()
 }
 
 static std::function<void(const std::string&)> funUpdateText;
-void startTextInput(const RectF& textBox, const std::string& oldText, std::function<void(const std::string&)> funUpdateText)
+void startTextInput(const RectF& textBox, const std::string& oldText,
+                    std::function<void(const std::string&)> funUpdateText)
 {
     LOG_DEBUG << "Start Text Input";
 
@@ -589,7 +590,6 @@ void stopTextInput()
     // SDL_StopTextInput();
 }
 
-
 void funEditing(const SDL_TextEditingEvent& e)
 {
     LOG_DEBUG << "Editing " << e.start << " " << e.length << " " << e.text;
@@ -618,8 +618,7 @@ void funKeyDown(const SDL_KeyboardEvent& e)
     {
         switch (e.keysym.sym)
         {
-        case SDLK_v:
-        {
+        case SDLK_v: {
             std::stringstream ss;
             char* pText = SDL_GetClipboardText();
             ss << pText;

@@ -1,13 +1,13 @@
 #pragma once
-#include <memory>
-#include <variant>
-#include <mutex>
-#include <future>
+#include "common/chartformat/chartformat.h"
+#include "game/chart/chart.h"
 #include "game/skin/skin_mgr.h"
 #include "scene.h"
 #include "scene_context.h"
-#include "common/chartformat/chartformat.h"
-#include "game/chart/chart.h"
+#include <future>
+#include <memory>
+#include <mutex>
+#include <variant>
 
 enum class ePlayState
 {
@@ -27,7 +27,7 @@ public:
     ~ScenePlay() override;
 
 private:
-	std::future<void> _loadChartFuture;
+    std::future<void> _loadChartFuture;
 
 private:
     ePlayState state;
@@ -40,44 +40,44 @@ protected:
 private:
     bool playInterrupted = false;
     bool playFinished = false;
-    bool holdingStart[2]{ false, false };
-    bool holdingSelect[2]{ false, false };
+    bool holdingStart[2]{false, false};
+    bool holdingSelect[2]{false, false};
     bool isHoldingStart(int player) const;
     bool isHoldingSelect(int player) const;
 
     struct PlayerState
     {
-		bool finished = false;
+        bool finished = false;
 
-		lunaticvibes::Time startPressedTime = TIMER_NEVER;
-		lunaticvibes::Time selectPressedTime = TIMER_NEVER;
+        lunaticvibes::Time startPressedTime = TIMER_NEVER;
+        lunaticvibes::Time selectPressedTime = TIMER_NEVER;
 
-		double turntableAngleAdd = 0;
+        double turntableAngleAdd = 0;
 
-		AxisDir scratchDirection = 0;
-		lunaticvibes::Time scratchLastUpdate = TIMER_NEVER;
-		double scratchAccumulator = 0;
+        AxisDir scratchDirection = 0;
+        lunaticvibes::Time scratchLastUpdate = TIMER_NEVER;
+        double scratchAccumulator = 0;
 
-		int hispeedAddPending = 0;
-		int lanecoverAddPending = 0;
+        int hispeedAddPending = 0;
+        int lanecoverAddPending = 0;
 
-		double savedHispeed = 1.0;
+        double savedHispeed = 1.0;
 
-		Option::e_lane_effect_type origLanecoverType = Option::LANE_OFF;
+        Option::e_lane_effect_type origLanecoverType = Option::LANE_OFF;
 
-		int healthLastTick = 0;
+        int healthLastTick = 0;
 
-		double lockspeedValueInternal = 300.0; // internal use only, for precise calculation
-		double lockspeedHispeedBuffered = 2.0;
-		int lockspeedGreenNumber = 300; // green number integer
+        double lockspeedValueInternal = 300.0; // internal use only, for precise calculation
+        double lockspeedHispeedBuffered = 2.0;
+        int lockspeedGreenNumber = 300; // green number integer
 
-		bool hispeedHasChanged = false;
-		bool lanecoverTopHasChanged = false;
-		bool lanecoverBottomHasChanged = false;
-		bool lanecoverStateHasChanged = false;
-		bool lockspeedResetPending = false;
+        bool hispeedHasChanged = false;
+        bool lanecoverTopHasChanged = false;
+        bool lanecoverBottomHasChanged = false;
+        bool lanecoverStateHasChanged = false;
+        bool lockspeedResetPending = false;
 
-		int judgeBP = 0; // used for displaying poor bga
+        int judgeBP = 0; // used for displaying poor bga
 
     } playerState[2];
 
@@ -118,33 +118,36 @@ private:
     std::array<size_t, 128> _keySampleIdxBuf{};
 
 private:
-	//std::map<size_t, std::variant<std::monostate, pVideo, pTexture>> _bgaIdxBuf{};
-	//std::map<size_t, std::list<std::shared_ptr<SpriteVideo>>> _bgaVideoSprites{};	// set when loading skins, to bind videos while loading chart
-	//size_t bgaBaseIdx = -1u;
-	//size_t bgaLayerIdx = -1u;
-	//size_t bgaPoorIdx = -1u;
-	//pTexture bgaBaseTexture;
-	//pTexture bgaLayerTexture;
-	//pTexture bgaPoorTexture;
+    // std::map<size_t, std::variant<std::monostate, pVideo, pTexture>> _bgaIdxBuf{};
+    // std::map<size_t, std::list<std::shared_ptr<SpriteVideo>>> _bgaVideoSprites{};	// set when loading skins, to
+    // bind videos while loading chart size_t bgaBaseIdx = -1u; size_t bgaLayerIdx = -1u; size_t bgaPoorIdx = -1u;
+    // pTexture bgaBaseTexture;
+    // pTexture bgaLayerTexture;
+    // pTexture bgaPoorTexture;
 public:
-	//void bindBgaVideoSprite(size_t idx, std::shared_ptr<SpriteVideo> pv) { _bgaVideoSprites[idx].push_back(pv); }
+    // void bindBgaVideoSprite(size_t idx, std::shared_ptr<SpriteVideo> pv) { _bgaVideoSprites[idx].push_back(pv); }
 
 protected:
     // common
     void loadChart();
-	constexpr double getWavLoadProgress() { return (wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0) : (double)wavLoaded / wavTotal; }
-	constexpr double getBgaLoadProgress() { return (bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0) : (double)bmpLoaded / bmpTotal; }
+    constexpr double getWavLoadProgress()
+    {
+        return (wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0) : (double)wavLoaded / wavTotal;
+    }
+    constexpr double getBgaLoadProgress()
+    {
+        return (bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0) : (double)bmpLoaded / bmpTotal;
+    }
 
     void setInputJudgeCallback();
     void removeInputJudgeCallback();
-
 
 protected:
     // loading indicators
     bool chartObjLoaded = false;
     bool rulesetLoaded = false;
-    //bool _sampleLoaded = false;
-    //bool _bgaLoaded = false;
+    // bool _sampleLoaded = false;
+    // bool _bgaLoaded = false;
     unsigned wavLoaded = 0;
     unsigned wavTotal = 0;
     unsigned bmpLoaded = 0;

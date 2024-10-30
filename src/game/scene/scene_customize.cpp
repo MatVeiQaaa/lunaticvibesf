@@ -51,7 +51,8 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     }
     load(selectedMode);
 
-    auto skinFileList = findFiles(PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin")), true);
+    auto skinFileList = findFiles(
+        PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin")), true);
     auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
     {
@@ -61,14 +62,15 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
         switch (s.info.mode)
         {
-        case SkinType::PLAY7:   skinList[SkinType::PLAY5].push_back(fs::absolute(p)); break;
+        case SkinType::PLAY7: skinList[SkinType::PLAY5].push_back(fs::absolute(p)); break;
         case SkinType::PLAY7_2: skinList[SkinType::PLAY5_2].push_back(fs::absolute(p)); break;
-        case SkinType::PLAY14:  skinList[SkinType::PLAY10].push_back(fs::absolute(p)); break;
+        case SkinType::PLAY14: skinList[SkinType::PLAY10].push_back(fs::absolute(p)); break;
         default: break;
         }
     }
 
-    auto soundsetFileList = findFiles(PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss")), true);
+    auto soundsetFileList = findFiles(
+        PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss")), true);
     for (auto& p : soundsetFileList)
     {
         soundsetList.push_back(fs::absolute(p));
@@ -105,7 +107,8 @@ SceneCustomize::~SceneCustomize()
 
 void SceneCustomize::_updateAsync()
 {
-    if (!gInCustomize && gNextScene != SceneType::SELECT) return;
+    if (!gInCustomize && gNextScene != SceneType::SELECT)
+        return;
 
     if (gAppIsExiting)
     {
@@ -219,7 +222,8 @@ void SceneCustomize::updateMain()
     // Let's allow the new customize scene to actually load stuff. If we load skins here in such case, main thread may
     // be waiting for ~SceneCustomize, but we here will be waiting for the main thread to load textures, causing a dead
     // lock.
-    if (gInCustomize && _is_virtual) return;
+    if (gInCustomize && _is_virtual)
+        return;
 
     lunaticvibes::Time t;
 
@@ -265,9 +269,11 @@ void SceneCustomize::updateMain()
                 int selectedIdx;
                 for (selectedIdx = 0; selectedIdx < (int)soundsetList.size(); selectedIdx++)
                 {
-                    Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
-                    if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) && fs::equivalent(soundsetList[selectedIdx], path))
+                    Path path = PathFromUTF8(
+                        convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                       ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+                    if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) &&
+                        fs::equivalent(soundsetList[selectedIdx], path))
                         break;
                 }
                 selectedIdx =
@@ -308,7 +314,8 @@ void SceneCustomize::updateMain()
                 selectedIdx = wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0,
                                           static_cast<int>(skinList[selectedMode].size()) - 1);
 
-                const auto& p = fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
+                const auto& p =
+                    fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
                 if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
                     ConfigMgr::set('S', key, p.u8string());
@@ -395,7 +402,7 @@ void SceneCustomize::updateFadeout()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-StringPath SceneCustomize::getConfigFileName(StringPathView skinPath) 
+StringPath SceneCustomize::getConfigFileName(StringPathView skinPath)
 {
     Path p(skinPath);
     std::string md5 = ::md5(p.u8string()).hexdigest();
@@ -403,13 +410,11 @@ StringPath SceneCustomize::getConfigFileName(StringPathView skinPath)
     return Path(md5).native();
 }
 
-
 void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
 {
     switch (pSkin->version())
     {
-    case SkinVersion::LR2beta3:
-    {
+    case SkinVersion::LR2beta3: {
         LVF_DEBUG_ASSERT(idxOption < optionsKeyList.size());
         Option& op = optionsMap[optionsKeyList[idxOption]];
         if (op.id != 0)
@@ -430,14 +435,14 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
         break;
     }
 
-    default:
-        break;
+    default: break;
     }
 
     if (selectedMode == SkinType::SOUNDSET)
     {
-        Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-            ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path =
+            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
 
         SoundSetLR2 ss(path);
         Path bgmOld = ss.getPathBGMSelect();
@@ -453,7 +458,6 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
     }
 }
 
-
 void SceneCustomize::load(SkinType mode)
 {
     LOG_DEBUG << "[Customize] Load";
@@ -463,8 +467,9 @@ void SceneCustomize::load(SkinType mode)
         optionsMap.clear();
         optionsKeyList.clear();
 
-        Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-            ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path =
+            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
 
         SoundSetLR2 ss(path);
 
@@ -543,7 +548,8 @@ void SceneCustomize::load(SkinType mode)
                 {
                     Option& op = itOp->second;
                     auto selectedEntryName = node.second.as<std::string>();
-                    if (const auto itEntry = std::find(op.entries.begin(), op.entries.end(), selectedEntryName); itEntry != op.entries.end())
+                    if (const auto itEntry = std::find(op.entries.begin(), op.entries.end(), selectedEntryName);
+                        itEntry != op.entries.end())
                     {
                         op.selectedEntry = std::distance(op.entries.begin(), itEntry);
                     }
@@ -569,8 +575,9 @@ void SceneCustomize::save(SkinType mode) const
     Path pCustomize;
     if (mode == SkinType::SOUNDSET)
     {
-        Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-            ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path =
+            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
 
         SoundSetLR2 ss(path);
 
@@ -631,8 +638,10 @@ void SceneCustomize::updateTexts() const
 // CALLBACK
 void SceneCustomize::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (m[Input::Pad::ESC]) exiting = true;
-    if (m[Input::Pad::M2]) exiting = true;
+    if (m[Input::Pad::ESC])
+        exiting = true;
+    if (m[Input::Pad::M2])
+        exiting = true;
 
     if (m[Input::Pad::MWHEELUP] && topOptionIndex > 0)
     {

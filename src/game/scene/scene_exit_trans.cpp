@@ -4,8 +4,8 @@
 
 SceneExitTrans::SceneExitTrans() : SceneBase(nullptr, SkinType::EXIT_TRANS, 240)
 {
-	_type = SceneType::EXIT_TRANS;
+    _type = SceneType::EXIT_TRANS;
 
-	LOG_DEBUG << "[ExitTrans]";
-	gNextScene = SceneType::EXIT;
+    LOG_DEBUG << "[ExitTrans]";
+    gNextScene = SceneType::EXIT;
 }

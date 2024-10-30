@@ -8,30 +8,23 @@
 #include <boost/format.hpp>
 #include <imgui.h>
 
-#include "common/sysutil.h"
 #include "common/coursefile/lr2crs.h"
 #include "common/entry/entry_arena.h"
 #include "common/entry/entry_course.h"
 #include "common/entry/entry_table.h"
+#include "common/sysutil.h"
 #include "config/config_mgr.h"
 #include "game/runtime/i18n.h"
 #include "git_version.h"
 #include "scene_context.h"
 
-ScenePreSelect::ScenePreSelect(): SceneBase(nullptr, SkinType::PRE_SELECT, 240)
+ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {
     _type = SceneType::PRE_SELECT;
 
-	_updateCallback = std::bind(&ScenePreSelect::updateLoadSongs, this);
+    _updateCallback = std::bind(&ScenePreSelect::updateLoadSongs, this);
 
-    rootFolderProp = SongListProperties{
-        {},
-        ROOT_FOLDER_HASH,
-        "",
-        {},
-        {},
-        0
-    };
+    rootFolderProp = SongListProperties{{}, ROOT_FOLDER_HASH, "", {}, {}, 0};
 
     graphics_set_maxfps(30);
 
@@ -47,7 +40,8 @@ ScenePreSelect::ScenePreSelect(): SceneBase(nullptr, SkinType::PRE_SELECT, 240)
         // song db
         LOG_INFO << "[List] Initializing song.db...";
         Path dbPath = Path(GAMEDATA_PATH) / "database";
-        if (!fs::exists(dbPath)) fs::create_directories(dbPath);
+        if (!fs::exists(dbPath))
+            fs::create_directories(dbPath);
         g_pSongDB = std::make_shared<SongDB>(dbPath / "song.db");
 
         std::unique_lock l(gSelectContext._mutex);
@@ -81,7 +75,8 @@ bool ScenePreSelect::readyToStopAsync() const
 
 void ScenePreSelect::_updateAsync()
 {
-    if (gNextScene != SceneType::PRE_SELECT && gNextScene != SceneType::SELECT) return;
+    if (gNextScene != SceneType::PRE_SELECT && gNextScene != SceneType::SELECT)
+        return;
 
     if (gAppIsExiting)
     {
@@ -90,7 +85,7 @@ void ScenePreSelect::_updateAsync()
         return;
     }
 
-	_updateCallback();
+    _updateCallback();
 }
 
 void ScenePreSelect::updateLoadSongs()
@@ -105,7 +100,6 @@ void ScenePreSelect::updateLoadSongs()
 
         // wait for another frame
         pushAndWaitMainThreadTask<void>([] {});
-
 
         // load files
         loadSongEnd = std::async(std::launch::async, [this]() {
@@ -136,13 +130,15 @@ void ScenePreSelect::updateLoadSongs()
             {
                 for (size_t i = 0; i < top->getContentsCount(); ++i)
                 {
-                    if (gAppIsExiting) break;
+                    if (gAppIsExiting)
+                        break;
                     auto entry = top->getEntry(i);
 
                     bool deleted = true;
                     for (auto& f : folderList)
                     {
-                        if (gAppIsExiting) break;
+                        if (gAppIsExiting)
+                            break;
                         if (fs::exists(f) && fs::exists(entry->getPath()) && fs::equivalent(f, entry->getPath()))
                         {
                             deleted = false;
@@ -156,7 +152,8 @@ void ScenePreSelect::updateLoadSongs()
                     }
                 }
             }
-            if (gAppIsExiting) return;
+            if (gAppIsExiting)
+                return;
             LOG_INFO << "[List] Added " << rootFolderProp.dbBrowseEntries.size() << " root folders";
 
             g_pSongDB->optimize();
@@ -172,11 +169,14 @@ void ScenePreSelect::updateLoadSongs()
                 auto entry = std::make_shared<EntryFolderNewSong>("NEW SONGS");
                 for (auto&& c : newSongList)
                 {
-                    if (gAppIsExiting) break;
+                    if (gAppIsExiting)
+                        break;
                     entry->pushEntry(std::make_shared<EntryFolderSong>(std::move(c)));
                 }
                 rootFolderProp.dbBrowseEntries.insert(rootFolderProp.dbBrowseEntries.begin(), {entry, nullptr});
-            } else {
+            }
+            else
+            {
                 LOG_INFO << "[List] No NEW SONG entries";
             }
 
@@ -184,19 +184,25 @@ void ScenePreSelect::updateLoadSongs()
             LOG_INFO << "[List] Generating ARENA folder...";
             if (!rootFolderProp.dbBrowseEntries.empty())
             {
-                auto entry = std::make_shared<EntryFolderArena>(i18n::s(i18nText::ARENA_FOLDER_TITLE), i18n::s(i18nText::ARENA_FOLDER_SUBTITLE));
+                auto entry = std::make_shared<EntryFolderArena>(i18n::s(i18nText::ARENA_FOLDER_TITLE),
+                                                                i18n::s(i18nText::ARENA_FOLDER_SUBTITLE));
 
-                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::HOST_LOBBY, i18n::s(i18nText::ARENA_HOST), i18n::s(i18nText::ARENA_HOST_DESCRIPTION)));
-                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::JOIN_LOBBY, i18n::s(i18nText::ARENA_JOIN), i18n::s(i18nText::ARENA_JOIN_DESCRIPTION)));
-                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::LEAVE_LOBBY, i18n::s(i18nText::ARENA_LEAVE), i18n::s(i18nText::ARENA_LEAVE_DESCRIPTION)));
+                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::HOST_LOBBY,
+                                                                     i18n::s(i18nText::ARENA_HOST),
+                                                                     i18n::s(i18nText::ARENA_HOST_DESCRIPTION)));
+                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::JOIN_LOBBY,
+                                                                     i18n::s(i18nText::ARENA_JOIN),
+                                                                     i18n::s(i18nText::ARENA_JOIN_DESCRIPTION)));
+                entry->pushEntry(std::make_shared<EntryArenaCommand>(EntryArenaCommand::Type::LEAVE_LOBBY,
+                                                                     i18n::s(i18nText::ARENA_LEAVE),
+                                                                     i18n::s(i18nText::ARENA_LEAVE_DESCRIPTION)));
 
                 // TODO load lobby list from file
 
                 rootFolderProp.dbBrowseEntries.emplace_back(std::move(entry), nullptr);
             }
             LOG_INFO << "[List] ARENA has " << 0 << " known hosts (placeholder)";
-
-            });
+        });
     }
 
     if (g_pSongDB->addChartTaskFinishCount != prevChartLoaded)
@@ -204,14 +210,12 @@ void ScenePreSelect::updateLoadSongs()
         std::shared_lock l(g_pSongDB->addCurrentPathMutex);
 
         prevChartLoaded = g_pSongDB->addChartTaskFinishCount;
-        textHint = (
-            boost::format(i18n::c(i18nText::LOADING_CHARTS))
-                % g_pSongDB->addChartTaskFinishCount
-                % g_pSongDB->addChartTaskCount
-            ).str();
+        textHint = (boost::format(i18n::c(i18nText::LOADING_CHARTS)) % g_pSongDB->addChartTaskFinishCount %
+                    g_pSongDB->addChartTaskCount)
+                       .str();
         textHint2 = g_pSongDB->addCurrentPath;
     }
-    
+
     if (loadSongEnd.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
     {
         g_pSongDB->waitLoadingFinish();
@@ -223,9 +227,10 @@ void ScenePreSelect::updateLoadSongs()
     }
 }
 
-static const std::string_view to_str(const DifficultyTable::UpdateResult result) 
+static const std::string_view to_str(const DifficultyTable::UpdateResult result)
 {
-    switch (result) {
+    switch (result)
+    {
     case DifficultyTable::UpdateResult::OK: return "OK";
     case DifficultyTable::UpdateResult::INTERNAL_ERROR: return "INTERNAL_ERROR";
     case DifficultyTable::UpdateResult::WEB_PATH_ERROR: return "WEB_PATH_ERROR";
@@ -259,7 +264,8 @@ void ScenePreSelect::updateLoadTables()
             size_t tableIndex = 0;
             for (auto& tableUrl : tableList)
             {
-                if (gAppIsExiting) break;
+                if (gAppIsExiting)
+                    break;
                 LOG_INFO << "[List] Add table " << tableUrl;
                 textHint2 = tableUrl;
 
@@ -267,8 +273,7 @@ void ScenePreSelect::updateLoadTables()
                 DifficultyTableBMS& t = gSelectContext.tables.back();
                 t.setUrl(tableUrl);
 
-                auto convertTable = [&](DifficultyTableBMS& t)
-                {
+                auto convertTable = [&](DifficultyTableBMS& t) {
                     auto tbl = std::make_shared<EntryFolderTable>(t.getName(), tableIndex);
                     size_t levelIndex = 0;
                     for (const auto& lv : t.getLevelList())
@@ -276,7 +281,8 @@ void ScenePreSelect::updateLoadTables()
                         auto tblLevel = std::make_shared<EntryFolderTable>(t.getSymbol() + lv, levelIndex);
                         for (const auto& r : t.getEntryList(lv))
                         {
-                            if (gAppIsExiting) break;
+                            if (gAppIsExiting)
+                                break;
                             auto charts = g_pSongDB->findChartByHash(r->md5, false);
                             for (auto& c : charts)
                             {
@@ -307,23 +313,21 @@ void ScenePreSelect::updateLoadTables()
                     LOG_INFO << "[List] Local file not found. Downloading... " << t.getFolderPath();
                     textHint2 = i18n::s(i18nText::DOWNLOADING_TABLE);
 
-                    t.updateFromUrl([&](DifficultyTable::UpdateResult result)
+                    t.updateFromUrl([&](DifficultyTable::UpdateResult result) {
+                        if (result == DifficultyTable::UpdateResult::OK)
                         {
-                            if (result == DifficultyTable::UpdateResult::OK)
-                            {
-                                LOG_INFO << "[List] Table file download complete: " << t.getFolderPath();
-                                rootFolderProp.dbBrowseEntries.emplace_back(convertTable(t), nullptr);
-                            }
-                            else
-                            {
-                                LOG_WARNING << "[List] Update table " << tableUrl << " failed: " << to_str(result);
-                            }
-                        });
+                            LOG_INFO << "[List] Table file download complete: " << t.getFolderPath();
+                            rootFolderProp.dbBrowseEntries.emplace_back(convertTable(t), nullptr);
+                        }
+                        else
+                        {
+                            LOG_WARNING << "[List] Update table " << tableUrl << " failed: " << to_str(result);
+                        }
+                    });
                     tableIndex += 1;
                 }
             }
-
-            });
+        });
     }
 
     if (loadTableEnd.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
@@ -356,8 +360,8 @@ void ScenePreSelect::updateLoadCourses()
             LOG_INFO << "[List] Loading courses from courses/*.lr2crs...";
             for (auto& courseFile : fs::recursive_directory_iterator(coursePath))
             {
-                if (!(fs::is_regular_file(courseFile)
-                        && lunaticvibes::iequals(courseFile.path().extension().string(), ".lr2crs")))
+                if (!(fs::is_regular_file(courseFile) &&
+                      lunaticvibes::iequals(courseFile.path().extension().string(), ".lr2crs")))
                     continue;
 
                 const Path& coursePath = courseFile.path();
@@ -378,7 +382,8 @@ void ScenePreSelect::updateLoadCourses()
 
             for (auto& [type, courses] : courses)
             {
-                if (courses.empty()) continue;
+                if (courses.empty())
+                    continue;
 
                 std::string folderTitle;
                 std::string folderTitle2;
@@ -402,8 +407,7 @@ void ScenePreSelect::updateLoadCourses()
                 }
                 rootFolderProp.dbBrowseEntries.emplace_back(std::move(folder), nullptr);
             }
-
-            });
+        });
     }
 
     if (loadCourseEnd.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
@@ -456,15 +460,14 @@ void ScenePreSelect::loadFinished()
         }
         if (gNextScene == SceneType::PRE_SELECT)
         {
-            textHint = (boost::format("%s %s %s (%s)")
-                % PROJECT_NAME % PROJECT_VERSION
+            textHint = (boost::format("%s %s %s (%s)") % PROJECT_NAME % PROJECT_VERSION
 #ifndef NDEBUG
-                % "Debug"
+                        % "Debug"
 #else
-                % ""
+                        % ""
 #endif
-                % GIT_REVISION
-                ).str();
+                        % GIT_REVISION)
+                           .str();
             textHint2 = i18n::s(i18nText::PLEASE_WAIT);
         }
 
@@ -484,7 +487,6 @@ void ScenePreSelect::loadFinished()
     }
 }
 
-
 bool ScenePreSelect::shouldShowImgui() const
 {
     return true;
@@ -492,13 +494,17 @@ bool ScenePreSelect::shouldShowImgui() const
 
 void ScenePreSelect::updateImgui()
 {
-    if (gInCustomize) return;
+    if (gInCustomize)
+        return;
 
     ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
                                     static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                              ImGuiCond_Always);
-    if (ImGui::Begin("LoadSong", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
+    if (ImGui::Begin("LoadSong", NULL,
+                     ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+                         ImGuiWindowFlags_NoCollapse))
     {
         ImGui::TextUnformatted(textHint.c_str());
         ImGui::TextUnformatted(textHint2.c_str());
@@ -506,7 +512,6 @@ void ScenePreSelect::updateImgui()
         ImGui::End();
     }
 }
-
 
 bool ScenePreSelect::isLoadingFinished() const
 {

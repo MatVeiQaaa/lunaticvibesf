@@ -10,13 +10,13 @@ public:
     fraction(long long numerator, long long denominator, bool trim = true);
 
 public:
-    fraction  operator+  (const fraction& rhs) const;
-    fraction& operator+= (const fraction& rhs);
-    fraction  operator-  (const fraction& rhs) const;
-    fraction& operator-= (const fraction& rhs);
-    fraction  operator*  (const fraction& rhs) const;
-    fraction& operator*= (const fraction& rhs);
-    fraction& operator=  (const double rhs);
+    fraction operator+(const fraction& rhs) const;
+    fraction& operator+=(const fraction& rhs);
+    fraction operator-(const fraction& rhs) const;
+    fraction& operator-=(const fraction& rhs);
+    fraction operator*(const fraction& rhs) const;
+    fraction& operator*=(const fraction& rhs);
+    fraction& operator=(const double rhs);
     operator double() const;
 };
 

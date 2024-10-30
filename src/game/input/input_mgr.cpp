@@ -1,7 +1,7 @@
-#include "common/log.h"
-#include "common/types.h"
 #include "input_mgr.h"
+#include "common/log.h"
 #include "common/sysutil.h"
+#include "common/types.h"
 #include "config/config_mgr.h"
 #include "game/graphics/graphics.h"
 
@@ -114,8 +114,8 @@ std::bitset<KEY_COUNT> InputMgr::_detect()
     {
         KeyMap& b = padBindings[k];
         {
-			switch (b.getType())
-			{
+            switch (b.getType())
+            {
             case KeyMap::DeviceType::UNDEF: break;
             case KeyMap::DeviceType::KEYBOARD:
                 if (isKeyPressed(b.getKeyboard()))
@@ -123,18 +123,17 @@ std::bitset<KEY_COUNT> InputMgr::_detect()
                     res[k] = true;
                     pressedTime[k] = t;
                 }
-				break;
-			case KeyMap::DeviceType::JOYSTICK:
+                break;
+            case KeyMap::DeviceType::JOYSTICK:
                 if (isButtonPressed(b.getJoystick(), padDeadzones[k]))
                 {
                     res[k] = true;
                     pressedTime[k] = t;
                 }
-				break;
-			case KeyMap::DeviceType::MOUSE:
-				break;
-			}
-			//if (res[k]) break;
+                break;
+            case KeyMap::DeviceType::MOUSE: break;
+            }
+            // if (res[k]) break;
         }
     }
 
@@ -204,7 +203,6 @@ std::bitset<KEY_COUNT> InputMgr::detect()
     return _inst._detect();
 }
 
-
 bool InputMgr::getMousePos(int& x, int& y)
 {
 #ifdef RENDER_SDL2
@@ -218,8 +216,10 @@ bool InputMgr::getMousePos(int& x, int& y)
     {
         double canvasScaleX = graphics_get_canvas_scale_x();
         double canvasScaleY = graphics_get_canvas_scale_y();
-        if (canvasScaleX != 1.0) x = (int)std::floor(x / canvasScaleX);
-        if (canvasScaleY != 1.0) y = (int)std::floor(y / canvasScaleY);
+        if (canvasScaleX != 1.0)
+            x = (int)std::floor(x / canvasScaleX);
+        if (canvasScaleY != 1.0)
+            y = (int)std::floor(y / canvasScaleY);
     }
     return ret;
 }

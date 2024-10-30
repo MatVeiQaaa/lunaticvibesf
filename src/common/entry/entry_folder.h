@@ -1,12 +1,12 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "entry.h"
 #include "common/hash.h"
+#include "entry.h"
 
-class EntryFolderBase: public EntryBase
+class EntryFolderBase : public EntryBase
 {
 public:
     EntryFolderBase() = delete;
@@ -15,10 +15,10 @@ public:
 
 protected:
     std::vector<std::shared_ptr<EntryBase>> entries;
+
 public:
     virtual std::shared_ptr<EntryBase> getEntry(size_t idx);
     virtual void pushEntry(std::shared_ptr<EntryBase> f);
     virtual size_t getContentsCount() { return entries.size(); }
     virtual bool empty() { return entries.empty(); }
-    
 };

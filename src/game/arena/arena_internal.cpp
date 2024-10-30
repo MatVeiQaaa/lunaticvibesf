@@ -10,95 +10,95 @@ using namespace Arena;
 
 struct NetworkPayload
 {
-	int messageIndex = 0;	// keep messages handled in order
-	uint8_t type = 0;		// ArenaMessageType
-
+    int messageIndex = 0; // keep messages handled in order
+    uint8_t type = 0;     // ArenaMessageType
 };
 
 std::ostream& operator<<(std::ostream& os, const ArenaErrorCode& err)
 {
-	switch (err) {
-	case ArenaErrorCode::NotEnoughSlots: return os << "not enough slots";
-	case ArenaErrorCode::HostIsPlaying: return os << "host is playing";
-	case ArenaErrorCode::VersionMismatch: return os << "version mismatch";
-	case ArenaErrorCode::DuplicateAddress: return os << "duplicate address";
-	}
-	return os << "unknown error " << static_cast<uint8_t>(err);
+    switch (err)
+    {
+    case ArenaErrorCode::NotEnoughSlots: return os << "not enough slots";
+    case ArenaErrorCode::HostIsPlaying: return os << "host is playing";
+    case ArenaErrorCode::VersionMismatch: return os << "version mismatch";
+    case ArenaErrorCode::DuplicateAddress: return os << "duplicate address";
+    }
+    return os << "unknown error " << static_cast<uint8_t>(err);
 }
 
 std::shared_ptr<std::vector<unsigned char>> ArenaMessage::pack()
 {
-	std::stringstream ss;
-	auto ret = std::make_shared<std::vector<unsigned char>>();
-	try
-	{
-		//LOG_DEBUG << "[Arena] Pack message type: " << (int)type;
+    std::stringstream ss;
+    auto ret = std::make_shared<std::vector<unsigned char>>();
+    try
+    {
+        // LOG_DEBUG << "[Arena] Pack message type: " << (int)type;
 
-		cereal::PortableBinaryOutputArchive ar(ss);
-		switch (type)
-		{
-		case RESPONSE:                ar(*static_cast<ArenaMessageResponse*>(this)); break;
-		case HEARTBEAT:               ar(*static_cast<ArenaMessageHeartbeat*>(this)); break;
-		case NOTICE:                  ar(*static_cast<ArenaMessageNotice*>(this)); break;
-		case SEEK_LOBBY:              ar(*static_cast<ArenaMessageSeekLobby*>(this)); break;
-		case DISBAND_LOBBY:           ar(*static_cast<ArenaMessageDisbandLobby*>(this)); break;
-		case JOIN_LOBBY:              ar(*static_cast<ArenaMessageJoinLobby*>(this)); break;
-		case LEAVE_LOBBY:             ar(*static_cast<ArenaMessageLeaveLobby*>(this)); break;
-		case PLAYER_JOINED_LOBBY:     ar(*static_cast<ArenaMessagePlayerJoinedLobby*>(this)); break;
-		case PLAYER_LEFT_LOBBY:       ar(*static_cast<ArenaMessagePlayerLeftLobby*>(this)); break;
-		case REQUEST_CHART:           ar(*static_cast<ArenaMessageRequestChart*>(this)); break;
-		case CHECK_CHART_EXIST:       ar(*static_cast<ArenaMessageCheckChartExist*>(this)); break;
-		case HOST_REQUEST_CHART:      ar(*static_cast<ArenaMessageHostRequestChart*>(this)); break;
-		case HOST_READY_STAT:         ar(*static_cast<ArenaMessageHostReadyStat*>(this)); break;
-		case HOST_START_PLAYING:      ar(*static_cast<ArenaMessageHostStartPlaying*>(this)); break;
-		case CLIENT_PLAY_INIT:        ar(*static_cast<ArenaMessageClientPlayInit*>(this)); break;
-		case HOST_PLAY_INIT:          ar(*static_cast<ArenaMessageHostPlayInit*>(this)); break;
-		case CLIENT_FINISHED_LOADING: ar(*static_cast<ArenaMessageClientFinishedLoading*>(this)); break;
-		case HOST_FINISHED_LOADING:   ar(*static_cast<ArenaMessageHostFinishedLoading*>(this)); break;
-		case CLIENT_PLAYDATA:         ar(*static_cast<ArenaMessageClientPlayData*>(this)); break;
-		case HOST_PLAYDATA:           ar(*static_cast<ArenaMessageHostPlayData*>(this)); break;
-		case CLIENT_FINISHED_PLAYING: ar(*static_cast<ArenaMessageClientFinishedPlaying*>(this)); break;
-		case HOST_FINISHED_PLAYING:   ar(*static_cast<ArenaMessageHostFinishedPlaying*>(this)); break;
-		case CLIENT_FINISHED_RESULT:  ar(*static_cast<ArenaMessageClientFinishedResult*>(this)); break;
-		case HOST_FINISHED_RESULT:    ar(*static_cast<ArenaMessageHostFinishedResult*>(this)); break;
-		}
-	}
-	catch (const cereal::Exception& e)
-	{
-		LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
-	}
-	if (ss.str().empty())
-	{
-		LOG_WARNING << "[Arena] Message pack failed. Type: " << (int)type;
-		return ret;
-	}
+        cereal::PortableBinaryOutputArchive ar(ss);
+        switch (type)
+        {
+        case RESPONSE: ar(*static_cast<ArenaMessageResponse*>(this)); break;
+        case HEARTBEAT: ar(*static_cast<ArenaMessageHeartbeat*>(this)); break;
+        case NOTICE: ar(*static_cast<ArenaMessageNotice*>(this)); break;
+        case SEEK_LOBBY: ar(*static_cast<ArenaMessageSeekLobby*>(this)); break;
+        case DISBAND_LOBBY: ar(*static_cast<ArenaMessageDisbandLobby*>(this)); break;
+        case JOIN_LOBBY: ar(*static_cast<ArenaMessageJoinLobby*>(this)); break;
+        case LEAVE_LOBBY: ar(*static_cast<ArenaMessageLeaveLobby*>(this)); break;
+        case PLAYER_JOINED_LOBBY: ar(*static_cast<ArenaMessagePlayerJoinedLobby*>(this)); break;
+        case PLAYER_LEFT_LOBBY: ar(*static_cast<ArenaMessagePlayerLeftLobby*>(this)); break;
+        case REQUEST_CHART: ar(*static_cast<ArenaMessageRequestChart*>(this)); break;
+        case CHECK_CHART_EXIST: ar(*static_cast<ArenaMessageCheckChartExist*>(this)); break;
+        case HOST_REQUEST_CHART: ar(*static_cast<ArenaMessageHostRequestChart*>(this)); break;
+        case HOST_READY_STAT: ar(*static_cast<ArenaMessageHostReadyStat*>(this)); break;
+        case HOST_START_PLAYING: ar(*static_cast<ArenaMessageHostStartPlaying*>(this)); break;
+        case CLIENT_PLAY_INIT: ar(*static_cast<ArenaMessageClientPlayInit*>(this)); break;
+        case HOST_PLAY_INIT: ar(*static_cast<ArenaMessageHostPlayInit*>(this)); break;
+        case CLIENT_FINISHED_LOADING: ar(*static_cast<ArenaMessageClientFinishedLoading*>(this)); break;
+        case HOST_FINISHED_LOADING: ar(*static_cast<ArenaMessageHostFinishedLoading*>(this)); break;
+        case CLIENT_PLAYDATA: ar(*static_cast<ArenaMessageClientPlayData*>(this)); break;
+        case HOST_PLAYDATA: ar(*static_cast<ArenaMessageHostPlayData*>(this)); break;
+        case CLIENT_FINISHED_PLAYING: ar(*static_cast<ArenaMessageClientFinishedPlaying*>(this)); break;
+        case HOST_FINISHED_PLAYING: ar(*static_cast<ArenaMessageHostFinishedPlaying*>(this)); break;
+        case CLIENT_FINISHED_RESULT: ar(*static_cast<ArenaMessageClientFinishedResult*>(this)); break;
+        case HOST_FINISHED_RESULT: ar(*static_cast<ArenaMessageHostFinishedResult*>(this)); break;
+        }
+    }
+    catch (const cereal::Exception& e)
+    {
+        LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
+    }
+    if (ss.str().empty())
+    {
+        LOG_WARNING << "[Arena] Message pack failed. Type: " << (int)type;
+        return ret;
+    }
 
-	size_t length = ss.tellp();
-	ret->resize(length + 1);
-	(*ret)[0] = type;
-	ss.read((char*)&(*ret)[1], length);
+    size_t length = ss.tellp();
+    ret->resize(length + 1);
+    (*ret)[0] = type;
+    ss.read((char*)&(*ret)[1], length);
 
-	return ret;
+    return ret;
 }
 
 std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, size_t len)
 {
-	if (len == 0)
-	{
-		LOG_WARNING << "[Arena] Empty message received";
-		return nullptr;
-	}
-	if (data[0] == UNDEF || data[0] >= MESSAGE_TYPE_COUNT)
-	{
-		LOG_WARNING << "[Arena] Invalid message type: " << (int)data[0];
-		return nullptr;
-	}
+    if (len == 0)
+    {
+        LOG_WARNING << "[Arena] Empty message received";
+        return nullptr;
+    }
+    if (data[0] == UNDEF || data[0] >= MESSAGE_TYPE_COUNT)
+    {
+        LOG_WARNING << "[Arena] Invalid message type: " << (int)data[0];
+        return nullptr;
+    }
 
-	std::stringstream ss;
-	ss.write((char*)&data[1], len - 1);
-	try
-	{
-		//LOG_DEBUG << "[Arena] Parse message type: " << (int)data[0];
+    std::stringstream ss;
+    ss.write((char*)&data[1], len - 1);
+    try
+    {
+        // LOG_DEBUG << "[Arena] Parse message type: " << (int)data[0];
         // clang-format off
         switch (data[0])
         {
@@ -128,11 +128,11 @@ std::shared_ptr<ArenaMessage> ArenaMessage::unpack(const unsigned char* data, si
         case HOST_FINISHED_RESULT:    { auto m = std::make_shared<ArenaMessageHostFinishedResult>();    { cereal::PortableBinaryInputArchive ar(ss); ar(*m); } return m; }
         }
         // clang-format on
-	}
-	catch (const cereal::Exception& e)
-	{
-		LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
-	}
-	LOG_WARNING << "[Arena] Message parsing failed. Type: " << (int)data[0];
-	return nullptr;
+    }
+    catch (const cereal::Exception& e)
+    {
+        LOG_ERROR << "[ArenaInternal] cereal exception: " << e.what();
+    }
+    LOG_WARNING << "[Arena] Message parsing failed. Type: " << (int)data[0];
+    return nullptr;
 }

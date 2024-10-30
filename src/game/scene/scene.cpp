@@ -91,16 +91,20 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
         }
     }
 
-    _input.register_p("DEBUG_TOGGLE", std::bind(&SceneBase::DebugToggle, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("DEBUG_TOGGLE",
+                      std::bind(&SceneBase::DebugToggle, this, std::placeholders::_1, std::placeholders::_2));
 
-    _input.register_p("GLOBALFUNC", std::bind(&SceneBase::GlobalFuncKeys, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("GLOBALFUNC",
+                      std::bind(&SceneBase::GlobalFuncKeys, this, std::placeholders::_1, std::placeholders::_2));
 
-    _input.register_p("SKIN_MOUSE_CLICK", std::bind(&SceneBase::MouseClick, this, std::placeholders::_1, std::placeholders::_2));
-    _input.register_h("SKIN_MOUSE_DRAG", std::bind(&SceneBase::MouseDrag, this, std::placeholders::_1, std::placeholders::_2));
-    _input.register_r("SKIN_MOUSE_RELEASE", std::bind(&SceneBase::MouseRelease, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("SKIN_MOUSE_CLICK",
+                      std::bind(&SceneBase::MouseClick, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_h("SKIN_MOUSE_DRAG",
+                      std::bind(&SceneBase::MouseDrag, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_r("SKIN_MOUSE_RELEASE",
+                      std::bind(&SceneBase::MouseRelease, this, std::placeholders::_1, std::placeholders::_2));
 
-    if (pSkin && 
-        !(gNextScene == SceneType::SELECT && skinType == SkinType::THEME_SELECT))
+    if (pSkin && !(gNextScene == SceneType::SELECT && skinType == SkinType::THEME_SELECT))
     {
         State::resetTimer();
 
@@ -111,7 +115,7 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
     }
 }
 
-SceneBase::~SceneBase() 
+SceneBase::~SceneBase()
 {
     LVF_DEBUG_ASSERT(!_input.isRunning());
     LVF_DEBUG_ASSERT(!isRunning());
@@ -120,7 +124,7 @@ SceneBase::~SceneBase()
     _input.unregister_p("SKIN_MOUSE_CLICK");
     _input.unregister_p("GLOBALFUNC");
     _input.unregister_p("DEBUG_TOGGLE");
-    sceneEnding = true; 
+    sceneEnding = true;
 }
 
 void SceneBase::postAsyncStart()
@@ -156,7 +160,8 @@ void SceneBase::update()
             std::unique_lock lock(gOverlayContext._mutex);
 
             // notifications expire check
-            while (!gOverlayContext.notifications.empty() && (t - gOverlayContext.notifications.begin()->first).norm() > 10 * 1000) // 10s
+            while (!gOverlayContext.notifications.empty() &&
+                   (t - gOverlayContext.notifications.begin()->first).norm() > 10 * 1000) // 10s
             {
                 gOverlayContext.notifications.pop_front();
             }
@@ -203,7 +208,8 @@ void SceneBase::update()
 
 void SceneBase::MouseClick(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (!pSkin) return;
+    if (!pSkin)
+        return;
     if (m[Input::Pad::M1])
     {
         auto [x, y] = _input.getCursorPos();
@@ -213,7 +219,8 @@ void SceneBase::MouseClick(InputMask& m, const lunaticvibes::Time& t)
 
 void SceneBase::MouseDrag(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (!pSkin) return;
+    if (!pSkin)
+        return;
     if (m[Input::Pad::M1])
     {
         auto [x, y] = _input.getCursorPos();
@@ -223,7 +230,8 @@ void SceneBase::MouseDrag(InputMask& m, const lunaticvibes::Time& t)
 
 void SceneBase::MouseRelease(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (!pSkin) return;
+    if (!pSkin)
+        return;
     if (m[Input::Pad::M1])
     {
         pSkin->update_mouse_release();
@@ -264,13 +272,11 @@ void SceneBase::draw() const
     if (queuedScreenshot)
     {
         Path p = "screenshot";
-        p /= (boost::format("LV %04d-%02d-%02d %02d-%02d-%02d.png")
-            % State::get(IndexNumber::DATE_YEAR)
-            % State::get(IndexNumber::DATE_MON)
-            % State::get(IndexNumber::DATE_DAY)
-            % State::get(IndexNumber::DATE_HOUR)
-            % State::get(IndexNumber::DATE_MIN)
-            % State::get(IndexNumber::DATE_SEC)).str();
+        p /=
+            (boost::format("LV %04d-%02d-%02d %02d-%02d-%02d.png") % State::get(IndexNumber::DATE_YEAR) %
+             State::get(IndexNumber::DATE_MON) % State::get(IndexNumber::DATE_DAY) %
+             State::get(IndexNumber::DATE_HOUR) % State::get(IndexNumber::DATE_MIN) % State::get(IndexNumber::DATE_SEC))
+                .str();
 
         lunaticvibes::graphics::queue_screenshot(std::move(p));
 
@@ -323,21 +329,21 @@ void SceneBase::updateImgui()
     if (showFPS || should_show_text_overlay())
     {
         ImGui::SetNextWindowPos(ImVec2(0.f, 0.f), ImGuiCond_Always);
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0.f, 0.f, 0.f, 0.4f });
-        if (ImGui::Begin("##textoverlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, {0.f, 0.f, 0.f, 0.4f});
+        if (ImGui::Begin("##textoverlay", NULL,
+                         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+                             ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize))
         {
             if (showFPS)
             {
                 ImGui::PushID("##fps");
-                ImGui::Text("FPS: Render %d | Input %d | Update %d",
-                    State::get(IndexNumber::FPS),
-                    State::get(IndexNumber::INPUT_DETECT_FPS),
-                    State::get(IndexNumber::SCENE_UPDATE_FPS));
+                ImGui::Text("FPS: Render %d | Input %d | Update %d", State::get(IndexNumber::FPS),
+                            State::get(IndexNumber::INPUT_DETECT_FPS), State::get(IndexNumber::SCENE_UPDATE_FPS));
                 ImGui::PopID();
             }
 
-            static const char* overlayTextID[] =
-            {
+            static const char* overlayTextID[] = {
                 "##overlaytext1",
                 "##overlaytext2",
                 "##overlaytext3",
@@ -362,21 +368,31 @@ void SceneBase::updateImgui()
 
     if (lunaticvibes::g_enable_imgui_debug_monitor)
     {
-        if (imguiShowMonitorLR2DST) imguiMonitorLR2DST();
-        if (imguiShowMonitorNumber) imguiMonitorNumber();
-        if (imguiShowMonitorOption) imguiMonitorOption();
-        if (imguiShowMonitorSlider) imguiMonitorSlider();
-        if (imguiShowMonitorSwitch) imguiMonitorSwitch();
-        if (imguiShowMonitorText) imguiMonitorText();
-        if (imguiShowMonitorBargraph) imguiMonitorBargraph();
-        if (imguiShowMonitorTimer) imguiMonitorTimer();
+        if (imguiShowMonitorLR2DST)
+            imguiMonitorLR2DST();
+        if (imguiShowMonitorNumber)
+            imguiMonitorNumber();
+        if (imguiShowMonitorOption)
+            imguiMonitorOption();
+        if (imguiShowMonitorSlider)
+            imguiMonitorSlider();
+        if (imguiShowMonitorSwitch)
+            imguiMonitorSwitch();
+        if (imguiShowMonitorText)
+            imguiMonitorText();
+        if (imguiShowMonitorBargraph)
+            imguiMonitorBargraph();
+        if (imguiShowMonitorTimer)
+            imguiMonitorTimer();
     }
 }
 
 void SceneBase::DebugToggle(InputMask& p, const lunaticvibes::Time& t)
 {
-    if (!(!gInCustomize || _type == SceneType::CUSTOMIZE)) return;
-    if (!lunaticvibes::g_enable_imgui_debug_monitor) return;
+    if (!(!gInCustomize || _type == SceneType::CUSTOMIZE))
+        return;
+    if (!lunaticvibes::g_enable_imgui_debug_monitor)
+        return;
 
     if (p[Input::F1])
     {
@@ -439,7 +455,6 @@ void SceneBase::stopTextEdit(bool modify)
         pSkin->stopTextEdit(modify);
     }
 }
-
 
 void SceneBase::GlobalFuncKeys(InputMask& m, const lunaticvibes::Time& t)
 {

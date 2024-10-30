@@ -8,11 +8,10 @@ TEST(ScoreDb, ChartScoreUpdating)
 {
     static const HashMD5 hash = md5("deadbeef");
 
-    ScoreDB score_db { IN_MEMORY_DB_PATH };
+    ScoreDB score_db{IN_MEMORY_DB_PATH};
 
     EXPECT_EQ(score_db.getChartScoreBMS(hash), nullptr);
     EXPECT_EQ(score_db.getStats().pgreat, 0);
-
 
     ScoreBMS score1;
     score1.exscore = 16;
@@ -118,7 +117,7 @@ TEST(ScoreDb, CourseScoreUpdating)
 {
     static const HashMD5 hash = md5("deadbeef");
 
-    ScoreDB score_db { IN_MEMORY_DB_PATH };
+    ScoreDB score_db{IN_MEMORY_DB_PATH};
     ScoreBMS score;
     score.exscore = 1;
     score.lamp = ScoreBMS::Lamp::EASY;
@@ -151,7 +150,7 @@ TEST(ScoreDb, ChartScoreDeleting)
 {
     static const HashMD5 hash = md5("deadbeef");
 
-    ScoreDB score_db { IN_MEMORY_DB_PATH };
+    ScoreDB score_db{IN_MEMORY_DB_PATH};
     ScoreBMS score;
     score.exscore = 1;
 
@@ -177,7 +176,7 @@ TEST(ScoreDb, CourseScoreDeleting)
 {
     static const HashMD5 hash = md5("deadbeef");
 
-    ScoreDB score_db { IN_MEMORY_DB_PATH };
+    ScoreDB score_db{IN_MEMORY_DB_PATH};
     ScoreBMS score;
     score.exscore = 1;
 

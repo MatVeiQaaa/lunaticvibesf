@@ -9,14 +9,15 @@
 
 #include <stdint.h>
 
-#include "common/types.h"
 #include "common/hash.h"
+#include "common/types.h"
 #include "db/db_conn.h"
 
 class ScoreBase;
 class ScoreBMS;
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 struct OverallStats
 {
@@ -36,8 +37,8 @@ struct OverallStats
 
 /* TABLE classic_chart:
     md5(TEXT), totalnotes(INTEGER), score(INTEGER), rate(REAL), reserved[1-4](INTEGER), reserved[5-6](REAL)
-    exscore(INTEGER), lamp(INTEGER), pgreat(INTEGER), great(INTEGER), good(INTEGER), bad(INTEGER), kpoor(INTEGER), miss(INTEGER)
-    md5: hash string, calculated by "relative path to exe" OR "absolute path"
+    exscore(INTEGER), lamp(INTEGER), pgreat(INTEGER), great(INTEGER), good(INTEGER), bad(INTEGER), kpoor(INTEGER),
+   miss(INTEGER) md5: hash string, calculated by "relative path to exe" OR "absolute path"
     ...
 */
 class ScoreDB : public SQLite
@@ -51,7 +52,7 @@ public:
     ScoreDB(const Path& path) : ScoreDB(path.u8string().c_str()) {}
     ~ScoreDB() override = default;
     ScoreDB(ScoreDB&) = delete;
-    ScoreDB& operator= (ScoreDB&) = delete;
+    ScoreDB& operator=(ScoreDB&) = delete;
 
 protected:
     void deleteLegacyScoreBMS(const char* tableName, const HashMD5& hash);
@@ -81,6 +82,7 @@ public:
     // Test things, don't normally use:
 
     void updateLegacyChartScoreBMS(const HashMD5& hash, const ScoreBMS& score);
+
 private:
     void updateStats(const ScoreBMS& score);
     void initTables();

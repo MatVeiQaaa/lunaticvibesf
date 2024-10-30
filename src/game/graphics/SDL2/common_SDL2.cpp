@@ -60,7 +60,8 @@ Color Color::operator+(const Color& rhs) const
 
 Color Color::operator*(const double& rhs) const
 {
-    if (rhs < 0) return Color(0);
+    if (rhs < 0)
+        return Color(0);
     Color c;
     c.r = (r * rhs <= 255) ? (Uint8)(r * rhs) : 255;
     c.g = (g * rhs <= 255) ? (Uint8)(g * rhs) : 255;
@@ -71,7 +72,8 @@ Color Color::operator*(const double& rhs) const
 
 Color Color::operator*(const Color& rhs) const
 {
-    if (hex() == 0xffffffff) return rhs;
+    if (hex() == 0xffffffff)
+        return rhs;
 
     Color c;
     c.r = Uint8(r * (rhs.r / 255.0));
@@ -95,17 +97,20 @@ bool Color::operator!=(const Color& rhs) const
 
 static bool isTGA(const std::string_view filePath)
 {
-    if (filePath.length() < 4) return false;
+    if (filePath.length() < 4)
+        return false;
     return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "tga");
 }
 static bool isPNG(const std::string_view filePath)
 {
-    if (filePath.length() < 4) return false;
+    if (filePath.length() < 4)
+        return false;
     return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "png");
 }
 static bool isGIF(const std::string_view filePath)
 {
-    if (filePath.length() < 4) return false;
+    if (filePath.length() < 4)
+        return false;
     return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "gif");
 }
 
@@ -118,29 +123,32 @@ Image::Image(const std::filesystem::path& path) : Image(path.u8string().c_str())
 // SDL_RWFromFile
 void ensure_tls_cleanup()
 {
-    static thread_local struct TlsCleanup{
+    static thread_local struct TlsCleanup
+    {
         ~TlsCleanup() { SDL_TLSCleanup(); };
     } tls_cleanup;
 }
 
 void close_rwops(SDL_RWops* s)
 {
-    if (s) s->close(s);
+    if (s)
+        s->close(s);
     ensure_tls_cleanup();
 }
 
-Image::Image(const char* filePath) : 
+Image::Image(const char* filePath)
+    :
 
-    Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
+      Image(filePath, std::shared_ptr<SDL_RWops>(SDL_RWFromFile(filePath, "rb"), close_rwops))
 {
 }
 
-Image::Image(const char* format, void* data, size_t size): 
-    Image(format, std::shared_ptr<SDL_RWops>(SDL_RWFromMem(data, size), close_rwops))
+Image::Image(const char* format, void* data, size_t size)
+    : Image(format, std::shared_ptr<SDL_RWops>(SDL_RWFromMem(data, size), close_rwops))
 {
 }
 
-Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw): _path(path), _pRWop(rw)
+Image::Image(const char* path, std::shared_ptr<SDL_RWops>&& rw) : _path(path), _pRWop(rw)
 {
     if (!_pRWop && !_path.empty())
     {
@@ -206,14 +214,17 @@ Rect Image::getRect() const
 
 Texture::Texture(const Image& srcImage)
 {
-    if (!srcImage.loaded) return;
+    if (!srcImage.loaded)
+        return;
 
-    _textures[0] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
-    _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+    _textures[0] =
+        std::shared_ptr<SDL_Texture>(pushAndWaitMainThreadTask<SDL_Texture*>(
+                                         std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
+                                     std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+    _textures[1] =
+        std::shared_ptr<SDL_Texture>(pushAndWaitMainThreadTask<SDL_Texture*>(
+                                         std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
+                                     std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
     if (_textures[0] || _textures[1])
     {
         textureRect = srcImage.getRect();
@@ -230,13 +241,17 @@ Texture::Texture(const Image& srcImage)
 Texture::Texture(const SDL_Surface* pSurface)
 {
     _textures[0] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
+        pushAndWaitMainThreadTask<SDL_Texture*>(
+            std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
         std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
-    if (!_textures[0]) return;
+    if (!_textures[0])
+        return;
     _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
+        pushAndWaitMainThreadTask<SDL_Texture*>(
+            std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
         std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
-    if (!_textures[1]) return;
+    if (!_textures[1])
+        return;
     textureRect = pSurface->clip_rect;
     loaded = true;
 }
@@ -244,17 +259,18 @@ Texture::Texture(const SDL_Surface* pSurface)
 Texture::Texture(SDL_Texture* pTexture, int w, int h)
 {
     _textures[0] = std::shared_ptr<SDL_Texture>(
-        pTexture, std::bind(pushAndWaitMainThreadTask<void, SDL_Texture *>, SDL_DestroyTexture, _1));
-    if (!pTexture) return;
+        pTexture, std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+    if (!pTexture)
+        return;
     textureRect = {0, 0, w, h};
     loaded = true;
 }
 
 Texture::Texture(int w, int h, PixelFormat fmt, bool target)
 {
-	SDL_PixelFormatEnum sdlfmt = SDL_PIXELFORMAT_UNKNOWN;
-	switch (fmt)
-	{
+    SDL_PixelFormatEnum sdlfmt = SDL_PIXELFORMAT_UNKNOWN;
+    switch (fmt)
+    {
     case PixelFormat::RGB24: sdlfmt = SDL_PIXELFORMAT_RGB24; break;
     case PixelFormat::BGR24: sdlfmt = SDL_PIXELFORMAT_BGR24; break;
     case PixelFormat::YV12: sdlfmt = SDL_PIXELFORMAT_YV12; break;
@@ -267,16 +283,18 @@ Texture::Texture(int w, int h, PixelFormat fmt, bool target)
     }
 
     if (sdlfmt != SDL_PIXELFORMAT_UNKNOWN)
-	{
+    {
         _textures[0] = std::shared_ptr<SDL_Texture>(
-            pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTexture, gFrameRenderer, sdlfmt, target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, w, h)),
+            pushAndWaitMainThreadTask<SDL_Texture*>(
+                std::bind(SDL_CreateTexture, gFrameRenderer, sdlfmt,
+                          target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, w, h)),
             std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
         if (_textures[0])
         {
-            textureRect = { 0, 0, w, h };
+            textureRect = {0, 0, w, h};
             loaded = true;
         }
-	}
+    }
 }
 
 void* Texture::raw()
@@ -294,8 +312,10 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
 {
     LVF_DEBUG_ASSERT(IsMainThread());
 
-    if (!loaded) return -1;
-    if (!Ypitch || !Upitch || !Vpitch) return -2;
+    if (!loaded)
+        return -1;
+    if (!Ypitch || !Upitch || !Vpitch)
+        return -2;
     for (const auto& tex : _textures)
         if (tex)
             SDL_UpdateYUVTexture(tex.get(), nullptr, Y, Ypitch, U, Upitch, V, Vpitch);
@@ -306,10 +326,18 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
                     const double angle, const Point* center)
 {
     int flipFlags = 0;
-    if (dstRectF.w < 0) { dstRectF.w = -dstRectF.w; dstRectF.x -= dstRectF.w; /*flipFlags |= SDL_FLIP_HORIZONTAL;*/ }
-    if (dstRectF.h < 0) { dstRectF.h = -dstRectF.h; dstRectF.y -= dstRectF.h; /*flipFlags |= SDL_FLIP_VERTICAL;*/ }
+    if (dstRectF.w < 0)
+    {
+        dstRectF.w = -dstRectF.w;
+        dstRectF.x -= dstRectF.w; /*flipFlags |= SDL_FLIP_HORIZONTAL;*/
+    }
+    if (dstRectF.h < 0)
+    {
+        dstRectF.h = -dstRectF.h;
+        dstRectF.y -= dstRectF.h; /*flipFlags |= SDL_FLIP_VERTICAL;*/
+    }
 
-	SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
+    SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
 
     int ssLevel = graphics_get_supersample_level();
     dstRectF.x *= ssLevel;
@@ -318,12 +346,13 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
     dstRectF.h *= ssLevel;
 
     SDL_FPoint scenter;
-    if (center) scenter = { (float)center->x * ssLevel, (float)center->y * ssLevel };
+    if (center)
+        scenter = {(float)center->x * ssLevel, (float)center->y * ssLevel};
 
     if (b == BlendMode::INVERT)
     {
         // ... pls help
-        const Rect rc = { 0, 0, (int)std::ceil(dstRectF.w), (int)std::ceil(dstRectF.h) };
+        const Rect rc = {0, 0, (int)std::ceil(dstRectF.w), (int)std::ceil(dstRectF.h)};
 
         static auto pTextureInverted = std::shared_ptr<SDL_Texture>(
             SDL_CreateTexture(gFrameRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, rc.w, rc.h),
@@ -339,31 +368,27 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
         SDL_SetRenderDrawColor(gFrameRenderer, r, g, b, a);
 
         static const auto blendMode = SDL_ComposeCustomBlendMode(
-            SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD,
-            SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+            SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE_MINUS_SRC_COLOR, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+            SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
         SDL_SetTextureBlendMode(pTex, blendMode);
         SDL_SetTextureAlphaMod(pTex, c.a);
         SDL_RenderCopy(gFrameRenderer, pTex, srcRect, &rc);
 
         SDL_SetRenderTarget(gFrameRenderer, oldTarget);
         SDL_SetTextureBlendMode(&*pTextureInverted, SDL_BLENDMODE_BLEND);
-        SDL_RenderCopyExF(
-            gFrameRenderer,
-            &*pTextureInverted,
-            &rc, &dstRectF,
-            angle,
-            center ? &scenter : NULL, SDL_RendererFlip(flipFlags)
-        );
+        SDL_RenderCopyExF(gFrameRenderer, &*pTextureInverted, &rc, &dstRectF, angle, center ? &scenter : NULL,
+                          SDL_RendererFlip(flipFlags));
         return;
     }
     else if (b == BlendMode::MULTIPLY_INVERTED_BACKGROUND)
     {
-        if (c.a <= 1) return;   // do not draw
+        if (c.a <= 1)
+            return; // do not draw
         // FIXME lmao
 
         static const SDL_BlendMode blendMode = SDL_ComposeCustomBlendMode(
-            SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
-            SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+            SDL_BLENDFACTOR_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ONE,
+            SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
         SDL_SetTextureBlendMode(pTex, blendMode);
     }
@@ -384,7 +409,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
                     SDL_BLENDFACTOR_ONE_MINUS_DST_ALPHA, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
                 return mode;
             }
-            case BlendMode::INVERT: // unreachable
+            case BlendMode::INVERT:                                                     // unreachable
             case BlendMode::MULTIPLY_INVERTED_BACKGROUND: return SDL_BLENDMODE_INVALID; // unreachable
             case BlendMode::MULTIPLY_WITH_ALPHA: {
                 // FIXME(rustbell): this is not correct.
@@ -405,21 +430,16 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
         }
     }
 
-    SDL_RenderCopyExF(
-        gFrameRenderer,
-        pTex,
-        srcRect, &dstRectF,
-        angle,
-        center ? &scenter : NULL, SDL_RendererFlip(flipFlags)
-    );
+    SDL_RenderCopyExF(gFrameRenderer, pTex, srcRect, &dstRectF, angle, center ? &scenter : NULL,
+                      SDL_RendererFlip(flipFlags));
 
-//#ifndef NDEBUG
-//    SDL_FRect& d = dstRectF;
-//    SDL_FPoint lines[5] = { {d.x, d.y}, {d.x + d.w, d.y}, {d.x + d.w, d.y + d.h}, {d.x, d.y + d.h}, {d.x, d.y} };
-//    SDL_SetRenderDrawColor(gFrameRenderer, 255, 255, 255, 255);
-//    SDL_RenderDrawLinesF(gFrameRenderer, lines, 5);
-//    SDL_SetRenderDrawColor(gFrameRenderer, 0, 0, 0, 255);
-//#endif
+    // #ifndef NDEBUG
+    //     SDL_FRect& d = dstRectF;
+    //     SDL_FPoint lines[5] = { {d.x, d.y}, {d.x + d.w, d.y}, {d.x + d.w, d.y + d.h}, {d.x, d.y + d.h}, {d.x, d.y} };
+    //     SDL_SetRenderDrawColor(gFrameRenderer, 255, 255, 255, 255);
+    //     SDL_RenderDrawLinesF(gFrameRenderer, lines, 5);
+    //     SDL_SetRenderDrawColor(gFrameRenderer, 0, 0, 0, 255);
+    // #endif
 }
 
 // TODO: store 'filter' within Texture itself.
@@ -460,68 +480,71 @@ static void copy_if_needed(const bool filter, std::array<std::shared_ptr<SDL_Tex
     }
 }
 
-void Texture::draw(RectF dstRect,
-    const Color c, const BlendMode b, const bool filter, const double angle) const
+void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
     do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, nullptr);
 }
 
-void Texture::draw(RectF dstRect,
-    const Color c, const BlendMode b, const bool filter, const double angle, const Point& center) const
+void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle,
+                   const Point& center) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
     do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, &center);
 }
 
-void Texture::draw(const Rect& srcRect, RectF dstRect,
-    const Color c, const BlendMode b, const bool filter, const double angle) const
+void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
+                   const double angle) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
     Rect srcRectTmp(srcRect);
-    if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
-    if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
+    if (srcRectTmp.w == RECT_FULL.w)
+        srcRectTmp.w = textureRect.w;
+    if (srcRectTmp.h == RECT_FULL.h)
+        srcRectTmp.h = textureRect.h;
     do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, nullptr);
 }
 
-void Texture::draw(const Rect& srcRect, RectF dstRect,
-    const Color c, const BlendMode b, const bool filter, const double angle, const Point& center) const
+void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
+                   const double angle, const Point& center) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
     Rect srcRectTmp(srcRect);
-    if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
-    if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
+    if (srcRectTmp.w == RECT_FULL.w)
+        srcRectTmp.w = textureRect.w;
+    if (srcRectTmp.h == RECT_FULL.h)
+        srcRectTmp.h = textureRect.h;
     do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, &center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // TextureFull
 
-TextureFull::TextureFull(const Color& c): Texture(nullptr)
+TextureFull::TextureFull(const Color& c) : Texture(nullptr)
 {
     auto surface = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 24, SDL_PIXELFORMAT_RGB24);
     textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
     _textures[0] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture *>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture *>, SDL_DestroyTexture, _1));
+        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
+        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
     _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture *>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture *>, SDL_DestroyTexture, _1));
+        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
+        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
     loaded = true;
     SDL_FreeSurface(surface);
 }
 
 TextureFull::TextureFull(const Image& srcImage) : Texture(srcImage) {}
 
-TextureFull::TextureFull(const SDL_Surface* pSurface): Texture(pSurface) {}
+TextureFull::TextureFull(const SDL_Surface* pSurface) : Texture(pSurface) {}
 
-TextureFull::TextureFull(SDL_Texture* pTexture, int w, int h): Texture(pTexture, w, h) {}
+TextureFull::TextureFull(SDL_Texture* pTexture, int w, int h) : Texture(pTexture, w, h) {}
 
 TextureFull::~TextureFull() {}
 
-void TextureFull::draw(const Rect& ignored, RectF dstRect,
-    const Color c, const BlendMode b, const bool filter, const double angle) const
+void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const BlendMode b, const bool filter,
+                       const double angle) const
 {
     (void)ignored;
     copy_if_needed(filter, _textures, _didRenderOnce);
@@ -531,12 +554,7 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect,
 void GraphLine::draw(Point p1, Point p2, Color c) const
 {
     int ss = graphics_get_supersample_level();
-	thickLineRGBA(
-		gFrameRenderer,
-		(Sint16)p1.x * ss, (Sint16)p1.y * ss,
-        (Sint16)p2.x * ss, (Sint16)p2.y * ss,
-		_width * ss,
-		c.r, c.g, c.b, c.a
-	);
+    thickLineRGBA(gFrameRenderer, (Sint16)p1.x * ss, (Sint16)p1.y * ss, (Sint16)p2.x * ss, (Sint16)p2.y * ss,
+                  _width * ss, c.r, c.g, c.b, c.a);
     SDL_SetRenderDrawColor(gFrameRenderer, 0, 0, 0, 255);
 }

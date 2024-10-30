@@ -25,7 +25,7 @@ void pushMainThreadTask(std::function<void()> f)
 {
     if (IsMainThread())
     {
-        //LOG_DEBUG << "Warning: Calling pushMainThreadTask at main thread";
+        // LOG_DEBUG << "Warning: Calling pushMainThreadTask at main thread";
         f();
     }
     else
@@ -60,7 +60,8 @@ bool CanHandleMainThreadTask()
 
 long long getFileTimeNow()
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
+        .count();
 }
 
 Path getSysFontPath(std::string* faceName, int* faceIndex, Languages lang)
@@ -69,26 +70,36 @@ Path getSysFontPath(std::string* faceName, int* faceIndex, Languages lang)
     switch (lang)
     {
     case Languages::KR:
-        if (faceName) *faceName = "Noto Sans CJK KR";
-        if (faceIndex) *faceIndex = 1;
+        if (faceName)
+            *faceName = "Noto Sans CJK KR";
+        if (faceIndex)
+            *faceIndex = 1;
         break;
     case Languages::ZHCN:
-        if (faceName) *faceName = "Noto Sans CJK SC";
-        if (faceIndex) *faceIndex = 2;
+        if (faceName)
+            *faceName = "Noto Sans CJK SC";
+        if (faceIndex)
+            *faceIndex = 2;
         break;
     case Languages::ZHTW:
-        if (faceName) *faceName = "Noto Sans CJK TC";
-        if (faceIndex) *faceIndex = 3;
+        if (faceName)
+            *faceName = "Noto Sans CJK TC";
+        if (faceIndex)
+            *faceIndex = 3;
         break;
     case Languages::ZHHK:
-        if (faceName) *faceName = "Noto Sans CJK HK";
-        if (faceIndex) *faceIndex = 4;
+        if (faceName)
+            *faceName = "Noto Sans CJK HK";
+        if (faceIndex)
+            *faceIndex = 4;
         break;
     case Languages::EN:
     case Languages::JP:
     default:
-        if (faceName) *faceName = "Noto Sans CJK JP";
-        if (faceIndex) *faceIndex = 0;
+        if (faceName)
+            *faceName = "Noto Sans CJK JP";
+        if (faceIndex)
+            *faceIndex = 0;
         break;
     }
     return p;
@@ -100,35 +111,47 @@ Path getSysMonoFontPath(std::string* faceName, int* faceIndex, Languages lang)
     switch (lang)
     {
     case Languages::KR:
-        if (faceName) *faceName = "Noto Sans Mono CJK KR";
-        if (faceIndex) *faceIndex = 6;
+        if (faceName)
+            *faceName = "Noto Sans Mono CJK KR";
+        if (faceIndex)
+            *faceIndex = 6;
         break;
     case Languages::ZHCN:
-        if (faceName) *faceName = "Noto Sans Mono CJK SC";
-        if (faceIndex) *faceIndex = 7;
+        if (faceName)
+            *faceName = "Noto Sans Mono CJK SC";
+        if (faceIndex)
+            *faceIndex = 7;
         break;
     case Languages::ZHTW:
-        if (faceName) *faceName = "Noto Sans Mono CJK TC";
-        if (faceIndex) *faceIndex = 8;
+        if (faceName)
+            *faceName = "Noto Sans Mono CJK TC";
+        if (faceIndex)
+            *faceIndex = 8;
         break;
     case Languages::ZHHK:
-        if (faceName) *faceName = "Noto Sans Mono CJK HK";
-        if (faceIndex) *faceIndex = 9;
+        if (faceName)
+            *faceName = "Noto Sans Mono CJK HK";
+        if (faceIndex)
+            *faceIndex = 9;
         break;
     case Languages::EN:
     case Languages::JP:
     default:
-        if (faceName) *faceName = "Noto Sans Mono CJK JP";
-        if (faceIndex) *faceIndex = 5;
+        if (faceName)
+            *faceName = "Noto Sans Mono CJK JP";
+        if (faceIndex)
+            *faceIndex = 5;
         break;
     }
     return p;
 }
 
-std::string safe_strerror(int errnum) {
+std::string safe_strerror(int errnum)
+{
     static constexpr size_t ERROR_DESCRIPTION_BUFFER_SIZE = 128;
-    char error_description_buffer[ERROR_DESCRIPTION_BUFFER_SIZE] = { 0 };
-    const char* error_description = safe_strerror(errnum, static_cast<char*>(error_description_buffer), ERROR_DESCRIPTION_BUFFER_SIZE);
+    char error_description_buffer[ERROR_DESCRIPTION_BUFFER_SIZE] = {0};
+    const char* error_description =
+        safe_strerror(errnum, static_cast<char*>(error_description_buffer), ERROR_DESCRIPTION_BUFFER_SIZE);
     return {error_description};
 }
 

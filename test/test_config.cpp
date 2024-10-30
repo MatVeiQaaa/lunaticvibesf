@@ -1,7 +1,7 @@
-#include "gmock/gmock.h"
 #include "config/config.h"
-#include <string>
+#include "gmock/gmock.h"
 #include <filesystem>
+#include <string>
 namespace fs = std::filesystem;
 
 class tConfig : public vConfig
@@ -30,7 +30,7 @@ TEST(Config, file_create)
         c.setDefaults();
         c.save();
     }
-    
+
     ASSERT_TRUE(fs::exists(file));
     fs::remove(file);
 }
@@ -46,7 +46,7 @@ TEST(Config, modify)
         c.set("ENTRYA", "TEST");
         c.save();
     }
-    
+
     ASSERT_TRUE(fs::exists(file));
 
     {
@@ -69,7 +69,7 @@ TEST(Config, add)
         c.set("ENTRY5", 5);
         c.save();
     }
-    
+
     ASSERT_TRUE(fs::exists(file));
 
     {
@@ -89,12 +89,13 @@ TEST(Config, get_type_mismatch)
         using namespace std::string_literals;
         tConfig c(file);
         c.setDefaults();
-        EXPECT_EQ(c.get("ENTRY1", 4.0), 1.0);       // double can convert
-        EXPECT_EQ(c.get("ENTRY1", 'e'), '1');       // char can convert
-        EXPECT_EQ(c.get("ENTRY10", 'e'), 'e');      // string can not convert to char
-        EXPECT_STREQ(c.get("ENTRY1", "ASDF").c_str(), "1");  // int can convert to string
+        EXPECT_EQ(c.get("ENTRY1", 4.0), 1.0);               // double can convert
+        EXPECT_EQ(c.get("ENTRY1", 'e'), '1');               // char can convert
+        EXPECT_EQ(c.get("ENTRY10", 'e'), 'e');              // string can not convert to char
+        EXPECT_STREQ(c.get("ENTRY1", "ASDF").c_str(), "1"); // int can convert to string
     }
-    if (fs::exists(file)) fs::remove(file);
+    if (fs::exists(file))
+        fs::remove(file);
 }
 
 TEST(Config, set_type_override)
@@ -108,5 +109,6 @@ TEST(Config, set_type_override)
         EXPECT_EQ(c.get("ENTRY1", 50), 50);
         EXPECT_STREQ(c.get("ENTRY1", "A").c_str(), "ASDF");
     }
-    if (fs::exists(file)) fs::remove(file);
+    if (fs::exists(file))
+        fs::remove(file);
 }

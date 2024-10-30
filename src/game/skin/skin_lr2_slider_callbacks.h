@@ -1,7 +1,7 @@
 #pragma once
 
-#include <functional>
 #include "common/keymap.h"
+#include <functional>
 
 namespace lr2skin::slider
 {

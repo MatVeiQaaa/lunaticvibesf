@@ -1,22 +1,21 @@
 #pragma once
+#include "common/types.h"
 #include "game/graphics/sprite.h"
 #include "game/graphics/video.h"
-#include "common/types.h"
+#include <map>
+#include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
-#include <map>
-#include <string>
-#include <memory>
 
 enum class SkinVersion
 {
     UNDEF,
     LR2beta3,
-
 };
 
-//typedef StringContent Token;
+// typedef StringContent Token;
 typedef std::vector<StringContent> Tokens;
 
 class SkinBase
@@ -27,42 +26,44 @@ protected:
 protected:
     SkinVersion _version;
     SkinBase();
+
 public:
-	virtual ~SkinBase();
+    virtual ~SkinBase();
     SkinVersion version() const { return _version; }
 
 protected:
     bool loaded = false;
+
 public:
     constexpr bool isLoaded() { return loaded; }
     virtual void setGaugeDisplayType(unsigned slot, GaugeDisplayType type) {};
 
-////////////////////////////////////////////////////////////////////////////////
-// Images
+    ////////////////////////////////////////////////////////////////////////////////
+    // Images
 protected:
-    std::map<std::string, std::shared_ptr<TTFFont>>  fontNameMap;
+    std::map<std::string, std::shared_ptr<TTFFont>> fontNameMap;
 
-////////////////////////////////////////////////////////////////////////////////
-// Textures
+    ////////////////////////////////////////////////////////////////////////////////
+    // Textures
 protected:
-    static std::map<std::string, std::shared_ptr<Texture>> textureNameMap;    // Use this to get texture instance from name
-	std::map<std::string, std::shared_ptr<sVideo>>  videoNameMap;	// Use this to get video instance from name
+    static std::map<std::string, std::shared_ptr<Texture>> textureNameMap; // Use this to get texture instance from name
+    std::map<std::string, std::shared_ptr<sVideo>> videoNameMap;           // Use this to get video instance from name
 
-////////////////////////////////////////////////////////////////////////////////
-// Sprite elements
+    ////////////////////////////////////////////////////////////////////////////////
+    // Sprite elements
 protected:
-    std::vector<std::shared_ptr<SpriteBase>> _sprites; // Only modified while parsing the skin.
+    std::vector<std::shared_ptr<SpriteBase>> _sprites;      // Only modified while parsing the skin.
     std::vector<std::shared_ptr<SpriteBase>> _mouseSprites; // Portion of '_sprites' which are also iSpriteMouse.
 
-// functional support
+    // functional support
 protected:
     bool handleMouseEvents = true;
 
     std::shared_ptr<iSpriteMouse> pSpriteDragging = nullptr;  // currently (mouse) dragging element
-    std::shared_ptr<SpriteText> pSpriteTextEditing = nullptr;     // currently text edit element
-    std::shared_ptr<iSpriteMouse> pSpriteLastClicked = nullptr; 
+    std::shared_ptr<SpriteText> pSpriteTextEditing = nullptr; // currently text edit element
+    std::shared_ptr<iSpriteMouse> pSpriteLastClicked = nullptr;
 
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 public:
     virtual void update();
     virtual void update_mouse(int x, int y);
@@ -95,12 +96,13 @@ public:
         bool hasTransparentColor = false;
         Color transparentColor;
 
-        // General 
-        unsigned timeIntro = 200; // #STARTINPUT | before this time the scene cannot receive input. Implemented by derived class
+        // General
+        unsigned timeIntro =
+            200; // #STARTINPUT | before this time the scene cannot receive input. Implemented by derived class
         unsigned timeOutro = 200; // #FADEOUT
 
         // Decide
-        unsigned timeDecideSkip = 200; // #SKIP | after this time the scene can be skipped. Solely for decide scene
+        unsigned timeDecideSkip = 200;   // #SKIP | after this time the scene can be skipped. Solely for decide scene
         unsigned timeDecideExpiry = 200; // #SCENETIME | switch to play scene if not skipped
 
         // Play
@@ -112,10 +114,10 @@ public:
         unsigned noteLaneHeight2P = 0;
         unsigned noteLaneHeight1PSub = 0;
         unsigned noteLaneHeight2PSub = 0;
-        
+
         // Result
-        unsigned timeResultRank = 200; //ignored
-        unsigned timeResultRecord = 200; //ignored
+        unsigned timeResultRank = 200;   // ignored
+        unsigned timeResultRecord = 200; // ignored
 
         unsigned scratchSide1P = 0;
         unsigned scratchSide2P = 0;
@@ -123,8 +125,8 @@ public:
 
     ///////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-// customize
+    ////////////////////////////////////////////////////////////////////////////////
+    // customize
 public:
     struct CustomizeOption
     {
@@ -141,11 +143,11 @@ public:
     virtual StringContent getMaker() const = 0;
     virtual StringPath getFilePath() const = 0;
 
-// For customize scene itself.
+    // For customize scene itself.
     void setThumbnailTextureSize(int w, int h);
 
-////////////////////////////////////////////////////////////////////////////////
-// extended capability support
+    ////////////////////////////////////////////////////////////////////////////////
+    // extended capability support
 public:
     bool isSupportExHardAndAssistEasy = false;
     bool isSupportFastSlow = false;

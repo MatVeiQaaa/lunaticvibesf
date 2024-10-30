@@ -1,9 +1,9 @@
 #pragma once
 
-#include <functional>
-#include <shared_mutex>
-#include <map>
 #include "types.h"
+#include <functional>
+#include <map>
+#include <shared_mutex>
 
 #ifdef _WIN32
 
@@ -18,7 +18,6 @@ typedef HANDLE LooperHandler;
 typedef std::thread LooperHandler;
 
 #endif // _WIN32
-
 
 // Poll update function in background thread.
 // Should be OS-specific to provide reasonable performance.

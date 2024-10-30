@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string_view>
 #include <string>
+#include <string_view>
 
 #include <stddef.h>
 
@@ -46,7 +46,7 @@ enum Pad
     K2SPDUP,
     K2SPDDN,
 
-    LANE_COUNT, 
+    LANE_COUNT,
 
     S1A = LANE_COUNT,
     S2A,
@@ -111,7 +111,7 @@ enum class Keyboard : unsigned
     K_9,
     K_0,
     K_MINUS,
-    K_EQUAL,            // US =+    JP ^ overbar
+    K_EQUAL, // US =+    JP ^ overbar
     K_BKSP,
 
     // 0x0f
@@ -126,8 +126,8 @@ enum class Keyboard : unsigned
     K_I,
     K_O,
     K_P,
-    K_LBRACKET,         // US [{    JP @`
-    K_RBRACKET,         // US ]}    JP [{
+    K_LBRACKET, // US [{    JP @`
+    K_RBRACKET, // US ]}    JP [{
 
     K_ENTER,
     K_LCTRL,
@@ -142,12 +142,12 @@ enum class Keyboard : unsigned
     K_J,
     K_K,
     K_L,
-    K_SEMICOLON,        // US ;:    JP ;+
-    K_APOSTROPHE,       // US '"    JP :* 
+    K_SEMICOLON,  // US ;:    JP ;+
+    K_APOSTROPHE, // US '"    JP :*
 
-    K_TYPEWRITER_APS,   // `~        JP hankaku zenkaku
+    K_TYPEWRITER_APS, // `~        JP hankaku zenkaku
     K_LSHIFT,
-    K_BACKSLASH,        // US \|    JP ]}
+    K_BACKSLASH, // US \|    JP ]}
 
     // 0x2c
     K_Z,
@@ -235,9 +235,8 @@ enum class Keyboard : unsigned
 };
 inline constexpr size_t keyboardKeyCount = static_cast<size_t>(Keyboard::K_COUNT);
 
-inline const char* keyboardNameMap[keyboardKeyCount]
-{
-    "",             // ERROR
+inline const char* keyboardNameMap[keyboardKeyCount]{
+    "", // ERROR
 
     "ESC",
 
@@ -253,7 +252,7 @@ inline const char* keyboardNameMap[keyboardKeyCount]
     "9",
     "0",
     "-",
-    "=",            // US =+    JP ^ overbar
+    "=", // US =+    JP ^ overbar
     "BackSpace",
 
     // 0x0f
@@ -268,8 +267,8 @@ inline const char* keyboardNameMap[keyboardKeyCount]
     "I",
     "O",
     "P",
-    "[",         // US [{    JP @`
-    "]",         // US ]}    JP [{
+    "[", // US [{    JP @`
+    "]", // US ]}    JP [{
 
     "Enter",
     "LCTRL",
@@ -284,12 +283,12 @@ inline const char* keyboardNameMap[keyboardKeyCount]
     "J",
     "K",
     "L",
-    ";",        // US ;:    JP ;+
-    "'",        // US '"    JP :* 
+    ";", // US ;:    JP ;+
+    "'", // US '"    JP :*
 
-    "`",        // `~        JP hankaku zenkaku
+    "`", // `~        JP hankaku zenkaku
     "LSHIFT",
-    "\\",       // US \|    JP ]}
+    "\\", // US \|    JP ]}
 
     // 0x2c
     "Z",
@@ -369,7 +368,6 @@ inline const char* keyboardNameMap[keyboardKeyCount]
     "JP_KANA",
 };
 
-
 enum class JoystickAxis
 {
     X,
@@ -383,16 +381,8 @@ enum class JoystickAxis
 
     COUNT
 };
-inline const char* joystickAxisName[(size_t)JoystickAxis::COUNT] =
-{
-    "X",
-    "Y",
-    "Z",
-    "Rx",
-    "Ry",
-    "Rz",
-    "Slider1",
-    "Slider2",
+inline const char* joystickAxisName[(size_t)JoystickAxis::COUNT] = {
+    "X", "Y", "Z", "Rx", "Ry", "Rz", "Slider1", "Slider2",
 };
 struct Joystick
 {
@@ -401,7 +391,7 @@ struct Joystick
     {
         UNDEF,
         BUTTON,
-        POV,    // bit31:left bit30:down bit29:up bit28:right
+        POV, // bit31:left bit30:down bit29:up bit28:right
         AXIS_RELATIVE_POSITIVE,
         AXIS_RELATIVE_NEGATIVE,
         AXIS_ABSOLUTE,
@@ -409,7 +399,7 @@ struct Joystick
     size_t index;
 };
 
-}
+} // namespace Input
 
 class KeyMap
 {
@@ -425,15 +415,14 @@ public:
         UNDEF,
         KEYBOARD,
         JOYSTICK,
-        MOUSE,          // ???
+        MOUSE, // ???
     };
 
     typedef int DeviceID;
 
 protected:
     DeviceType type = DeviceType::UNDEF;
-    union
-    {
+    union {
         Input::Keyboard keyboard;
         Input::Joystick joystick;
     };
@@ -443,10 +432,18 @@ public:
     DeviceType getType() const { return type; }
     std::string toString() const;
 
-    Input::Keyboard getKeyboard() const { LVF_DEBUG_ASSERT(type == DeviceType::KEYBOARD); return keyboard; }
+    Input::Keyboard getKeyboard() const
+    {
+        LVF_DEBUG_ASSERT(type == DeviceType::KEYBOARD);
+        return keyboard;
+    }
     void setKeyboard(Input::Keyboard kb);
 
-    Input::Joystick getJoystick() const { LVF_DEBUG_ASSERT(type == DeviceType::JOYSTICK); return joystick; }
+    Input::Joystick getJoystick() const
+    {
+        LVF_DEBUG_ASSERT(type == DeviceType::JOYSTICK);
+        return joystick;
+    }
     void setJoystick(size_t device, Input::Joystick::Type jtype, size_t index);
 
 private:

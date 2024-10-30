@@ -68,5 +68,4 @@ private:
     lunaticvibes::CustomizeState _state;
     bool exiting = false;
     bool _is_virtual = false;
-
 };

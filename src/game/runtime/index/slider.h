@@ -1,10 +1,10 @@
 #pragma once
 
 /*
-* !!! WARNING !!!
-* These indices are currently DIRECTLY casted to LR2skin indices.
-* When adding new value, do not modify existing values.
-*/
+ * !!! WARNING !!!
+ * These indices are currently DIRECTLY casted to LR2skin indices.
+ * When adding new value, do not modify existing values.
+ */
 enum class IndexSlider : unsigned
 {
     ZERO = 0,
@@ -46,7 +46,7 @@ enum class IndexSlider : unsigned
     PITCH = 26,
 
     // new
-	// key config extended
+    // key config extended
     DEADZONE_K11 = 31,
     DEADZONE_K12,
     DEADZONE_K13,

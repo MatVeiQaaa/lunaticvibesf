@@ -2,7 +2,6 @@
 
 #include "sprite.h"
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Line sprite
 struct ColorPoint
@@ -33,7 +32,7 @@ private:
     GraphLine _line;
     std::vector<ColorPoint> _points;
     std::vector<std::pair<Point, Point>> _rects;
-    double _progress = 1.0;	// 0 ~ 1
+    double _progress = 1.0; // 0 ~ 1
 
 public:
     struct SpriteLineBuilder : SpriteStaticBuilder
@@ -49,6 +48,7 @@ public:
 
         std::shared_ptr<SpriteLine> build() { return std::make_shared<SpriteLine>(*this); }
     };
+
 public:
     SpriteLine() = delete;
     SpriteLine(const SpriteLineBuilder& builder);
@@ -63,4 +63,3 @@ public:
     bool update(const lunaticvibes::Time& t) override;
     void draw() const override;
 };
-

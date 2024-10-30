@@ -2,8 +2,8 @@
 
 enum class eSoundSample : size_t
 {
-    BGM_TITLE,  // unused
-    BGM_MODE,   // unused
+    BGM_TITLE, // unused
+    BGM_MODE,  // unused
 
     BGM_SELECT, // loop
     BGM_DECIDE,

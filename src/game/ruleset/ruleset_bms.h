@@ -1,7 +1,7 @@
 #pragma once
 
-#include "game/scene/scene_context.h"
 #include "common//chartformat/chartformat_bms.h"
+#include "game/scene/scene_context.h"
 #include "ruleset.h"
 
 #include <memory>
@@ -41,25 +41,22 @@ public:
 
     static constexpr auto LR2_DEFAULT_RANK{JudgeDifficulty::NORMAL};
 
-    enum class JudgeType {
-        PERFECT = 0,    // Option::JUDGE_0
+    enum class JudgeType
+    {
+        PERFECT = 0, // Option::JUDGE_0
         GREAT,
         GOOD,
         BAD,
         KPOOR,
         MISS,
     };
-    inline static const std::map<JudgeType, Option::e_judge_type> JudgeTypeOptMap =
-    {
-        { JudgeType::PERFECT, Option::JUDGE_0 },
-        { JudgeType::GREAT, Option::JUDGE_1 },
-        { JudgeType::GOOD, Option::JUDGE_2 },
-        { JudgeType::BAD, Option::JUDGE_3 },
-        { JudgeType::KPOOR, Option::JUDGE_4 },
-        { JudgeType::MISS, Option::JUDGE_5 },
+    inline static const std::map<JudgeType, Option::e_judge_type> JudgeTypeOptMap = {
+        {JudgeType::PERFECT, Option::JUDGE_0}, {JudgeType::GREAT, Option::JUDGE_1}, {JudgeType::GOOD, Option::JUDGE_2},
+        {JudgeType::BAD, Option::JUDGE_3},     {JudgeType::KPOOR, Option::JUDGE_4}, {JudgeType::MISS, Option::JUDGE_5},
     };
 
-    enum class GaugeType {
+    enum class GaugeType
+    {
         GROOVE,
         EASY,
         ASSIST,
@@ -75,7 +72,8 @@ public:
     // Judge Time definitions.
     // Values are one-way judge times in ms, representing
     // PERFECT, GREAT, GOOD, BAD, ПеPOOR respectively.
-    struct JudgeTime {
+    struct JudgeTime
+    {
         lunaticvibes::Time PERFECT;
         lunaticvibes::Time GREAT;
         lunaticvibes::Time GOOD;
@@ -94,7 +92,8 @@ public:
 
     // Judge area definitions.
     // e.g. EARLY_PERFECT: Perfect early half part
-    enum class JudgeArea {
+    enum class JudgeArea
+    {
         NOTHING = 0,
         EARLY_KPOOR,
         EARLY_BAD,
@@ -110,46 +109,38 @@ public:
         LATE_KPOOR,
         MINE_KPOOR,
     };
-    inline static const std::map<JudgeArea, JudgeType> JudgeAreaTypeMap =
-    {
-        { JudgeArea::NOTHING, JudgeType::MISS },
-        { JudgeArea::EARLY_KPOOR, JudgeType::KPOOR },
-        { JudgeArea::EARLY_BAD, JudgeType::BAD },
-        { JudgeArea::EARLY_GOOD, JudgeType::GOOD },
-        { JudgeArea::EARLY_GREAT, JudgeType::GREAT },
-        { JudgeArea::EARLY_PERFECT, JudgeType::PERFECT },
-        { JudgeArea::EXACT_PERFECT, JudgeType::PERFECT },
-        { JudgeArea::LATE_PERFECT, JudgeType::PERFECT },
-        { JudgeArea::LATE_GREAT, JudgeType::GREAT },
-        { JudgeArea::LATE_GOOD, JudgeType::GOOD },
-        { JudgeArea::LATE_BAD, JudgeType::BAD },
-        { JudgeArea::MISS, JudgeType::MISS },
-        { JudgeArea::LATE_KPOOR, JudgeType::KPOOR },
-        { JudgeArea::MINE_KPOOR, JudgeType::KPOOR },
+    inline static const std::map<JudgeArea, JudgeType> JudgeAreaTypeMap = {
+        {JudgeArea::NOTHING, JudgeType::MISS},          {JudgeArea::EARLY_KPOOR, JudgeType::KPOOR},
+        {JudgeArea::EARLY_BAD, JudgeType::BAD},         {JudgeArea::EARLY_GOOD, JudgeType::GOOD},
+        {JudgeArea::EARLY_GREAT, JudgeType::GREAT},     {JudgeArea::EARLY_PERFECT, JudgeType::PERFECT},
+        {JudgeArea::EXACT_PERFECT, JudgeType::PERFECT}, {JudgeArea::LATE_PERFECT, JudgeType::PERFECT},
+        {JudgeArea::LATE_GREAT, JudgeType::GREAT},      {JudgeArea::LATE_GOOD, JudgeType::GOOD},
+        {JudgeArea::LATE_BAD, JudgeType::BAD},          {JudgeArea::MISS, JudgeType::MISS},
+        {JudgeArea::LATE_KPOOR, JudgeType::KPOOR},      {JudgeArea::MINE_KPOOR, JudgeType::KPOOR},
     };
-    inline static const std::map<JudgeArea, std::vector<JudgeIndex>> JudgeAreaIndexAccMap =
-    {
-        { JudgeArea::NOTHING, {} } ,
-        { JudgeArea::EARLY_KPOOR, { JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_EARLY } } ,
-        { JudgeArea::EARLY_BAD, { JUDGE_BAD, JUDGE_EARLY_BAD, JUDGE_BP, JUDGE_CB, JUDGE_EARLY } } ,
-        { JudgeArea::EARLY_GOOD, { JUDGE_GOOD, JUDGE_EARLY_GOOD, JUDGE_EARLY } } ,
-        { JudgeArea::EARLY_GREAT, { JUDGE_GREAT, JUDGE_EARLY_GREAT, JUDGE_EARLY } } ,
-        { JudgeArea::EARLY_PERFECT, { JUDGE_PERFECT, JUDGE_EARLY_PERFECT } } ,
-        { JudgeArea::EXACT_PERFECT, { JUDGE_PERFECT, JUDGE_EXACT_PERFECT } } ,
-        { JudgeArea::LATE_PERFECT, { JUDGE_PERFECT, JUDGE_LATE_PERFECT} } ,
-        { JudgeArea::LATE_GREAT, { JUDGE_GREAT, JUDGE_LATE_GREAT, JUDGE_LATE } } ,
-        { JudgeArea::LATE_GOOD, { JUDGE_GOOD, JUDGE_LATE_GOOD, JUDGE_LATE} } ,
-        { JudgeArea::LATE_BAD, { JUDGE_BAD, JUDGE_LATE_BAD, JUDGE_BP, JUDGE_CB, JUDGE_LATE } } ,
-        { JudgeArea::MISS, { JUDGE_MISS, JUDGE_POOR, JUDGE_BP, JUDGE_CB, JUDGE_LATE } } ,
-        { JudgeArea::LATE_KPOOR, { JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_LATE } },
-        { JudgeArea::MINE_KPOOR, { JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP } },
+    inline static const std::map<JudgeArea, std::vector<JudgeIndex>> JudgeAreaIndexAccMap = {
+        {JudgeArea::NOTHING, {}},
+        {JudgeArea::EARLY_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_EARLY}},
+        {JudgeArea::EARLY_BAD, {JUDGE_BAD, JUDGE_EARLY_BAD, JUDGE_BP, JUDGE_CB, JUDGE_EARLY}},
+        {JudgeArea::EARLY_GOOD, {JUDGE_GOOD, JUDGE_EARLY_GOOD, JUDGE_EARLY}},
+        {JudgeArea::EARLY_GREAT, {JUDGE_GREAT, JUDGE_EARLY_GREAT, JUDGE_EARLY}},
+        {JudgeArea::EARLY_PERFECT, {JUDGE_PERFECT, JUDGE_EARLY_PERFECT}},
+        {JudgeArea::EXACT_PERFECT, {JUDGE_PERFECT, JUDGE_EXACT_PERFECT}},
+        {JudgeArea::LATE_PERFECT, {JUDGE_PERFECT, JUDGE_LATE_PERFECT}},
+        {JudgeArea::LATE_GREAT, {JUDGE_GREAT, JUDGE_LATE_GREAT, JUDGE_LATE}},
+        {JudgeArea::LATE_GOOD, {JUDGE_GOOD, JUDGE_LATE_GOOD, JUDGE_LATE}},
+        {JudgeArea::LATE_BAD, {JUDGE_BAD, JUDGE_LATE_BAD, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
+        {JudgeArea::MISS, {JUDGE_MISS, JUDGE_POOR, JUDGE_BP, JUDGE_CB, JUDGE_LATE}},
+        {JudgeArea::LATE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP, JUDGE_LATE}},
+        {JudgeArea::MINE_KPOOR, {JUDGE_KPOOR, JUDGE_POOR, JUDGE_BP}},
     };
 
     /// /////////////////////////////////////////////////////////////////////
 
     typedef std::map<chart::NoteLaneIndex, IndexTimer> NoteLaneTimerMap;
 
-    enum class PlaySide {
+    enum class PlaySide
+    {
         SINGLE,
         DOUBLE,
         BATTLE_1P,
@@ -192,21 +183,20 @@ protected:
 
 protected:
     // members change in game
-    std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{ JudgeArea::NOTHING };
+    std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{JudgeArea::NOTHING};
     std::array<JudgeRes, 2> _lastNoteJudge{};
 
     std::map<chart::NoteLane, ChartObjectBase::NoteIterator> _noteListIterators;
 
-    std::array<AxisDir, 2>  playerScratchDirection = { 0, 0 };
-    std::array<lunaticvibes::Time, 2>     playerScratchLastUpdate = { TIMER_NEVER, TIMER_NEVER };
-    std::array<double, 2>   playerScratchAccumulator = { 0, 0 };
+    std::array<AxisDir, 2> playerScratchDirection = {0, 0};
+    std::array<lunaticvibes::Time, 2> playerScratchLastUpdate = {TIMER_NEVER, TIMER_NEVER};
+    std::array<double, 2> playerScratchAccumulator = {0, 0};
 
 protected:
     // members essential for score calculation
     double moneyScore = 0.0;
     double maxMoneyScore = 200000.0;
     unsigned exScore = 0;
-
 
 public:
     // fiveKeyMapIndex - if not 5k, set to -1.
@@ -218,15 +208,20 @@ public:
 
 protected:
     JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
+
 private:
-    void _judgePress(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot);
-    void _judgeHold(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot);
-    void _judgeRelease(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot);
+    void _judgePress(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                     const lunaticvibes::Time& t, int slot);
+    void _judgeHold(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                    const lunaticvibes::Time& t, int slot);
+    void _judgeRelease(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                       const lunaticvibes::Time& t, int slot);
     void judgeNotePress(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
     void judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
     void judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot);
     void _updateHp(double diff);
     void _updateHp(JudgeArea judge);
+
 public:
     // Register to InputWrapper
     void updatePress(InputMask& pg, const lunaticvibes::Time& t) override;

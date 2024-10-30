@@ -1,9 +1,9 @@
 #include "ruleset_bms_auto.h"
 
-#include <common/assert.h>
+#include "game/chart/chart_types.h"
 #include "game/scene/scene.h"
 #include "game/scene/scene_context.h"
-#include "game/chart/chart_types.h"
+#include <common/assert.h>
 
 RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
                                const std::shared_ptr<ChartObjectBase>& chart, const PlayModifiers mods,
@@ -12,7 +12,8 @@ RulesetBMSAuto::RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format,
     : RulesetBase(format, chart),
       RulesetBMS(format, chart, mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr)
 {
-    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL);
+    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P ||
+                     side == PlaySide::RIVAL);
     showJudge = (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P);
     isPressingLN.fill(false);
     setTargetRate(1.0);
@@ -29,7 +30,8 @@ void RulesetBMSAuto::setTargetRate(double rate)
         if (pChart != nullptr)
         {
             count -= pChart->getScratchCount();
-            if (score > count * 2) score = count * 2;
+            if (score > count * 2)
+                score = count * 2;
         }
     }
 
@@ -114,8 +116,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
     _basic.play_time = rt;
     using namespace chart;
 
-    auto updateSection = [&](Input::Pad begin, Input::Pad end, int side)
-    {
+    auto updateSection = [&](Input::Pad begin, Input::Pad end, int side) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
             bool scratch = false;
@@ -124,9 +125,7 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
             case Input::S1L:
             case Input::S1R:
             case Input::S2L:
-            case Input::S2R:
-                scratch = true;
-                break;
+            case Input::S2R: scratch = true; break;
             }
 
             NoteLaneIndex idx;
@@ -135,7 +134,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx);
-                while (!_chart->isLastNote(NoteLaneCategory::Note, idx, itNote) && !itNote->expired && rt >= itNote->time)
+                while (!_chart->isLastNote(NoteLaneCategory::Note, idx, itNote) && !itNote->expired &&
+                       rt >= itNote->time)
                 {
                     itNote->hit = true;
                     itNote->expired = true;
@@ -185,7 +185,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
 
                             if (!scratch || _judgeScratch)
                             {
-                                if (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P)
+                                if (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE ||
+                                    _side == PlaySide::AUTO_2P)
                                 {
                                     State::set(InputGamePressMap[k].tm, t.norm());
                                     State::set(InputGameReleaseMap[k].tm, TIMER_NEVER);
@@ -204,7 +205,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexSwitch::S2_DOWN, true);
                                     }
 
-                                    if (_bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
+                                    if (_bombLNTimerMap != nullptr &&
+                                        _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
                                         State::set(_bombLNTimerMap->at(idx), t.norm());
 
                                     isPressingLN[k] = true;
@@ -223,7 +225,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                             {
                                 updateJudge(t, idx, noteJudges[judgeIndex++], side);
 
-                                if (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE || _side == PlaySide::AUTO_2P)
+                                if (_side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE ||
+                                    _side == PlaySide::AUTO_2P)
                                 {
                                     State::set(InputGamePressMap[k].tm, TIMER_NEVER);
                                     State::set(InputGameReleaseMap[k].tm, t.norm());
@@ -242,7 +245,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
                                         State::set(IndexSwitch::S2_DOWN, false);
                                     }
 
-                                    if (_bombLNTimerMap != nullptr && _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
+                                    if (_bombLNTimerMap != nullptr &&
+                                        _bombLNTimerMap->find(idx) != _bombLNTimerMap->end())
                                         State::set(_bombLNTimerMap->at(idx), TIMER_NEVER);
 
                                     isPressingLN[k] = false;
@@ -259,7 +263,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Invs, idx);
-                while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired && rt >= itNote->time)
+                while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired &&
+                       rt >= itNote->time)
                 {
                     itNote->hit = true;
                     itNote->expired = true;
@@ -271,7 +276,8 @@ void RulesetBMSAuto::update(const lunaticvibes::Time& t)
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Mine, idx);
-                while (!_chart->isLastNote(NoteLaneCategory::Mine, idx, itNote) && !itNote->expired && rt >= itNote->time)
+                while (!_chart->isLastNote(NoteLaneCategory::Mine, idx, itNote) && !itNote->expired &&
+                       rt >= itNote->time)
                 {
                     itNote->hit = true;
                     itNote->expired = true;

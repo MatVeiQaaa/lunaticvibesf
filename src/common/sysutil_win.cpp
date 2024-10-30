@@ -14,17 +14,18 @@
 
 const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
-#pragma pack(push,8)  
+#pragma pack(push, 8)
 typedef struct tagTHREADNAME_INFO
 {
-    DWORD dwType; // Must be 0x1000.  
-    LPCSTR szName; // Pointer to name (in user addr space).  
-    DWORD dwThreadID; // Thread ID (-1=caller thread).  
-    DWORD dwFlags; // Reserved for future use, must be zero.  
+    DWORD dwType;     // Must be 0x1000.
+    LPCSTR szName;    // Pointer to name (in user addr space).
+    DWORD dwThreadID; // Thread ID (-1=caller thread).
+    DWORD dwFlags;    // Reserved for future use, must be zero.
 } THREADNAME_INFO;
-#pragma pack(pop)  
+#pragma pack(pop)
 
-void SetThreadNameWin32(DWORD dwThreadID, const char* threadName) {
+void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
+{
 
     // change VS debugger thread name
     THREADNAME_INFO info;
@@ -32,14 +33,16 @@ void SetThreadNameWin32(DWORD dwThreadID, const char* threadName) {
     info.szName = threadName;
     info.dwThreadID = dwThreadID;
     info.dwFlags = 0;
-#pragma warning(push)  
-#pragma warning(disable: 6320 6322)  
-    __try {
-        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)& info);
+#pragma warning(push)
+#pragma warning(disable : 6320 6322)
+    __try
+    {
+        RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
     }
-    __except (EXCEPTION_EXECUTE_HANDLER) {
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
     }
-#pragma warning(pop)  
+#pragma warning(pop)
 }
 
 [[noreturn]] inline void panicWin32(const char* title, const char* msg)
@@ -67,16 +70,16 @@ bool IsMainThread()
 
 void SetThreadName(const char* name)
 {
-    SetThreadNameWin32(GetCurrentThreadId(), name); 
+    SetThreadNameWin32(GetCurrentThreadId(), name);
 }
-void panic(const char* title, const char* msg) 
+void panic(const char* title, const char* msg)
 {
     panicWin32(title, msg);
 }
 
 Path GetExecutablePath()
 {
-    char fullpath[256] = { 0 };
+    char fullpath[256] = {0};
 
     if (!GetModuleFileNameA(NULL, fullpath, sizeof(fullpath)))
     {
@@ -98,7 +101,8 @@ void getWindowHandle(void* handle)
 
 long long getFileLastWriteTime(const Path& p)
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(fs::last_write_time(p).time_since_epoch()).count() - 11644473600;
+    return std::chrono::duration_cast<std::chrono::seconds>(fs::last_write_time(p).time_since_epoch()).count() -
+           11644473600;
 }
 
 const char* safe_strerror(int errnum, char* buffer, size_t buffer_length)
@@ -118,7 +122,8 @@ bool lunaticvibes::open(const std::string& link)
 const char* lunaticvibes::safe_ctime(const std::time_t* timep, char* buf)
 {
     errno_t err = ctime_s(buf, 26, timep);
-    if (err) return "";
+    if (err)
+        return "";
     return buf;
 };
 
@@ -133,7 +138,8 @@ const tm* lunaticvibes::safe_gmtime(const std::time_t* timep, tm* result)
 const tm* lunaticvibes::safe_localtime(const std::time_t* timep, tm* result)
 {
     errno_t err = localtime_s(result, timep);
-    if (err) return nullptr;
+    if (err)
+        return nullptr;
     return result;
 };
 

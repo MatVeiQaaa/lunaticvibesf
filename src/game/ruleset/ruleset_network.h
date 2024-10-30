@@ -2,7 +2,7 @@
 #include "ruleset.h"
 #include <vector>
 
-class vRulesetNetwork: virtual public RulesetBase
+class vRulesetNetwork : virtual public RulesetBase
 {
 public:
     static std::vector<unsigned char> packInit(const std::shared_ptr<RulesetBase>& local);

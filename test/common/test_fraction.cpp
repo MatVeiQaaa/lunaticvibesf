@@ -1,5 +1,5 @@
-#include "gmock/gmock.h"
 #include "common/fraction.h"
+#include "gmock/gmock.h"
 TEST(Fraction, trim)
 {
     EXPECT_EQ(fraction(1, 2), fraction(2, 4));
@@ -52,7 +52,6 @@ TEST(Fraction, largetrim)
     EXPECT_DOUBLE_EQ(0.5 * static_cast<double>(LLONG_MAX), fraction(LLONG_MAX, 2));
 }
 
-
 TEST(Fraction, addbasic)
 {
     fraction f1(1, 5);
@@ -81,7 +80,6 @@ TEST(Fraction, addapprox)
     EXPECT_EQ(f1 + f2, fraction(3, 4));
 }
 
-
 TEST(Fraction, minusbasic)
 {
     fraction f1(3, 5);
@@ -109,7 +107,6 @@ TEST(Fraction, minusapprox)
     fraction f2(1, 8);
     EXPECT_EQ(f1 - f2, fraction(1, 4));
 }
-
 
 TEST(Fraction, mulbasic1)
 {

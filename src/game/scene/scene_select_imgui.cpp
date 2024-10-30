@@ -7,15 +7,15 @@
 
 #include "common/log.h"
 #include "config/config_mgr.h"
+#include "game/arena/arena_client.h"
+#include "game/arena/arena_data.h"
+#include "game/arena/arena_host.h"
+#include "game/runtime/i18n.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
-#include "game/runtime/i18n.h"
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_host.h"
 
-#include "imgui.h"
 #include "git_version.h"
+#include "imgui.h"
 
 #ifdef _WIN32
 #include <VersionHelpers.h>
@@ -43,7 +43,8 @@ void SceneSelect::imguiInit()
     old_profile_index = imgui_profile_index;
 
     std::string playerName = ConfigMgr::get('P', cfg::P_PLAYERNAME, "Unnamed");
-    strncpy(imgui_player_name_buf, playerName.c_str(), std::max(sizeof(imgui_player_name_buf) - 1, playerName.length()));
+    strncpy(imgui_player_name_buf, playerName.c_str(),
+            std::max(sizeof(imgui_player_name_buf) - 1, playerName.length()));
 
     imguiRefreshLanguageList();
     old_language_index = imgui_language_index;
@@ -70,7 +71,8 @@ void SceneSelect::imguiInit()
     imgui_video_display_resolution_index = -1;
     for (int i = 0; i < (int)imgui_video_display_resolution_size.size(); ++i)
     {
-        if (imgui_video_display_resolution_size[i].first == windowX && imgui_video_display_resolution_size[i].second == windowY)
+        if (imgui_video_display_resolution_size[i].first == windowX &&
+            imgui_video_display_resolution_size[i].second == windowY)
         {
             imgui_video_display_resolution_index = i;
             break;
@@ -115,15 +117,15 @@ void SceneSelect::imguiInit()
     imgui_adv_previewDirect = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, true);
 
     imgui_adv_selectKeyBindings = old_adv_selectKeyBindings = 0;
-    static const char* imgui_select_keybindings_str[] =
-    {
+    static const char* imgui_select_keybindings_str[] = {
         cfg::P_SELECT_KEYBINDINGS_7K,
         cfg::P_SELECT_KEYBINDINGS_5K,
         cfg::P_SELECT_KEYBINDINGS_9K,
     };
     for (size_t i = 0; i < sizeof(imgui_select_keybindings_str) / sizeof(imgui_select_keybindings_str[0]); ++i)
     {
-        if (ConfigMgr::get('P', cfg::P_SELECT_KEYBINDINGS, cfg::P_SELECT_KEYBINDINGS_7K) == imgui_select_keybindings_str[i])
+        if (ConfigMgr::get('P', cfg::P_SELECT_KEYBINDINGS, cfg::P_SELECT_KEYBINDINGS_7K) ==
+            imgui_select_keybindings_str[i])
         {
             imgui_adv_selectKeyBindings = old_adv_selectKeyBindings = i;
             break;
@@ -157,7 +159,6 @@ void SceneSelect::imguiInit()
     }
 }
 
-
 bool SceneSelect::shouldShowImgui() const
 {
     return imguiShow || imgui_show_arenaJoinLobbyPrompt || SceneBase::shouldShowImgui();
@@ -166,12 +167,12 @@ bool SceneSelect::shouldShowImgui() const
 void SceneSelect::updateImgui()
 {
     SceneBase::updateImgui();
-    if (gNextScene != SceneType::SELECT) return;
+    if (gNextScene != SceneType::SELECT)
+        return;
 
     imguiSettings();
     imguiArenaJoinLobbyPrompt();
 }
-
 
 #ifdef _WIN32
 #include <ShlObj.h>
@@ -189,7 +190,10 @@ void SceneSelect::imguiSettings()
         ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
                                         static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                                  ImGuiCond_Always);
-        if (ImGui::Begin("Main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin("Main", NULL,
+                         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+                             ImGuiWindowFlags_NoCollapse))
         {
             if (ImGui::BeginTable("##main", 2, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingFixedFit))
             {
@@ -215,51 +219,54 @@ void SceneSelect::imguiSettings()
                     float height = 40.0f;
                     float interval = 5.0f;
 
-                    ImGui::Dummy( { mainTagWidth, ImGui::GetWindowHeight() - (height + interval) * MENU_COUNT - 20.0f });
+                    ImGui::Dummy({mainTagWidth, ImGui::GetWindowHeight() - (height + interval) * MENU_COUNT - 20.0f});
 
-                    if (ImGui::InvisibleButton("##dummy123123122", { -1.f, height }))
+                    if (ImGui::InvisibleButton("##dummy123123122", {-1.f, height}))
                     {
                     }
-                    ImGui::Dummy({ 0.f, interval });
+                    ImGui::Dummy({0.f, interval});
 
                     if (ImGui::Button(i18n::c(MAIN_SETTINGS), {-1.f, height}))
                     {
                         imgui_main_index = ImGui::GetIO().KeyShift ? MENU_DEBUG : MENU_OPTIONS;
                     }
-                    ImGui::Dummy({ 0.f, interval });
+                    ImGui::Dummy({0.f, interval});
 
-                    if (ImGui::InvisibleButton("##dummy123123123", { -1.f, height }))
+                    if (ImGui::InvisibleButton("##dummy123123123", {-1.f, height}))
                     {
                     }
-                    ImGui::Dummy({ 0.f, interval });
+                    ImGui::Dummy({0.f, interval});
 
                     if (ImGui::Button(i18n::c(MAIN_ABOUT), {-1.f, height}))
                     {
                         imgui_main_index = MENU_ABOUT;
                     }
-                    ImGui::Dummy({ 0.f, interval });
+                    ImGui::Dummy({0.f, interval});
 
                     if (ImGui::Button(i18n::c(MAIN_EXIT), {-1.f, height}))
                     {
                         imgui_main_index = MENU_EXIT;
                     }
-                    ImGui::Dummy({ 0.f, 20.0f });
+                    ImGui::Dummy({0.f, 20.0f});
 
                     if (ImGui::TableNextColumn())
                     {
-                        if (imgui_main_index == MENU_OPTIONS && ImGui::BeginTabBar("##option", ImGuiTabBarFlags_FittingPolicyScroll))
+                        if (imgui_main_index == MENU_OPTIONS &&
+                            ImGui::BeginTabBar("##option", ImGuiTabBarFlags_FittingPolicyScroll))
                         {
                             imguiPageOptions();
                             ImGui::EndTabBar();
                         }
 
-                        if (imgui_main_index == MENU_ABOUT && ImGui::BeginTabBar("##about", ImGuiTabBarFlags_FittingPolicyScroll))
+                        if (imgui_main_index == MENU_ABOUT &&
+                            ImGui::BeginTabBar("##about", ImGuiTabBarFlags_FittingPolicyScroll))
                         {
                             imguiPageAbout();
                             ImGui::EndTabBar();
                         }
 
-                        if (imgui_main_index == MENU_DEBUG && ImGui::BeginTabBar("##debug", ImGuiTabBarFlags_FittingPolicyScroll))
+                        if (imgui_main_index == MENU_DEBUG &&
+                            ImGui::BeginTabBar("##debug", ImGuiTabBarFlags_FittingPolicyScroll))
                         {
                             imguiPageDebug();
                             ImGui::EndTabBar();
@@ -279,7 +286,9 @@ void SceneSelect::imguiSettings()
                 ImGui::OpenPopup(i18n::c(NEW_PROFILE));
 
                 ImGui::SetNextWindowSize(ImVec2(480.f, 180.f), ImGuiCond_Always);
-                if (ImGui::BeginPopupModal(i18n::c(NEW_PROFILE), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+                if (ImGui::BeginPopupModal(i18n::c(NEW_PROFILE), nullptr,
+                                           ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |
+                                               ImGuiWindowFlags_NoResize))
                 {
                     static std::string errorMessage;
                     int old_imgui_add_profile_popup_error = imgui_add_profile_popup_error;
@@ -287,7 +296,8 @@ void SceneSelect::imguiSettings()
 
                     ImGui::TextUnformatted(i18n::c(NEW_PROFILE_NAME));
                     ImGui::SameLine();
-                    ok |= ImGui::InputText("##newprofilename", imgui_add_profile_buf, sizeof(imgui_add_profile_buf), ImGuiInputTextFlags_EnterReturnsTrue);
+                    ok |= ImGui::InputText("##newprofilename", imgui_add_profile_buf, sizeof(imgui_add_profile_buf),
+                                           ImGuiInputTextFlags_EnterReturnsTrue);
                     ImGui::SameLine();
                     HelpMarker(i18n::c(NEW_PROFILE_NAME_HINT));
 
@@ -302,8 +312,10 @@ void SceneSelect::imguiSettings()
                         }
                         else
                         {
-                            if (ConfigMgr::createProfile(imgui_add_profile_buf, 
-                                imgui_add_profile_copy_from_current ? ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT) : "") == 0)
+                            if (ConfigMgr::createProfile(imgui_add_profile_buf,
+                                                         imgui_add_profile_copy_from_current
+                                                             ? ConfigMgr::get('E', cfg::E_PROFILE, cfg::PROFILE_DEFAULT)
+                                                             : "") == 0)
                             {
                                 memset(imgui_add_profile_buf, 0, sizeof(imgui_add_profile_buf));
                                 ImGui::CloseCurrentPopup();
@@ -311,7 +323,6 @@ void SceneSelect::imguiSettings()
 
                                 imgui_add_profile_popup = false;
                                 imgui_add_profile_popup_error = 0;
-                                
                             }
                             else
                             {
@@ -335,15 +346,16 @@ void SceneSelect::imguiSettings()
                     }
                     if (imgui_add_profile_popup_error == 1)
                     {
-                        if (errorMessage.empty()) 
+                        if (errorMessage.empty())
                             errorMessage = i18n::c(NEW_PROFILE_EMPTY);
                     }
                     else if (imgui_add_profile_popup_error == 2)
                     {
                         if (errorMessage.empty())
-                            errorMessage = (boost::format(i18n::c(NEW_PROFILE_DUPLICATE)) % imgui_add_profile_buf).str();
+                            errorMessage =
+                                (boost::format(i18n::c(NEW_PROFILE_DUPLICATE)) % imgui_add_profile_buf).str();
                     }
-                    ImGui::TextColored({ 1.f, 0.2f, 0.2f, 1.f }, "%s", errorMessage.c_str());
+                    ImGui::TextColored({1.f, 0.2f, 0.2f, 1.f}, "%s", errorMessage.c_str());
 
                     ImGui::EndPopup();
                 }
@@ -372,13 +384,15 @@ void SceneSelect::imguiPageDebugArena()
 
     ImGui::Checkbox("Online", &online);
 
-    if (!online) return;
+    if (!online)
+        return;
 
     static bool expired = false;
     expired = d.isExpired();
     ImGui::Checkbox("Expired", &expired);
 
-    if (expired) return;
+    if (expired)
+        return;
 
     static bool client = false;
     static bool server = false;
@@ -408,10 +422,8 @@ void SceneSelect::imguiPageDebugArena()
         if (r)
         {
             ImGui::Text("%d: %s [%s%s%s%s ]", d.getPlayerID(i), d.getPlayerName(i).c_str(),
-                r->isNoScore() ? " NoScore" : "",
-                r->isFinished() ? " Finished" : "",
-                r->isCleared() ? " Cleared" : "",
-                r->isFailed() ? " Failed" : "");
+                        r->isNoScore() ? " NoScore" : "", r->isFinished() ? " Finished" : "",
+                        r->isCleared() ? " Cleared" : "", r->isFailed() ? " Failed" : "");
         }
         else
         {
@@ -422,7 +434,7 @@ void SceneSelect::imguiPageDebugArena()
     if (client && g_pArenaClient)
     {
         auto& c = *g_pArenaClient;
-        
+
         ImGui::Text("PlayerID: %d", c.getPlayerID());
         ImGui::Text("isCreatedRuleset: %d", c.isCreatedRuleset());
         ImGui::Text("isLoadingFinished: %d", c.isLoadingFinished());
@@ -471,16 +483,15 @@ void SceneSelect::imguiPageDebugArena()
 
         std::shared_lock l(s.clientsMutex);
         static std::map<std::string, std::string> hashs;
-        for (auto& [key, c]: s.clients)
+        for (auto& [key, c] : s.clients)
         {
             hashs[key] = c.requestChartHash.hexdigest();
             ImGui::Text("%s %d: %s ping:%dms send:%d recv:%d hb:%lds [%s%s%s ] req:%s", key.c_str(), c.id,
-                c.name.c_str(), c.ping, c.sendMessageIndex, c.recvMessageIndex, (lunaticvibes::Time() - c.heartbeatRecvTime).norm() / 1000,
-                c.isLoadingFinished ? " isLoadingFinished" : "",
-                c.isPlayingFinished ? " isPlayingFinished" : "",
-                c.isResultFinished ? " isResultFinished" : "",
-                hashs[key].c_str()
-            );
+                        c.name.c_str(), c.ping, c.sendMessageIndex, c.recvMessageIndex,
+                        (lunaticvibes::Time() - c.heartbeatRecvTime).norm() / 1000,
+                        c.isLoadingFinished ? " isLoadingFinished" : "",
+                        c.isPlayingFinished ? " isPlayingFinished" : "", c.isResultFinished ? " isResultFinished" : "",
+                        hashs[key].c_str());
         }
 #endif
     }
@@ -541,7 +552,8 @@ void SceneSelect::imguiPageOptionsGeneral()
     {
         ImGui::TextUnformatted(i18n::c(PROFILE));
         ImGui::SameLine(infoRowWidth);
-        ImGui::Combo("##profile", &imgui_profile_index, imgui_profiles_display.data(), (int)imgui_profiles_display.size());
+        ImGui::Combo("##profile", &imgui_profile_index, imgui_profiles_display.data(),
+                     (int)imgui_profiles_display.size());
 
         if (ImGui::Button(i18n::c(ADD_MORE)))
         {
@@ -556,7 +568,8 @@ void SceneSelect::imguiPageOptionsGeneral()
         ImGui::TextUnformatted(i18n::c(PLAYER_NAME));
         ImGui::SameLine(infoRowWidth);
         bool modifiedPlayName = false;
-        modifiedPlayName |= ImGui::InputText("##playername", imgui_player_name_buf, sizeof(imgui_player_name_buf), ImGuiInputTextFlags_EnterReturnsTrue);
+        modifiedPlayName |= ImGui::InputText("##playername", imgui_player_name_buf, sizeof(imgui_player_name_buf),
+                                             ImGuiInputTextFlags_EnterReturnsTrue);
         ImGui::SameLine();
         modifiedPlayName |= ImGui::Button((i18n::s(APPLY) + "##applyname").c_str());
         if (modifiedPlayName)
@@ -566,17 +579,19 @@ void SceneSelect::imguiPageOptionsGeneral()
 
         ImGui::TextUnformatted(i18n::c(LANGUAGE));
         ImGui::SameLine(infoRowWidth);
-        ImGui::Combo("##language", &imgui_language_index, imgui_languages_display.data(), (int)imgui_languages_display.size());
+        ImGui::Combo("##language", &imgui_language_index, imgui_languages_display.data(),
+                     (int)imgui_languages_display.size());
 
         /////////////////////////////////////////////////////////////////////////////////////////
 
         ImGui::TextUnformatted(i18n::c(LOG_LEVEL));
         ImGui::SameLine(infoRowWidth);
-        static constexpr std::array<const char *, static_cast<size_t>(lunaticvibes::LogLevel::Verbose) + 1>
+        static constexpr std::array<const char*, static_cast<size_t>(lunaticvibes::LogLevel::Verbose) + 1>
             imgui_log_level_display = {
                 "Fatal", "Error", "Warning", "Info", "Debug", "Verbose",
             };
-        if (ImGui::Combo("##loglevel", &imgui_log_level, imgui_log_level_display.data(), imgui_log_level_display.size()))
+        if (ImGui::Combo("##loglevel", &imgui_log_level, imgui_log_level_display.data(),
+                         imgui_log_level_display.size()))
         {
             lunaticvibes::SetLogLevel(static_cast<lunaticvibes::LogLevel>(imgui_log_level));
             ConfigMgr::set('E', cfg::E_LOG_LEVEL, imgui_log_level);
@@ -601,7 +616,9 @@ void SceneSelect::imguiPageOptionsJukebox()
 
         ImGui::TextUnformatted(i18n::c(JUKEBOX_FOLDER));
         {
-            bool enterPath = ImGui::InputTextWithHint("##folderpath", i18n::c(JUKEBOX_FOLDER_PATH_HINT), imgui_folder_path_buf, sizeof(imgui_folder_path_buf), ImGuiInputTextFlags_EnterReturnsTrue);
+            bool enterPath =
+                ImGui::InputTextWithHint("##folderpath", i18n::c(JUKEBOX_FOLDER_PATH_HINT), imgui_folder_path_buf,
+                                         sizeof(imgui_folder_path_buf), ImGuiInputTextFlags_EnterReturnsTrue);
             if (enterPath || (ImGui::SameLine(), ImGui::Button(" + ##folder")))
             {
                 imguiAddFolder(imgui_folder_path_buf);
@@ -633,7 +650,8 @@ void SceneSelect::imguiPageOptionsJukebox()
 
         ImGui::TextUnformatted(i18n::c(JUKEBOX_TABLES));
         {
-            bool enterUrl = ImGui::InputTextWithHint("##tableurl", i18n::c(JUKEBOX_TABLE_URL_HINT), imgui_table_url_buf, sizeof(imgui_table_url_buf), ImGuiInputTextFlags_EnterReturnsTrue);
+            bool enterUrl = ImGui::InputTextWithHint("##tableurl", i18n::c(JUKEBOX_TABLE_URL_HINT), imgui_table_url_buf,
+                                                     sizeof(imgui_table_url_buf), ImGuiInputTextFlags_EnterReturnsTrue);
             if (enterUrl || (ImGui::SameLine(), ImGui::Button(" + ##table")))
             {
                 imguiAddTable();
@@ -659,12 +677,12 @@ void SceneSelect::imguiPageOptionsVideo()
     {
         ImGui::TextUnformatted(i18n::c(VIDEO_RESOLUTION));
         ImGui::SameLine(infoRowWidth);
-        ImGui::Combo("##resolution", &imgui_video_display_resolution_index, imgui_video_display_resolution_display.data(), (int)imgui_video_display_resolution_display.size());
+        ImGui::Combo("##resolution", &imgui_video_display_resolution_index,
+                     imgui_video_display_resolution_display.data(), (int)imgui_video_display_resolution_display.size());
 
         ImGui::TextUnformatted(i18n::c(VIDEO_SS_LEVEL));
         ImGui::SameLine(infoRowWidth);
-        static const char* imgui_video_ss_display[] =
-        {
+        static const char* imgui_video_ss_display[] = {
             "1x",
             "2x",
             "3x",
@@ -679,21 +697,17 @@ void SceneSelect::imguiPageOptionsVideo()
 
         ImGui::TextUnformatted(i18n::c(VIDEO_SCREEN_MODE));
         ImGui::SameLine(infoRowWidth);
-        const char* imgui_video_mode_display[] =
-        {
-            i18n::c(VIDEO_WINDOWED),
-            i18n::c(VIDEO_FULLSCREEN),
-            i18n::c(VIDEO_BORDERLESS)
-        };
-        if (ImGui::Combo("##window", &imgui_video_mode, imgui_video_mode_display, sizeof(imgui_video_mode_display) / sizeof(char*)))
+        const char* imgui_video_mode_display[] = {i18n::c(VIDEO_WINDOWED), i18n::c(VIDEO_FULLSCREEN),
+                                                  i18n::c(VIDEO_BORDERLESS)};
+        if (ImGui::Combo("##window", &imgui_video_mode, imgui_video_mode_display,
+                         sizeof(imgui_video_mode_display) / sizeof(char*)))
         {
             imguiRefreshVideoDisplayResolutionList();
         }
 
         ImGui::TextUnformatted(i18n::c(VIDEO_VSYNC));
         ImGui::SameLine(infoRowWidth);
-        const char* imgui_vsync_mode_display[] =
-        {
+        const char* imgui_vsync_mode_display[] = {
             i18n::c(OFF),
             i18n::c(ON),
 #ifdef _WIN32
@@ -701,13 +715,14 @@ void SceneSelect::imguiPageOptionsVideo()
             i18n::c(VIDEO_ADAPTIVE)
 #endif
         };
-        ImGui::Combo("##vsync", &imgui_video_vsync_index, imgui_vsync_mode_display, sizeof(imgui_vsync_mode_display) / sizeof(char*));
+        ImGui::Combo("##vsync", &imgui_video_vsync_index, imgui_vsync_mode_display,
+                     sizeof(imgui_vsync_mode_display) / sizeof(char*));
 
         ImGui::TextUnformatted(i18n::c(VIDEO_MAXFPS));
         ImGui::SameLine(infoRowWidth);
         ImGui::InputInt("##maxfps", &imgui_video_maxFPS, 0);
 
-        if (ImGui::Button(i18n::c(APPLY), { 80.f, 0.f }))
+        if (ImGui::Button(i18n::c(APPLY), {80.f, 0.f}))
         {
             imguiApplyResolution();
 
@@ -733,7 +748,8 @@ void SceneSelect::imguiPageOptionsAudio()
     {
         ImGui::TextUnformatted(i18n::c(AUDIO_DEVICE));
         ImGui::SameLine(infoRowWidth);
-        ImGui::Combo("##audiodevice", &imgui_audio_device_index, imgui_audio_devices_display.data(), (int)imgui_audio_devices_display.size());
+        ImGui::Combo("##audiodevice", &imgui_audio_device_index, imgui_audio_devices_display.data(),
+                     (int)imgui_audio_devices_display.size());
 
         if (ImGui::Button(i18n::c(AUDIO_REFRESH_DEVICE_LIST)))
         {
@@ -750,7 +766,7 @@ void SceneSelect::imguiPageOptionsAudio()
         ImGui::SameLine(infoRowWidth);
         ImGui::InputInt("##bufsize", &imgui_audio_bufferSize, 0);
 
-        if (ImGui::Button(i18n::c(APPLY), { 80.f, 0.f }))
+        if (ImGui::Button(i18n::c(APPLY), {80.f, 0.f}))
         {
             imguiApplyAudioSettings();
         }
@@ -774,16 +790,12 @@ void SceneSelect::imguiPageOptionsPlay()
         ImGui::InputInt("##mininputinterval", &imgui_adv_minInputInterval, 1, 10);
         ImGui::SameLine();
         HelpMarker(i18n::c(MIN_INPUT_INTERVAL_HINT));
-        //ImGui::Checkbox("Accept mouse movements as Analog input", &imgui_adv_mouseAnalog);
+        // ImGui::Checkbox("Accept mouse movements as Analog input", &imgui_adv_mouseAnalog);
 
         ImGui::TextUnformatted(i18n::c(INPUT_POLLING_RATE));
         ImGui::SameLine(infoRowWidth);
-        static const char* imgui_play_inputPollingRate_display[] =
-        {
-            "1000 Hz",
-            "2000 Hz",
-            "4000 Hz",
-            "8000 Hz",
+        static const char* imgui_play_inputPollingRate_display[] = {
+            "1000 Hz", "2000 Hz", "4000 Hz", "8000 Hz",
             //"Unlimited (Not recommended)"
         };
 #ifdef _WIN32
@@ -791,15 +803,31 @@ void SceneSelect::imguiPageOptionsPlay()
 #else
         int imgui_play_inputPollingRate_count = 4;
 #endif
-        if (ImGui::Combo("##inputpollingrate", &imgui_play_inputPollingRate, imgui_play_inputPollingRate_display, imgui_play_inputPollingRate_count))
+        if (ImGui::Combo("##inputpollingrate", &imgui_play_inputPollingRate, imgui_play_inputPollingRate_display,
+                         imgui_play_inputPollingRate_count))
         {
             switch (imgui_play_inputPollingRate)
             {
-            case 0: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 1000); _input.setRate(1000); break;
-            case 1: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 2000); _input.setRate(2000); break;
-            case 2: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 4000); _input.setRate(4000); break;
-            case 3: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 8000); _input.setRate(8000); break;
-            case 4: ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 0); _input.setRate(0); break;
+            case 0:
+                ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 1000);
+                _input.setRate(1000);
+                break;
+            case 1:
+                ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 2000);
+                _input.setRate(2000);
+                break;
+            case 2:
+                ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 4000);
+                _input.setRate(4000);
+                break;
+            case 3:
+                ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 8000);
+                _input.setRate(8000);
+                break;
+            case 4:
+                ConfigMgr::set('P', cfg::P_INPUT_POLLING_RATE, 0);
+                _input.setRate(0);
+                break;
             }
         }
 #ifdef _WIN32
@@ -831,7 +859,8 @@ void SceneSelect::imguiPageOptionsPlay()
         imgui_play_lockGreenNumber = State::get(IndexSwitch::P1_LOCK_SPEED);
         if (ImGui::Checkbox(i18n::c(LOCK_GREENNUMBER), &imgui_play_lockGreenNumber))
         {
-            State::set(IndexOption::PLAY_HSFIX_TYPE, imgui_play_lockGreenNumber ? Option::SPEED_FIX_INITIAL : Option::SPEED_NORMAL);
+            State::set(IndexOption::PLAY_HSFIX_TYPE,
+                       imgui_play_lockGreenNumber ? Option::SPEED_FIX_INITIAL : Option::SPEED_NORMAL);
             State::set(IndexText::SCROLL_TYPE, Option::s_speed_type[State::get(IndexOption::PLAY_HSFIX_TYPE)]);
             State::set(IndexSwitch::P1_LOCK_SPEED, imgui_play_lockGreenNumber);
         }
@@ -863,31 +892,30 @@ void SceneSelect::imguiPageOptionsPlay()
         ImGui::Spacing();
         ImGui::Separator();
 
-		if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_HISPEED_WITH_ARROWKEYS), &imgui_play_adjustHispeedWithUpDown))
-		{
-			ConfigMgr::set('P', cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, imgui_play_adjustHispeedWithUpDown);
-		}
+        if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_HISPEED_WITH_ARROWKEYS), &imgui_play_adjustHispeedWithUpDown))
+        {
+            ConfigMgr::set('P', cfg::P_ADJUST_HISPEED_WITH_ARROWKEYS, imgui_play_adjustHispeedWithUpDown);
+        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_HISPEED_WITH_SELECT), &imgui_play_adjustHispeedWithSelect))
         {
             ConfigMgr::set('P', cfg::P_ADJUST_HISPEED_WITH_SELECT, imgui_play_adjustHispeedWithSelect);
         }
 
-		if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_START_67), &imgui_play_adjustLanecoverWithStart67))
-		{
-			ConfigMgr::set('P', cfg::P_ADJUST_LANECOVER_WITH_START_67, imgui_play_adjustLanecoverWithStart67);
-		}
+        if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_START_67), &imgui_play_adjustLanecoverWithStart67))
+        {
+            ConfigMgr::set('P', cfg::P_ADJUST_LANECOVER_WITH_START_67, imgui_play_adjustLanecoverWithStart67);
+        }
 
-		if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_ARROWKEYS), &imgui_play_adjustLanecoverWithLeftRight))
-		{
-			ConfigMgr::set('P', cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, imgui_play_adjustLanecoverWithLeftRight);
-		}
+        if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_ARROWKEYS), &imgui_play_adjustLanecoverWithLeftRight))
+        {
+            ConfigMgr::set('P', cfg::P_ADJUST_LANECOVER_WITH_ARROWKEYS, imgui_play_adjustLanecoverWithLeftRight);
+        }
 
         if (ImGui::Checkbox(i18n::c(PLAY_ADJUST_LANECOVER_WITH_MOUSEWHEEL), &imgui_play_adjustLanecoverWithMousewheel))
         {
             ConfigMgr::set('P', cfg::P_ADJUST_LANECOVER_WITH_MOUSEWHEEL, imgui_play_adjustLanecoverWithMousewheel);
         }
-
 
         ImGui::EndChild();
     }
@@ -913,13 +941,9 @@ void SceneSelect::imguiPageOptionsSelect()
 
         ImGui::TextUnformatted(i18n::c(SELECT_KEYBINDINGS));
         ImGui::SameLine(infoRowWidth);
-        static const char* imgui_adv_select_keybindings_display[] =
-        {
-            "7 Keys",
-            "5 Keys",
-            "9 Buttons"
-        };
-        ImGui::Combo("##adv6", &imgui_adv_selectKeyBindings, imgui_adv_select_keybindings_display, sizeof(imgui_adv_select_keybindings_display) / sizeof(char*));
+        static const char* imgui_adv_select_keybindings_display[] = {"7 Keys", "5 Keys", "9 Buttons"};
+        ImGui::Combo("##adv6", &imgui_adv_selectKeyBindings, imgui_adv_select_keybindings_display,
+                     sizeof(imgui_adv_select_keybindings_display) / sizeof(char*));
         ImGui::SameLine();
         HelpMarker(i18n::c(SELECT_KEYBINDINGS_HINT));
 
@@ -1070,16 +1094,16 @@ void SceneSelect::imguiPageAbout()
         if (ImGui::BeginChild("##pagesub21"))
         {
             ImGui::TextUnformatted("\"Lunatic Vibes F\" 2017-2024");
-            ImGui::TextUnformatted((boost::format("Version: %s %s (%s)")
-                % PROJECT_VERSION
+            ImGui::TextUnformatted((boost::format("Version: %s %s (%s)") % PROJECT_VERSION
 #ifndef NDEBUG
-                % "Debug" 
+                                    % "Debug"
 #else
-                % "Release"
+                                    % "Release"
 #endif
-                % GIT_REVISION
-                ).str().c_str());
-                
+                                    % GIT_REVISION)
+                                       .str()
+                                       .c_str());
+
             ImGui::TextUnformatted("https://github.com/chown2/lunaticvibesf");
 
             ImGui::TextUnformatted(R"(
@@ -1171,8 +1195,6 @@ void SceneSelect::imguiPageExit()
     gNextScene = SceneType::EXIT_TRANS;
 }
 
-
-
 void SceneSelect::imguiRefreshProfileList()
 {
     imgui_profile_index = -1;
@@ -1239,7 +1261,6 @@ void SceneSelect::imguiRefreshLanguageList()
     }
 }
 
-
 void SceneSelect::imguiRefreshFolderList()
 {
     imgui_folder_index = -1;
@@ -1287,7 +1308,7 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
             int y = std::get<1>(r);
             if (x >= 640 && y >= 480)
             {
-                resolutions.insert({ x, y });
+                resolutions.insert({x, y});
             }
         }
         for (auto& r : resolutions)
@@ -1301,8 +1322,7 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
         auto res = graphics_get_desktop_resolution();
         int w = res.first;
         int h = res.second;
-        auto addResolution = [w, h, this](int dw, int dh)
-        {
+        auto addResolution = [w, h, this](int dw, int dh) {
             if (w >= dw && h >= dh)
             {
                 imgui_video_display_resolution_size.emplace_back(dw, dh);
@@ -1322,7 +1342,7 @@ void SceneSelect::imguiRefreshVideoDisplayResolutionList()
     for (size_t i = 0; i < imgui_video_display_resolution_size.size(); ++i)
     {
         std::stringstream ss;
-        ss << imgui_video_display_resolution_size[i].first; 
+        ss << imgui_video_display_resolution_size[i].first;
         ss << "x";
         ss << imgui_video_display_resolution_size[i].second;
         imgui_video_display_resolution.push_back(ss.str());
@@ -1411,11 +1431,10 @@ void SceneSelect::imguiCheckSettings()
     }
     if (imgui_adv_selectKeyBindings != old_adv_selectKeyBindings)
     {
-        static const std::pair<GameModeKeys, std::string> imgui_select_keybindings_str[] =
-        {
-            { 7, cfg::P_SELECT_KEYBINDINGS_7K },
-            { 5, cfg::P_SELECT_KEYBINDINGS_5K },
-            { 9, cfg::P_SELECT_KEYBINDINGS_9K },
+        static const std::pair<GameModeKeys, std::string> imgui_select_keybindings_str[] = {
+            {7, cfg::P_SELECT_KEYBINDINGS_7K},
+            {5, cfg::P_SELECT_KEYBINDINGS_5K},
+            {9, cfg::P_SELECT_KEYBINDINGS_9K},
         };
         const auto& [keys, cfgstr] = imgui_select_keybindings_str[imgui_adv_selectKeyBindings];
         old_adv_selectKeyBindings = imgui_adv_selectKeyBindings;
@@ -1459,8 +1478,8 @@ bool SceneSelect::imguiAddFolder(const char* path)
     {
 #ifdef _WIN32
         // TODO replace with IFileDialog
-        char szDisplayName[MAX_PATH] = { 0 };
-        BROWSEINFOA lpbi = { 0 };
+        char szDisplayName[MAX_PATH] = {0};
+        BROWSEINFOA lpbi = {0};
         getWindowHandle(&lpbi.hwndOwner);
         lpbi.pszDisplayName = szDisplayName;
         lpbi.lpszTitle = "Select Folder";
@@ -1488,7 +1507,7 @@ bool SceneSelect::imguiAddFolder(const char* path)
     }
     else
     {
-        if (strnlen(path, 1) == 0) 
+        if (strnlen(path, 1) == 0)
             return false;
 
         for (auto& f : imgui_folders)
@@ -1496,7 +1515,7 @@ bool SceneSelect::imguiAddFolder(const char* path)
             if (f == path)
                 return false;
         }
-        
+
         imgui_folders.emplace_back(path);
         imgui_folders_display.push_back(imgui_folders.back().c_str());
         imgui_folder_index = -1;
@@ -1509,7 +1528,8 @@ bool SceneSelect::imguiAddFolder(const char* path)
 
 bool SceneSelect::imguiDelFolder()
 {
-    if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size())) return false;
+    if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size()))
+        return false;
 
     int oldSize = imgui_folders.size();
     imgui_folders.erase(std::next(imgui_folders.begin(), imgui_folder_index));
@@ -1524,7 +1544,8 @@ bool SceneSelect::imguiDelFolder()
 
 bool SceneSelect::imguiBrowseFolder()
 {
-    if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size())) return false;
+    if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size()))
+        return false;
     std::string pathstr = Path(imgui_folders_display[imgui_folder_index]).u8string();
     return lunaticvibes::open(pathstr);
 }
@@ -1558,7 +1579,8 @@ bool SceneSelect::imguiAddTable()
 
 bool SceneSelect::imguiDelTable()
 {
-    if (imgui_table_index < 0 || imgui_table_index >= static_cast<int>(imgui_tables_display.size())) return false;
+    if (imgui_table_index < 0 || imgui_table_index >= static_cast<int>(imgui_tables_display.size()))
+        return false;
 
     int oldSize = imgui_tables.size();
     imgui_tables.erase(std::next(imgui_tables.begin(), imgui_table_index));
@@ -1597,8 +1619,8 @@ bool SceneSelect::imguiApplyResolution()
         const char* windowMode = NULL;
         switch (imgui_video_mode)
         {
-        case 0: windowMode = cfg::V_WINMODE_WINDOWED;   break;
-        case 1: windowMode = cfg::V_WINMODE_FULL;       break;
+        case 0: windowMode = cfg::V_WINMODE_WINDOWED; break;
+        case 1: windowMode = cfg::V_WINMODE_FULL; break;
         case 2: windowMode = cfg::V_WINMODE_BORDERLESS; break;
         }
         ConfigMgr::set('V', cfg::V_WINMODE, windowMode);
@@ -1610,8 +1632,7 @@ bool SceneSelect::imguiApplyResolution()
     {
         State::set(IndexOption::SYS_WINDOWED, imgui_video_mode == 1 ? 1 : 0);
 
-        static const std::map<int, std::string> smap =
-        {
+        static const std::map<int, std::string> smap = {
             {0, "WINDOW"},
             {1, "FULL"},
             {2, "BORDERLESS"},
@@ -1627,14 +1648,12 @@ bool SceneSelect::imguiApplyResolution()
     {
         State::set(IndexOption::SYS_VSYNC, imgui_video_vsync_index == 0 ? 0 : 1);
 
-        static const std::map<int, std::string> smap =
-        {
-            {0, "OFF"},
-            {1, "ON"},
+        static const std::map<int, std::string> smap = {{0, "OFF"},
+                                                        {1, "ON"},
 #ifdef _WIN32
-            {2, "ON"}
+                                                        {2, "ON"}
 #else
-            {2, "ADAPTIVE"}
+                                                        {2, "ADAPTIVE"}
 #endif
         };
 
@@ -1674,7 +1693,6 @@ bool SceneSelect::imguiRefreshAudioDevices()
         }
         imgui_audio_devices.push_back(d);
         imgui_audio_devices_display.push_back(imgui_audio_devices_name.back().c_str());
-
     }
     if (imgui_audio_device_index == -1)
     {
@@ -1697,7 +1715,7 @@ bool SceneSelect::imguiApplyAudioSettings()
 
         SoundMgr::stopSysSamples();
         SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::BGM_SELECT);
-        
+
         ret = true;
     }
     else
@@ -1714,9 +1732,8 @@ bool SceneSelect::imguiApplyAudioSettings()
     return ret;
 }
 
-
-#include "game/arena/arena_data.h"
 #include "game/arena/arena_client.h"
+#include "game/arena/arena_data.h"
 #include "game/arena/arena_host.h"
 
 bool SceneSelect::imguiArenaJoinLobbyPrompt()
@@ -1732,18 +1749,24 @@ bool SceneSelect::imguiArenaJoinLobbyPrompt()
         ImGui::SetNextWindowSize(ImVec2(static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_X, CANVAS_WIDTH)),
                                         static_cast<float>(ConfigMgr::get('V', cfg::V_DISPLAY_RES_Y, CANVAS_HEIGHT))),
                                  ImGuiCond_Always);
-        if (ImGui::Begin("Join Lobby Main", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin("Join Lobby Main", NULL,
+                         ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                             ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |
+                             ImGuiWindowFlags_NoCollapse))
         {
             ImGui::OpenPopup("JOIN LOBBY");
 
             ImGui::SetNextWindowSize(ImVec2(480.f, 180.f), ImGuiCond_Always);
-            if (ImGui::BeginPopupModal("JOIN LOBBY", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+            if (ImGui::BeginPopupModal("JOIN LOBBY", nullptr,
+                                       ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |
+                                           ImGuiWindowFlags_NoResize))
             {
                 ImGui::TextUnformatted("IP Address");
                 ImGui::SameLine();
                 if (ImGui::IsWindowAppearing())
                     ImGui::SetKeyboardFocusHere();
-                ok |= ImGui::InputText("##joinlobbyaddr", imgui_arena_address_buf, sizeof(imgui_arena_address_buf), ImGuiInputTextFlags_EnterReturnsTrue);
+                ok |= ImGui::InputText("##joinlobbyaddr", imgui_arena_address_buf, sizeof(imgui_arena_address_buf),
+                                       ImGuiInputTextFlags_EnterReturnsTrue);
 
                 ok |= ImGui::Button(i18n::c(OK));
 

@@ -3,54 +3,54 @@
 #include <iterator>
 #include <utility>
 
-#include <common/assert.h>
 #include "game/arena/arena_data.h"
 #include "game/chart/chart_bms.h"
 #include "game/runtime/state.h"
 #include "game/scene/scene_context.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
+#include <common/assert.h>
 
 using namespace chart;
 
 void setJudgeInternalTimer1P(RulesetBMS::JudgeType judge, long long t)
 {
-	State::set(IndexTimer::_JUDGE_1P_0, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_1P_1, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_1P_2, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_1P_3, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_1P_4, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_1P_5, TIMER_NEVER);
-	switch (judge)
-	{
-	case RulesetBMS::JudgeType::KPOOR:   State::set(IndexTimer::_JUDGE_1P_0, t); break;
-	case RulesetBMS::JudgeType::MISS:    State::set(IndexTimer::_JUDGE_1P_1, t); break;
-	case RulesetBMS::JudgeType::BAD:     State::set(IndexTimer::_JUDGE_1P_2, t); break;
-	case RulesetBMS::JudgeType::GOOD:    State::set(IndexTimer::_JUDGE_1P_3, t); break;
-	case RulesetBMS::JudgeType::GREAT:   State::set(IndexTimer::_JUDGE_1P_4, t); break;
-	case RulesetBMS::JudgeType::PERFECT: State::set(IndexTimer::_JUDGE_1P_5, t); break;
-	default: break;
-	}
+    State::set(IndexTimer::_JUDGE_1P_0, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_1P_1, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_1P_2, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_1P_3, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_1P_4, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_1P_5, TIMER_NEVER);
+    switch (judge)
+    {
+    case RulesetBMS::JudgeType::KPOOR: State::set(IndexTimer::_JUDGE_1P_0, t); break;
+    case RulesetBMS::JudgeType::MISS: State::set(IndexTimer::_JUDGE_1P_1, t); break;
+    case RulesetBMS::JudgeType::BAD: State::set(IndexTimer::_JUDGE_1P_2, t); break;
+    case RulesetBMS::JudgeType::GOOD: State::set(IndexTimer::_JUDGE_1P_3, t); break;
+    case RulesetBMS::JudgeType::GREAT: State::set(IndexTimer::_JUDGE_1P_4, t); break;
+    case RulesetBMS::JudgeType::PERFECT: State::set(IndexTimer::_JUDGE_1P_5, t); break;
+    default: break;
+    }
 }
 
 void setJudgeInternalTimer2P(RulesetBMS::JudgeType judge, long long t)
 {
-	State::set(IndexTimer::_JUDGE_2P_0, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_2P_1, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_2P_2, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_2P_3, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_2P_4, TIMER_NEVER);
-	State::set(IndexTimer::_JUDGE_2P_5, TIMER_NEVER);
-	switch (judge)
-	{
-    case RulesetBMS::JudgeType::KPOOR:   State::set(IndexTimer::_JUDGE_2P_0, t); break;
-    case RulesetBMS::JudgeType::MISS:    State::set(IndexTimer::_JUDGE_2P_1, t); break;
-    case RulesetBMS::JudgeType::BAD:     State::set(IndexTimer::_JUDGE_2P_2, t); break;
-    case RulesetBMS::JudgeType::GOOD:    State::set(IndexTimer::_JUDGE_2P_3, t); break;
-    case RulesetBMS::JudgeType::GREAT:   State::set(IndexTimer::_JUDGE_2P_4, t); break;
+    State::set(IndexTimer::_JUDGE_2P_0, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_2P_1, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_2P_2, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_2P_3, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_2P_4, TIMER_NEVER);
+    State::set(IndexTimer::_JUDGE_2P_5, TIMER_NEVER);
+    switch (judge)
+    {
+    case RulesetBMS::JudgeType::KPOOR: State::set(IndexTimer::_JUDGE_2P_0, t); break;
+    case RulesetBMS::JudgeType::MISS: State::set(IndexTimer::_JUDGE_2P_1, t); break;
+    case RulesetBMS::JudgeType::BAD: State::set(IndexTimer::_JUDGE_2P_2, t); break;
+    case RulesetBMS::JudgeType::GOOD: State::set(IndexTimer::_JUDGE_2P_3, t); break;
+    case RulesetBMS::JudgeType::GREAT: State::set(IndexTimer::_JUDGE_2P_4, t); break;
     case RulesetBMS::JudgeType::PERFECT: State::set(IndexTimer::_JUDGE_2P_5, t); break;
-	default: break;
-	}
+    default: break;
+    }
 }
 
 RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart,
@@ -182,7 +182,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         }},
     };
 
-    static const NoteLaneTimerMap bombTimer7k = { {
+    static const NoteLaneTimerMap bombTimer7k = {{
         {chart::Sc1, IndexTimer::S1_BOMB},
         {chart::N11, IndexTimer::K11_BOMB},
         {chart::N12, IndexTimer::K12_BOMB},
@@ -199,9 +199,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {chart::N26, IndexTimer::K26_BOMB},
         {chart::N27, IndexTimer::K27_BOMB},
         {chart::Sc2, IndexTimer::S2_BOMB},
-    } };
+    }};
 
-    static const NoteLaneTimerMap bombTimer7kLN = { {
+    static const NoteLaneTimerMap bombTimer7kLN = {{
         {chart::Sc1, IndexTimer::S1_LN_BOMB},
         {chart::N11, IndexTimer::K11_LN_BOMB},
         {chart::N12, IndexTimer::K12_LN_BOMB},
@@ -218,9 +218,9 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {chart::N26, IndexTimer::K26_LN_BOMB},
         {chart::N27, IndexTimer::K27_LN_BOMB},
         {chart::Sc2, IndexTimer::S2_LN_BOMB},
-    } };
+    }};
 
-    static const NoteLaneTimerMap bombTimer9k = { {
+    static const NoteLaneTimerMap bombTimer9k = {{
         {chart::N11, IndexTimer::K11_BOMB},
         {chart::N12, IndexTimer::K12_BOMB},
         {chart::N13, IndexTimer::K13_BOMB},
@@ -230,19 +230,19 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {chart::N17, IndexTimer::K17_BOMB},
         {chart::N18, IndexTimer::K18_BOMB},
         {chart::N19, IndexTimer::K19_BOMB},
-    } };
+    }};
 
-    static const NoteLaneTimerMap bombTimer9kLN = { {
-        {chart::N11,  IndexTimer::K11_LN_BOMB},
-        {chart::N12,  IndexTimer::K12_LN_BOMB},
-        {chart::N13,  IndexTimer::K13_LN_BOMB},
-        {chart::N14,  IndexTimer::K14_LN_BOMB},
-        {chart::N15,  IndexTimer::K15_LN_BOMB},
-        {chart::N16,  IndexTimer::K16_LN_BOMB},
-        {chart::N17,  IndexTimer::K17_LN_BOMB},
-        {chart::N18,  IndexTimer::K18_LN_BOMB},
-        {chart::N19,  IndexTimer::K19_LN_BOMB},
-    } };
+    static const NoteLaneTimerMap bombTimer9kLN = {{
+        {chart::N11, IndexTimer::K11_LN_BOMB},
+        {chart::N12, IndexTimer::K12_LN_BOMB},
+        {chart::N13, IndexTimer::K13_LN_BOMB},
+        {chart::N14, IndexTimer::K14_LN_BOMB},
+        {chart::N15, IndexTimer::K15_LN_BOMB},
+        {chart::N16, IndexTimer::K16_LN_BOMB},
+        {chart::N17, IndexTimer::K17_LN_BOMB},
+        {chart::N18, IndexTimer::K18_LN_BOMB},
+        {chart::N19, IndexTimer::K19_LN_BOMB},
+    }};
 
     switch (keys)
     {
@@ -273,7 +273,7 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     case 14: maxMoneyScore = 200000.0; break;
     case 5:
     case 10:
-    case 9:  maxMoneyScore = 100000.0; break;
+    case 9: maxMoneyScore = 100000.0; break;
     default: break;
     }
 
@@ -289,29 +289,29 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
 
     _side = side;
     _judgeScratch = !(mods.assist_mask & PLAY_MOD_ASSIST_AUTOSCR);
-	switch (side)
-	{
-	case RulesetBMS::PlaySide::SINGLE:
+    switch (side)
+    {
+    case RulesetBMS::PlaySide::SINGLE:
         _k1P = true;
         _k2P = false;
         break;
-	case RulesetBMS::PlaySide::DOUBLE:
-		_k1P = true;
-		_k2P = true;
-		break;
-	case RulesetBMS::PlaySide::BATTLE_1P:
-		_k1P = true;
-		_k2P = false;
-		break;
-	case RulesetBMS::PlaySide::BATTLE_2P:
-		_k1P = false;
-		_k2P = true;
-		break;
+    case RulesetBMS::PlaySide::DOUBLE:
+        _k1P = true;
+        _k2P = true;
+        break;
+    case RulesetBMS::PlaySide::BATTLE_1P:
+        _k1P = true;
+        _k2P = false;
+        break;
+    case RulesetBMS::PlaySide::BATTLE_2P:
+        _k1P = false;
+        _k2P = true;
+        break;
     default:
         _k1P = true;
         _k2P = true;
         break;
-	}
+    }
 
     std::stringstream ssMod;
     std::stringstream ssModShort;
@@ -320,12 +320,18 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     case RulesetBMS::PlaySide::SINGLE:
     case RulesetBMS::PlaySide::BATTLE_1P:
     case RulesetBMS::PlaySide::AUTO:
-        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL ? "" : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
-        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL ? "" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
+        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
+                      ? ""
+                      : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
+        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
+                           ? ""
+                           : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)]);
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
         {
-            if (!ssMod.str().empty()) ssMod << ", ";
-            if (!ssModShort.str().empty()) ssModShort << ",";
+            if (!ssMod.str().empty())
+                ssMod << ", ";
+            if (!ssModShort.str().empty())
+                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
             ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
@@ -334,12 +340,18 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     case RulesetBMS::PlaySide::RIVAL:
     case RulesetBMS::PlaySide::BATTLE_2P:
     case RulesetBMS::PlaySide::AUTO_2P:
-        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL ? "" : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL ? "" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
+        ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
+                      ? ""
+                      : Option::s_random_type[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
+        ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
+                           ? ""
+                           : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_2P))
         {
-            if (!ssMod.str().empty()) ssMod << ", ";
-            if (!ssModShort.str().empty()) ssModShort << ",";
+            if (!ssMod.str().empty())
+                ssMod << ", ";
+            if (!ssModShort.str().empty())
+                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
             ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
@@ -347,32 +359,46 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
 
     case RulesetBMS::PlaySide::DOUBLE:
     case RulesetBMS::PlaySide::AUTO_DOUBLE:
-        if (!(State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL && State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL))
+        if (!(State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL &&
+              State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL))
         {
-            ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL ? "-" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
-                << "/" << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL ? "-" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
-            ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL ? "-" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
-                << "/" << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL ? "-" : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
+            ssMod << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
+                          ? "-"
+                          : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
+                  << "/"
+                  << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
+                          ? "-"
+                          : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
+            ssModShort << (State::get(IndexOption::PLAY_RANDOM_TYPE_1P) == Option::RAN_NORMAL
+                               ? "-"
+                               : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_1P)])
+                       << "/"
+                       << (State::get(IndexOption::PLAY_RANDOM_TYPE_2P) == Option::RAN_NORMAL
+                               ? "-"
+                               : Option::s_random_type_short[State::get(IndexOption::PLAY_RANDOM_TYPE_2P)]);
         }
         if (State::get(IndexSwitch::PLAY_OPTION_DP_FLIP))
         {
-            if (!ssMod.str().empty()) ssMod << ", ";
-            if (!ssModShort.str().empty()) ssModShort << ",";
+            if (!ssMod.str().empty())
+                ssMod << ", ";
+            if (!ssModShort.str().empty())
+                ssModShort << ",";
             ssMod << "FLIP";
             ssModShort << "F";
         }
         if (State::get(IndexSwitch::PLAY_OPTION_AUTOSCR_1P))
         {
-            if (!ssMod.str().empty()) ssMod << ", ";
-            if (!ssModShort.str().empty()) ssModShort << ",";
+            if (!ssMod.str().empty())
+                ssMod << ", ";
+            if (!ssModShort.str().empty())
+                ssModShort << ",";
             ssMod << "" << Option::s_assist_type[Option::ASSIST_AUTOSCR];
             ssModShort << "" << Option::s_assist_type_short[Option::ASSIST_AUTOSCR];
         }
         break;
 
     case RulesetBMS::PlaySide::MYBEST:
-    case RulesetBMS::PlaySide::NETWORK:
-        break;
+    case RulesetBMS::PlaySide::NETWORK: break;
     }
     modifierText = ssMod.str();
     if (modifierText.empty())
@@ -391,13 +417,17 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
         {
             NoteLaneIndex idx;
             idx = _chart->getLaneFromKey(NoteLaneCategory::Note, (Input::Pad)k);
-            if (idx != NoteLaneIndex::_) _noteListIterators[{NoteLaneCategory::Note, idx}] = _chart->firstNote(NoteLaneCategory::Note, idx);
+            if (idx != NoteLaneIndex::_)
+                _noteListIterators[{NoteLaneCategory::Note, idx}] = _chart->firstNote(NoteLaneCategory::Note, idx);
             idx = _chart->getLaneFromKey(NoteLaneCategory::LN, (Input::Pad)k);
-            if (idx != NoteLaneIndex::_) _noteListIterators[{NoteLaneCategory::LN, idx}] = _chart->firstNote(NoteLaneCategory::LN, idx);
+            if (idx != NoteLaneIndex::_)
+                _noteListIterators[{NoteLaneCategory::LN, idx}] = _chart->firstNote(NoteLaneCategory::LN, idx);
             idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, (Input::Pad)k);
-            if (idx != NoteLaneIndex::_) _noteListIterators[{NoteLaneCategory::Mine, idx}] = _chart->firstNote(NoteLaneCategory::Mine, idx);
+            if (idx != NoteLaneIndex::_)
+                _noteListIterators[{NoteLaneCategory::Mine, idx}] = _chart->firstNote(NoteLaneCategory::Mine, idx);
             idx = _chart->getLaneFromKey(NoteLaneCategory::Invs, (Input::Pad)k);
-            if (idx != NoteLaneIndex::_) _noteListIterators[{NoteLaneCategory::Invs, idx}] = _chart->firstNote(NoteLaneCategory::Invs, idx);
+            if (idx != NoteLaneIndex::_)
+                _noteListIterators[{NoteLaneCategory::Invs, idx}] = _chart->firstNote(NoteLaneCategory::Invs, idx);
         }
     }
 }
@@ -406,18 +436,20 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
 {
     switch (gauge)
     {
-    case PlayModifierGaugeType::HARD:               _gauge = GaugeType::HARD;    break;
-    case PlayModifierGaugeType::DEATH:              _gauge = GaugeType::DEATH;   break;
-    case PlayModifierGaugeType::EASY:               _gauge = GaugeType::EASY;    break;
-        //case PlayModifierGaugeType::PATTACK     : _gauge = GaugeType::P_ATK;   break;
-        //case PlayModifierGaugeType::GATTACK     : _gauge = GaugeType::G_ATK;   break;
-    case PlayModifierGaugeType::ASSISTEASY:         _gauge = GaugeType::ASSIST;  break;
-    case PlayModifierGaugeType::GRADE_NORMAL:       _gauge = GaugeType::GRADE;   break;
-    case PlayModifierGaugeType::GRADE_DEATH:        _gauge = GaugeType::EXGRADE; break;
-    case PlayModifierGaugeType::EXHARD:             _gauge = GaugeType::EXHARD;  break;
-    case PlayModifierGaugeType::GRADE_HARD:         _gauge = GaugeType::EXGRADE; break;
+    case PlayModifierGaugeType::HARD: _gauge = GaugeType::HARD; break;
+    case PlayModifierGaugeType::DEATH: _gauge = GaugeType::DEATH; break;
+    case PlayModifierGaugeType::EASY:
+        _gauge = GaugeType::EASY;
+        break;
+        // case PlayModifierGaugeType::PATTACK     : _gauge = GaugeType::P_ATK;   break;
+        // case PlayModifierGaugeType::GATTACK     : _gauge = GaugeType::G_ATK;   break;
+    case PlayModifierGaugeType::ASSISTEASY: _gauge = GaugeType::ASSIST; break;
+    case PlayModifierGaugeType::GRADE_NORMAL: _gauge = GaugeType::GRADE; break;
+    case PlayModifierGaugeType::GRADE_DEATH: _gauge = GaugeType::EXGRADE; break;
+    case PlayModifierGaugeType::EXHARD: _gauge = GaugeType::EXHARD; break;
+    case PlayModifierGaugeType::GRADE_HARD: _gauge = GaugeType::EXGRADE; break;
     case PlayModifierGaugeType::NORMAL:
-    default:                            _gauge = GaugeType::GROOVE;  break;
+    default: _gauge = GaugeType::GROOVE; break;
     }
 
     if (_format)
@@ -442,15 +474,11 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
         case RulesetBMS::GaugeType::EXHARD:
         case RulesetBMS::GaugeType::DEATH:
         case RulesetBMS::GaugeType::GRADE:
-        case RulesetBMS::GaugeType::EXGRADE:
-            total = 300;
-            break;
+        case RulesetBMS::GaugeType::EXGRADE: total = 300; break;
         case RulesetBMS::GaugeType::GROOVE:
         case RulesetBMS::GaugeType::EASY:
         case RulesetBMS::GaugeType::ASSIST:
-        default:
-            total = 160;
-            break;
+        default: total = 160; break;
         }
     }
 
@@ -583,8 +611,7 @@ void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
         _healthGain[JudgeType::KPOOR] = -0.1;
         break;
 
-    default:
-        break;
+    default: break;
     }
 }
 
@@ -592,7 +619,7 @@ RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunat
 {
     // spot judge area
     JudgeArea a = JudgeArea::NOTHING;
-	lunaticvibes::Time error = time - note.time;
+    lunaticvibes::Time error = time - note.time;
     if (error > -judgeTime[(size_t)_judgeDifficulty].KPOOR)
     {
         if (error < -judgeTime[(size_t)_judgeDifficulty].BAD)
@@ -638,12 +665,11 @@ RulesetBMS::JudgeRes RulesetBMS::_calcJudgeByTimes(const Note& note, const lunat
     }
     */
 
-    return { a, error };
+    return {a, error};
 }
 
 // TODO: nuke this and JUDGE_* replay commands.
-static const std::map<RulesetBMS::JudgeArea, ReplayChart::Commands::Type> judgeAreaReplayCommandType[] =
-{
+static const std::map<RulesetBMS::JudgeArea, ReplayChart::Commands::Type> judgeAreaReplayCommandType[] = {
     {
         {RulesetBMS::JudgeArea::EXACT_PERFECT, ReplayChart::Commands::Type::JUDGE_LEFT_EXACT_0},
         {RulesetBMS::JudgeArea::EARLY_PERFECT, ReplayChart::Commands::Type::JUDGE_LEFT_EARLY_0},
@@ -669,15 +695,13 @@ static const std::map<RulesetBMS::JudgeArea, ReplayChart::Commands::Type> judgeA
         {RulesetBMS::JudgeArea::LATE_GOOD, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_2},
         {RulesetBMS::JudgeArea::LATE_BAD, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3},
         {RulesetBMS::JudgeArea::MISS, ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4},
-    }
-};
+    }};
 
-void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot)
+void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                             const lunaticvibes::Time& t, int slot)
 {
-    if (cat == NoteLaneCategory::LN && 
-        (note.flags & Note::LN_TAIL) &&
-        (idx == NoteLaneIndex::Sc1 || idx == NoteLaneIndex::Sc2) && 
-        _lnJudge[idx] != JudgeArea::NOTHING)
+    if (cat == NoteLaneCategory::LN && (note.flags & Note::LN_TAIL) &&
+        (idx == NoteLaneIndex::Sc1 || idx == NoteLaneIndex::Sc2) && _lnJudge[idx] != JudgeArea::NOTHING)
     {
         // Handle scratch direction change as miss
         _judgeRelease(cat, idx, note, judge, t, slot);
@@ -721,13 +745,11 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         case JudgeArea::NOTHING:
         case JudgeArea::MISS:
         case JudgeArea::LATE_KPOOR:
-        case JudgeArea::MINE_KPOOR:
-            break;
+        case JudgeArea::MINE_KPOOR: break;
         }
         break;
 
-    case NoteLaneCategory::Invs:
-        break;
+    case NoteLaneCategory::Invs: break;
 
     case NoteLaneCategory::LN:
         if (!(note.flags & Note::LN_TAIL))
@@ -764,8 +786,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
             case JudgeArea::NOTHING:
             case JudgeArea::MISS:
             case JudgeArea::LATE_KPOOR:
-            case JudgeArea::MINE_KPOOR:
-                break;
+            case JudgeArea::MINE_KPOOR: break;
             }
             break;
         }
@@ -774,8 +795,7 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
     case NoteLaneCategory::_:
     case NoteLaneCategory::Mine:
     case NoteLaneCategory::EXTRA:
-    case NoteLaneCategory::NOTECATEGORY_COUNT:
-        break;
+    case NoteLaneCategory::NOTECATEGORY_COUNT: break;
     }
 
     if (note.expired || judge.area == JudgeArea::EARLY_KPOOR || judge.area == JudgeArea::MINE_KPOOR)
@@ -797,14 +817,13 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         }
     }
 }
-void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot)
+void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                            const lunaticvibes::Time& t, int slot)
 {
     switch (cat)
     {
-    case NoteLaneCategory::Mine:
-    {
-        if (judge.area == JudgeArea::EXACT_PERFECT ||
-            (judge.area == JudgeArea::EARLY_PERFECT && judge.time < -2) ||
+    case NoteLaneCategory::Mine: {
+        if (judge.area == JudgeArea::EXACT_PERFECT || (judge.area == JudgeArea::EARLY_PERFECT && judge.time < -2) ||
             (judge.area == JudgeArea::LATE_PERFECT && judge.time < 2))
         {
             note.hit = true;
@@ -841,20 +860,18 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
                 long long ms = t.norm() - _startTime.norm();
                 ReplayChart::Commands cmd;
                 cmd.ms = ms;
-                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LANDMINE : ReplayChart::Commands::Type::JUDGE_RIGHT_LANDMINE;
+                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LANDMINE
+                                                      : ReplayChart::Commands::Type::JUDGE_RIGHT_LANDMINE;
                 _replayNew->replay->commands.push_back(cmd);
             }
         }
         break;
     }
     case NoteLaneCategory::LN:
-        if ((note.flags & Note::LN_TAIL) &&
-            _lnJudge[idx] != RulesetBMS::JudgeArea::NOTHING &&
-            _lnJudge[idx] != RulesetBMS::JudgeArea::EARLY_BAD &&
-            _lnJudge[idx] != RulesetBMS::JudgeArea::LATE_BAD)
+        if ((note.flags & Note::LN_TAIL) && _lnJudge[idx] != RulesetBMS::JudgeArea::NOTHING &&
+            _lnJudge[idx] != RulesetBMS::JudgeArea::EARLY_BAD && _lnJudge[idx] != RulesetBMS::JudgeArea::LATE_BAD)
         {
-            if (judge.area == JudgeArea::EXACT_PERFECT ||
-                (judge.area == JudgeArea::EARLY_PERFECT && judge.time < -2) ||
+            if (judge.area == JudgeArea::EXACT_PERFECT || (judge.area == JudgeArea::EARLY_PERFECT && judge.time < -2) ||
                 (judge.area == JudgeArea::LATE_PERFECT && judge.time < 2))
             {
                 note.hit = true;
@@ -887,18 +904,17 @@ void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote
         }
         break;
 
-    default:
-        break;
+    default: break;
     }
 }
-void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge, const lunaticvibes::Time& t, int slot)
+void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
+                               const lunaticvibes::Time& t, int slot)
 {
     bool pushReplayCommand = false;
     switch (cat)
     {
     case NoteLaneCategory::LN:
-        if ((note.flags & Note::LN_TAIL) &&
-            _lnJudge[idx] != RulesetBMS::JudgeArea::NOTHING)
+        if ((note.flags & Note::LN_TAIL) && _lnJudge[idx] != RulesetBMS::JudgeArea::NOTHING)
         {
             bool hit = true;
             JudgeArea lnJudge = judge.area;
@@ -928,13 +944,12 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
 
                 case JudgeArea::EARLY_GOOD:
                 case JudgeArea::LATE_GOOD:
-                    if (judge.area == JudgeArea::EARLY_PERFECT || judge.area == JudgeArea::EARLY_GREAT || judge.area == JudgeArea::EARLY_GOOD)
+                    if (judge.area == JudgeArea::EARLY_PERFECT || judge.area == JudgeArea::EARLY_GREAT ||
+                        judge.area == JudgeArea::EARLY_GOOD)
                         lnJudge = JudgeArea::EARLY_GOOD;
                     break;
 
-                default:
-                    lnJudge = JudgeArea::EARLY_BAD;
-                    break;
+                default: lnJudge = JudgeArea::EARLY_BAD; break;
                 }
                 break;
             }
@@ -954,8 +969,7 @@ void RulesetBMS::_judgeRelease(NoteLaneCategory cat, NoteLaneIndex idx, HitableN
         }
         break;
 
-    default:
-        break;
+    default: break;
     }
 
     // push replay command
@@ -982,31 +996,51 @@ void RulesetBMS::_updateHp(double diff)
         double pTotal = 1.0;
         if (total >= 240)
             ;
-        else if (total >= 230) pTotal = 10.0 / 9;
-        else if (total >= 210) pTotal = 1.25;
-        else if (total >= 200) pTotal = 1.5;
-        else if (total >= 180) pTotal = 5.0 / 3;
-        else if (total >= 160) pTotal = 2.0;
-        else if (total >= 150) pTotal = 2.5;
-        else if (total >= 130) pTotal = 10.0 / 3;
-        else if (total >= 120) pTotal = 5.0;
-        else pTotal = 10.0;
+        else if (total >= 230)
+            pTotal = 10.0 / 9;
+        else if (total >= 210)
+            pTotal = 1.25;
+        else if (total >= 200)
+            pTotal = 1.5;
+        else if (total >= 180)
+            pTotal = 5.0 / 3;
+        else if (total >= 160)
+            pTotal = 2.0;
+        else if (total >= 150)
+            pTotal = 2.5;
+        else if (total >= 130)
+            pTotal = 10.0 / 3;
+        else if (total >= 120)
+            pTotal = 5.0;
+        else
+            pTotal = 10.0;
 
         double pNotes = 1.0;
         unsigned notes = getNoteCount();
         if (notes >= 1000)
             ;
-        else if (notes >= 500) pNotes = (notes - 500) * 0.002;
-        else if (notes >= 250) pNotes = 1.0 + (notes - 250) * 0.004;
-        else if (notes >= 125) pNotes = 2.0 + (notes - 125) * 0.008;
-        else if (notes >= 62) pNotes = 3.0 + (notes - 62) * (1.0 / 62);
-        else if (notes >= 31) pNotes = 4.0 + (notes - 31) * (1.0 / 31);
-        else if (notes >= 16) pNotes = 5.0 + (notes - 16) * 0.0625;
-        else if (notes >= 8) pNotes = 6.0 + (notes - 8) * 0.125;
-        else if (notes >= 4) pNotes = 7.0 + (notes - 4) * 0.25;
-        else if (notes >= 2) pNotes = 8.0 + (notes - 2) * 0.50;
-        else if (notes == 1) pNotes = 9.0;
-        else pNotes = 10.0;
+        else if (notes >= 500)
+            pNotes = (notes - 500) * 0.002;
+        else if (notes >= 250)
+            pNotes = 1.0 + (notes - 250) * 0.004;
+        else if (notes >= 125)
+            pNotes = 2.0 + (notes - 125) * 0.008;
+        else if (notes >= 62)
+            pNotes = 3.0 + (notes - 62) * (1.0 / 62);
+        else if (notes >= 31)
+            pNotes = 4.0 + (notes - 31) * (1.0 / 31);
+        else if (notes >= 16)
+            pNotes = 5.0 + (notes - 16) * 0.0625;
+        else if (notes >= 8)
+            pNotes = 6.0 + (notes - 8) * 0.125;
+        else if (notes >= 4)
+            pNotes = 7.0 + (notes - 4) * 0.25;
+        else if (notes >= 2)
+            pNotes = 8.0 + (notes - 2) * 0.50;
+        else if (notes == 1)
+            pNotes = 9.0;
+        else
+            pNotes = 10.0;
 
         diff *= 1.0 * std::max(pTotal, pNotes);
     }
@@ -1035,9 +1069,11 @@ void RulesetBMS::_updateHp(JudgeArea judge)
     _updateHp(_healthGain.at(JudgeAreaTypeMap.at(judge)));
 }
 
-void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch, const RulesetBMS::JudgeArea judge, const int slot)
+void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch, const RulesetBMS::JudgeArea judge,
+                             const int slot)
 {
-    if (isFailed()) return;
+    if (isFailed())
+        return;
 
     for (auto& i : JudgeAreaIndexAccMap.at(judge))
     {
@@ -1049,8 +1085,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::EARLY_PERFECT:
     case JudgeArea::EXACT_PERFECT:
     case JudgeArea::LATE_PERFECT:
-        //moneyScore += 150000.0 / getNoteCount() +
-        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        // moneyScore += 150000.0 / getNoteCount() +
+        //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
         moneyScore += 1.0 * maxMoneyScore / getNoteCount();
         exScore += 2;
         ++_basic.combo;
@@ -1058,8 +1094,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
 
     case JudgeArea::EARLY_GREAT:
     case JudgeArea::LATE_GREAT:
-        //moneyScore += 100000.0 / getNoteCount() +
-        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        // moneyScore += 100000.0 / getNoteCount() +
+        //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
         moneyScore += 0.5 * maxMoneyScore / getNoteCount();
         exScore += 1;
         ++_basic.combo;
@@ -1067,8 +1103,8 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
 
     case JudgeArea::EARLY_GOOD:
     case JudgeArea::LATE_GOOD:
-        //moneyScore += 20000.0 / getNoteCount() +
-        //    std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
+        // moneyScore += 20000.0 / getNoteCount() +
+        //     std::min(int(_basic.combo) - 1, 10) * 50000.0 / (10 * getNoteCount() - 55);
         moneyScore += 0.25 * maxMoneyScore / getNoteCount();
         ++_basic.combo;
         break;
@@ -1083,8 +1119,7 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     case JudgeArea::NOTHING:
     case JudgeArea::EARLY_KPOOR:
     case JudgeArea::LATE_KPOOR:
-    case JudgeArea::MINE_KPOOR:
-        break;
+    case JudgeArea::MINE_KPOOR: break;
     }
 
     _updateHp(judge);
@@ -1166,7 +1201,7 @@ void RulesetBMS::judgeNotePress(const Input::Pad k, const lunaticvibes::Time& t,
 }
 void RulesetBMS::judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot)
 {
-    NoteLaneIndex idx; 
+    NoteLaneIndex idx;
 
     idx = _chart->getLaneFromKey(NoteLaneCategory::Mine, k);
     if (idx != _ && !_chart->isLastNote(NoteLaneCategory::Mine, idx))
@@ -1194,7 +1229,8 @@ void RulesetBMS::judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, con
         {
             if (!itNote->expired)
             {
-;                auto j = _calcJudgeByTimes(*itNote, rt);
+                ;
+                auto j = _calcJudgeByTimes(*itNote, rt);
                 _judgeRelease(NoteLaneCategory::LN, idx, *itNote, j, t, slot);
                 break;
             }
@@ -1205,73 +1241,91 @@ void RulesetBMS::judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, con
 
 void RulesetBMS::updatePress(InputMask& pg, const lunaticvibes::Time& t)
 {
-	lunaticvibes::Time rt = t - _startTime.norm();
-    if (rt.norm() < 0) return;
-    if (gPlayContext.isAuto) return;
-    auto updatePressRange = [&](Input::Pad begin, Input::Pad end, int slot)
-    {
+    lunaticvibes::Time rt = t - _startTime.norm();
+    if (rt.norm() < 0)
+        return;
+    if (gPlayContext.isAuto)
+        return;
+    auto updatePressRange = [&](Input::Pad begin, Input::Pad end, int slot) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
-            if (!pg[k]) continue;
+            if (!pg[k])
+                continue;
             judgeNotePress((Input::Pad)k, t, rt, slot);
         }
     };
-    if (_k1P) updatePressRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
-    if (_k2P) updatePressRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
+    if (_k1P)
+        updatePressRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
+    if (_k2P)
+        updatePressRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
     if (_judgeScratch)
     {
         if (_k1P)
         {
-            if (pg[Input::S1L]) playerScratchDirection[PLAYER_SLOT_PLAYER] = AxisDir::AXIS_UP;
-            if (pg[Input::S1R]) playerScratchDirection[PLAYER_SLOT_PLAYER] = AxisDir::AXIS_DOWN;
+            if (pg[Input::S1L])
+                playerScratchDirection[PLAYER_SLOT_PLAYER] = AxisDir::AXIS_UP;
+            if (pg[Input::S1R])
+                playerScratchDirection[PLAYER_SLOT_PLAYER] = AxisDir::AXIS_DOWN;
             updatePressRange(Input::S1L, Input::S1R, PLAYER_SLOT_PLAYER);
         }
         if (_k2P)
         {
-            if (pg[Input::S2L]) playerScratchDirection[PLAYER_SLOT_TARGET] = AxisDir::AXIS_UP;
-            if (pg[Input::S2R]) playerScratchDirection[PLAYER_SLOT_TARGET] = AxisDir::AXIS_DOWN;
+            if (pg[Input::S2L])
+                playerScratchDirection[PLAYER_SLOT_TARGET] = AxisDir::AXIS_UP;
+            if (pg[Input::S2R])
+                playerScratchDirection[PLAYER_SLOT_TARGET] = AxisDir::AXIS_DOWN;
             updatePressRange(Input::S2L, Input::S2R, PLAYER_SLOT_TARGET);
         }
     }
 }
 void RulesetBMS::updateHold(InputMask& hg, const lunaticvibes::Time& t)
 {
-	lunaticvibes::Time rt = t - _startTime.norm();
-    if (rt < 0) return;
-    if (gPlayContext.isAuto) return;
+    lunaticvibes::Time rt = t - _startTime.norm();
+    if (rt < 0)
+        return;
+    if (gPlayContext.isAuto)
+        return;
 
-    auto updateHoldRange = [&](Input::Pad begin, Input::Pad end, int slot)
-    {
+    auto updateHoldRange = [&](Input::Pad begin, Input::Pad end, int slot) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
-            if (!hg[k]) continue;
+            if (!hg[k])
+                continue;
             judgeNoteHold((Input::Pad)k, t, rt, slot);
         }
     };
-    if (_k1P) updateHoldRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
-    if (_k2P) updateHoldRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
+    if (_k1P)
+        updateHoldRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
+    if (_k2P)
+        updateHoldRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
     if (_judgeScratch)
     {
-        if (_k1P) updateHoldRange(Input::S1L, Input::S1R, PLAYER_SLOT_PLAYER);
-        if (_k2P) updateHoldRange(Input::S2L, Input::S2R, PLAYER_SLOT_TARGET);
+        if (_k1P)
+            updateHoldRange(Input::S1L, Input::S1R, PLAYER_SLOT_PLAYER);
+        if (_k2P)
+            updateHoldRange(Input::S2L, Input::S2R, PLAYER_SLOT_TARGET);
     }
 }
 void RulesetBMS::updateRelease(InputMask& rg, const lunaticvibes::Time& t)
 {
-	lunaticvibes::Time rt = t - _startTime.norm();
-    if (rt < 0) return;
-    if (gPlayContext.isAuto) return;
+    lunaticvibes::Time rt = t - _startTime.norm();
+    if (rt < 0)
+        return;
+    if (gPlayContext.isAuto)
+        return;
 
-    auto updateReleaseRange = [&](Input::Pad begin, Input::Pad end, int slot)
-    {
+    auto updateReleaseRange = [&](Input::Pad begin, Input::Pad end, int slot) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
-            if (!rg[k]) continue;
+            if (!rg[k])
+                continue;
             judgeNoteRelease((Input::Pad)k, t, rt, slot);
         }
     };
-    if (_k1P) updateReleaseRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
-    if (_k2P) updateReleaseRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
+    if (_k1P)
+        updateReleaseRange(Input::K11, Input::K19, PLAYER_SLOT_PLAYER);
+    if (_k2P)
+        updateReleaseRange(Input::K21, Input::K29, PLAYER_SLOT_TARGET);
     if (_judgeScratch)
     {
         if (_k1P)
@@ -1293,7 +1347,8 @@ void RulesetBMS::updateRelease(InputMask& rg, const lunaticvibes::Time& t)
 void RulesetBMS::updateAxis(double s1, double s2, const lunaticvibes::Time& t)
 {
     lunaticvibes::Time rt = t - _startTime.norm();
-    if (rt.norm() < 0) return;
+    if (rt.norm() < 0)
+        return;
 
     using namespace Input;
 
@@ -1312,16 +1367,14 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
     auto rt = t - _startTime.norm();
     _basic.play_time = rt;
 
-    for (auto& [c, n]: _noteListIterators)
+    for (auto& [c, n] : _noteListIterators)
     {
         auto [cat, idx] = c;
         while (!_chart->isLastNote(cat, idx, n) && rt >= n->time)
         {
             switch (cat)
             {
-            case NoteLaneCategory::Note:
-                notesReached++;
-                break;
+            case NoteLaneCategory::Note: notesReached++; break;
 
             case NoteLaneCategory::LN:
                 if (n->flags & Note::LN_TAIL)
@@ -1339,8 +1392,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
         }
     }
 
-    auto updateRange = [&](Input::Pad begin, Input::Pad end, int slot)
-    {
+    auto updateRange = [&](Input::Pad begin, Input::Pad end, int slot) {
         for (size_t k = begin; k <= static_cast<size_t>(end); ++k)
         {
             auto is_scratch_input = [](size_t k) {
@@ -1382,13 +1434,14 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                 long long ms = t.norm() - _startTime.norm();
                                 ReplayChart::Commands cmd;
                                 cmd.ms = ms;
-                                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_4 : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4;
+                                cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_4
+                                                                      : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_4;
                                 _replayNew->replay->commands.push_back(cmd);
                             }
                         }
 
                         notesExpired++;
-                        //LOG_DEBUG << "LATE   POOR    "; break;
+                        // LOG_DEBUG << "LATE   POOR    "; break;
                     }
                     itNote++;
                 }
@@ -1407,7 +1460,8 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                             lunaticvibes::Time hitTime = itNote->time + judgeTime[(size_t)_judgeDifficulty].BAD;
                             auto itTail = itNote;
                             itTail++;
-                            if (!_chart->isLastNote(NoteLaneCategory::LN, idx, itTail) && (itTail->flags & Note::LN_TAIL) && hitTime > itTail->time)
+                            if (!_chart->isLastNote(NoteLaneCategory::LN, idx, itTail) &&
+                                (itTail->flags & Note::LN_TAIL) && hitTime > itTail->time)
                             {
                                 hitTime = itTail->time;
                             }
@@ -1428,12 +1482,14 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                                         long long ms = t.norm() - _startTime.norm();
                                         ReplayChart::Commands cmd;
                                         cmd.ms = ms;
-                                        cmd.type = slot == PLAYER_SLOT_PLAYER ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_3 : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3;
+                                        cmd.type = slot == PLAYER_SLOT_PLAYER
+                                                       ? ReplayChart::Commands::Type::JUDGE_LEFT_LATE_3
+                                                       : ReplayChart::Commands::Type::JUDGE_RIGHT_LATE_3;
                                         _replayNew->replay->commands.push_back(cmd);
                                     }
                                 }
 
-                                //LOG_DEBUG << "LATE   POOR    "; break;
+                                // LOG_DEBUG << "LATE   POOR    "; break;
                             }
                         }
                     }
@@ -1462,7 +1518,8 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
             {
                 const lunaticvibes::Time& hitTime = -judgeTime[(size_t)_judgeDifficulty].BAD;
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Invs, idx);
-                while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired && rt - itNote->time >= hitTime)
+                while (!_chart->isLastNote(NoteLaneCategory::Invs, idx, itNote) && !itNote->expired &&
+                       rt - itNote->time >= hitTime)
                 {
                     itNote->expired = true;
                     itNote++;
@@ -1473,7 +1530,8 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
             if (idx != NoteLaneIndex::_)
             {
                 auto itNote = _chart->incomingNote(NoteLaneCategory::Mine, idx);
-                while (!_chart->isLastNote(NoteLaneCategory::Mine, idx, itNote) && !itNote->expired && rt >= itNote->time)
+                while (!_chart->isLastNote(NoteLaneCategory::Mine, idx, itNote) && !itNote->expired &&
+                       rt >= itNote->time)
                 {
                     itNote->expired = true;
                     itNote++;
@@ -1481,13 +1539,14 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
             }
         }
     };
-    if (_k1P) updateRange(Input::S1L, Input::K19, PLAYER_SLOT_PLAYER);
-    if (_k2P) updateRange(Input::S2L, Input::K29, PLAYER_SLOT_TARGET);
+    if (_k1P)
+        updateRange(Input::S1L, Input::K19, PLAYER_SLOT_PLAYER);
+    if (_k2P)
+        updateRange(Input::S2L, Input::K29, PLAYER_SLOT_TARGET);
 
     if (_judgeScratch)
     {
-        auto updateScratch = [&](const lunaticvibes::Time& t, Input::Pad up, Input::Pad dn, double& val, int slot)
-        {
+        auto updateScratch = [&](const lunaticvibes::Time& t, Input::Pad up, Input::Pad dn, double& val, int slot) {
             double scratchThreshold = 0.001;
             double scratchRewind = 0.0001;
             if (val > scratchThreshold)
@@ -1497,9 +1556,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
                 switch (playerScratchDirection[slot])
                 {
-                case AxisDir::AXIS_DOWN:
-                    judgeNoteHold(dn, t, rt, slot);
-                    break;
+                case AxisDir::AXIS_DOWN: judgeNoteHold(dn, t, rt, slot); break;
                 case AxisDir::AXIS_UP:
                     judgeNoteRelease(up, t, rt, slot);
                     judgeNotePress(dn, t, rt, slot);
@@ -1520,9 +1577,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
                 switch (playerScratchDirection[slot])
                 {
-                case AxisDir::AXIS_UP:
-                    judgeNoteHold(up, t, rt, slot);
-                    break;
+                case AxisDir::AXIS_UP: judgeNoteHold(up, t, rt, slot); break;
                 case AxisDir::AXIS_DOWN:
                     judgeNoteRelease(dn, t, rt, slot);
                     judgeNotePress(up, t, rt, slot);
@@ -1549,12 +1604,8 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
                 // release
                 switch (playerScratchDirection[slot])
                 {
-                case AxisDir::AXIS_UP:
-                    judgeNoteRelease(up, t, rt, slot);
-                    break;
-                case AxisDir::AXIS_DOWN:
-                    judgeNoteRelease(dn, t, rt, slot);
-                    break;
+                case AxisDir::AXIS_UP: judgeNoteRelease(up, t, rt, slot); break;
+                case AxisDir::AXIS_DOWN: judgeNoteRelease(dn, t, rt, slot); break;
                 }
 
                 playerScratchDirection[slot] = AxisDir::AXIS_NONE;
@@ -1567,7 +1618,7 @@ void RulesetBMS::update(const lunaticvibes::Time& t)
 
     _isCleared = isCleared();
 
-    if (isFinished()) 
+    if (isFinished())
         _isFailed |= _basic.health < getClearHealth();
 
     updateGlobals();
@@ -1592,12 +1643,12 @@ unsigned RulesetBMS::getJudgeCount(JudgeType idx) const
 {
     switch (idx)
     {
-        case JudgeType::PERFECT: return _basic.judge[JUDGE_PERFECT];
-        case JudgeType::GREAT: return _basic.judge[JUDGE_GREAT];
-        case JudgeType::GOOD: return _basic.judge[JUDGE_GOOD];
-        case JudgeType::BAD: return _basic.judge[JUDGE_BAD];
-        case JudgeType::KPOOR: return _basic.judge[JUDGE_KPOOR];
-        case JudgeType::MISS: return _basic.judge[JUDGE_MISS];
+    case JudgeType::PERFECT: return _basic.judge[JUDGE_PERFECT];
+    case JudgeType::GREAT: return _basic.judge[JUDGE_GREAT];
+    case JudgeType::GOOD: return _basic.judge[JUDGE_GOOD];
+    case JudgeType::BAD: return _basic.judge[JUDGE_BAD];
+    case JudgeType::KPOOR: return _basic.judge[JUDGE_KPOOR];
+    case JudgeType::MISS: return _basic.judge[JUDGE_MISS];
     }
     return 0;
 }
@@ -1639,12 +1690,11 @@ unsigned RulesetBMS::getMaxCombo() const
     }
 }
 
-
 void RulesetBMS::fail()
 {
     _isFailed = true;
 
-    _basic.health = _minHealth; 
+    _basic.health = _minHealth;
     _basic.combo = 0;
 
     int notesRemain = getNoteCount() - notesExpired;
@@ -1657,7 +1707,8 @@ void RulesetBMS::fail()
 
 void RulesetBMS::updateGlobals()
 {
-    if (_side == PlaySide::SINGLE || _side == PlaySide::DOUBLE || _side == PlaySide::BATTLE_1P || _side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE) // includes DP
+    if (_side == PlaySide::SINGLE || _side == PlaySide::DOUBLE || _side == PlaySide::BATTLE_1P ||
+        _side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE) // includes DP
     {
         if (!gArenaData.isOnline())
         {
@@ -1674,7 +1725,8 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_1P_RATEDECIMAL, int(std::floor((_basic.acc - int(_basic.acc)) * 100)));
         State::set(IndexNumber::PLAY_1P_TOTALNOTES, getNoteCount());
         State::set(IndexNumber::PLAY_1P_TOTAL_RATE, int(std::floor(_basic.total_acc)));
-        State::set(IndexNumber::PLAY_1P_TOTAL_RATE_DECIMAL2, int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
+        State::set(IndexNumber::PLAY_1P_TOTAL_RATE_DECIMAL2,
+                   int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
         State::set(IndexNumber::PLAY_1P_PERFECT, _basic.judge[JUDGE_PERFECT]);
         State::set(IndexNumber::PLAY_1P_GREAT, _basic.judge[JUDGE_GREAT]);
         State::set(IndexNumber::PLAY_1P_GOOD, _basic.judge[JUDGE_GOOD]);
@@ -1719,7 +1771,8 @@ void RulesetBMS::updateGlobals()
             const int fs_of_player = get_fastslow(_lastNoteJudge[PLAYER_SLOT_PLAYER].area);
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_FAST_SLOW, fs_of_player);
             State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_1P, fs_of_player);
-            State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_PLAYER].time.norm());
+            State::set(IndexNumber::LR2IR_REPLACE_PLAY_1P_JUDGE_TIME_ERROR_MS,
+                       _lastNoteJudge[PLAYER_SLOT_PLAYER].time.norm());
             State::set(IndexNumber::PLAY_1P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_PLAYER].time.norm());
 
             if (_side == PlaySide::DOUBLE || _side == PlaySide::AUTO_DOUBLE)
@@ -1727,7 +1780,8 @@ void RulesetBMS::updateGlobals()
                 const int fs_of_target = get_fastslow(_lastNoteJudge[PLAYER_SLOT_TARGET].area);
                 State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_FAST_SLOW, fs_of_target);
                 State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_2P, fs_of_target);
-                State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
+                State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS,
+                           _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
                 State::set(IndexNumber::PLAY_2P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
             }
         }
@@ -1749,15 +1803,24 @@ void RulesetBMS::updateGlobals()
         State::set(IndexOption::PLAY_HEALTH_1P, Option::getHealthType(_basic.health));
 
         int maxScore = getMaxScore();
-        //if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 - dp.score2));    // MAX-
-        if      (_basic.total_acc >= 100.0 * 8.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF,     exScore - maxScore);    // MAX-
-        else if (_basic.total_acc >= 100.0 * 7.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9));    // AAA-
-        else if (_basic.total_acc >= 100.0 * 6.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9));    // AA-
-        else if (_basic.total_acc >= 100.0 * 5.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9));    // A-
-        else if (_basic.total_acc >= 100.0 * 4.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9));    // B-
-        else if (_basic.total_acc >= 100.0 * 3.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9));    // C-
-        else if (_basic.total_acc >= 100.0 * 2.0 / 9) State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9));    // D-
-        else                                          State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9));    // E-
+        // if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 -
+        // dp.score2));    // MAX-
+        if (_basic.total_acc >= 100.0 * 8.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, exScore - maxScore); // MAX-
+        else if (_basic.total_acc >= 100.0 * 7.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9)); // AAA-
+        else if (_basic.total_acc >= 100.0 * 6.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9)); // AA-
+        else if (_basic.total_acc >= 100.0 * 5.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9)); // A-
+        else if (_basic.total_acc >= 100.0 * 4.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9)); // B-
+        else if (_basic.total_acc >= 100.0 * 3.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9)); // C-
+        else if (_basic.total_acc >= 100.0 * 2.0 / 9)
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9)); // D-
+        else
+            State::set(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9)); // E-
         State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, State::get(IndexNumber::PLAY_1P_NEXT_RANK_EX_DIFF));
 
         State::set(IndexNumber::LR2IR_REPLACE_PLAY_RUNNING_NOTES, notesExpired);
@@ -1781,18 +1844,17 @@ void RulesetBMS::updateGlobals()
         {
             switch (_gauge)
             {
-            case GaugeType::HARD:       lamp = Option::LAMP_HARD; break;
-            case GaugeType::EXHARD:     lamp = Option::LAMP_EXHARD; break;
-            case GaugeType::DEATH:      lamp = Option::LAMP_FULLCOMBO; break;
-            //case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            //case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            case GaugeType::GROOVE:     lamp = Option::LAMP_NORMAL; break;
-            case GaugeType::EASY:       lamp = Option::LAMP_EASY; break;
-            case GaugeType::ASSIST:     lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE:      lamp = Option::LAMP_NOPLAY; break;
-            case GaugeType::EXGRADE:    lamp = Option::LAMP_NOPLAY; break;
-            default:
-                break;
+            case GaugeType::HARD: lamp = Option::LAMP_HARD; break;
+            case GaugeType::EXHARD: lamp = Option::LAMP_EXHARD; break;
+            case GaugeType::DEATH: lamp = Option::LAMP_FULLCOMBO; break;
+            // case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
+            // case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
+            case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
+            case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
+            case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
+            case GaugeType::GRADE: lamp = Option::LAMP_NOPLAY; break;
+            case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
+            default: break;
             }
         }
         else
@@ -1808,7 +1870,7 @@ void RulesetBMS::updateGlobals()
             State::set(IndexBargraph::PLAY_RIVAL_EXSCORE, _basic.total_acc / 100.0);
         }
         State::set(IndexBargraph::PLAY_RIVAL_EXSCORE_BACKUP, _basic.total_acc / 100.0);
-        
+
         State::set(IndexNumber::PLAY_2P_SCORE, int(std::round(moneyScore)));
         if (_side == PlaySide::RIVAL)
         {
@@ -1824,7 +1886,8 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_2P_RATEDECIMAL, int(std::floor((_basic.acc - int(_basic.acc)) * 100)));
         State::set(IndexNumber::PLAY_2P_TOTALNOTES, getNoteCount());
         State::set(IndexNumber::PLAY_2P_TOTAL_RATE, int(std::floor(_basic.total_acc)));
-        State::set(IndexNumber::PLAY_2P_TOTAL_RATE_DECIMAL2, int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
+        State::set(IndexNumber::PLAY_2P_TOTAL_RATE_DECIMAL2,
+                   int(std::floor((_basic.total_acc - int(_basic.total_acc)) * 100)));
         State::set(IndexNumber::PLAY_2P_PERFECT, _basic.judge[JUDGE_PERFECT]);
         State::set(IndexNumber::PLAY_2P_GREAT, _basic.judge[JUDGE_GREAT]);
         State::set(IndexNumber::PLAY_2P_GOOD, _basic.judge[JUDGE_GOOD]);
@@ -1841,33 +1904,29 @@ void RulesetBMS::updateGlobals()
 
         if (showJudge)
         {
-            int fastslow = 0;   // 1:fast 2:slow
+            int fastslow = 0; // 1:fast 2:slow
             switch (_lastNoteJudge[PLAYER_SLOT_TARGET].area)
             {
             case JudgeArea::EARLY_GREAT:
             case JudgeArea::EARLY_GOOD:
             case JudgeArea::EARLY_BAD:
-            case JudgeArea::EARLY_KPOOR:
-                fastslow = 1;
-                break;
+            case JudgeArea::EARLY_KPOOR: fastslow = 1; break;
 
             case JudgeArea::LATE_GREAT:
             case JudgeArea::LATE_GOOD:
             case JudgeArea::LATE_BAD:
             case JudgeArea::MISS:
-            case JudgeArea::LATE_KPOOR:
-                fastslow = 2;
-                break;
+            case JudgeArea::LATE_KPOOR: fastslow = 2; break;
             case JudgeArea::NOTHING:
             case JudgeArea::EARLY_PERFECT:
             case JudgeArea::EXACT_PERFECT:
             case JudgeArea::LATE_PERFECT:
-            case JudgeArea::MINE_KPOOR:
-                break;
+            case JudgeArea::MINE_KPOOR: break;
             }
             State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_FAST_SLOW, fastslow);
             State::set(IndexOption::PLAY_LAST_JUDGE_FASTSLOW_2P, fastslow);
-            State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
+            State::set(IndexNumber::LR2IR_REPLACE_PLAY_2P_JUDGE_TIME_ERROR_MS,
+                       _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
             State::set(IndexNumber::PLAY_2P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
         }
 
@@ -1888,15 +1947,24 @@ void RulesetBMS::updateGlobals()
         State::set(IndexOption::PLAY_HEALTH_2P, Option::getHealthType(_basic.health));
 
         int maxScore = getMaxScore();
-        //if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 - dp.score2));    // MAX-
-        if      (_basic.total_acc >= 100.0 * 8.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF,     exScore - maxScore);    // MAX-
-        else if (_basic.total_acc >= 100.0 * 7.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9));    // AAA-
-        else if (_basic.total_acc >= 100.0 * 6.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9));    // AA-
-        else if (_basic.total_acc >= 100.0 * 5.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9));    // A-
-        else if (_basic.total_acc >= 100.0 * 4.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9));    // B-
-        else if (_basic.total_acc >= 100.0 * 3.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9));    // C-
-        else if (_basic.total_acc >= 100.0 * 2.0 / 9) State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9));    // D-
-        else                                          State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9));    // E-
+        // if      (dp.total_acc >= 94.44) State::set(IndexNumber::RESULT_NEXT_RANK_EX_DIFF, int(maxScore * 1.000 -
+        // dp.score2));    // MAX-
+        if (_basic.total_acc >= 100.0 * 8.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, exScore - maxScore); // MAX-
+        else if (_basic.total_acc >= 100.0 * 7.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 8.0 / 9)); // AAA-
+        else if (_basic.total_acc >= 100.0 * 6.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 7.0 / 9)); // AA-
+        else if (_basic.total_acc >= 100.0 * 5.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 6.0 / 9)); // A-
+        else if (_basic.total_acc >= 100.0 * 4.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 5.0 / 9)); // B-
+        else if (_basic.total_acc >= 100.0 * 3.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 4.0 / 9)); // C-
+        else if (_basic.total_acc >= 100.0 * 2.0 / 9)
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 3.0 / 9)); // D-
+        else
+            State::set(IndexNumber::PLAY_2P_NEXT_RANK_EX_DIFF, int(exScore - maxScore * 2.0 / 9)); // E-
 
         Option::e_lamp_type lamp = Option::LAMP_NOPLAY;
         if (isNoScore() && _basic.judge[JUDGE_BP] == 0)
@@ -1916,18 +1984,19 @@ void RulesetBMS::updateGlobals()
         {
             switch (_gauge)
             {
-            case GaugeType::HARD:       lamp = Option::LAMP_HARD; break;
-            case GaugeType::EXHARD:     lamp = Option::LAMP_EXHARD; break;
-            case GaugeType::DEATH:      lamp = Option::LAMP_FULLCOMBO; break;
-                //case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-                //case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
-            case GaugeType::GROOVE:     lamp = Option::LAMP_NORMAL; break;
-            case GaugeType::EASY:       lamp = Option::LAMP_EASY; break;
-            case GaugeType::ASSIST:     lamp = Option::LAMP_ASSIST; break;
-            case GaugeType::GRADE:      lamp = Option::LAMP_NOPLAY; break;
-            case GaugeType::EXGRADE:    lamp = Option::LAMP_NOPLAY; break;
-            default:
+            case GaugeType::HARD: lamp = Option::LAMP_HARD; break;
+            case GaugeType::EXHARD: lamp = Option::LAMP_EXHARD; break;
+            case GaugeType::DEATH:
+                lamp = Option::LAMP_FULLCOMBO;
                 break;
+                // case GaugeType::P_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
+                // case GaugeType::G_ATK:      lamp = Option::LAMP_FULLCOMBO; break;
+            case GaugeType::GROOVE: lamp = Option::LAMP_NORMAL; break;
+            case GaugeType::EASY: lamp = Option::LAMP_EASY; break;
+            case GaugeType::ASSIST: lamp = Option::LAMP_ASSIST; break;
+            case GaugeType::GRADE: lamp = Option::LAMP_NOPLAY; break;
+            case GaugeType::EXGRADE: lamp = Option::LAMP_NOPLAY; break;
+            default: break;
             }
         }
         else

@@ -4,8 +4,9 @@
 #include "common/meta.h"
 
 ConfigInput::ConfigInput(const std::string& profile, GameModeKeys k)
-    : vConfig(profile, (k == 5 ? CONFIG_FILE_INPUT_5 : (k == 7 ? CONFIG_FILE_INPUT_7 : (k == 9 ? CONFIG_FILE_INPUT_9 : ""))))
-    , keys(k)
+    : vConfig(profile,
+              (k == 5 ? CONFIG_FILE_INPUT_5 : (k == 7 ? CONFIG_FILE_INPUT_7 : (k == 9 ? CONFIG_FILE_INPUT_9 : "")))),
+      keys(k)
 {
 }
 
@@ -17,41 +18,41 @@ const char* getBindingKey(Input::Pad ingame)
     using namespace Input;
     switch (ingame)
     {
-    case S1L:       return I_BINDINGS_K1ScL;
-    case S1R:       return I_BINDINGS_K1ScR;
-    case K11:       return I_BINDINGS_K11;
-    case K12:       return I_BINDINGS_K12;
-    case K13:       return I_BINDINGS_K13;
-    case K14:       return I_BINDINGS_K14;
-    case K15:       return I_BINDINGS_K15;
-    case K16:       return I_BINDINGS_K16;
-    case K17:       return I_BINDINGS_K17;
-    case K18:       return I_BINDINGS_K18;
-    case K19:       return I_BINDINGS_K19;
-    case K1START:   return I_BINDINGS_K1Start;
-    case K1SELECT:  return I_BINDINGS_K1Select;
-    case K1SPDUP:   return I_BINDINGS_K1SpdUp;
-    case K1SPDDN:   return I_BINDINGS_K1SpdDn;
-    case S1A:       return I_BINDINGS_K1ScAxis;
+    case S1L: return I_BINDINGS_K1ScL;
+    case S1R: return I_BINDINGS_K1ScR;
+    case K11: return I_BINDINGS_K11;
+    case K12: return I_BINDINGS_K12;
+    case K13: return I_BINDINGS_K13;
+    case K14: return I_BINDINGS_K14;
+    case K15: return I_BINDINGS_K15;
+    case K16: return I_BINDINGS_K16;
+    case K17: return I_BINDINGS_K17;
+    case K18: return I_BINDINGS_K18;
+    case K19: return I_BINDINGS_K19;
+    case K1START: return I_BINDINGS_K1Start;
+    case K1SELECT: return I_BINDINGS_K1Select;
+    case K1SPDUP: return I_BINDINGS_K1SpdUp;
+    case K1SPDDN: return I_BINDINGS_K1SpdDn;
+    case S1A: return I_BINDINGS_K1ScAxis;
 
-    case S2L:       return I_BINDINGS_K2ScL;
-    case S2R:       return I_BINDINGS_K2ScR;
-    case K21:       return I_BINDINGS_K21;
-    case K22:       return I_BINDINGS_K22;
-    case K23:       return I_BINDINGS_K23;
-    case K24:       return I_BINDINGS_K24;
-    case K25:       return I_BINDINGS_K25;
-    case K26:       return I_BINDINGS_K26;
-    case K27:       return I_BINDINGS_K27;
-    case K28:       return I_BINDINGS_K28;
-    case K29:       return I_BINDINGS_K29;
-    case K2START:   return I_BINDINGS_K2Start;
-    case K2SELECT:  return I_BINDINGS_K2Select;
-    case K2SPDUP:   return I_BINDINGS_K2SpdUp;
-    case K2SPDDN:   return I_BINDINGS_K2SpdDn;
-    case S2A:       return I_BINDINGS_K2ScAxis;
+    case S2L: return I_BINDINGS_K2ScL;
+    case S2R: return I_BINDINGS_K2ScR;
+    case K21: return I_BINDINGS_K21;
+    case K22: return I_BINDINGS_K22;
+    case K23: return I_BINDINGS_K23;
+    case K24: return I_BINDINGS_K24;
+    case K25: return I_BINDINGS_K25;
+    case K26: return I_BINDINGS_K26;
+    case K27: return I_BINDINGS_K27;
+    case K28: return I_BINDINGS_K28;
+    case K29: return I_BINDINGS_K29;
+    case K2START: return I_BINDINGS_K2Start;
+    case K2SELECT: return I_BINDINGS_K2Select;
+    case K2SPDUP: return I_BINDINGS_K2SpdUp;
+    case K2SPDDN: return I_BINDINGS_K2SpdDn;
+    case S2A: return I_BINDINGS_K2ScAxis;
 
-    default:        return I_NOTBOUND;
+    default: return I_NOTBOUND;
     }
 }
 
@@ -81,9 +82,10 @@ void ConfigInput::setDefaults() noexcept
     clearAll();
 
     Path path = GAMEDATA_PATH;
-    path /= keys == 5 ? CONFIG_FILE_INPUT_DEFAULT_5 :
-            keys == 7 ? CONFIG_FILE_INPUT_DEFAULT_7 :
-            keys == 9 ? CONFIG_FILE_INPUT_DEFAULT_9 : "";
+    path /= keys == 5   ? CONFIG_FILE_INPUT_DEFAULT_5
+            : keys == 7 ? CONFIG_FILE_INPUT_DEFAULT_7
+            : keys == 9 ? CONFIG_FILE_INPUT_DEFAULT_9
+                        : "";
     try
     {
         _yaml = YAML::LoadFile(path.u8string());
@@ -110,7 +112,7 @@ void ConfigInput::setDefaults() noexcept
 void ConfigInput::clearAll()
 {
     using namespace cfg;
-    
+
     set(I_BINDINGS_K1ScL, "");
     set(I_BINDINGS_K1ScR, "");
     set(I_BINDINGS_K11, "");
@@ -151,7 +153,6 @@ void ConfigInput::clearAll()
     }
 }
 
-
 void ConfigInput::clearKey(Input::Pad ingame)
 {
     using namespace cfg;
@@ -184,15 +185,10 @@ void ConfigInput::bind(Input::Pad ingame, const KeyMap& km)
             clearKey(Input::Pad::S2R);
             break;
         case Input::Pad::S1L:
-        case Input::Pad::S1R:
-            clearKey(Input::Pad::S1A);
-            break;
+        case Input::Pad::S1R: clearKey(Input::Pad::S1A); break;
         case Input::Pad::S2L:
-        case Input::Pad::S2R:
-            clearKey(Input::Pad::S2A);
-            break;
-        default:
-            break;
+        case Input::Pad::S2R: clearKey(Input::Pad::S2A); break;
+        default: break;
         }
     }
 }

@@ -40,7 +40,8 @@ bool is_shiftjis(const std::string_view str)
         // JIS X 0208
         else if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xef))
         {
-            if (++it == str.end()) return false;
+            if (++it == str.end())
+                return false;
             uint8_t cc = *it;
             if ((cc >= 0x40 && cc <= 0x7e) || (cc >= 0x80 && cc <= 0xfc))
                 continue;
@@ -49,13 +50,15 @@ bool is_shiftjis(const std::string_view str)
         // user defined
         else if (c >= 0xf0 && c <= 0xfc)
         {
-            if (++it == str.end()) return false;
+            if (++it == str.end())
+                return false;
             uint8_t cc = *it;
             if ((cc >= 0x40 && cc <= 0x7e) || (cc >= 0x80 && cc <= 0xfc))
                 continue;
         }
 
-        else return false;
+        else
+            return false;
     }
 
     return true;
@@ -78,13 +81,15 @@ bool is_euckr(const std::string_view str)
         // shared range
         else if (c >= 0xa1 && c <= 0xfe)
         {
-            if (++it == str.end()) return false;
+            if (++it == str.end())
+                return false;
             uint8_t cc = *it;
             if (cc >= 0xa1 && cc <= 0xfe)
                 continue;
         }
 
-        else return false;
+        else
+            return false;
     }
 
     return true;
@@ -106,24 +111,31 @@ bool is_utf8(const std::string_view str)
             continue;
 
         // 2~6 bytes
-        else if ((c & 0b1110'0000) == 0b1100'0000) bytes = 2;
-        else if ((c & 0b1111'0000) == 0b1110'0000) bytes = 3;
-        else if ((c & 0b1111'1000) == 0b1111'0000) bytes = 4;
-        else if ((c & 0b1111'1100) == 0b1111'1000) bytes = 5;
-        else if ((c & 0b1111'1110) == 0b1111'1100) bytes = 6;
-        else return false;
+        else if ((c & 0b1110'0000) == 0b1100'0000)
+            bytes = 2;
+        else if ((c & 0b1111'0000) == 0b1110'0000)
+            bytes = 3;
+        else if ((c & 0b1111'1000) == 0b1111'0000)
+            bytes = 4;
+        else if ((c & 0b1111'1100) == 0b1111'1000)
+            bytes = 5;
+        else if ((c & 0b1111'1110) == 0b1111'1100)
+            bytes = 6;
+        else
+            return false;
 
         while (--bytes)
         {
-            if (++it == str.end()) return false;
+            if (++it == str.end())
+                return false;
             uint8_t cc = *it;
-            if ((cc & 0b1100'0000) != 0b10000000) return false;
+            if ((cc & 0b1100'0000) != 0b10000000)
+                return false;
         }
     }
 
     return true;
 }
-
 
 eFileEncoding getFileEncoding(const Path& path)
 {
@@ -146,7 +158,8 @@ eFileEncoding getFileEncoding(std::istream& is)
     eFileEncoding enc = eFileEncoding::LATIN1;
     for (std::string buf; std::getline(is, buf);)
     {
-        if (is_ascii(buf)) continue;
+        if (is_ascii(buf))
+            continue;
 
         if (is_utf8(buf))
         {
@@ -180,16 +193,11 @@ const char* getFileEncodingName(eFileEncoding enc)
 {
     switch (enc)
     {
-    case eFileEncoding::EUC_KR: 
-        return "EUC-KR";
-    case eFileEncoding::LATIN1: 
-        return "Latin 1";
-    case eFileEncoding::SHIFT_JIS: 
-        return "Shift JIS";
-    case eFileEncoding::UTF8: 
-        return "UTF-8";
-    default:
-        return "Unknown";
+    case eFileEncoding::EUC_KR: return "EUC-KR";
+    case eFileEncoding::LATIN1: return "Latin 1";
+    case eFileEncoding::SHIFT_JIS: return "Shift JIS";
+    case eFileEncoding::UTF8: return "UTF-8";
+    default: return "Unknown";
     }
 }
 
@@ -210,10 +218,10 @@ void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding,
     int cp = CP_UTF8;
     switch (fromEncoding)
     {
-    case eFileEncoding::SHIFT_JIS:  cp = 932; break;
-    case eFileEncoding::EUC_KR:     cp = 949; break;
-    case eFileEncoding::LATIN1:     cp = CP_ACP; break;
-    default:                        cp = CP_UTF8; break;
+    case eFileEncoding::SHIFT_JIS: cp = 932; break;
+    case eFileEncoding::EUC_KR: cp = 949; break;
+    case eFileEncoding::LATIN1: cp = CP_ACP; break;
+    default: cp = CP_UTF8; break;
     }
     if (cp == CP_UTF8)
     {
@@ -237,18 +245,18 @@ void lunaticvibes::to_utf8(const std::string& input, eFileEncoding fromEncoding,
     delete[] ustr;
 }
 
-
 std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 {
     int cp = CP_UTF8;
     switch (toEncoding)
     {
-    case eFileEncoding::SHIFT_JIS:  cp = 932; break;
-    case eFileEncoding::EUC_KR:     cp = 949; break;
-    case eFileEncoding::LATIN1:     cp = CP_ACP; break;
-    default:                        cp = CP_UTF8; break;
+    case eFileEncoding::SHIFT_JIS: cp = 932; break;
+    case eFileEncoding::EUC_KR: cp = 949; break;
+    case eFileEncoding::LATIN1: cp = CP_ACP; break;
+    default: cp = CP_UTF8; break;
     }
-    if (cp == CP_UTF8) return input;
+    if (cp == CP_UTF8)
+        return input;
 
     DWORD dwNum;
 
@@ -278,23 +286,23 @@ std::string from_utf8(const std::string& input, eFileEncoding toEncoding)
 
 static const char* get_iconv_encoding_name(eFileEncoding encoding)
 {
-    switch (encoding) {
-    case eFileEncoding::LATIN1:
-        return "ISO-8859-1";
-    case eFileEncoding::SHIFT_JIS:
-        return "CP932";
-    case eFileEncoding::EUC_KR:
-        return "CP949";
-    case eFileEncoding::UTF8:
-        return "UTF-8";
+    switch (encoding)
+    {
+    case eFileEncoding::LATIN1: return "ISO-8859-1";
+    case eFileEncoding::SHIFT_JIS: return "CP932";
+    case eFileEncoding::EUC_KR: return "CP949";
+    case eFileEncoding::UTF8: return "UTF-8";
     }
     panic("Error", "Incorrect eFileEncoding");
 }
 
-struct IcdDeleter {
-    void operator()(iconv_t icd) {
+struct IcdDeleter
+{
+    void operator()(iconv_t icd)
+    {
         int ret = iconv_close(icd);
-        if (ret == -1) {
+        if (ret == -1)
+        {
             const int error = errno;
             LOG_ERROR << "iconv_close() error: " << safe_strerror(error) << " (" << error << ")";
         }
@@ -327,7 +335,7 @@ static void convert(const std::string& input, eFileEncoding from, eFileEncoding 
     static constexpr size_t BUF_SIZE = 1024l * 32l;
     // I wanted to avoid manually allocating here so that we don't have
     // to clean up manually in all return paths.
-    char out_buf[BUF_SIZE] = { 0 };
+    char out_buf[BUF_SIZE] = {0};
 
     // BRUH-cast.
     char* buf_ptr = const_cast<char*>(input.c_str());
@@ -336,7 +344,8 @@ static void convert(const std::string& input, eFileEncoding from, eFileEncoding 
     std::size_t out_len = sizeof(out_buf);
 
     std::size_t iconv_ret = iconv(icd, &buf_ptr, &buf_len, &out_ptr, &out_len);
-    if (iconv_ret == static_cast<size_t>(-1)) {
+    if (iconv_ret == static_cast<size_t>(-1))
+    {
         const int error = errno;
         LOG_ERROR << "iconv() error: " << safe_strerror(error) << " (" << error << ")";
         out = "(conversion error)";
@@ -371,10 +380,9 @@ void lunaticvibes::utf8_to_utf32(const std::string& str, std::u32string& out)
     char32_t* to_next = &out[0];
 
     std::codecvt_base::result res;
-    do {
-        res = facet_u32_u8.in(s,
-            from_next, &str[str.size()], from_next,
-            to_next, &out[out.size()], to_next);
+    do
+    {
+        res = facet_u32_u8.in(s, from_next, &str[str.size()], from_next, to_next, &out[out.size()], to_next);
 
         // skip unconvertiable chars (which is impossible though)
         if (res == std::codecvt_base::error)
@@ -396,10 +404,9 @@ std::string utf32_to_utf8(const std::u32string& str)
     char* to_next = &u8Text[0];
 
     std::codecvt_base::result res;
-    do {
-        res = facet_u32_u8.out(s,
-            from_next, &str[str.size()], from_next,
-            to_next, &u8Text[u8Text.size()], to_next);
+    do
+    {
+        res = facet_u32_u8.out(s, from_next, &str[str.size()], from_next, to_next, &u8Text[u8Text.size()], to_next);
 
         // skip unconvertiable chars (which is impossible though)
         if (res == std::codecvt_base::error)

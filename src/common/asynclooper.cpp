@@ -8,23 +8,18 @@
 #include <utility>
 #endif
 
-#include <common/assert.h>
-#include <common/utils.h>
-#include <common/sysutil.h>
 #include "log.h"
+#include <common/assert.h>
+#include <common/sysutil.h>
+#include <common/utils.h>
 
-AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsigned rate_per_sec, bool single_inst) : 
-    _tag(tag), _loopFunc(std::move(func))
+AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsigned rate_per_sec, bool single_inst)
+    : _tag(tag), _loopFunc(std::move(func))
 {
     _rate = rate_per_sec;
 
 #ifdef _WIN32
-    handler = CreateWaitableTimerExA(
-        NULL,
-        NULL,
-        0,
-        TIMER_ALL_ACCESS
-    );
+    handler = CreateWaitableTimerExA(NULL, NULL, 0, TIMER_ALL_ACCESS);
     LVF_DEBUG_ASSERT(handler != NULL);
 #endif
 }
@@ -80,68 +75,60 @@ void AsyncLooper::loopStart()
         {
             _running = true;
 
-            loopFuture = std::async(std::launch::async, [this]()
+            loopFuture = std::async(std::launch::async, [this]() {
+                SetThreadName(_tag.c_str());
+                long long us = _rate > 0 ? 1000000 / _rate : 0;
+                long long reset_threshold = us * 4;
+
+                LARGE_INTEGER dueTime = {0};
+                dueTime.QuadPart = -(static_cast<long long>(us) * 10);
+
+                using namespace std::chrono;
+                using namespace std::chrono_literals;
+
+                tStart = duration_cast<microseconds>(high_resolution_clock::now().time_since_epoch()).count();
+
+                try
                 {
-                    SetThreadName(_tag.c_str());
-                    long long us = _rate > 0 ? 1000000 / _rate : 0;
-                    long long reset_threshold = us * 4;
-
-                    LARGE_INTEGER dueTime = { 0 };
-                    dueTime.QuadPart = -(static_cast<long long>(us) * 10);
-
-                    using namespace std::chrono;
-                    using namespace std::chrono_literals;
-
-                    tStart = duration_cast<microseconds>(high_resolution_clock::now().time_since_epoch()).count();
-
-                    try
+                    while (_running)
                     {
-                        while (_running)
+                        if (us > 0 && dueTime.QuadPart < 0)
                         {
-                            if (us > 0 && dueTime.QuadPart < 0)
-                            {
-                                SetWaitableTimerEx(
-                                    handler,
-                                    &dueTime,
-                                    0,
-                                    NULL,
-                                    NULL,
-                                    NULL,
-                                    0
-                                );
-                                //SleepEx(100, TRUE);
-                                WaitForSingleObjectEx(handler, 1000, TRUE);
-                            }
+                            SetWaitableTimerEx(handler, &dueTime, 0, NULL, NULL, NULL, 0);
+                            // SleepEx(100, TRUE);
+                            WaitForSingleObjectEx(handler, 1000, TRUE);
+                        }
 
-                            run();
+                        run();
 
-                            auto t2 = duration_cast<microseconds>(high_resolution_clock::now().time_since_epoch()).count();
+                        auto t2 = duration_cast<microseconds>(high_resolution_clock::now().time_since_epoch()).count();
 
-                            if (us > (t2 - tStart))
-                            {
-                                dueTime.QuadPart = -(static_cast<long long>(us - (t2 - tStart)) * 10);
-                            }
-                            else
-                            {
-                                dueTime.QuadPart = 0;
-                            }
+                        if (us > (t2 - tStart))
+                        {
+                            dueTime.QuadPart = -(static_cast<long long>(us - (t2 - tStart)) * 10);
+                        }
+                        else
+                        {
+                            dueTime.QuadPart = 0;
+                        }
 
-                            if ((t2 - tStart) < reset_threshold)
-                            {
-                                tStart += us;
-                            }
-                            else
-                            {
-                                tStart = t2;
-                            }
+                        if ((t2 - tStart) < reset_threshold)
+                        {
+                            tStart += us;
+                        }
+                        else
+                        {
+                            tStart = t2;
                         }
                     }
-                    catch (const std::exception& e)
-                    {
-                        LOG_ERROR << "[AsyncLooper] " << _tag << ": Exception: " << to_utf8(e.what(), eFileEncoding::LATIN1);
-                        throw;
-                    }
-                });
+                }
+                catch (const std::exception& e)
+                {
+                    LOG_ERROR << "[AsyncLooper] " << _tag
+                              << ": Exception: " << to_utf8(e.what(), eFileEncoding::LATIN1);
+                    throw;
+                }
+            });
         }
 
         if (_running)
@@ -184,8 +171,10 @@ void AsyncLooper::_loopWithSleep()
     while (_running)
     {
         run();
-        const long long sleep_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(
-            frameTimestampPrev + desiredFrameTimeBetweenFrames - std::chrono::high_resolution_clock::now()).count();
+        const long long sleep_duration =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(frameTimestampPrev + desiredFrameTimeBetweenFrames -
+                                                                 std::chrono::high_resolution_clock::now())
+                .count();
         preciseSleep(sleep_duration);
         frameTimestampPrev = std::chrono::high_resolution_clock::now();
     }
@@ -194,14 +183,16 @@ void AsyncLooper::_loopWithSleep()
 
 void AsyncLooper::loopStart()
 {
-    if (_running) return;
+    if (_running)
+        return;
     _running = true;
     handler = std::thread(&AsyncLooper::_loopWithSleep, this);
 }
 
 void AsyncLooper::loopEnd()
 {
-    if (!_running) return;
+    if (!_running)
+        return;
     _running = false;
     handler.join();
 }

@@ -18,10 +18,10 @@
 #include <unistd.h>
 
 #include <common/assert.h>
-#include <common/utils.h>
 #include <common/log.h>
+#include <common/utils.h>
 
-static std::thread::id s_main_thread {};
+static std::thread::id s_main_thread{};
 
 void SetThreadAsMainThread()
 {
@@ -70,16 +70,17 @@ void SetThreadName(const char* name)
 
 void panic(const char* title, const char* msg)
 {
-    fprintf(stderr, "PANIC! [%s] %s\n", title, msg); 
-    abort(); 
+    fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
+    abort();
 }
 
 Path GetExecutablePath()
 {
-    char fullpath[256] = { 0 };
+    char fullpath[256] = {0};
 
     char process_path[] = "/proc/self/exe";
-    const auto bytes = std::min(readlink(process_path, fullpath, sizeof(fullpath)), static_cast<ssize_t>(sizeof(fullpath) - 1));
+    const auto bytes =
+        std::min(readlink(process_path, fullpath, sizeof(fullpath)), static_cast<ssize_t>(sizeof(fullpath) - 1));
     if (bytes >= 0)
         fullpath[bytes] = '\0';
 
@@ -98,7 +99,8 @@ long long getFileLastWriteTime(const Path& p)
     return static_cast<long long>(sb.st_mtim.tv_sec);
 }
 
-namespace portable_strerror_r_detail {
+namespace portable_strerror_r_detail
+{
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 
@@ -146,7 +148,8 @@ bool lunaticvibes::open(const std::string& link)
 const char* lunaticvibes::safe_ctime(const std::time_t* timep, char* buf)
 {
     const char* out = ctime_r(timep, buf);
-    if (out == nullptr) return "";
+    if (out == nullptr)
+        return "";
     return out;
 }
 

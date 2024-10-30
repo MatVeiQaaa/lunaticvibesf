@@ -1,10 +1,10 @@
 #include "i18n.h"
 #include <fstream>
-#include <sstream>
 #include <re2/re2.h>
+#include <sstream>
 
-#include "common/utils.h"
 #include "common/meta.h"
+#include "common/utils.h"
 
 std::vector<i18n> i18n::languages;
 size_t i18n::currentLanguage = 0;
@@ -30,8 +30,8 @@ i18n::i18n(const Path& translationFile)
         if (i >= i18n_TEXT_COUNT)
             break;
 
-        static const RE2 regexIn{ "\\\\n" };
-        static const re2::StringPiece regexOut{ "\n" };
+        static const RE2 regexIn{"\\\\n"};
+        static const re2::StringPiece regexOut{"\n"};
         RE2::GlobalReplace(&line, regexIn, regexOut);
 
         text[i] = line;
@@ -48,7 +48,8 @@ void i18n::init()
     // other languages
     for (auto& f : fs::directory_iterator(Path(GAMEDATA_PATH) / "resources" / "translations"))
     {
-        if (fs::equivalent(f.path(), en)) continue;
+        if (fs::equivalent(f.path(), en))
+            continue;
 
         if (lunaticvibes::iequals(f.path().extension().string(), ".txt"))
         {
@@ -88,7 +89,7 @@ void i18n::setLanguage(const std::string& name)
 const std::string& i18n::s(size_t index)
 {
     static std::string emptyString;
-    if (index >= i18n_TEXT_COUNT) 
+    if (index >= i18n_TEXT_COUNT)
         return emptyString;
 
     return languages[currentLanguage].text[index];
@@ -98,7 +99,6 @@ const char* i18n::c(size_t index)
 {
     return s(index).c_str();
 }
-
 
 Languages i18n::getCurrentLanguage()
 {

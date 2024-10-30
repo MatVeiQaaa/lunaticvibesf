@@ -13,7 +13,8 @@ RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std
       RulesetBMS(std::move(format_), std::move(chart_), mods, keys, difficulty, health, side, fiveKeyMapIndex, nullptr),
       replay(std::move(replay_))
 {
-    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P || side == PlaySide::RIVAL || side == PlaySide::MYBEST);
+    LVF_DEBUG_ASSERT(side == PlaySide::AUTO || side == PlaySide::AUTO_DOUBLE || side == PlaySide::AUTO_2P ||
+                     side == PlaySide::RIVAL || side == PlaySide::MYBEST);
 
     if (fiveKeyMapIndex == -1)
     {
@@ -74,7 +75,8 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
         const lunaticvibes::Time replayT{
             _startTime.norm() + static_cast<long long>(std::round(itReplayCommand->ms * replayTimestampMultiplier)),
             false};
-        if (t < replayT) break;
+        if (t < replayT)
+            break;
 
         if (prevReplayT != 0 && replayT != prevReplayT)
             updateInput();
@@ -91,14 +93,15 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
         {
             keyPressing[it->second] = false;
         }
-        else switch (cmd)
+        else
+            switch (cmd)
             {
-            case ReplayChart::Commands::Type::S1A_PLUS:  playerScratchAccumulator[PLAYER_SLOT_PLAYER] = 0.0015; break;
+            case ReplayChart::Commands::Type::S1A_PLUS: playerScratchAccumulator[PLAYER_SLOT_PLAYER] = 0.0015; break;
             case ReplayChart::Commands::Type::S1A_MINUS: playerScratchAccumulator[PLAYER_SLOT_PLAYER] = -0.0015; break;
-            case ReplayChart::Commands::Type::S1A_STOP:  playerScratchAccumulator[PLAYER_SLOT_PLAYER] = 0; break;
-            case ReplayChart::Commands::Type::S2A_PLUS:  playerScratchAccumulator[PLAYER_SLOT_TARGET] = 0.0015; break;
+            case ReplayChart::Commands::Type::S1A_STOP: playerScratchAccumulator[PLAYER_SLOT_PLAYER] = 0; break;
+            case ReplayChart::Commands::Type::S2A_PLUS: playerScratchAccumulator[PLAYER_SLOT_TARGET] = 0.0015; break;
             case ReplayChart::Commands::Type::S2A_MINUS: playerScratchAccumulator[PLAYER_SLOT_TARGET] = -0.0015; break;
-            case ReplayChart::Commands::Type::S2A_STOP:  playerScratchAccumulator[PLAYER_SLOT_TARGET] = 0; break;
+            case ReplayChart::Commands::Type::S2A_STOP: playerScratchAccumulator[PLAYER_SLOT_TARGET] = 0; break;
             default: break;
             }
 

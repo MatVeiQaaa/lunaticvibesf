@@ -8,12 +8,12 @@
 
 #include "utils.h"
 
-template <size_t _Len>
-class Hash
+template <size_t _Len> class Hash
 {
 private:
-    unsigned char data[_Len] = { 0 };
+    unsigned char data[_Len] = {0};
     bool set = false;
+
 public:
     constexpr Hash() = default;
     explicit Hash(const std::string_view hex)
@@ -23,8 +23,7 @@ public:
         set = true;
         hex2bin(hex, data);
     }
-    template<size_t HexLen>
-    explicit Hash(const char(&hex)[HexLen])
+    template <size_t HexLen> explicit Hash(const char (&hex)[HexLen])
     {
         static_assert(HexLen - 1 == _Len * 2);
         set = true;
@@ -36,7 +35,11 @@ public:
     constexpr bool empty() const { return !set; }
     std::string hexdigest() const { return bin2hex(data, _Len); }
     constexpr const unsigned char* hex() const { return data; }
-    void reset() { set = false; memset(data, 0, _Len); }
+    void reset()
+    {
+        set = false;
+        memset(data, 0, _Len);
+    }
 
     bool operator<(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) < 0; }
     bool operator>(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) > 0; }
@@ -48,8 +51,7 @@ public:
     friend struct std::hash<Hash<_Len>>;
 };
 
-template<size_t _Len>
-struct std::hash<Hash<_Len>>
+template <size_t _Len> struct std::hash<Hash<_Len>>
 {
     size_t operator()(const Hash<_Len>& obj) const
     {

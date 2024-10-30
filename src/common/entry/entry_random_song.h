@@ -17,10 +17,7 @@ public:
 
     explicit EntryRandomChart(std::string name, std::string name2, Filter filter);
 
-    Filter filter() const
-    {
-        return _filter;
-    };
+    Filter filter() const { return _filter; };
 
 private:
     Filter _filter;

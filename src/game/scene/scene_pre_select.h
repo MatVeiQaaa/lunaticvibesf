@@ -2,7 +2,7 @@
 #include "scene.h"
 #include "scene_context.h"
 
-class ScenePreSelect: public SceneBase
+class ScenePreSelect : public SceneBase
 {
 public:
     ScenePreSelect();
@@ -22,7 +22,6 @@ protected:
 
     bool shouldShowImgui() const override;
     void updateImgui() override;
-
 
 protected:
     SongListProperties rootFolderProp;

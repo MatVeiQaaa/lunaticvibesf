@@ -6,8 +6,7 @@
 class EntryFolderArena : public EntryFolderBase
 {
 public:
-    EntryFolderArena(const std::string& name, const std::string& name2 = "") :
-        EntryFolderBase(HashMD5{}, name, name2)
+    EntryFolderArena(const std::string& name, const std::string& name2 = "") : EntryFolderBase(HashMD5{}, name, name2)
     {
         _type = eEntryType::ARENA_FOLDER;
     }
@@ -21,8 +20,8 @@ public:
         HOST_LOBBY,
         JOIN_LOBBY,
         LEAVE_LOBBY,
-
     };
+
 protected:
     Type cmdType = Type::HOST_LOBBY;
 

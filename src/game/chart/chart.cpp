@@ -10,7 +10,6 @@
 
 using namespace chart;
 
-
 // from NoteLaneIndex to Input::Pad
 const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
 {
@@ -19,8 +18,7 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
     switch (keys)
     {
     case 5:
-    case 10:
-    {
+    case 10: {
         static const std::vector<Input::Pad> pad[] = {
             {Input::Pad::S1L, Input::Pad::S1R}, // Sc1
             {Input::Pad::K11},
@@ -28,20 +26,25 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
             {Input::Pad::K13},
             {Input::Pad::K14},
             {Input::Pad::K15},
-            {},{},{},{},
+            {},
+            {},
+            {},
+            {},
             {Input::Pad::K21},
             {Input::Pad::K22},
             {Input::Pad::K23},
             {Input::Pad::K24},
             {Input::Pad::K25},
-            {},{},{},{},
+            {},
+            {},
+            {},
+            {},
             {Input::Pad::S2L, Input::Pad::S2R} // Sc2
         };
         return pad[idx];
     }
     case 7:
-    case 14:
-    {
+    case 14: {
         static const std::vector<Input::Pad> pad[] = {
             {Input::Pad::S1L, Input::Pad::S1R}, // Sc1
             {Input::Pad::K11},
@@ -51,7 +54,8 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
             {Input::Pad::K15},
             {Input::Pad::K16},
             {Input::Pad::K17},
-            {},{},
+            {},
+            {},
             {Input::Pad::K21},
             {Input::Pad::K22},
             {Input::Pad::K23},
@@ -59,13 +63,13 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
             {Input::Pad::K25},
             {Input::Pad::K26},
             {Input::Pad::K27},
-            {},{},
+            {},
+            {},
             {Input::Pad::S2L, Input::Pad::S2R} // Sc2
         };
         return pad[idx];
     }
-    case 9:
-    {
+    case 9: {
         static const std::vector<Input::Pad> pad[] = {
             {}, // Sc1
             {Input::Pad::K11},
@@ -77,7 +81,15 @@ const std::vector<Input::Pad>& chart::LaneToKey(int keys, size_t idx)
             {Input::Pad::K17},
             {Input::Pad::K18},
             {Input::Pad::K19},
-            {},{},{},{},{},{},{},{},{},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
+            {},
             {} // Sc2
         };
         return pad[idx];
@@ -96,21 +108,19 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
     switch (keys)
     {
     case 5:
-    case 10:
-    {
-        static constexpr NoteLaneIndex lane[4][Input::Pad::LANE_COUNT] =
-        {
+    case 10: {
+        static constexpr NoteLaneIndex lane[4][Input::Pad::LANE_COUNT] = {
             {
                 Sc1, Sc1, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _,
                 Sc2, Sc2, N21, N22, N23, N24, N25, _, _, _, _, _, _, _, _,
             },
             {
-                Sc1, Sc1, N11, N12, N13, N14, N15, _, _, _, _, _, _, _, _,
-                Sc2, Sc2, _, _, N21, N22, N23, N24, N25, _, _, _, _, _, _,
+                Sc1, Sc1, N11, N12, N13, N14, N15, _,   _,   _, _, _, _, _, _,
+                Sc2, Sc2, _,   _,   N21, N22, N23, N24, N25, _, _, _, _, _, _,
             },
             {
-                Sc1, Sc1, _, _, N11, N12, N13, N14, N15, _, _, _, _, _, _,
-                Sc2, Sc2, N21, N22, N23, N24, N25, _, _, _, _, _, _, _, _,
+                Sc1, Sc1, _,   _,   N11, N12, N13, N14, N15, _, _, _, _, _, _,
+                Sc2, Sc2, N21, N22, N23, N24, N25, _,   _,   _, _, _, _, _, _,
             },
             {
                 Sc1, Sc1, _, _, N11, N12, N13, N14, N15, _, _, _, _, _, _,
@@ -123,21 +133,16 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
         return lane[fiveKeyMapIndex][pad];
     }
     case 7:
-    case 14:
-    {
-        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] =
-        {
+    case 14: {
+        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] = {
             Sc1, Sc1, N11, N12, N13, N14, N15, N16, N17, _, _, _, _, _, _,
             Sc2, Sc2, N21, N22, N23, N24, N25, N26, N27, _, _, _, _, _, _,
         };
         return lane[pad];
     }
-    case 9:
-    {
-        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] =
-        {
-            _, _, N11, N12, N13, N14, N15, N16, N17, N18, N19, _, _, _, _,
-            _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
+    case 9: {
+        static constexpr NoteLaneIndex lane[Input::Pad::LANE_COUNT] = {
+            _, _, N11, N12, N13, N14, N15, N16, N17, N18, N19, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,
         };
         return lane[pad];
     }
@@ -145,9 +150,9 @@ chart::NoteLaneIndex chart::KeyToLane(int keys, Input::Pad pad)
     return _;
 }
 
-
-ChartObjectBase::ChartObjectBase(int slot, size_t pn, size_t en) :
-    _playerSlot(slot), _noteLists{}, _bgmNoteLists(pn), _specialNoteLists(en), _bgmNoteListIters(pn), _specialNoteListIters(en)
+ChartObjectBase::ChartObjectBase(int slot, size_t pn, size_t en)
+    : _playerSlot(slot), _noteLists{}, _bgmNoteLists(pn), _specialNoteLists(en), _bgmNoteListIters(pn),
+      _specialNoteListIters(en)
 {
     reset();
     _bpmNoteList.clear();
@@ -155,8 +160,8 @@ ChartObjectBase::ChartObjectBase(int slot, size_t pn, size_t en) :
     //_stopList.push_back({ 0, {0, 1}, 0.0, 0, 1.0 });
 }
 
-
-std::shared_ptr<ChartObjectBase> ChartObjectBase::createFromChartFormat(int slot, const std::shared_ptr<ChartFormatBase>& p)
+std::shared_ptr<ChartObjectBase> ChartObjectBase::createFromChartFormat(int slot,
+                                                                        const std::shared_ptr<ChartFormatBase>& p)
 {
     switch (p->type())
     {
@@ -171,20 +176,18 @@ std::shared_ptr<ChartObjectBase> ChartObjectBase::createFromChartFormat(int slot
             LOG_ERROR << "[chart] Load chart exception (" << e.what() << "): " << p->fileName;
             return nullptr;
         }
-    default:
-        LOG_WARNING << "[chart] Chart type unknown (" << int(p->type()) << "): " << p->fileName;
-        return nullptr;
+    default: LOG_WARNING << "[chart] Chart type unknown (" << int(p->type()) << "): " << p->fileName; return nullptr;
     }
 }
 
 void ChartObjectBase::reset()
 {
-    _currentBarTemp         = 0;
-    _currentMetreTemp        = 0;
-    _currentBPM         = _bpmNoteList.empty()? 150 : BPM(_bpmNoteList.front().fvalue);
-    _currentBeatLength    = lunaticvibes::Time::singleBeatLengthFromBPM(_currentBPM);
+    _currentBarTemp = 0;
+    _currentMetreTemp = 0;
+    _currentBPM = _bpmNoteList.empty() ? 150 : BPM(_bpmNoteList.front().fvalue);
+    _currentBeatLength = lunaticvibes::Time::singleBeatLengthFromBPM(_currentBPM);
     _lastChangedBPMTime = 0;
-    _lastChangedBPMMetre    = 0;
+    _lastChangedBPMMetre = 0;
 
     // reset notes
     for (auto& ch : _noteLists)
@@ -200,11 +203,11 @@ void ChartObjectBase::reset()
 
 void ChartObjectBase::resetNoteListsIterators()
 {
-    for (size_t i = 0; i < _noteLists.size(); ++i)         
-        _noteListIterators[i]  = _noteLists[i].begin();
-    for (size_t i = 0; i < _bgmNoteLists.size(); ++i)      
+    for (size_t i = 0; i < _noteLists.size(); ++i)
+        _noteListIterators[i] = _noteLists[i].begin();
+    for (size_t i = 0; i < _bgmNoteLists.size(); ++i)
         _bgmNoteListIters[i] = _bgmNoteLists[i].begin();
-    for (size_t i = 0; i < _specialNoteLists.size(); ++i)   
+    for (size_t i = 0; i < _specialNoteLists.size(); ++i)
         _specialNoteListIters[i] = _specialNoteLists[i].begin();
     _bpmNoteListIter = _bpmNoteList.begin();
 }
@@ -244,28 +247,28 @@ bool ChartObjectBase::isLastNoteBgm(size_t idx, const decltype(_bgmNoteLists)::v
 }
 bool ChartObjectBase::isLastNoteSpecial(size_t idx, const decltype(_specialNoteLists)::value_type::iterator& it) const
 {
-    return _specialNoteLists[idx].empty() || it == _specialNoteLists[idx].end(); 
+    return _specialNoteLists[idx].empty() || it == _specialNoteLists[idx].end();
 }
 bool ChartObjectBase::isLastNoteBpm(const decltype(_bpmNoteList)::iterator& it) const
 {
-	return _bpmNoteList.empty() || it == _bpmNoteList.end(); 
+    return _bpmNoteList.empty() || it == _bpmNoteList.end();
 }
 
 bool ChartObjectBase::isLastNote(NoteLaneCategory cat, size_t idx)
 {
-	return isLastNote(cat, idx, incomingNote(cat, idx));
+    return isLastNote(cat, idx, incomingNote(cat, idx));
 }
 bool ChartObjectBase::isLastNoteBgm(size_t channel)
 {
-	return isLastNoteBgm(channel, incomingNoteBgm(channel));
+    return isLastNoteBgm(channel, incomingNoteBgm(channel));
 }
 bool ChartObjectBase::isLastNoteSpecial(size_t channel)
 {
-	return isLastNoteSpecial(channel, incomingNoteSpecial(channel));
+    return isLastNoteSpecial(channel, incomingNoteSpecial(channel));
 }
 bool ChartObjectBase::isLastNoteBpm()
 {
-	return isLastNoteBpm(incomingNoteBpm());
+    return isLastNoteBpm(incomingNoteBpm());
 }
 
 auto ChartObjectBase::nextNote(NoteLaneCategory cat, size_t idx) -> NoteIterator&
@@ -295,7 +298,7 @@ lunaticvibes::Time ChartObjectBase::getBarLength(size_t bar)
     }
 
     auto l = _barTimestamp[bar + 1] - _barTimestamp[bar];
-	return l.hres() > 0 ? l : -1;
+    return l.hres() > 0 ? l : -1;
 }
 
 lunaticvibes::Time ChartObjectBase::getCurrentBarLength()
@@ -307,25 +310,25 @@ Metre ChartObjectBase::getBarMetre(size_t bar)
 {
     if (bar >= barMetreLength.size())
     {
-		return { 1, 1 };
+        return {1, 1};
     }
 
-	return barMetreLength[bar];
+    return barMetreLength[bar];
 }
 
 Metre ChartObjectBase::getCurrentBarMetre()
 {
-	return getBarMetre(_currentBarTemp);
+    return getBarMetre(_currentBarTemp);
 }
 
 Metre ChartObjectBase::getBarMetrePosition(size_t bar)
 {
     if (bar >= _barMetrePos.size())
     {
-		return Metre(LLONG_MAX, 1);
+        return Metre(LLONG_MAX, 1);
     }
 
-	return _barMetrePos[bar];
+    return _barMetrePos[bar];
 }
 
 void ChartObjectBase::update(const lunaticvibes::Time& rt)
@@ -374,7 +377,7 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
                 noteExpired.push_back(*it);
                 it = nextNote(cat, idx);
             }
-        } 
+        }
     }
 
     // Skip expired barline
@@ -405,7 +408,7 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
             noteBgmExpired.push_back(*it);
             it = nextNoteBgm(idx);
         }
-    } 
+    }
     // Skip expired extended note
     for (size_t idx = 0; idx < _specialNoteLists.size(); ++idx)
     {
@@ -425,9 +428,9 @@ void ChartObjectBase::update(const lunaticvibes::Time& rt)
 
     postUpdate(vt);
 
-	State::set(IndexNumber::_TEST1, _currentBarTemp);
-	State::set(IndexNumber::_TEST2, (int)std::floor(_currentMetreTemp * 1000));
-	
+    State::set(IndexNumber::_TEST1, _currentBarTemp);
+    State::set(IndexNumber::_TEST2, (int)std::floor(_currentMetreTemp * 1000));
+
     _currentBar = _currentBarTemp;
     _currentMetre = _currentMetreTemp;
 }

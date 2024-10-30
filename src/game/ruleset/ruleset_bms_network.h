@@ -39,9 +39,9 @@ public:
 public:
     struct PayloadInit
     {
-        int8_t randomLeft = 0; // PlayModifierRandomType
+        int8_t randomLeft = 0;  // PlayModifierRandomType
         int8_t randomRight = 0; // PlayModifierRandomType
-        int8_t gauge = 0;  // PlayModifierGaugeType
+        int8_t gauge = 0;       // PlayModifierGaugeType
         uint8_t assist_mask = 0;
         bool dpflip = false;
         double health = 1.0;
@@ -49,8 +49,7 @@ public:
         std::string modifierText;
         std::string modifierTextShort;
 
-        template<class Archive>
-        void serialize(Archive& ar)
+        template <class Archive> void serialize(Archive& ar)
         {
             ar(randomLeft);
             ar(randomRight);
@@ -83,8 +82,7 @@ public:
         bool isCleared = false;
         bool isFailed = false;
 
-        template<class Archive>
-        void serialize(Archive& ar)
+        template <class Archive> void serialize(Archive& ar)
         {
             ar(health);
             ar(acc);
@@ -102,4 +100,3 @@ public:
     static std::vector<unsigned char> packFrame(const std::shared_ptr<RulesetBMS>& local);
     bool unpackFrame(std::vector<unsigned char>& payload) override;
 };
-

@@ -1,6 +1,6 @@
 #include "sound_sample.h"
-#include "sound_mgr.h"
 #include "config/config_mgr.h"
+#include "sound_mgr.h"
 #include "soundset_lr2.h"
 
 void loadLR2Sound()
@@ -8,12 +8,12 @@ void loadLR2Sound()
     LOG_INFO << "[Sound] Load system samples from LR2 Soundset";
 
     Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+                                            ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
 
     SoundSetLR2 ss(path);
 
-    //SoundMgr::loadSysSample((path / ""), eSoundSample::BGM_TITLE, true);
-    //SoundMgr::loadSysSample((path / ""), eSoundSample::BGM_MODE, true);
+    // SoundMgr::loadSysSample((path / ""), eSoundSample::BGM_TITLE, true);
+    // SoundMgr::loadSysSample((path / ""), eSoundSample::BGM_MODE, true);
     SoundMgr::loadSysSample(ss.getPathBGMSelect(), eSoundSample::BGM_SELECT, true, true);
     SoundMgr::loadSysSample(ss.getPathBGMDecide(), eSoundSample::BGM_DECIDE, false);
 

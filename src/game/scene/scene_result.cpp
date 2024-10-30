@@ -42,7 +42,7 @@ SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
     {
         _inputAvailable |= INPUT_MASK_1P;
     }
-        
+
     if (gPlayContext.chartObj[PLAYER_SLOT_TARGET] != nullptr)
     {
         _inputAvailable |= INPUT_MASK_2P;
@@ -222,7 +222,8 @@ SceneResult::~SceneResult()
 
 void SceneResult::_updateAsync()
 {
-    if (gNextScene != SceneType::RESULT) return;
+    if (gNextScene != SceneType::RESULT)
+        return;
 
     if (gAppIsExiting)
     {
@@ -231,21 +232,11 @@ void SceneResult::_updateAsync()
 
     switch (state)
     {
-    case eResultState::DRAW:
-        updateDraw();
-        break;
-    case eResultState::STOP:
-        updateStop();
-        break;
-    case eResultState::RECORD:
-        updateRecord();
-        break;
-    case eResultState::FADEOUT:
-        updateFadeout();
-        break;
-    case eResultState::WAIT_ARENA:
-        updateWaitArena();
-        break;
+    case eResultState::DRAW: updateDraw(); break;
+    case eResultState::STOP: updateStop(); break;
+    case eResultState::RECORD: updateRecord(); break;
+    case eResultState::FADEOUT: updateFadeout(); break;
+    case eResultState::WAIT_ARENA: updateWaitArena(); break;
     }
 
     if (gArenaData.isOnline() && gArenaData.isExpired())
@@ -268,9 +259,7 @@ void SceneResult::updateDraw()
     }
 }
 
-void SceneResult::updateStop()
-{
-}
+void SceneResult::updateStop() {}
 
 void SceneResult::updateRecord()
 {
@@ -305,7 +294,7 @@ void SceneResult::updateRecord()
     gChartContext.chart = pChart;
 
     auto& nextChart = *gChartContext.chart;
-    //gChartContext.path = chart._filePath;
+    // gChartContext.path = chart._filePath;
     gChartContext.path = nextChart.absolutePath;
 
     // only reload resources if selected chart is different
@@ -318,7 +307,7 @@ void SceneResult::updateRecord()
     }
     gChartContext.hash = nextChart.fileHash;
 
-    //gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
+    // gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
     gChartContext.title = nextChart.title;
     gChartContext.title2 = nextChart.title2;
     gChartContext.artist = nextChart.artist;
@@ -344,7 +333,8 @@ void SceneResult::updateRecord()
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].gauge = gPlayContext.replayMybest->gaugeType;
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].assist_mask = gPlayContext.replayMybest->assistMask;
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].hispeedFix = gPlayContext.replayMybest->hispeedFix;
-                gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect = (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
+                gPlayContext.mods[PLAYER_SLOT_MYBEST].laneEffect =
+                    (PlayModifierLaneEffectType)gPlayContext.replayMybest->laneEffectType;
                 gPlayContext.mods[PLAYER_SLOT_MYBEST].DPFlip = gPlayContext.replayMybest->DPFlip;
             }
             else
@@ -366,15 +356,13 @@ void SceneResult::updateFadeout()
     {
         SoundMgr::stopNoteSamples();
 
-        std::string replayFileName = (boost::format("%04d%02d%02d-%02d%02d%02d.rep")
-            % State::get(IndexNumber::DATE_YEAR)
-            % State::get(IndexNumber::DATE_MON)
-            % State::get(IndexNumber::DATE_DAY)
-            % State::get(IndexNumber::DATE_HOUR)
-            % State::get(IndexNumber::DATE_MIN)
-            % State::get(IndexNumber::DATE_SEC)
-            ).str();
-        Path replayPath = ConfigMgr::Profile()->getPath() / "replay" / "chart" / gChartContext.hash.hexdigest() / replayFileName;
+        std::string replayFileName =
+            (boost::format("%04d%02d%02d-%02d%02d%02d.rep") % State::get(IndexNumber::DATE_YEAR) %
+             State::get(IndexNumber::DATE_MON) % State::get(IndexNumber::DATE_DAY) %
+             State::get(IndexNumber::DATE_HOUR) % State::get(IndexNumber::DATE_MIN) % State::get(IndexNumber::DATE_SEC))
+                .str();
+        Path replayPath =
+            ConfigMgr::Profile()->getPath() / "replay" / "chart" / gChartContext.hash.hexdigest() / replayFileName;
 
         // FIXME: save BEFORE fadeout, e.g. on entrance.
         // save replay
@@ -398,8 +386,7 @@ void SceneResult::updateFadeout()
             switch (format->type())
             {
             case eChartFormat::BMS:
-            case eChartFormat::BMSON:
-            {
+            case eChartFormat::BMSON: {
                 auto score = std::make_shared<ScoreBMS>();
 
                 auto& chart = gPlayContext.chartObj[PLAYER_SLOT_PLAYER];
@@ -456,7 +443,7 @@ void SceneResult::updateFadeout()
                 }
             }
         }
-        
+
         // check retry
         if (_retryRequested && gPlayContext.canRetry)
         {
@@ -496,17 +483,25 @@ void SceneResult::updateFadeout()
 
             if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER])
             {
-                gPlayContext.initialHealth[PLAYER_SLOT_PLAYER] = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().health;
-                gPlayContext.courseStageRulesetCopy[PLAYER_SLOT_PLAYER].push_back(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
-                gPlayContext.courseRunningCombo[PLAYER_SLOT_PLAYER] = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().combo;
-                gPlayContext.courseMaxCombo[PLAYER_SLOT_PLAYER] = gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().maxCombo;
+                gPlayContext.initialHealth[PLAYER_SLOT_PLAYER] =
+                    gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().health;
+                gPlayContext.courseStageRulesetCopy[PLAYER_SLOT_PLAYER].push_back(
+                    gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
+                gPlayContext.courseRunningCombo[PLAYER_SLOT_PLAYER] =
+                    gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().combo;
+                gPlayContext.courseMaxCombo[PLAYER_SLOT_PLAYER] =
+                    gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getData().maxCombo;
             }
             if (gPlayContext.ruleset[PLAYER_SLOT_TARGET])
             {
-                gPlayContext.initialHealth[PLAYER_SLOT_TARGET] = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().health;
-                gPlayContext.courseStageRulesetCopy[PLAYER_SLOT_TARGET].push_back(gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
-                gPlayContext.courseRunningCombo[PLAYER_SLOT_TARGET] = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().combo;
-                gPlayContext.courseMaxCombo[PLAYER_SLOT_TARGET] = gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().maxCombo;
+                gPlayContext.initialHealth[PLAYER_SLOT_TARGET] =
+                    gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().health;
+                gPlayContext.courseStageRulesetCopy[PLAYER_SLOT_TARGET].push_back(
+                    gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
+                gPlayContext.courseRunningCombo[PLAYER_SLOT_TARGET] =
+                    gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().combo;
+                gPlayContext.courseMaxCombo[PLAYER_SLOT_TARGET] =
+                    gPlayContext.ruleset[PLAYER_SLOT_TARGET]->getData().maxCombo;
             }
 
             gNextScene = lunaticvibes::advanceCourseStage(SceneType::COURSE_RESULT, SceneType::PLAY);
@@ -541,7 +536,8 @@ void SceneResult::updateWaitArena()
 // CALLBACK
 void SceneResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 
     if ((_inputAvailable & m & (INPUT_MASK_DECIDE | INPUT_MASK_CANCEL)).any() || m[Input::ESC])
     {
@@ -609,11 +605,9 @@ void SceneResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             }
             break;
 
-        case eResultState::FADEOUT:
-            break;
+        case eResultState::FADEOUT: break;
 
-        default:
-            break;
+        default: break;
         }
     }
 }
@@ -621,18 +615,19 @@ void SceneResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 // CALLBACK
 void SceneResult::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 
     if (state == eResultState::FADEOUT)
     {
         _retryRequested =
-            (_inputAvailable & m & INPUT_MASK_DECIDE).any() && 
-            (_inputAvailable & m & INPUT_MASK_CANCEL).any();
+            (_inputAvailable & m & INPUT_MASK_DECIDE).any() && (_inputAvailable & m & INPUT_MASK_CANCEL).any();
     }
 }
 
 // CALLBACK
 void SceneResult::inputGameRelease(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro) return;
+    if (t - State::get(IndexTimer::SCENE_START) < pSkin->info.timeIntro)
+        return;
 }

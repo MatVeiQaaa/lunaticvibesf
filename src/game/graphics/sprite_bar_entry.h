@@ -1,9 +1,9 @@
 #pragma once
-#include <cstdint>
-#include <memory>
-#include <array>
 #include "sprite.h"
 #include "sprite_imagetext.h"
+#include <array>
+#include <cstdint>
+#include <memory>
 
 using uint8_t = std::uint8_t;
 
@@ -27,13 +27,13 @@ enum class BarType : uint8_t
 
 enum class BarLevelType : uint8_t
 {
-    UNDEF,      // WHITE
-    BEGINNER,   // GREEN
-    NORMAL,     // BLUE
-    HYPER,      // YELLOW
-    ANOTHER,    // RED
-    INSANE,     // PURPLE
-    IRRANK,     // GREY
+    UNDEF,    // WHITE
+    BEGINNER, // GREEN
+    NORMAL,   // BLUE
+    HYPER,    // YELLOW
+    ANOTHER,  // RED
+    INSANE,   // PURPLE
+    IRRANK,   // GREY
     LEVEL_TYPE_COUNT
 };
 
@@ -44,7 +44,7 @@ enum class BarLampType : uint8_t
     EASY,
     NORMAL,
     HARD,
-    //PATK_OR_GATK, // LR2Skin actually uses 5 as Fullcombo index
+    // PATK_OR_GATK, // LR2Skin actually uses 5 as Fullcombo index
     FULLCOMBO,
     PERFECT,
     EXHARD,
@@ -92,25 +92,25 @@ class SkinLR2;
 class SpriteBarEntry : public SpriteBase, public iSpriteMouse
 {
     typedef std::shared_ptr<SpriteAnimated> psAnimated;
-    typedef std::shared_ptr<SpriteNumber>   psNumber;
-    typedef std::shared_ptr<SpriteOption>   psOption;
-    typedef std::shared_ptr<SpriteText>     psText;
+    typedef std::shared_ptr<SpriteNumber> psNumber;
+    typedef std::shared_ptr<SpriteOption> psOption;
+    typedef std::shared_ptr<SpriteText> psText;
 
     friend class SkinLR2;
 
 protected:
-    size_t      index = 0;
-    bool        available = false;
-    std::array<psAnimated, static_cast<size_t>(BarType::TYPE_COUNT)> sBodyOff{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarType::TYPE_COUNT)> sBodyOn{ nullptr };
-    std::array<psText, static_cast<size_t>(BarTitleType::TITLE_TYPE_COUNT)> sTitle{ nullptr };
-    psAnimated  sFlash{ nullptr };
-    std::array<psNumber, static_cast<size_t>(BarLevelType::LEVEL_TYPE_COUNT)> sLevel{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sLamp{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarRankType::RANK_TYPE_COUNT)> sRank{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarRivalType::RIVAL_TYPE_COUNT)> sRivalWinLose{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sRivalLampSelf{ nullptr };
-    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sRivalLampRival{ nullptr };
+    size_t index = 0;
+    bool available = false;
+    std::array<psAnimated, static_cast<size_t>(BarType::TYPE_COUNT)> sBodyOff{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarType::TYPE_COUNT)> sBodyOn{nullptr};
+    std::array<psText, static_cast<size_t>(BarTitleType::TITLE_TYPE_COUNT)> sTitle{nullptr};
+    psAnimated sFlash{nullptr};
+    std::array<psNumber, static_cast<size_t>(BarLevelType::LEVEL_TYPE_COUNT)> sLevel{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sLamp{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarRankType::RANK_TYPE_COUNT)> sRank{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarRivalType::RIVAL_TYPE_COUNT)> sRivalWinLose{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sRivalLampSelf{nullptr};
+    std::array<psAnimated, static_cast<size_t>(BarLampType::LAMP_TYPE_COUNT)> sRivalLampRival{nullptr};
     bool drawBodyOn = false;
     bool drawTitle = false;
     bool drawFlash = false;
@@ -134,7 +134,7 @@ public:
     ~SpriteBarEntry() override = default;
     int setBody(BarType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setFlash(const SpriteAnimated::SpriteAnimatedBuilder& builder);
-	int setLevel(BarLevelType type, const SpriteNumber::SpriteNumberBuilder& builder);
+    int setLevel(BarLevelType type, const SpriteNumber::SpriteNumberBuilder& builder);
     int setLamp(BarLampType type, const SpriteAnimated::SpriteAnimatedBuilder& builder);
     int setTitle(BarTitleType type, const SpriteText::SpriteTextBuilder& builder);
     int setTitle(BarTitleType type, const SpriteImageText::SpriteImageTextBuilder& builder);

@@ -10,7 +10,7 @@
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_select.h>
 
-static constexpr auto &&IN_MEMORY_DB_PATH = ":memory:";
+static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
 TEST(SceneSelect, SearchQueryScoreDeletionWorks)
 {

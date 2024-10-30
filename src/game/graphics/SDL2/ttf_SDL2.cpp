@@ -2,42 +2,46 @@
 
 #include <SDL_ttf.h>
 
-#include <common/assert.h>
 #include "common/log.h"
 #include "common/sysutil.h"
 #include "common/types.h"
+#include <common/assert.h>
 
-TTFFont::TTFFont(const Path& filePath, int ptsize): _filePath(filePath.u8string()), _ptsize(ptsize)
+TTFFont::TTFFont(const Path& filePath, int ptsize) : _filePath(filePath.u8string()), _ptsize(ptsize)
 {
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFont(_filePath.c_str(), ptsize); });
     if (!_pFont)
         LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
-    else loaded = true;
+    else
+        loaded = true;
 }
 
-TTFFont::TTFFont(const Path& filePath, int ptsize, int faceIndex) : _filePath(filePath.u8string()), _faceIndex(faceIndex), _ptsize(ptsize)
+TTFFont::TTFFont(const Path& filePath, int ptsize, int faceIndex)
+    : _filePath(filePath.u8string()), _faceIndex(faceIndex), _ptsize(ptsize)
 {
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFontIndex(_filePath.c_str(), ptsize, faceIndex); });
     if (!_pFont)
         LOG_WARNING << "[TTF] " << filePath << ": " << TTF_GetError();
-    else loaded = true;
+    else
+        loaded = true;
 }
 
 TTFFont::~TTFFont()
 {
-    if (!loaded) return;
+    if (!loaded)
+        return;
 
     if (_pFontOutline)
         pushAndWaitMainThreadTask<void>(std::bind(TTF_CloseFont, _pFontOutline));
-    if (_pFont) 
+    if (_pFont)
         pushAndWaitMainThreadTask<void>(std::bind(TTF_CloseFont, _pFont));
 }
-
 
 void TTFFont::setStyle(TTFStyle style)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    if (!loaded) return;
+    if (!loaded)
+        return;
 
     switch (style)
     {
@@ -50,7 +54,8 @@ void TTFFont::setStyle(TTFStyle style)
 void TTFFont::setOutline(int width, const Color& c)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    if (!loaded) return;
+    if (!loaded)
+        return;
 
     if (width == 0)
     {
@@ -76,20 +81,22 @@ void TTFFont::setOutline(int width, const Color& c)
 void TTFFont::setHinting(TTFHinting mode)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    if (!loaded) return;
+    if (!loaded)
+        return;
 
     switch (mode)
     {
-    case TTFHinting::Normal:    TTF_SetFontHinting(_pFont, TTF_HINTING_NORMAL); break;
-    case TTFHinting::Light:     TTF_SetFontHinting(_pFont, TTF_HINTING_LIGHT);  break;
-    case TTFHinting::Mono:      TTF_SetFontHinting(_pFont, TTF_HINTING_MONO);   break;
-    case TTFHinting::None_:     TTF_SetFontHinting(_pFont, TTF_HINTING_NONE);   break;
+    case TTFHinting::Normal: TTF_SetFontHinting(_pFont, TTF_HINTING_NORMAL); break;
+    case TTFHinting::Light: TTF_SetFontHinting(_pFont, TTF_HINTING_LIGHT); break;
+    case TTFHinting::Mono: TTF_SetFontHinting(_pFont, TTF_HINTING_MONO); break;
+    case TTFHinting::None_: TTF_SetFontHinting(_pFont, TTF_HINTING_NONE); break;
     }
 }
 void TTFFont::setKerning(bool enabled)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    if (!loaded) return;
+    if (!loaded)
+        return;
 
     TTF_SetFontKerning(_pFont, enabled);
 }
@@ -97,7 +104,8 @@ void TTFFont::setKerning(bool enabled)
 std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    if (!loaded) return nullptr;
+    if (!loaded)
+        return nullptr;
 
     SDL_Surface* surfaceText = TTF_RenderUTF8_Blended(_pFont, text, c);
     SDL_Rect rcText{};
@@ -107,8 +115,8 @@ std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
         SDL_Surface* surfaceOutline = TTF_RenderUTF8_Blended(_pFontOutline, text, _outlineColor);
 
         SDL_Rect rcTextInner = rcText;
-        //rcTextInner.x += (rcOutline.w - rcText.w) / 2;
-        //rcTextInner.y += (rcOutline.h - rcText.h) / 2;
+        // rcTextInner.x += (rcOutline.w - rcText.w) / 2;
+        // rcTextInner.y += (rcOutline.h - rcText.h) / 2;
         rcTextInner.x += _outlineWidth;
         rcTextInner.y += _outlineWidth;
         SDL_BlitSurface(surfaceText, &rcText, surfaceOutline, &rcTextInner);
@@ -127,9 +135,10 @@ std::shared_ptr<Texture> TTFFont::TextUTF8(const char* text, const Color& c)
 Rect TTFFont::getRectUTF8(const char* text)
 {
     LVF_DEBUG_ASSERT(IsMainThread());
-    Rect r{ 0, 0, 0, 0 };
+    Rect r{0, 0, 0, 0};
 
-    if (!loaded) return r;
+    if (!loaded)
+        return r;
     TTF_SizeUTF8(_pFontOutline ? _pFontOutline : _pFont, text, &r.w, &r.h);
     return r;
 }

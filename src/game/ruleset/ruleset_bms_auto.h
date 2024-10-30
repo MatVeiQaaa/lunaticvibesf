@@ -1,18 +1,18 @@
 #pragma once
 
-#include "ruleset_bms.h"
 #include "game/scene/scene_context.h"
+#include "ruleset_bms.h"
 
 class RulesetBMSAuto : public RulesetBMS
 {
 public:
     // fiveKeyMapIndex - if not 5k, set to -1.
-    RulesetBMSAuto(const std::shared_ptr<ChartFormatBase> &format, const std::shared_ptr<ChartObjectBase> &chart,
+    RulesetBMSAuto(const std::shared_ptr<ChartFormatBase>& format, const std::shared_ptr<ChartObjectBase>& chart,
                    PlayModifiers mods, GameModeKeys keys, JudgeDifficulty difficulty, double health, PlaySide side,
                    int fiveKeyMapIndex);
 
 protected:
-	double targetRate = 100.0;
+    double targetRate = 100.0;
     std::vector<JudgeArea> noteJudges;
     size_t judgeIndex = 0;
 
@@ -31,8 +31,8 @@ public:
     void updateRelease(InputMask& rg, const lunaticvibes::Time& t) override {}
     // Register to InputWrapper
     void updateAxis(double s1, double s2, const lunaticvibes::Time& t) override {}
-	// Called by ScenePlay
-	void update(const lunaticvibes::Time& t) override;
+    // Called by ScenePlay
+    void update(const lunaticvibes::Time& t) override;
 
     void fail() override;
 };

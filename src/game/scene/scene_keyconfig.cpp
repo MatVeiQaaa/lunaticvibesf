@@ -1,8 +1,8 @@
 #include "scene_keyconfig.h"
-#include "scene_context.h"
 #include "config/config_mgr.h"
-#include "game/sound/sound_mgr.h"
 #include "game/runtime/i18n.h"
+#include "game/sound/sound_mgr.h"
+#include "scene_context.h"
 #include <string_view>
 
 SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::KEY_CONFIG, 240)
@@ -57,7 +57,7 @@ SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneB
     State::set(IndexSwitch::KEY_CONFIG_SLOT8, false);
     State::set(IndexSwitch::KEY_CONFIG_SLOT9, false);
 
-    gKeyconfigContext.selecting = { Input::Pad::K11, 0 };
+    gKeyconfigContext.selecting = {Input::Pad::K11, 0};
     gKeyconfigContext.keys = 7;
     State::set(IndexSwitch::K11_CONFIG, true);
     State::set(IndexSwitch::KEY_CONFIG_SLOT0, true);
@@ -116,7 +116,8 @@ SceneKeyConfig::~SceneKeyConfig()
 
 void SceneKeyConfig::_updateAsync()
 {
-    if (gNextScene != SceneType::KEYCONFIG) return;
+    if (gNextScene != SceneType::KEYCONFIG)
+        return;
 
     if (gAppIsExiting)
     {
@@ -138,8 +139,10 @@ void SceneKeyConfig::_updateAsync()
     State::set(IndexNumber::_ANGLE_TT_2P, int(playerTurntableAngleAdd[1]) % 360);
     State::set(IndexNumber::SCRATCH_AXIS_1P_ANGLE, (360 + int(playerTurntableAngleAdd[0]) % 360) % 360 / 360.0 * 256);
     State::set(IndexNumber::SCRATCH_AXIS_2P_ANGLE, (360 + int(playerTurntableAngleAdd[1]) % 360) % 360 / 360.0 * 256);
-    State::set(IndexText::KEYCONFIG_1P_SCRATCH_ABS_VALUE, std::to_string(State::get(IndexNumber::SCRATCH_AXIS_1P_ANGLE)));
-    State::set(IndexText::KEYCONFIG_2P_SCRATCH_ABS_VALUE, std::to_string(State::get(IndexNumber::SCRATCH_AXIS_2P_ANGLE)));
+    State::set(IndexText::KEYCONFIG_1P_SCRATCH_ABS_VALUE,
+               std::to_string(State::get(IndexNumber::SCRATCH_AXIS_1P_ANGLE)));
+    State::set(IndexText::KEYCONFIG_2P_SCRATCH_ABS_VALUE,
+               std::to_string(State::get(IndexNumber::SCRATCH_AXIS_2P_ANGLE)));
 }
 
 void SceneKeyConfig::updateStart()
@@ -183,7 +186,7 @@ void SceneKeyConfig::updateFadeout()
 
     if (rt.norm() > pSkin->info.timeOutro)
     {
-        ConfigMgr::Input(gKeyconfigContext.keys)->save();   // this is kinda important
+        ConfigMgr::Input(gKeyconfigContext.keys)->save(); // this is kinda important
         gNextScene = SceneType::SELECT;
     }
 }
@@ -193,8 +196,10 @@ void SceneKeyConfig::updateFadeout()
 // CALLBACK
 void SceneKeyConfig::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
 {
-    if (m[Input::Pad::ESC]) exiting = true;
-    if (m[Input::Pad::M2]) exiting = true;
+    if (m[Input::Pad::ESC])
+        exiting = true;
+    if (m[Input::Pad::M2])
+        exiting = true;
 
     // individual keys
     for (size_t i = 0; i < Input::Pad::ESC; ++i)
@@ -217,34 +222,20 @@ void SceneKeyConfig::inputGameAxis(double S1, double S2, const lunaticvibes::Tim
     playerTurntableAngleAdd[PLAYER_SLOT_TARGET] += S2 * 2.0 * 360;
 }
 
-static const std::map<Input::Pad, IndexBargraph> forceBargraphMap =
-{
-    { Input::Pad::S1L,      IndexBargraph::FORCE_S1L },
-    { Input::Pad::S1R,      IndexBargraph::FORCE_S1R },
-    { Input::Pad::K1START,  IndexBargraph::FORCE_K1Start },
-    { Input::Pad::K1SELECT, IndexBargraph::FORCE_K1Select },
-    { Input::Pad::S2L,      IndexBargraph::FORCE_S2L },
-    { Input::Pad::S2R,      IndexBargraph::FORCE_S2R },
-    { Input::Pad::K2START,  IndexBargraph::FORCE_K2Start },
-    { Input::Pad::K2SELECT, IndexBargraph::FORCE_K2Select },
-    { Input::Pad::K11,      IndexBargraph::FORCE_K11 },
-    { Input::Pad::K12,      IndexBargraph::FORCE_K12 },
-    { Input::Pad::K13,      IndexBargraph::FORCE_K13 },
-    { Input::Pad::K14,      IndexBargraph::FORCE_K14 },
-    { Input::Pad::K15,      IndexBargraph::FORCE_K15 },
-    { Input::Pad::K16,      IndexBargraph::FORCE_K16 },
-    { Input::Pad::K17,      IndexBargraph::FORCE_K17 },
-    { Input::Pad::K18,      IndexBargraph::FORCE_K18 },
-    { Input::Pad::K19,      IndexBargraph::FORCE_K19 },
-    { Input::Pad::K21,      IndexBargraph::FORCE_K21 },
-    { Input::Pad::K22,      IndexBargraph::FORCE_K22 },
-    { Input::Pad::K23,      IndexBargraph::FORCE_K23 },
-    { Input::Pad::K24,      IndexBargraph::FORCE_K24 },
-    { Input::Pad::K25,      IndexBargraph::FORCE_K25 },
-    { Input::Pad::K26,      IndexBargraph::FORCE_K26 },
-    { Input::Pad::K27,      IndexBargraph::FORCE_K27 },
-    { Input::Pad::K28,      IndexBargraph::FORCE_K28 },
-    { Input::Pad::K29,      IndexBargraph::FORCE_K29 },
+static const std::map<Input::Pad, IndexBargraph> forceBargraphMap = {
+    {Input::Pad::S1L, IndexBargraph::FORCE_S1L},         {Input::Pad::S1R, IndexBargraph::FORCE_S1R},
+    {Input::Pad::K1START, IndexBargraph::FORCE_K1Start}, {Input::Pad::K1SELECT, IndexBargraph::FORCE_K1Select},
+    {Input::Pad::S2L, IndexBargraph::FORCE_S2L},         {Input::Pad::S2R, IndexBargraph::FORCE_S2R},
+    {Input::Pad::K2START, IndexBargraph::FORCE_K2Start}, {Input::Pad::K2SELECT, IndexBargraph::FORCE_K2Select},
+    {Input::Pad::K11, IndexBargraph::FORCE_K11},         {Input::Pad::K12, IndexBargraph::FORCE_K12},
+    {Input::Pad::K13, IndexBargraph::FORCE_K13},         {Input::Pad::K14, IndexBargraph::FORCE_K14},
+    {Input::Pad::K15, IndexBargraph::FORCE_K15},         {Input::Pad::K16, IndexBargraph::FORCE_K16},
+    {Input::Pad::K17, IndexBargraph::FORCE_K17},         {Input::Pad::K18, IndexBargraph::FORCE_K18},
+    {Input::Pad::K19, IndexBargraph::FORCE_K19},         {Input::Pad::K21, IndexBargraph::FORCE_K21},
+    {Input::Pad::K22, IndexBargraph::FORCE_K22},         {Input::Pad::K23, IndexBargraph::FORCE_K23},
+    {Input::Pad::K24, IndexBargraph::FORCE_K24},         {Input::Pad::K25, IndexBargraph::FORCE_K25},
+    {Input::Pad::K26, IndexBargraph::FORCE_K26},         {Input::Pad::K27, IndexBargraph::FORCE_K27},
+    {Input::Pad::K28, IndexBargraph::FORCE_K28},         {Input::Pad::K29, IndexBargraph::FORCE_K29},
 };
 
 void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvibes::Time& t)
@@ -357,12 +348,11 @@ void SceneKeyConfig::inputGamePressJoystick(JoystickMask& mask, size_t device, c
         // Pov, 4 directions each
         for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_POV_COUNT; ++index)
         {
-            static const std::pair<size_t, size_t> bitmask[] =
-            {
-                {static_cast<size_t>(base + index * 4 + 0), (1ul << 31)},   // LEFT
-                {static_cast<size_t>(base + index * 4 + 1), (1ul << 30)},   // DOWN
-                {static_cast<size_t>(base + index * 4 + 2), (1ul << 29)},   // UP
-                {static_cast<size_t>(base + index * 4 + 3), (1ul << 28)},   // RIGHT
+            static const std::pair<size_t, size_t> bitmask[] = {
+                {static_cast<size_t>(base + index * 4 + 0), (1ul << 31)}, // LEFT
+                {static_cast<size_t>(base + index * 4 + 1), (1ul << 30)}, // DOWN
+                {static_cast<size_t>(base + index * 4 + 2), (1ul << 29)}, // UP
+                {static_cast<size_t>(base + index * 4 + 3), (1ul << 28)}, // RIGHT
             };
             for (size_t i = 0; i < 4; ++i)
             {
@@ -452,8 +442,7 @@ void SceneKeyConfig::inputGameAbsoluteAxis(JoystickAxis& axis, size_t device, co
         if (axis[index] != -1.0)
         {
             const auto bindings = ConfigMgr::Input(keys)->getBindings(pad);
-            if (bindings.getType() != KeyMap::DeviceType::JOYSTICK ||
-                bindings.getJoystick().index != index)
+            if (bindings.getType() != KeyMap::DeviceType::JOYSTICK || bindings.getJoystick().index != index)
             {
                 KeyMap j(device, Input::Joystick::Type::AXIS_ABSOLUTE, index);
                 ConfigMgr::Input(keys)->bind(pad, j);
@@ -467,7 +456,6 @@ void SceneKeyConfig::inputGameAbsoluteAxis(JoystickAxis& axis, size_t device, co
         }
     }
 }
-
 
 void SceneKeyConfig::setInputBindingText(GameModeKeys keys, Input::Pad pad)
 {
@@ -519,8 +507,7 @@ void SceneKeyConfig::updateForceBargraphs()
         {
             const auto binding = input->getBindings(p);
             if (binding.getType() == KeyMap::DeviceType::JOYSTICK &&
-                binding.getJoystick().type == Input::Joystick::Type::BUTTON &&
-                binding.getJoystick().index == index)
+                binding.getJoystick().type == Input::Joystick::Type::BUTTON && binding.getJoystick().index == index)
             {
                 if (isButtonPressed(binding.getJoystick(), 0.0))
                 {
@@ -558,7 +545,8 @@ void SceneKeyConfig::updateForceBargraphs()
                 binding.getJoystick().type == Input::Joystick::Type::AXIS_RELATIVE_POSITIVE &&
                 binding.getJoystick().index == index)
             {
-                double axis = _input.getJoystickAxis(binding.getJoystick().device, Input::Joystick::Type::AXIS_RELATIVE_POSITIVE, index);
+                double axis = _input.getJoystickAxis(binding.getJoystick().device,
+                                                     Input::Joystick::Type::AXIS_RELATIVE_POSITIVE, index);
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
@@ -577,7 +565,8 @@ void SceneKeyConfig::updateForceBargraphs()
                 binding.getJoystick().type == Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE &&
                 binding.getJoystick().index == index)
             {
-                double axis = _input.getJoystickAxis(binding.getJoystick().device, Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE, index);
+                double axis = _input.getJoystickAxis(binding.getJoystick().device,
+                                                     Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE, index);
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
@@ -590,8 +579,7 @@ void SceneKeyConfig::updateForceBargraphs()
     for (auto& [pad, bar] : forceBargraphMap)
     {
         if (forceBargraphTriggerTimestamp.find(pad) != forceBargraphTriggerTimestamp.end() &&
-            forceBargraphTriggerTimestamp[pad] != 0 &&
-            t - forceBargraphTriggerTimestamp[pad] > 200)  // 1s timeout
+            forceBargraphTriggerTimestamp[pad] != 0 && t - forceBargraphTriggerTimestamp[pad] > 200) // 1s timeout
         {
             State::set(bar, 0.0);
         }

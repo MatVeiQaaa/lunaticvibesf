@@ -13,7 +13,8 @@ namespace lr2skin::slider
 
 void select_pos(double p)
 {
-    if (gSelectContext.entries.empty()) return;
+    if (gSelectContext.entries.empty())
+        return;
     // TODO: allow smooth dragging. It currently snaps to closest possible value.
     size_t idx_new = (size_t)std::floor(p * gSelectContext.entries.size());
     if (idx_new != gSelectContext.selectedEntryIndex)
@@ -105,7 +106,6 @@ static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
     return {};
 };
 
-
 void fx0(int idx, double p)
 {
     State::set(idx == 0 ? IndexSlider::FX0_P1 : IndexSlider::FX0_P2, p);
@@ -173,8 +173,7 @@ void updatePitchState(int val)
             SoundMgr::setSpeed(f);
             gSelectContext.pitchSpeed = f;
             break;
-        default:
-            break;
+        default: break;
         }
     }
 }
@@ -201,39 +200,123 @@ void deadzone(int type, double p)
     {
     case Option::KEYCFG_5: keys = 5; break;
     case Option::KEYCFG_7: keys = 7; break;
-    case Option::KEYCFG_9: keys = 9; break; 
+    case Option::KEYCFG_9: keys = 9; break;
     default: return;
     }
     switch (type)
     {
-    case 31: State::set(IndexSlider::DEADZONE_K11, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K11, p); break;
-    case 32: State::set(IndexSlider::DEADZONE_K12, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K12, p); break;
-    case 33: State::set(IndexSlider::DEADZONE_K13, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K13, p); break;
-    case 34: State::set(IndexSlider::DEADZONE_K14, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K14, p); break;
-    case 35: State::set(IndexSlider::DEADZONE_K15, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K15, p); break;
-    case 36: State::set(IndexSlider::DEADZONE_K16, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K16, p); break;
-    case 37: State::set(IndexSlider::DEADZONE_K17, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K17, p); break;
-    case 38: State::set(IndexSlider::DEADZONE_K18, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K18, p); break;
-    case 39: State::set(IndexSlider::DEADZONE_K19, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K19, p); break;
-    case 40: State::set(IndexSlider::DEADZONE_K1Start, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K1Start, p); break;
-    case 41: State::set(IndexSlider::DEADZONE_K1Select, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K1Select, p); break;
-    case 42: State::set(IndexSlider::DEADZONE_S1L, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S1L, p); break;
-    case 43: State::set(IndexSlider::DEADZONE_S1R, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S1R, p); break;
-    case 44: State::set(IndexSlider::SPEED_S1A, p); ConfigMgr::Input(keys)->set(I_INPUT_SPEED_S1A, p); break;
-    case 51: State::set(IndexSlider::DEADZONE_K21, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K21, p); break;
-    case 52: State::set(IndexSlider::DEADZONE_K22, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K22, p); break;
-    case 53: State::set(IndexSlider::DEADZONE_K23, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K23, p); break;
-    case 54: State::set(IndexSlider::DEADZONE_K24, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K24, p); break;
-    case 55: State::set(IndexSlider::DEADZONE_K25, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K25, p); break;
-    case 56: State::set(IndexSlider::DEADZONE_K26, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K26, p); break;
-    case 57: State::set(IndexSlider::DEADZONE_K27, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K27, p); break;
-    case 58: State::set(IndexSlider::DEADZONE_K28, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K28, p); break;
-    case 59: State::set(IndexSlider::DEADZONE_K29, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K29, p); break;
-    case 60: State::set(IndexSlider::DEADZONE_K2Start, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K2Start, p); break;
-    case 61: State::set(IndexSlider::DEADZONE_K2Select, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K2Select, p); break;
-    case 62: State::set(IndexSlider::DEADZONE_S2L, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S2L, p); break;
-    case 63: State::set(IndexSlider::DEADZONE_S2R, p); ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S2R, p); break;
-    case 64: State::set(IndexSlider::SPEED_S2A, p); ConfigMgr::Input(keys)->set(I_INPUT_SPEED_S2A, p); break;
+    case 31:
+        State::set(IndexSlider::DEADZONE_K11, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K11, p);
+        break;
+    case 32:
+        State::set(IndexSlider::DEADZONE_K12, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K12, p);
+        break;
+    case 33:
+        State::set(IndexSlider::DEADZONE_K13, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K13, p);
+        break;
+    case 34:
+        State::set(IndexSlider::DEADZONE_K14, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K14, p);
+        break;
+    case 35:
+        State::set(IndexSlider::DEADZONE_K15, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K15, p);
+        break;
+    case 36:
+        State::set(IndexSlider::DEADZONE_K16, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K16, p);
+        break;
+    case 37:
+        State::set(IndexSlider::DEADZONE_K17, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K17, p);
+        break;
+    case 38:
+        State::set(IndexSlider::DEADZONE_K18, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K18, p);
+        break;
+    case 39:
+        State::set(IndexSlider::DEADZONE_K19, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K19, p);
+        break;
+    case 40:
+        State::set(IndexSlider::DEADZONE_K1Start, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K1Start, p);
+        break;
+    case 41:
+        State::set(IndexSlider::DEADZONE_K1Select, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K1Select, p);
+        break;
+    case 42:
+        State::set(IndexSlider::DEADZONE_S1L, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S1L, p);
+        break;
+    case 43:
+        State::set(IndexSlider::DEADZONE_S1R, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S1R, p);
+        break;
+    case 44:
+        State::set(IndexSlider::SPEED_S1A, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_SPEED_S1A, p);
+        break;
+    case 51:
+        State::set(IndexSlider::DEADZONE_K21, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K21, p);
+        break;
+    case 52:
+        State::set(IndexSlider::DEADZONE_K22, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K22, p);
+        break;
+    case 53:
+        State::set(IndexSlider::DEADZONE_K23, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K23, p);
+        break;
+    case 54:
+        State::set(IndexSlider::DEADZONE_K24, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K24, p);
+        break;
+    case 55:
+        State::set(IndexSlider::DEADZONE_K25, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K25, p);
+        break;
+    case 56:
+        State::set(IndexSlider::DEADZONE_K26, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K26, p);
+        break;
+    case 57:
+        State::set(IndexSlider::DEADZONE_K27, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K27, p);
+        break;
+    case 58:
+        State::set(IndexSlider::DEADZONE_K28, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K28, p);
+        break;
+    case 59:
+        State::set(IndexSlider::DEADZONE_K29, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K29, p);
+        break;
+    case 60:
+        State::set(IndexSlider::DEADZONE_K2Start, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K2Start, p);
+        break;
+    case 61:
+        State::set(IndexSlider::DEADZONE_K2Select, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_K2Select, p);
+        break;
+    case 62:
+        State::set(IndexSlider::DEADZONE_S2L, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S2L, p);
+        break;
+    case 63:
+        State::set(IndexSlider::DEADZONE_S2R, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_DEADZONE_S2R, p);
+        break;
+    case 64:
+        State::set(IndexSlider::SPEED_S2A, p);
+        ConfigMgr::Input(keys)->set(I_INPUT_SPEED_S2A, p);
+        break;
     }
     InputMgr::updateDeadzones(keys);
 }
@@ -246,14 +329,11 @@ std::function<void(double)> getSliderCallback(int type)
     using namespace std::placeholders;
     switch (type)
     {
-    case 1:
-        return std::bind(select_pos, _1);
+    case 1: return std::bind(select_pos, _1);
 
-    case 7:
-        return std::bind(customize_scrollbar, _1);
+    case 7: return std::bind(customize_scrollbar, _1);
 
-    case 8:
-        return std::bind(ir_ranking_scrollbar, _1);
+    case 8: return std::bind(ir_ranking_scrollbar, _1);
 
     case 10:
     case 11:
@@ -261,30 +341,19 @@ std::function<void(double)> getSliderCallback(int type)
     case 13:
     case 14:
     case 15:
-    case 16:
-        return std::bind(eq, type - 10, _1);
+    case 16: return std::bind(eq, type - 10, _1);
 
-    case 17:
-        return std::bind(master_volume, _1);
-    case 18:
-        return std::bind(key_volume, _1);
-    case 19:
-        return std::bind(bgm_volume, _1);
+    case 17: return std::bind(master_volume, _1);
+    case 18: return std::bind(key_volume, _1);
+    case 19: return std::bind(bgm_volume, _1);
 
-    case 20:
-        return std::bind(fx0, 0, _1);
-    case 21:
-        return std::bind(fx0, 1, _1);
-    case 22:
-        return std::bind(fx1, 0, _1);
-    case 23:
-        return std::bind(fx1, 1, _1);
-    case 24:
-        return std::bind(fx2, 0, _1);
-    case 25:
-        return std::bind(fx2, 1, _1);
-    case 26:
-        return std::bind(pitch, _1);
+    case 20: return std::bind(fx0, 0, _1);
+    case 21: return std::bind(fx0, 1, _1);
+    case 22: return std::bind(fx1, 0, _1);
+    case 23: return std::bind(fx1, 1, _1);
+    case 24: return std::bind(fx2, 0, _1);
+    case 25: return std::bind(fx2, 1, _1);
+    case 26: return std::bind(pitch, _1);
 
     case 31:
     case 32:
@@ -313,13 +382,10 @@ std::function<void(double)> getSliderCallback(int type)
     case 61:
     case 62:
     case 63:
-    case 64:
-        return std::bind(deadzone, type, _1);
+    case 64: return std::bind(deadzone, type, _1);
 
-    default:
-        return [](double) {};
+    default: return [](double) {};
     }
 }
 
-
-}
+} // namespace lr2skin::slider

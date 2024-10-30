@@ -1,22 +1,24 @@
 #include "chartformat_bms.h"
 #include "common/log.h"
-#include <iostream>
-#include <fstream>
-#include <optional>
-#include <set>
-#include <utility>
 #include <exception>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <numeric>
+#include <optional>
 #include <random>
+#include <set>
+#include <utility>
 
-#include <common/assert.h>
 #include "common/encoding.h"
 #include "common/utils.h"
 #include "re2/re2.h"
 #include <boost/algorithm/string.hpp>
+#include <common/assert.h>
 
-class noteLineException : public std::exception {};
+class noteLineException : public std::exception
+{
+};
 
 using lunaticvibes::parser_bms::JudgeDifficulty;
 
@@ -38,13 +40,15 @@ std::optional<JudgeDifficulty> lunaticvibes::parser_bms::parse_rank(const int va
     abort(); // unreachable.
 }
 
-ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta() {
+ChartFormatBMS::ChartFormatBMS() : ChartFormatBMSMeta()
+{
     wavFiles.resize(MAXSAMPLEIDX + 1);
     bgaFiles.resize(MAXSAMPLEIDX + 1);
     metres.resize(MAXBARIDX + 1);
 }
 
-ChartFormatBMS::ChartFormatBMS(const Path& filePath, uint64_t randomSeed): ChartFormatBMSMeta() {
+ChartFormatBMS::ChartFormatBMS(const Path& filePath, uint64_t randomSeed) : ChartFormatBMSMeta()
+{
     wavFiles.resize(MAXSAMPLEIDX + 1);
     bgaFiles.resize(MAXSAMPLEIDX + 1);
     metres.resize(MAXBARIDX + 1);
@@ -56,8 +60,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     using err = ErrorCode;
     if (loaded)
     {
-        //errorCode = err::ALREADY_INITIALIZED;
-        //errorLine = 0;
+        // errorCode = err::ALREADY_INITIALIZED;
+        // errorLine = 0;
         return 1;
     }
 
@@ -104,13 +108,15 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     for (StringContent lineBuf, lineBuf_; std::getline(bmsFile, lineBuf_);)
     {
         srcLine++;
-        if (lineBuf_.length() <= 1) continue;
+        if (lineBuf_.length() <= 1)
+            continue;
 
         lunaticvibes::trim_in_place(lineBuf_);
         lunaticvibes::to_utf8(lineBuf_, encoding, lineBuf);
 
         StringContentView buf(lineBuf);
-        if (buf[0] != '#') continue;
+        if (buf[0] != '#')
+            continue;
 
         // parsing
         try
@@ -121,12 +127,13 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
             if (!randomUsedValues.empty() && static_cast<int>(randomUsedValues.top().size()) < randomValue.top())
             {
                 StringContentView v = buf;
-                if (ifValue.empty() && !v.empty() && v[0] == '#' &&
-                    !lunaticvibes::iequals(v.substr(0, 3), "#IF") &&
+                if (ifValue.empty() && !v.empty() && v[0] == '#' && !lunaticvibes::iequals(v.substr(0, 3), "#IF") &&
                     !lunaticvibes::iequals(v.substr(0, 6), "#ENDIF") &&
                     !lunaticvibes::iequals(v.substr(0, 10), "#ENDRANDOM"))
                 {
-                    LOG_WARNING << "[BMS] definition found after all IF blocks finished, assuming #ENDRANDOM is missing. " << absolutePath << "@" << srcLine;
+                    LOG_WARNING
+                        << "[BMS] definition found after all IF blocks finished, assuming #ENDRANDOM is missing. "
+                        << absolutePath << "@" << srcLine;
                     randomValueMax.pop();
                     randomValue.pop();
                     randomUsedValues.pop();
@@ -140,7 +147,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 int iValue = toInt(value);
                 if (iValue == 0)
                 {
-                    LOG_WARNING << "[BMS] Invalid #RANDOM value found. " << absolutePath  << "@" << srcLine;
+                    LOG_WARNING << "[BMS] Invalid #RANDOM value found. " << absolutePath << "@" << srcLine;
                     continue;
                 }
 
@@ -175,7 +182,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         // one level control flow
                         if (!ifValue.empty())
                         {
-                            LOG_WARNING << "[BMS] unexpected #IF found, assuming #ENDIF is missing. " << absolutePath << "@" << srcLine;
+                            LOG_WARNING << "[BMS] unexpected #IF found, assuming #ENDIF is missing. " << absolutePath
+                                        << "@" << srcLine;
                             randomUsedValues.top().emplace(ifValue.top());
                             ifValue.pop();
                         }
@@ -218,7 +226,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     }
                 }
 
-                if (!randomUsedValues.empty() && static_cast<int>(randomUsedValues.top().size()) == randomValueMax.top())
+                if (!randomUsedValues.empty() &&
+                    static_cast<int>(randomUsedValues.top().size()) == randomValueMax.top())
                 {
                     randomValueMax.pop();
                     randomValue.pop();
@@ -246,22 +255,25 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 }
             }
 
-            static LazyRE2 regexNote{ R"(#[\d]{3}[0-9A-Za-z]{2}:.*)" };
+            static LazyRE2 regexNote{R"(#[\d]{3}[0-9A-Za-z]{2}:.*)"};
             if (!RE2::FullMatch(re2::StringPiece(buf.data(), buf.length()), *regexNote))
             {
                 auto spacePos = std::min(buf.length(), buf.find_first_of(' '));
-                if (spacePos <= 1) continue;
+                if (spacePos <= 1)
+                    continue;
 
                 StringContentView key = buf.substr(1, spacePos - 1);
                 StringContentView value = spacePos < buf.length() ? buf.substr(spacePos + 1) : "";
 
-                static LazyRE2 regexWav{ R"((?i)WAV[0-9A-Za-z]{1,2})" };
-                static LazyRE2 regexBga{ R"((?i)BMP[0-9A-Za-z]{1,2})" };
-                static LazyRE2 regexBpm{ R"((?i)BPM[0-9A-Za-z]{1,2})" };
-                static LazyRE2 regexStop{ R"((?i)STOP[0-9A-Za-z]{1,2})" };
+                static LazyRE2 regexWav{R"((?i)WAV[0-9A-Za-z]{1,2})"};
+                static LazyRE2 regexBga{R"((?i)BMP[0-9A-Za-z]{1,2})"};
+                static LazyRE2 regexBpm{R"((?i)BPM[0-9A-Za-z]{1,2})"};
+                static LazyRE2 regexStop{R"((?i)STOP[0-9A-Za-z]{1,2})"};
 
-                if (key.empty()) continue;
-                if (value.empty()) continue;
+                if (key.empty())
+                    continue;
+                if (value.empty())
+                    continue;
 
                 // https://hitkey.nekokan.dyndns.info/cmds.htm
                 // digits
@@ -357,7 +369,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 {
                     int idx = base36(key[3], key[4]);
                     wavFiles[idx].assign(value.begin(), value.end());
-                    if (!ifStack.empty()) resourceStable = false;
+                    if (!ifStack.empty())
+                        resourceStable = false;
                 }
                 else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexBga))
                 {
@@ -365,7 +378,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     if (idx != 0)
                     {
                         bgaFiles[idx].assign(value.begin(), value.end());
-                        if (!ifStack.empty()) resourceStable = false;
+                        if (!ifStack.empty())
+                            resourceStable = false;
                     }
                 }
                 else if (RE2::FullMatch(re2::StringPiece(key.data(), key.length()), *regexBpm))
@@ -413,35 +427,35 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                     {
                         switch (_y)
                         {
-                        case 1:            // 01: BGM
+                        case 1: // 01: BGM
                             seqToLane36(chBGM[bgmLayersCount[bar]][bar], value);
                             ++bgmLayersCount[bar];
                             break;
-                        case 2:            // 02: Bar Length
+                        case 2: // 02: Bar Length
                             metres[bar] = toDouble(value);
                             haveMetricMod = true;
                             break;
-                        case 3:            // 03: BPM change
+                        case 3: // 03: BPM change
                             seqToLane16(chBPMChange[bar], value);
                             haveBPMChange = true;
                             break;
-                        case 4:            // 04: BGA Base
+                        case 4: // 04: BGA Base
                             seqToLane36(chBGABase[bar], value);
                             haveBGA = true;
                             break;
-                        case 6:            // 06: BGA Poor
+                        case 6: // 06: BGA Poor
                             seqToLane36(chBGAPoor[bar], value);
                             haveBGA = true;
                             break;
-                        case 7:            // 07: BGA Layer
+                        case 7: // 07: BGA Layer
                             seqToLane36(chBGALayer[bar], value);
                             haveBGA = true;
                             break;
-                        case 8:            // 08: ExBPM
+                        case 8: // 08: ExBPM
                             seqToLane36(chExBPMChange[bar], value);
                             haveBPMChange = true;
                             break;
-                        case 9:            // 09: Stop
+                        case 9: // 09: Stop
                             seqToLane36(chStop[bar], value);
                             haveStop = true;
                             break;
@@ -462,27 +476,31 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                         {
                             switch (x_)
                             {
-                            case 1:            // 1x: 1P visible
-                            case 2:            // 2x: 2P visible
+                            case 1: // 1x: 1P visible
+                            case 2: // 2x: 2P visible
                                 seqToLane36(chNotesRegular[chIdx][bar], value);
                                 haveNote = true;
-                                if (side == 1) haveAny_2 = true;
+                                if (side == 1)
+                                    haveAny_2 = true;
                                 break;
-                            case 3:            // 3x: 1P invisible
-                            case 4:            // 4x: 2P invisible
+                            case 3: // 3x: 1P invisible
+                            case 4: // 4x: 2P invisible
                                 seqToLane36(chNotesInvisible[chIdx][bar], value);
                                 haveInvisible = true;
-                                if (side == 1) haveAny_2 = true;
+                                if (side == 1)
+                                    haveAny_2 = true;
                                 break;
-                            case 5:            // 5x: 1P LN
-                            case 6:            // 6x: 2P LN
+                            case 5: // 5x: 1P LN
+                            case 6: // 6x: 2P LN
                                 haveLNchannels = true;
                                 if (!lnobjSet.empty())
                                 {
-                                    // Note: there is so many possibilities of conflicting LN definition. Add all LN channel notes as regular notes
+                                    // Note: there is so many possibilities of conflicting LN definition. Add all LN
+                                    // channel notes as regular notes
                                     channel noteLane;
                                     seqToLane36(noteLane, value, channel::NoteParseValue::LN);
-                                    unsigned scale = chNotesRegular[chIdx][bar].relax(noteLane.resolution) / noteLane.resolution;
+                                    unsigned scale =
+                                        chNotesRegular[chIdx][bar].relax(noteLane.resolution) / noteLane.resolution;
                                     for (auto& note : noteLane.notes)
                                     {
                                         note.segment *= scale;
@@ -490,7 +508,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                                         channel& chTarget = chNotesRegular[chIdx][bar];
                                         for (auto it = chTarget.notes.begin(); it != chTarget.notes.end(); ++it)
                                         {
-                                            if (it->segment > note.segment || (it->segment == note.segment && it->value > note.value))
+                                            if (it->segment > note.segment ||
+                                                (it->segment == note.segment && it->value > note.value))
                                             {
                                                 chTarget.notes.insert(it, note);
                                                 noteInserted = true;
@@ -508,11 +527,12 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                                     // #LNTYPE 1
                                     seqToLane36(chNotesLN[chIdx][bar], value, channel::NoteParseValue::LN);
                                     haveLN = true;
-                                    if (side == 1) haveAny_2 = true;
+                                    if (side == 1)
+                                        haveAny_2 = true;
                                 }
                                 break;
-                            case 0xD:        // Dx: 1P mine
-                            case 0xE:        // Ex: 2P mine
+                            case 0xD: // Dx: 1P mine
+                            case 0xE: // Ex: 2P mine
                                 seqToLane36(chMines[chIdx][bar], value);
                                 haveMine = true;
                                 break;
@@ -574,13 +594,9 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit subtitle
     if (title2.empty())
     {
-        static const LazyRE2 subTitleRegex[]
-        {
-            { R"((.+?) *(-.*?-))" },
-            { R"((.+?) *(〜.*?〜))" },
-            { R"((.+?) *(\(.*?\)))" },
-            { R"((.+?) *(\[.*?\]))" },
-            { R"((.+?) *(<.*?>))" },
+        static const LazyRE2 subTitleRegex[]{
+            {R"((.+?) *(-.*?-))"},   {R"((.+?) *(〜.*?〜))"}, {R"((.+?) *(\(.*?\)))"},
+            {R"((.+?) *(\[.*?\]))"}, {R"((.+?) *(<.*?>))"},
         };
         for (auto& reg : subTitleRegex)
         {
@@ -597,13 +613,12 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     // implicit difficulty
     if (!hasDifficulty)
     {
-        static const LazyRE2 difficultyRegex[]
-        {
-            { "" },
-            { R"((?i)(easy|beginner|light))" },
-            { R"((?i)(normal|standard))" },
-            { R"((?i)(hard|hyper))" },
-            { R"((?i)(ex|another|insane|lunatic|maniac))" },
+        static const LazyRE2 difficultyRegex[]{
+            {""},
+            {R"((?i)(easy|beginner|light))"},
+            {R"((?i)(normal|standard))"},
+            {R"((?i)(hard|hyper))"},
+            {R"((?i)(ex|another|insane|lunatic|maniac))"},
         };
         difficulty = 2; // defaults to normal
         for (int i = 4; i >= 1; --i)
@@ -635,7 +650,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     {
         for (unsigned chIdx = 0; chIdx < 20; ++chIdx)
         {
-            if (chNotesRegular.find(chIdx) == chNotesRegular.end()) continue;
+            if (chNotesRegular.find(chIdx) == chNotesRegular.end())
+                continue;
 
             decltype(std::declval<channel>().notes.begin()) LNhead;
             unsigned bar_head = 0;
@@ -646,29 +662,34 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
             // find next LN head
             for (; bar_curr <= lastBarIdx; bar_curr++)
             {
-                if (chNotesRegular[chIdx][bar_curr].notes.empty()) continue;
+                if (chNotesRegular[chIdx][bar_curr].notes.empty())
+                    continue;
 
                 auto& noteList = chNotesRegular[chIdx][bar_curr].notes;
                 auto itNote = noteList.begin();
                 while (itNote != noteList.end())
                 {
-                    // Regular note inside a LN (can be seen with o2mania + #LNTYPE 1) is not allowed. Handle any following note as LN tail.
+                    // Regular note inside a LN (can be seen with o2mania + #LNTYPE 1) is not allowed. Handle any
+                    // following note as LN tail.
                     if (hasHead && (lnobjSet.count(itNote->value) || (LNhead->flags & channel::NoteParseValue::LN)))
                     {
-                        unsigned segment = LNhead->segment * chNotesLN[chIdx][bar_head].relax(resolution_head) / resolution_head;
+                        unsigned segment =
+                            LNhead->segment * chNotesLN[chIdx][bar_head].relax(resolution_head) / resolution_head;
                         unsigned value = LNhead->value;
                         unsigned resolution_tail = chNotesRegular[chIdx][bar_curr].resolution;
-                        unsigned segment2 = itNote->segment * chNotesLN[chIdx][bar_curr].relax(resolution_tail) / resolution_tail;
+                        unsigned segment2 =
+                            itNote->segment * chNotesLN[chIdx][bar_curr].relax(resolution_tail) / resolution_tail;
                         unsigned value2 = itNote->value;
-                        chNotesLN[chIdx][bar_head].notes.push_back({ segment, value });
-                        chNotesLN[chIdx][bar_curr].notes.push_back({ segment2, value2 });
+                        chNotesLN[chIdx][bar_head].notes.push_back({segment, value});
+                        chNotesLN[chIdx][bar_curr].notes.push_back({segment2, value2});
 
                         haveLN = true;
 
                         chNotesRegular[chIdx][bar_head].notes.erase(LNhead);
                         auto itPrev = itNote;
                         bool resetItNote = (itNote == noteList.begin());
-                        if (!resetItNote) itPrev--;
+                        if (!resetItNote)
+                            itPrev--;
                         chNotesRegular[chIdx][bar_curr].notes.erase(itNote);
                         itNote = resetItNote ? noteList.begin() : ++itPrev;
 
@@ -688,8 +709,10 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
                 }
             }
 
-            if (bar_head <= lastBarIdx) chNotesLN[chIdx][bar_head].sortNotes();
-            if (bar_curr <= lastBarIdx) chNotesLN[chIdx][bar_curr].sortNotes();
+            if (bar_head <= lastBarIdx)
+                chNotesLN[chIdx][bar_head].sortNotes();
+            if (bar_curr <= lastBarIdx)
+                chNotesLN[chIdx][bar_curr].sortNotes();
         }
     }
 
@@ -703,8 +726,9 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
         for (unsigned lane = 0; lane < chNotesRegular.size(); ++lane)
         {
-            if (lane == 0 || lane == 10) continue;
-            for (const auto& [barIdx, ch]: chNotesRegular[lane])
+            if (lane == 0 || lane == 10)
+                continue;
+            for (const auto& [barIdx, ch] : chNotesRegular[lane])
             {
                 notes_key += ch.notes.size();
             }
@@ -722,7 +746,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
         for (unsigned lane = 0; lane < chNotesLN.size(); ++lane)
         {
-            if (lane == 0 || lane == 10) continue;
+            if (lane == 0 || lane == 10)
+                continue;
             for (const auto& [barIdx, ch] : chNotesLN[lane])
             {
                 notes_key_ln += ch.notes.size();
@@ -753,13 +778,17 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
         {
             for (const auto& ns : chBPMChange[m].notes)
             {
-                if (ns.value > maxBPM) maxBPM = ns.value;
-                if (ns.value < minBPM) minBPM = ns.value;
+                if (ns.value > maxBPM)
+                    maxBPM = ns.value;
+                if (ns.value < minBPM)
+                    minBPM = ns.value;
             }
             for (const auto& ns : chExBPMChange[m].notes)
             {
-                if (exBPM[ns.value] > maxBPM) maxBPM = exBPM[ns.value];
-                if (exBPM[ns.value] < minBPM) minBPM = exBPM[ns.value];
+                if (exBPM[ns.value] > maxBPM)
+                    maxBPM = exBPM[ns.value];
+                if (exBPM[ns.value] < minBPM)
+                    minBPM = exBPM[ns.value];
             }
         }
     }
@@ -803,8 +832,9 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
         // 11	12	13	14	15	22	23	24	25	standard PMS
         auto imbue = [](LaneMap& lhs, LaneMap& rhs) {
-            if (lhs.empty()) std::swap(lhs, rhs);
-            for (auto &[k, rv] : rhs)
+            if (lhs.empty())
+                std::swap(lhs, rhs);
+            for (auto& [k, rv] : rhs)
                 lhs[k].imbue(rv);
         };
         imbue(chNotesRegular[6], chNotesRegular[12]);
@@ -838,7 +868,8 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
     }
 
     fileHash = md5file(absolutePath);
-    LOG_INFO << "[BMS] File (" << getFileEncodingName(encoding) << "): " << absolutePath << " MD5: " << fileHash.hexdigest();
+    LOG_INFO << "[BMS] File (" << getFileEncodingName(encoding) << "): " << absolutePath
+             << " MD5: " << fileHash.hexdigest();
 
     loaded = true;
 
@@ -868,8 +899,9 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
     {
         const unsigned segment = i * scale;
         const unsigned value = base36(str[i * 2], str[i * 2 + 1]);
-        if (value == 0) continue;
-        ch.notes.push_back({ segment, value, flags });
+        if (value == 0)
+            continue;
+        ch.notes.push_back({segment, value, flags});
     }
     ch.sortNotes();
 
@@ -899,8 +931,9 @@ int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
     {
         const unsigned segment = i * scale;
         const unsigned value = base16(str[i * 2], str[i * 2 + 1]);
-        if (value == 0) continue;
-        ch.notes.push_back({ segment, value });
+        if (value == 0)
+            continue;
+        ch.notes.push_back({segment, value});
     }
     ch.sortNotes();
 
@@ -913,16 +946,16 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexBME(int x_, int _y)
     int idx = 0;
     switch (x_)
     {
-    case 1:            // 1x: 1P visible
-    case 3:            // 3x: 1P invisible
-    case 5:            // 5x: 1P LN
-    case 0xD:          // Dx: 1P mine
+    case 1:   // 1x: 1P visible
+    case 3:   // 3x: 1P invisible
+    case 5:   // 5x: 1P LN
+    case 0xD: // Dx: 1P mine
         side = 0;
         break;
-    case 2:            // 2x: 2P visible
-    case 4:            // 4x: 2P invisible
-    case 6:            // 6x: 2P LN
-    case 0xE:          // Ex: 2P mine
+    case 2:   // 2x: 2P visible
+    case 4:   // 4x: 2P invisible
+    case 6:   // 6x: 2P LN
+    case 0xE: // Ex: 2P mine
         side = 1;
         break;
     default:
@@ -938,24 +971,22 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexBME(int x_, int _y)
         case 2:
         case 3:
         case 4:
-        case 5:
-            idx = _y;
-            break;
-        case 6:        //SCR
+        case 5: idx = _y; break;
+        case 6: // SCR
             idx = 0;
             break;
-        case 8:        //6
+        case 8: // 6
             idx = 6;
             break;
-        case 9:        //7
+        case 9: // 7
             idx = 7;
             break;
-        case 7:        //Free zone / pedal
+        case 7: // Free zone / pedal
             idx = 9;
             break;
         }
     }
-    return { side, idx };
+    return {side, idx};
 }
 
 std::pair<int, int> ChartFormatBMS::getLaneIndexPMS(int x_, int _y)
@@ -964,16 +995,16 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexPMS(int x_, int _y)
     int idx = 0;
     switch (x_)
     {
-    case 1:            // 1x: 1P visible
-    case 3:            // 3x: 1P invisible
-    case 5:            // 5x: 1P LN
-    case 0xD:          // Dx: 1P mine
+    case 1:   // 1x: 1P visible
+    case 3:   // 3x: 1P invisible
+    case 5:   // 5x: 1P LN
+    case 0xD: // Dx: 1P mine
         side = 0;
         break;
-    case 2:            // 2x: 2P visible
-    case 4:            // 4x: 2P invisible
-    case 6:            // 6x: 2P LN
-    case 0xE:          // Ex: 2P mine
+    case 2:   // 2x: 2P visible
+    case 4:   // 4x: 2P invisible
+    case 6:   // 6x: 2P LN
+    case 0xE: // Ex: 2P mine
         side = 1;
         break;
     default:
@@ -986,7 +1017,7 @@ std::pair<int, int> ChartFormatBMS::getLaneIndexPMS(int x_, int _y)
         // return as-is and handle after parsing completed. PMS 6-9 lanes definition may vary
         idx = _y;
     }
-    return { side, idx };
+    return {side, idx};
 }
 
 auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) const -> const channel&
@@ -994,8 +1025,7 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
     static const channel emptyChannel;
     if (barIdx <= lastBarIdx)
     {
-        auto getCommonLane = [](const LaneMap& ch, unsigned barIdx) -> const channel&
-        {
+        auto getCommonLane = [](const LaneMap& ch, unsigned barIdx) -> const channel& {
             if (auto it = ch.find(barIdx); it != ch.end())
             {
                 return it->second;
@@ -1003,8 +1033,8 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
             return emptyChannel;
         };
 
-        auto getNoteLane = [&](const std::map<unsigned, LaneMap>& ch, unsigned chIdx, unsigned barIdx) -> const channel&
-        {
+        auto getNoteLane = [&](const std::map<unsigned, LaneMap>& ch, unsigned chIdx,
+                               unsigned barIdx) -> const channel& {
             if (auto it = ch.find(chIdx); it != ch.end())
             {
                 return getCommonLane(it->second, barIdx);
@@ -1015,21 +1045,21 @@ auto ChartFormatBMS::getLane(LaneCode code, unsigned chIdx, unsigned barIdx) con
         using eC = LaneCode;
         switch (code)
         {
-        case eC::BGM:          return getNoteLane(chBGM, chIdx, barIdx); 
-        case eC::BPM:          return getCommonLane(chBPMChange, barIdx); 
-        case eC::EXBPM:        return getCommonLane(chExBPMChange, barIdx); 
-        case eC::STOP:         return getCommonLane(chStop, barIdx); 
-        case eC::BGABASE:      return getCommonLane(chBGABase, barIdx); 
-        case eC::BGALAYER:     return getCommonLane(chBGALayer, barIdx); 
-        case eC::BGAPOOR:      return getCommonLane(chBGAPoor, barIdx); 
-        case eC::NOTE1:        return getNoteLane(chNotesRegular, chIdx, barIdx); 
-        case eC::NOTE2:        return getNoteLane(chNotesRegular, chIdx + 10, barIdx); 
-        case eC::NOTEINV1:     return getNoteLane(chNotesInvisible, chIdx, barIdx); 
-        case eC::NOTEINV2:     return getNoteLane(chNotesInvisible, chIdx + 10, barIdx);
-        case eC::NOTELN1:      return getNoteLane(chNotesLN, chIdx, barIdx); 
-        case eC::NOTELN2:      return getNoteLane(chNotesLN, chIdx + 10, barIdx); 
-        case eC::NOTEMINE1:    return getNoteLane(chMines, chIdx, barIdx); 
-        case eC::NOTEMINE2:    return getNoteLane(chMines, chIdx + 10, barIdx); 
+        case eC::BGM: return getNoteLane(chBGM, chIdx, barIdx);
+        case eC::BPM: return getCommonLane(chBPMChange, barIdx);
+        case eC::EXBPM: return getCommonLane(chExBPMChange, barIdx);
+        case eC::STOP: return getCommonLane(chStop, barIdx);
+        case eC::BGABASE: return getCommonLane(chBGABase, barIdx);
+        case eC::BGALAYER: return getCommonLane(chBGALayer, barIdx);
+        case eC::BGAPOOR: return getCommonLane(chBGAPoor, barIdx);
+        case eC::NOTE1: return getNoteLane(chNotesRegular, chIdx, barIdx);
+        case eC::NOTE2: return getNoteLane(chNotesRegular, chIdx + 10, barIdx);
+        case eC::NOTEINV1: return getNoteLane(chNotesInvisible, chIdx, barIdx);
+        case eC::NOTEINV2: return getNoteLane(chNotesInvisible, chIdx + 10, barIdx);
+        case eC::NOTELN1: return getNoteLane(chNotesLN, chIdx, barIdx);
+        case eC::NOTELN2: return getNoteLane(chNotesLN, chIdx + 10, barIdx);
+        case eC::NOTEMINE1: return getNoteLane(chMines, chIdx, barIdx);
+        case eC::NOTEMINE2: return getNoteLane(chMines, chIdx + 10, barIdx);
         default: break;
         }
     }
@@ -1042,7 +1072,8 @@ unsigned ChartFormatBMS::channel::relax(unsigned target_resolution)
 {
     const unsigned target = std::lcm(target_resolution, resolution);
     const unsigned pow = target / resolution;
-    if (pow == 1) return target;
+    if (pow == 1)
+        return target;
     resolution = target;
     for (auto& n : notes)
     {
@@ -1072,8 +1103,5 @@ void ChartFormatBMS::channel::imbue(channel& c)
 void ChartFormatBMS::channel::sortNotes()
 {
     // NOTE: stable_sort
-    notes.sort([](const NoteParseValue& lhs, const NoteParseValue& rhs)
-        {
-            return lhs.segment < rhs.segment;
-        });
+    notes.sort([](const NoteParseValue& lhs, const NoteParseValue& rhs) { return lhs.segment < rhs.segment; });
 }

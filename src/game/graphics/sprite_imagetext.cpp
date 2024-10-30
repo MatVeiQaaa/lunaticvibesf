@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include <common/assert.h>
 #include "common/beat.h"
 #include "common/encoding.h"
+#include <common/assert.h>
 
 SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder)
     : SpriteText(builder), _textures(builder.charTextures), _chrList(builder.charMappingList),
@@ -18,7 +18,8 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
 {
     // NOTE: we need to draw empty text too, to keep empty input fields selectable.
 
-    if (_text == text && _firstLine == first_line) return;
+    if (_text == text && _firstLine == first_line)
+        return;
 
     _text = text;
     _firstLine = first_line;
@@ -51,7 +52,8 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
             if (line > first_line)
             {
                 draw_y += r.h;
-                if (draw_y > _maxHeight) break;
+                if (draw_y > _maxHeight)
+                    break;
             }
             else
             {
@@ -63,13 +65,13 @@ void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_
         if (line < first_line)
             continue;
         if (chrIt->second.textureIdx < _textures.size())
-            _drawListOrig.push_back({ c, {draw_x, draw_y, (float)r.w, (float)r.h} });
+            _drawListOrig.push_back({c, {draw_x, draw_y, (float)r.w, (float)r.h}});
         this_line_width = draw_x + r.w;
         text_width = std::max(text_width, this_line_width);
         draw_x += r.w + _margin;
     }
     //_drawList = _drawListOrig;
-    _drawRect = { 0, 0, (int)std::ceil(text_width), (int)textHeight};
+    _drawRect = {0, 0, (int)std::ceil(text_width), (int)textHeight};
 }
 
 void SpriteImageText::updateTextRect()
@@ -106,13 +108,14 @@ void SpriteImageText::updateTextRect()
     // align
     switch (align)
     {
-    case TEXT_ALIGN_LEFT:
-        break;
+    case TEXT_ALIGN_LEFT: break;
     case TEXT_ALIGN_CENTER:
-        for (auto& [c, r] : _drawList) r.x -= text_w / 2;
+        for (auto& [c, r] : _drawList)
+            r.x -= text_w / 2;
         break;
     case TEXT_ALIGN_RIGHT:
-        for (auto& [c, r] : _drawList) r.x -= text_w;
+        for (auto& [c, r] : _drawList)
+            r.x -= text_w;
         break;
     }
 
@@ -140,7 +143,6 @@ void SpriteImageText::updateTextRect()
         }
     }
     */
-
 }
 
 bool SpriteImageText::update(const lunaticvibes::Time& t)

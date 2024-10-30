@@ -5,7 +5,8 @@
 unsigned char sdl_key_from_common_scancode(Input::Keyboard key)
 {
     // Enum members in order, hopefully the compiler will make a nice jump table out of this.
-    switch (key) {
+    switch (key)
+    {
     case Input::Keyboard::K_ERROR: return SDL_SCANCODE_UNKNOWN;
     case Input::Keyboard::K_ESC: return SDL_SCANCODE_ESCAPE;
     case Input::Keyboard::K_1: return SDL_SCANCODE_1;

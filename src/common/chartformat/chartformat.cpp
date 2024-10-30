@@ -19,10 +19,8 @@ eChartFormat analyzeChartType(const Path& p)
     auto extension = p.extension().u8string();
     if (extension.length() == 4)
     {
-        if (lunaticvibes::iequals(extension, ".bms") ||
-            lunaticvibes::iequals(extension, ".bme") ||
-            lunaticvibes::iequals(extension, ".bml") ||
-            lunaticvibes::iequals(extension, ".pms"))
+        if (lunaticvibes::iequals(extension, ".bms") || lunaticvibes::iequals(extension, ".bme") ||
+            lunaticvibes::iequals(extension, ".bml") || lunaticvibes::iequals(extension, ".pms"))
             fmt = eChartFormat::BMS;
     }
     else if (extension.length() == 6)
@@ -53,15 +51,10 @@ std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& pat
     case eChartFormat::BMS:
         return std::static_pointer_cast<ChartFormatBase>(std::make_shared<ChartFormatBMS>(filePath, randomSeed));
 
-    case eChartFormat::UNKNOWN:
-        LOG_WARNING << "[Chart] File type unknown: " << filePath;
-        return nullptr;
+    case eChartFormat::UNKNOWN: LOG_WARNING << "[Chart] File type unknown: " << filePath; return nullptr;
 
-    default:
-        LOG_WARNING << "[Chart] File type unsupported: " << filePath;
-        return nullptr;
+    default: LOG_WARNING << "[Chart] File type unsupported: " << filePath; return nullptr;
     }
-
 }
 
 std::string ChartFormatBase::formatReadmeText(const std::vector<std::pair<std::string, std::string>>& files)

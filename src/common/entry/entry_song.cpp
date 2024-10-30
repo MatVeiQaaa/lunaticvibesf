@@ -7,7 +7,8 @@ std::shared_ptr<ChartFormatBase> EntryFolderSong::getChart(size_t idx)
 }
 std::shared_ptr<ChartFormatBase> EntryFolderSong::getCurrentChart()
 {
-    if (charts.empty()) return nullptr;
+    if (charts.empty())
+        return nullptr;
     idx %= getContentsCount();
     return charts[idx];
 }
@@ -25,7 +26,8 @@ void EntryFolderSong::pushChart(std::shared_ptr<ChartFormatBase> c)
     chartMap[c->gamemode][c->difficulty].push_back(std::move(c));
 }
 
-const std::vector<std::shared_ptr<ChartFormatBase>>& EntryFolderSong::getDifficultyList(int gamemode, unsigned difficulty) const
+const std::vector<std::shared_ptr<ChartFormatBase>>& EntryFolderSong::getDifficultyList(int gamemode,
+                                                                                        unsigned difficulty) const
 {
     if (chartMap.find(gamemode) != chartMap.end())
     {

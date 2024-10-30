@@ -1,11 +1,11 @@
 #include "config.h"
 
-#include <fstream>
 #include <filesystem>
+#include <fstream>
 
 #include "common/log.h"
-#include "common/types.h"
 #include "common/meta.h"
+#include "common/types.h"
 
 vConfig::vConfig()
 {
@@ -19,7 +19,7 @@ vConfig::vConfig(const StringPath& file)
 
 vConfig::vConfig(const char* file)
 {
-	_path = file;
+    _path = file;
 }
 
 vConfig::vConfig(const std::string& profile, const char* file)
@@ -40,7 +40,7 @@ vConfig::vConfig(const std::string& profile, const StringPath& file)
 
 void vConfig::load()
 {
-	setDefaults();
+    setDefaults();
     try
     {
         for (const auto& node : YAML::LoadFile(_path.u8string()))
@@ -56,8 +56,7 @@ void vConfig::load()
 
 void vConfig::save()
 {
-	std::ofstream fout(_path, std::ios_base::trunc);
-	fout << _yaml;
+    std::ofstream fout(_path, std::ios_base::trunc);
+    fout << _yaml;
     fout.close();
 }
-

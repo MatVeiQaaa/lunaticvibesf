@@ -1,7 +1,8 @@
 ---
-Language:        Cpp
+Language: Cpp
 BasedOnStyle: microsoft
 AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: Inline
 AllowShortCaseLabelsOnASingleLine: true
 PointerAlignment: Left
 QualifierAlignment: Left

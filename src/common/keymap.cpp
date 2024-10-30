@@ -2,18 +2,18 @@
 
 #include <string>
 
-#include <common/assert.h>
 #include "common/log.h"
 #include "common/utils.h"
+#include <common/assert.h>
 
 std::string KeyMap::toString() const
 {
     switch (type)
     {
-    case DeviceType::UNDEF:    return "-";
+    case DeviceType::UNDEF: return "-";
     case DeviceType::KEYBOARD: return toStringK();
     case DeviceType::JOYSTICK: return toStringJ();
-    case DeviceType::MOUSE:    return toStringM();
+    case DeviceType::MOUSE: return toStringM();
     }
     LOG_ERROR << "[Keymap] Invalid KeyMap";
     LVF_DEBUG_ASSERT(false && "invalid KeyMap");
@@ -37,7 +37,8 @@ void KeyMap::setJoystick(size_t device, Input::Joystick::Type jtype, size_t inde
 void KeyMap::loadFromString(const std::string_view name)
 {
     type = DeviceType::UNDEF;
-    if (name.empty()) return;
+    if (name.empty())
+        return;
 
     switch (name[0])
     {
@@ -50,8 +51,10 @@ void KeyMap::loadFromString(const std::string_view name)
 
 void KeyMap::loadFromStringK(const std::string_view name)
 {
-    if (name.length() < 3) return;
-    if (name.substr(0, 2) != "K_") return;
+    if (name.length() < 3)
+        return;
+    if (name.substr(0, 2) != "K_")
+        return;
     type = DeviceType::KEYBOARD;
 
     auto keystr = name.substr(2);
@@ -69,8 +72,10 @@ void KeyMap::loadFromStringK(const std::string_view name)
 
 void KeyMap::loadFromStringJ(const std::string_view name)
 {
-    if (name.length() < 8) return;
-    if (name[0] != 'J' || name[2] != '_') return;
+    if (name.length() < 8)
+        return;
+    if (name[0] != 'J' || name[2] != '_')
+        return;
     type = DeviceType::JOYSTICK;
     joystick.type = Input::Joystick::Type::UNDEF;
 
@@ -112,7 +117,8 @@ void KeyMap::loadFromStringJ(const std::string_view name)
         }
         if (axisIndex != -1)
         {
-            joystick.type = axisPositive ? Input::Joystick::Type::AXIS_RELATIVE_POSITIVE : Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE;
+            joystick.type = axisPositive ? Input::Joystick::Type::AXIS_RELATIVE_POSITIVE
+                                         : Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE;
             joystick.index = (size_t)axisIndex;
         }
     }
@@ -147,12 +153,12 @@ void KeyMap::loadFromStringJ(const std::string_view name)
             joystick.type = Input::Joystick::Type::UNDEF;
         }
     }
-    
 }
 
 void KeyMap::loadFromStringM(const std::string_view name)
 {
-    if (name.substr(0, 2) != "M_") return;
+    if (name.substr(0, 2) != "M_")
+        return;
     type = DeviceType::MOUSE;
     LVF_DEBUG_ASSERT(false);
 }
@@ -168,26 +174,25 @@ std::string KeyMap::toStringJ() const
     ss << "J" << joystick.device + 1 << "_";
     switch (joystick.type)
     {
-    case Input::Joystick::Type::UNDEF:
-        break;
-    case Input::Joystick::Type::BUTTON:        
-        ss << "BTN_" << joystick.index + 1;
-        break;
+    case Input::Joystick::Type::UNDEF: break;
+    case Input::Joystick::Type::BUTTON: ss << "BTN_" << joystick.index + 1; break;
     case Input::Joystick::Type::POV:
-        if      (joystick.index & (1ul << 31)) ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_LEFT";
-        else if (joystick.index & (1ul << 30)) ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_DOWN";
-        else if (joystick.index & (1ul << 29)) ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_UP";
-        else if (joystick.index & (1ul << 28)) ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_RIGHT";
+        if (joystick.index & (1ul << 31))
+            ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_LEFT";
+        else if (joystick.index & (1ul << 30))
+            ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_DOWN";
+        else if (joystick.index & (1ul << 29))
+            ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_UP";
+        else if (joystick.index & (1ul << 28))
+            ss << "POV_" << (joystick.index & 0xFFFFFFF) + 1 << "_RIGHT";
         break;
-    case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE: 
+    case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE:
         ss << "REL_" << Input::joystickAxisName[joystick.index] << "+";
         break;
     case Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE:
         ss << "REL_" << Input::joystickAxisName[joystick.index] << "-";
         break;
-    case Input::Joystick::Type::AXIS_ABSOLUTE: 
-        ss << "ABS_" << Input::joystickAxisName[joystick.index];
-        break;
+    case Input::Joystick::Type::AXIS_ABSOLUTE: ss << "ABS_" << Input::joystickAxisName[joystick.index]; break;
     }
     return ss.str();
 }

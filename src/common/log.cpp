@@ -13,37 +13,41 @@
 
 namespace plog
 {
-    // TxtFormatterImpl
-    class TxtFormatterFileLine
+// TxtFormatterImpl
+class TxtFormatterFileLine
+{
+public:
+    static util::nstring header() { return util::nstring(); }
+
+    static util::nstring format(const Record& record)
     {
-    public:
-        static util::nstring header()
-        {
-            return util::nstring();
-        }
+        tm t;
+        util::localtime_s(&t, &record.getTime().time);
 
-        static util::nstring format(const Record& record)
-        {
-            tm t;
-            util::localtime_s(&t, &record.getTime().time);
+        util::nostringstream ss;
+        ss << t.tm_year + 1900 << "-" << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mon + 1 << PLOG_NSTR("-")
+           << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mday << PLOG_NSTR(" ");
+        ss << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_hour << PLOG_NSTR(":")
+           << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_min << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0'))
+           << std::setw(2) << t.tm_sec << PLOG_NSTR(".") << std::setfill(PLOG_NSTR('0')) << std::setw(3)
+           << static_cast<int>(record.getTime().millitm) << PLOG_NSTR(" ");
+        ss << std::setfill(PLOG_NSTR(' ')) << std::setw(5) << std::left << severityToString(record.getSeverity())
+           << PLOG_NSTR(" ");
+        ss << PLOG_NSTR("[") << record.getTid() << PLOG_NSTR("] ");
+        ss << PLOG_NSTR("[") << fs::path(record.getFile()).filename() << PLOG_NSTR("@") << record.getLine()
+           << PLOG_NSTR("] ");
+        ss << record.getMessage() << PLOG_NSTR("\n");
 
-            util::nostringstream ss;
-            ss << t.tm_year + 1900 << "-" << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mon + 1 << PLOG_NSTR("-") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mday << PLOG_NSTR(" ");
-            ss << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_hour << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_min << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_sec << PLOG_NSTR(".") << std::setfill(PLOG_NSTR('0')) << std::setw(3) << static_cast<int> (record.getTime().millitm) << PLOG_NSTR(" ");
-            ss << std::setfill(PLOG_NSTR(' ')) << std::setw(5) << std::left << severityToString(record.getSeverity()) << PLOG_NSTR(" ");
-            ss << PLOG_NSTR("[") << record.getTid() << PLOG_NSTR("] ");
-            ss << PLOG_NSTR("[") << fs::path(record.getFile()).filename() << PLOG_NSTR("@") << record.getLine() << PLOG_NSTR("] ");
-            ss << record.getMessage() << PLOG_NSTR("\n");
-
-            return ss.str();
-        }
-    };
-}
+        return ss.str();
+    }
+};
+} // namespace plog
 
 static std::shared_ptr<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>> pConsoleAppender;
 static std::shared_ptr<plog::RollingFileAppender<plog::TxtFormatterFileLine>> pTxtAppender;
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 void InitLogger(const char* logFileName)
 {
@@ -52,8 +56,7 @@ void InitLogger(const char* logFileName)
 
     if (logFileName != nullptr)
     {
-        pTxtAppender =
-            std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>(logFileName, 1000000, 5);
+        pTxtAppender = std::make_shared<plog::RollingFileAppender<plog::TxtFormatterFileLine>>(logFileName, 1000000, 5);
         plog::get()->addAppender(pTxtAppender.get());
     }
 }

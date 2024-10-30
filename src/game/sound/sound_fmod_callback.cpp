@@ -1,17 +1,17 @@
 #include "sound_fmod_callback.h"
-#include <queue>
 #include <mutex>
+#include <queue>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Open file
 
 #pragma warning(push)
-#pragma warning(disable: 4996)
-FMOD_RESULT F_CALLBACK FmodCallbackFileOpen(const char* file, unsigned int* pSize, void **pHandle, void *pUserData)
+#pragma warning(disable : 4996)
+FMOD_RESULT F_CALLBACK FmodCallbackFileOpen(const char* file, unsigned int* pSize, void** pHandle, void* pUserData)
 {
     if (file)
     {
-        FILE *pFile;
+        FILE* pFile;
 
         pFile = fopen(file, "rb");
         if (!pFile)
@@ -30,7 +30,7 @@ FMOD_RESULT F_CALLBACK FmodCallbackFileOpen(const char* file, unsigned int* pSiz
 ////////////////////////////////////////////////////////////////////////////////
 // Close file
 
-FMOD_RESULT F_CALLBACK FmodCallbackFileClose(void *handle, void *userData)
+FMOD_RESULT F_CALLBACK FmodCallbackFileClose(void* handle, void* userData)
 {
     if (!handle)
         return FMOD_ERR_INVALID_HANDLE;
@@ -46,7 +46,7 @@ static std::queue<FMOD_ASYNCREADINFO*> asyncSampleLoadQueue;
 
 #define LOCK_QUEUE std::lock_guard<std::mutex> _queueLock_(queueMutex)
 
-FMOD_RESULT F_CALLBACK FmodCallbackAsyncRead(FMOD_ASYNCREADINFO *info, void *userData)
+FMOD_RESULT F_CALLBACK FmodCallbackAsyncRead(FMOD_ASYNCREADINFO* info, void* userData)
 {
     try
     {
@@ -60,18 +60,17 @@ FMOD_RESULT F_CALLBACK FmodCallbackAsyncRead(FMOD_ASYNCREADINFO *info, void *use
     return FMOD_OK;
 };
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Cancel Async Read: cancel reading(TODO) and pop file from queue
 
-FMOD_RESULT F_CALLBACK FmodCallbackAsyncReadCancel(FMOD_ASYNCREADINFO *handle, void *userData)
+FMOD_RESULT F_CALLBACK FmodCallbackAsyncReadCancel(FMOD_ASYNCREADINFO* handle, void* userData)
 {
     try
     {
         LOCK_QUEUE;
         if (!asyncSampleLoadQueue.empty())
         {
-            auto &s = asyncSampleLoadQueue.front();
+            auto& s = asyncSampleLoadQueue.front();
             if (s->handle == handle->handle)
                 asyncSampleLoadQueue.pop();
         }

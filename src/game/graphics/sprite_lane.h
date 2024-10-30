@@ -1,18 +1,18 @@
 #pragma once
-#include "sprite.h"
 #include "game/chart/chart.h"
+#include "sprite.h"
 #include <memory>
 #include <vector>
 
 // Draw the whole lane (on screen) with only one sprite per key.
 // Currently only handles normal notes. LN, mines or others are meant to be managed by other Sprite class.
 // Note that an instance of this class handles ONE note lane. That is, a 7+1 chart needs 8 instances of this class.
-class SpriteLaneVertical: public SpriteStatic
+class SpriteLaneVertical : public SpriteStatic
 {
 protected:
-	chart::NoteLaneCategory _category;
+    chart::NoteLaneCategory _category;
     chart::NoteLaneIndex _index;
-    int _noteAreaHeight = 500;  // used to calculate note speed
+    int _noteAreaHeight = 500; // used to calculate note speed
     double _basespd;
     double _hispeed;
     std::vector<RectF> _outRect;
@@ -35,6 +35,7 @@ public:
 
         std::shared_ptr<SpriteLaneVertical> build() const { return std::make_shared<SpriteLaneVertical>(*this); }
     };
+
 public:
     SpriteLaneVertical() = delete;
     SpriteLaneVertical(const SpriteLaneVerticalBuilder& builder);
@@ -59,13 +60,13 @@ protected:
     std::shared_ptr<Texture> _hiddenCompatibleTexture = nullptr;
     bool _hiddenCompatibleDraw = false;
     RectF _hiddenCompatibleArea;
+
 public:
     void setHIDDENCompatible() { _hiddenCompatible = true; }
+
 protected:
     void updateHIDDENCompatible();
-
 };
-
 
 class SpriteLaneVerticalLN : public SpriteLaneVertical
 {
@@ -76,6 +77,7 @@ protected:
     bool headHit = false;
     bool tailHit = false;
     bool animLimited = false;
+
 public:
     std::shared_ptr<SpriteAnimated> pNoteBody, pNoteTail;
 
@@ -84,6 +86,7 @@ public:
     {
         std::shared_ptr<SpriteLaneVerticalLN> build() { return std::make_shared<SpriteLaneVerticalLN>(*this); }
     };
+
 public:
     SpriteLaneVerticalLN() = delete;
     SpriteLaneVerticalLN(const SpriteLaneVerticalLNBuilder& builder);

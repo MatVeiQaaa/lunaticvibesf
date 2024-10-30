@@ -3,72 +3,70 @@
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
 #include <InitGuid.h>
+#include <Windows.h>
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 
-
 class InputDirectInput8
 {
 public:
-	struct DeviceMouse
-	{
-		LPDIRECTINPUTDEVICE8 lpdid = nullptr;
-		DIMOUSESTATE state = { 0 };
-	};
-	struct DeviceKeyboard
-	{
-		LPDIRECTINPUTDEVICE8 lpdid = nullptr;
-		BYTE state[256] = { 0 };	// diKeys[DIK_ESCAPE] & 0x80
-	};
-	struct DeviceJoystick
-	{
-		LPDIRECTINPUTDEVICE8 lpdid = nullptr;
-		DIJOYSTATE state = { 0 };
-		struct Capabilities
-		{
-			unsigned buttons = 0;
-			bool hasPOV[4] = { 0 };
-			bool hasAxis[8] = { 0 };
-		} caps;
-	};
+    struct DeviceMouse
+    {
+        LPDIRECTINPUTDEVICE8 lpdid = nullptr;
+        DIMOUSESTATE state = {0};
+    };
+    struct DeviceKeyboard
+    {
+        LPDIRECTINPUTDEVICE8 lpdid = nullptr;
+        BYTE state[256] = {0}; // diKeys[DIK_ESCAPE] & 0x80
+    };
+    struct DeviceJoystick
+    {
+        LPDIRECTINPUTDEVICE8 lpdid = nullptr;
+        DIJOYSTATE state = {0};
+        struct Capabilities
+        {
+            unsigned buttons = 0;
+            bool hasPOV[4] = {0};
+            bool hasAxis[8] = {0};
+        } caps;
+    };
 
 protected:
-	LPDIRECTINPUT8 lpdi = nullptr;
+    LPDIRECTINPUT8 lpdi = nullptr;
 
-	DeviceMouse deviceMouse;
-	DeviceKeyboard deviceKeyboard;
-	std::vector<DeviceJoystick> deviceJoysticks;
+    DeviceMouse deviceMouse;
+    DeviceKeyboard deviceKeyboard;
+    std::vector<DeviceJoystick> deviceJoysticks;
 
-	bool acquired = false;
-	
-public:
-	BOOL DIEnumDevicesCallbackJoystick(LPCDIDEVICEINSTANCE lpddi);
-	BOOL DIEnumDeviceObjectsCallback(LPCDIDEVICEOBJECTINSTANCE lpddoi);
-
-	bool acquireDevices();
-	bool releaseDevices();
-
+    bool acquired = false;
 
 public:
-	InputDirectInput8();
-	virtual ~InputDirectInput8();
+    BOOL DIEnumDevicesCallbackJoystick(LPCDIDEVICEINSTANCE lpddi);
+    BOOL DIEnumDeviceObjectsCallback(LPCDIDEVICEOBJECTINSTANCE lpddoi);
 
-	int refreshDevices();
-
-	void poll();
-
-	size_t getJoystickCount() const;
-
-	const DIMOUSESTATE& getMouseState() const;
-	const BYTE* getKeyboardState() const;
-	const DIJOYSTATE& getJoystickState(size_t idx) const;
-	const DeviceJoystick::Capabilities& getJoystickCapabilities(size_t idx) const;
+    bool acquireDevices();
+    bool releaseDevices();
 
 public:
-	static InputDirectInput8& inst();
+    InputDirectInput8();
+    virtual ~InputDirectInput8();
+
+    int refreshDevices();
+
+    void poll();
+
+    size_t getJoystickCount() const;
+
+    const DIMOUSESTATE& getMouseState() const;
+    const BYTE* getKeyboardState() const;
+    const DIJOYSTATE& getJoystickState(size_t idx) const;
+    const DeviceJoystick::Capabilities& getJoystickCapabilities(size_t idx) const;
+
+public:
+    static InputDirectInput8& inst();
 };
 
 #endif

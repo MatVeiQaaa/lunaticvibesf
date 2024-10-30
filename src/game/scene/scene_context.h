@@ -1,20 +1,20 @@
 #pragma once
-#include <array>
-#include <memory>
-#include <string>
-#include <shared_mutex>
-#include <variant>
-#include "scene.h"
-#include "common/types.h"
 #include "common/chartformat/chartformat.h"
+#include "common/difficultytable/table_bms.h"
+#include "common/entry/entry_folder.h"
+#include "common/types.h"
+#include "db/db_score.h"
+#include "db/db_song.h"
 #include "game/chart/chart.h"
-#include "game/ruleset/ruleset.h"
 #include "game/graphics/texture_extra.h"
 #include "game/replay/replay_chart.h"
-#include "common/entry/entry_folder.h"
-#include "db/db_song.h"
-#include "db/db_score.h"
-#include "common/difficultytable/table_bms.h"
+#include "game/ruleset/ruleset.h"
+#include "scene.h"
+#include <array>
+#include <memory>
+#include <shared_mutex>
+#include <string>
+#include <variant>
 
 inline SceneType gNextScene = SceneType::SELECT;
 inline bool gInCustomize = false;
@@ -28,14 +28,14 @@ struct ChartContextParams
     Path path{};
     HashMD5 hash{};
     std::shared_ptr<ChartFormatBase> chart;
-    std::shared_ptr<ChartFormatBase> chartMybest;   // mybest obj is loaded with a different random seed
+    std::shared_ptr<ChartFormatBase> chartMybest; // mybest obj is loaded with a different random seed
 
-    //bool isChartSamplesLoaded;
+    // bool isChartSamplesLoaded;
     bool isSampleLoaded = false;
     HashMD5 sampleLoadedHash;
     bool isBgaLoaded = false;
     HashMD5 bgaLoadedHash;
-	bool started = false;
+    bool started = false;
 
     // DP flags
     bool isDoubleBattle = false;
@@ -73,14 +73,14 @@ struct PlayContextParams
 
     unsigned judgeLevel = 0;
 
-	std::shared_ptr<TextureBmsBga> bgaTexture = std::make_shared<TextureBmsBga>();
+    std::shared_ptr<TextureBmsBga> bgaTexture = std::make_shared<TextureBmsBga>();
 
-    std::array<std::shared_ptr<ChartObjectBase>, MAX_PLAYERS> chartObj{ nullptr, nullptr, nullptr };
-    std::array<double, MAX_PLAYERS> initialHealth{ 1.0, 1.0, 1.0 };
+    std::array<std::shared_ptr<ChartObjectBase>, MAX_PLAYERS> chartObj{nullptr, nullptr, nullptr};
+    std::array<double, MAX_PLAYERS> initialHealth{1.0, 1.0, 1.0};
     std::array<std::vector<int>, MAX_PLAYERS> graphGauge;
     std::array<std::vector<double>, MAX_PLAYERS> graphAcc;
-    std::array<GaugeDisplayType, MAX_PLAYERS> gaugeType{};        // resolve on ruleset construction
-    std::array<PlayModifiers, MAX_PLAYERS> mods{};         // eMod: 
+    std::array<GaugeDisplayType, MAX_PLAYERS> gaugeType{}; // resolve on ruleset construction
+    std::array<PlayModifiers, MAX_PLAYERS> mods{};         // eMod:
 
     RulesetType rulesetType = RulesetType::BMS;
     std::array<std::shared_ptr<RulesetBase>, MAX_PLAYERS> ruleset;
@@ -103,8 +103,8 @@ struct PlayContextParams
     std::vector<std::shared_ptr<RulesetBase>> courseStageRulesetCopy[2];
     std::vector<Path> courseStageReplayPath;
     std::vector<Path> courseStageReplayPathNew;
-    unsigned courseRunningCombo[2] = { 0, 0 };
-    unsigned courseMaxCombo[2] = { 0, 0 };
+    unsigned courseRunningCombo[2] = {0, 0};
+    unsigned courseMaxCombo[2] = {0, 0};
 
     lunaticvibes::Time remainTime;
 
@@ -113,12 +113,12 @@ struct PlayContextParams
     bool isAuto = false;
     bool isReplay = false;
     bool haveReplay = false;
-    bool isBattle = false;  // Note: DB is NOT Battle
+    bool isBattle = false; // Note: DB is NOT Battle
 
     struct PlayerState
     {
         double hispeed = 2.0;
-        lunaticvibes::Time   hispeedGradientStart;
+        lunaticvibes::Time hispeedGradientStart;
         double hispeedGradientFrom = 2.0;
         double hispeedGradientNow = 2.0;
 
@@ -128,8 +128,10 @@ struct PlayContextParams
     bool shift2PNotes5KFor7KSkin = false;
     constexpr int shiftFiveKeyForSevenKeyIndex(const bool isFiveKey)
     {
-        if (!isFiveKey) return -1;
-        if (shift1PNotes5KFor7KSkin) return shift2PNotes5KFor7KSkin ? 3 : 2;
+        if (!isFiveKey)
+            return -1;
+        if (shift1PNotes5KFor7KSkin)
+            return shift2PNotes5KFor7KSkin ? 3 : 2;
         return shift2PNotes5KFor7KSkin ? 1 : 0;
     }
 };
@@ -150,7 +152,7 @@ struct SongListProperties
 {
     HashMD5 parent;
     HashMD5 folder;
-    std::string name;       // folder path, search query+result, etc.
+    std::string name; // folder path, search query+result, etc.
     EntryList dbBrowseEntries;
     EntryList displayEntries;
     size_t index;
@@ -159,7 +161,7 @@ struct SongListProperties
 
 enum class SongListSortType
 {
-    DEFAULT,    // LEVEL
+    DEFAULT, // LEVEL
     TITLE,
     LEVEL,
     CLEAR,
@@ -183,32 +185,32 @@ struct SelectContextParams
     std::shared_mutex _mutex;
     std::list<SongListProperties> backtrace;
     EntryList entries;
-    size_t selectedEntryIndex = 0;     // current selected entry index
+    size_t selectedEntryIndex = 0; // current selected entry index
     size_t highlightBarIndex = 0;  // highlighted bar index
-    bool draggingListSlider = 0;    // is dragging slider
+    bool draggingListSlider = 0;   // is dragging slider
 
-    size_t cursorClick = 0;  // click bar
-    int cursorClickScroll = 0;  // -1: scroll up / 1: scroll down / 2: decide
+    size_t cursorClick = 0;    // click bar
+    int cursorClickScroll = 0; // -1: scroll up / 1: scroll down / 2: decide
     bool cursorEnterPending = false;
 
     SongListSortType sortType = SongListSortType::DEFAULT;
     unsigned filterDifficulty = 0; // all / B / N / H / A / I (type 0 is not included)
-    unsigned filterKeys = 0; // all / 5, 7, 9, 10, 14, etc
+    unsigned filterKeys = 0;       // all / 5, 7, 9, 10, 14, etc
     bool optionChangePending = false;
 
     std::vector<DifficultyTableBMS> tables;
 
     double pitchSpeed = 1.0;
 
-    unsigned scrollTimeLength = 300; // 
-    int scrollDirection = 0;    // -1: up / 1: down
+    unsigned scrollTimeLength = 300; //
+    int scrollDirection = 0;         // -1: up / 1: down
 
     int lastLaneEffectType1P = 0;
 
     ReadmeOpenRequest readmeOpenRequest;
 
-    HashMD5 remoteRequestedChart;       // only valid when remote is requesting a new chart; reset after list change
-    std::string remoteRequestedPlayer;  // only valid when remote is requesting a new chart; reset after list change
+    HashMD5 remoteRequestedChart;      // only valid when remote is requesting a new chart; reset after list change
+    std::string remoteRequestedPlayer; // only valid when remote is requesting a new chart; reset after list change
 
     bool isArenaReady = false;
     bool isInArenaRequest = false;
@@ -237,7 +239,7 @@ void setDynamicTextures();
 struct KeyConfigContextParams
 {
     GameModeKeys keys;
-    std::pair<Input::Pad, int> selecting = { Input::Pad::K11, 0 };
+    std::pair<Input::Pad, int> selecting = {Input::Pad::K11, 0};
     bool modeChanged = false;
     bool skinHasAbsAxis = false;
 };

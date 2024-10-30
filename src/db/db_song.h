@@ -29,7 +29,7 @@ inline const HashMD5 ROOT_FOLDER_HASH = md5({});
     type: see enum eChartFormat in chartformat.h
     file: file name (not including path)
 */
-class SongDB: public SQLite
+class SongDB : public SQLite
 {
 public:
     enum FolderType
@@ -48,19 +48,23 @@ public:
     SongDB(const Path& path) : SongDB(path.u8string().c_str()) {}
     ~SongDB() override;
     SongDB(SongDB&) = delete;
-    SongDB& operator= (SongDB&) = delete;
+    SongDB& operator=(SongDB&) = delete;
 
 protected:
     bool addChart(const HashMD5& folder, const Path& path);
     bool removeChart(const Path& path, const HashMD5& parent);
     bool removeChart(const HashMD5& md5, const HashMD5& parent);
-    
+
 public:
     // Search from genre, version, artist, artist2, title, title2.
-    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByName(const HashMD5& folder, const std::string&, unsigned limit = 1000) const;
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByName(const HashMD5& folder,
+                                                                                const std::string&,
+                                                                                unsigned limit = 1000) const;
     // May contain duplicates.
-    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByHash(const HashMD5&, bool checksum = true) const;
-    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartFromTime(const HashMD5& folder, unsigned long long addTime) const;
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartByHash(const HashMD5&,
+                                                                                bool checksum = true) const;
+    [[nodiscard]] std::vector<std::shared_ptr<ChartFormatBase>> findChartFromTime(const HashMD5& folder,
+                                                                                  unsigned long long addTime) const;
 
 protected:
     std::vector<std::vector<std::any>> songQueryPool;
@@ -69,6 +73,7 @@ protected:
     std::vector<std::vector<std::any>> folderQueryPool;
     std::unordered_map<HashMD5, std::vector<size_t>> folderQueryHashMap;
     std::unordered_map<HashMD5, std::vector<size_t>> folderQueryParentMap;
+
 public:
     void prepareCache();
     void freeCache();

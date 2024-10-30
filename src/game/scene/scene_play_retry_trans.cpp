@@ -4,9 +4,9 @@
 
 ScenePlayRetryTrans::ScenePlayRetryTrans() : SceneBase(nullptr, SkinType::RETRY_TRANS, 240)
 {
-	_type = SceneType::RETRY_TRANS;
+    _type = SceneType::RETRY_TRANS;
 
-	LOG_DEBUG << "[PlayRetryTrans]";
-	clearContextPlayForRetry();
-	gNextScene = SceneType::PLAY;
+    LOG_DEBUG << "[PlayRetryTrans]";
+    clearContextPlayForRetry();
+    gNextScene = SceneType::PLAY;
 }

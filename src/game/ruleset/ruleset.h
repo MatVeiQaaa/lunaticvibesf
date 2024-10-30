@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "game/input/input_wrapper.h"
+#include "common/beat.h"
 #include "common/chartformat/chartformat.h"
 #include "game/chart/chart.h"
-#include "common/beat.h"
+#include "game/input/input_wrapper.h"
 
 enum class RulesetType
 {
@@ -21,8 +21,8 @@ public:
         lunaticvibes::Time play_time;
         double health = 1.0;
 
-        double acc;         // 0.0 - 100.0
-        double total_acc;   // 0.0 - 100.0
+        double acc;       // 0.0 - 100.0
+        double total_acc; // 0.0 - 100.0
 
         unsigned combo;
         unsigned maxCombo;
@@ -48,30 +48,31 @@ protected:
     bool _hasStartTime = false;
     lunaticvibes::Time _startTime;
 
-    unsigned notesReached = 0;    // total notes reached. +1 when timestamp reached
-    unsigned notesExpired = 0;    // total notes expired. +1 when timestamp+POOR reached; +1 for LN when tail timestamp (no +POOR) is reached
+    unsigned notesReached = 0; // total notes reached. +1 when timestamp reached
+    unsigned notesExpired =
+        0; // total notes expired. +1 when timestamp+POOR reached; +1 for LN when tail timestamp (no +POOR) is reached
 
 public:
-    RulesetBase() : _basic{}
-    {
-    }
+    RulesetBase() : _basic{} {}
     RulesetBase(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<ChartObjectBase> chart)
         : _format(std::move(format)), _chart(std::move(chart)), _basic{}
     {
     }
     virtual ~RulesetBase() = default;
+
 public:
     virtual void updatePress(InputMask& pg, const lunaticvibes::Time& t) = 0;
     virtual void updateHold(InputMask& hg, const lunaticvibes::Time& t) = 0;
     virtual void updateRelease(InputMask& rg, const lunaticvibes::Time& t) = 0;
     virtual void updateAxis(double s1, double s2, const lunaticvibes::Time& t) = 0;
     virtual void update(const lunaticvibes::Time& t) = 0;
+
 public:
     BasicData getData() const { return _basic; }
     double getClearHealth() const { return _clearHealth; }
     bool failWhenNoHealth() const { return _failWhenNoHealth; }
 
-    virtual bool isNoScore() const { return false; }    // for quick esc
+    virtual bool isNoScore() const { return false; } // for quick esc
     virtual bool isFinished() const { return notesExpired >= getMaxCombo(); }
     virtual bool isCleared() const { return _isCleared; }
     virtual bool isFailed() const { return _isFailed; }
@@ -89,7 +90,15 @@ public:
 
     virtual void updateGlobals() = 0;
 
-    void setComboDisplay(unsigned combo) { _basic.comboDisplay = combo; _basic.maxComboDisplay = std::max(_basic.maxComboDisplay, _basic.combo + combo); }
+    void setComboDisplay(unsigned combo)
+    {
+        _basic.comboDisplay = combo;
+        _basic.maxComboDisplay = std::max(_basic.maxComboDisplay, _basic.combo + combo);
+    }
     void setMaxComboDisplay(unsigned combo) { _basic.maxComboDisplay = combo; }
-    void setStartTime(const lunaticvibes::Time& t) { _hasStartTime = true; _startTime = t; }
+    void setStartTime(const lunaticvibes::Time& t)
+    {
+        _hasStartTime = true;
+        _startTime = t;
+    }
 };

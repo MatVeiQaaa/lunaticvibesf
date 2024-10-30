@@ -16,16 +16,17 @@ using StringPathView = std::basic_string_view<Path::value_type>;
 using uint8_t = std::uint8_t;
 using namespace std::string_literals;
 
-const size_t INDEX_INVALID	= ~0;
+const size_t INDEX_INVALID = ~0;
 
-[[nodiscard]] inline StringPath operator ""_p(const char* s, size_t len)
+[[nodiscard]] inline StringPath operator""_p(const char* s, size_t len)
 {
     return Path(std::string_view(s, len));
 }
 
 // Exhaustive.
 // Iterated on using underlying value.
-enum class SkinType : uint8_t {
+enum class SkinType : uint8_t
+{
     EXIT = 0,
     TITLE = 1,
     MUSIC_SELECT,
@@ -59,11 +60,13 @@ enum class SkinType : uint8_t {
 };
 std::ostream& operator<<(std::ostream& os, const SkinType& mode);
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 class Time;
 
-[[nodiscard]] inline SkinType skinTypeForKeys(unsigned keys) {
+[[nodiscard]] inline SkinType skinTypeForKeys(unsigned keys)
+{
     switch (keys)
     {
     case 5: return SkinType::PLAY5;
@@ -95,21 +98,21 @@ class Time;
 
 enum class ePlayMode
 {
-    SINGLE_PLAYER,  // means "Single Player Mode", so DP is also included
-    LOCAL_BATTLE,   // separate chart objects are required
-    GHOST_BATTLE,   // 
+    SINGLE_PLAYER, // means "Single Player Mode", so DP is also included
+    LOCAL_BATTLE,  // separate chart objects are required
+    GHOST_BATTLE,  //
 };
 
 typedef unsigned GameModeKeys; // 5 7 9 10 14
 
-enum class PlayModifierRandomType: uint8_t
+enum class PlayModifierRandomType : uint8_t
 {
     NONE = 0,
     MIRROR,
     RANDOM,
     SRAN,
-    HRAN,			// Scatter
-    ALLSCR,			// Converge
+    HRAN,   // Scatter
+    ALLSCR, // Converge
     RRAN,
     DB_SYNCHRONIZE,
     DB_SYMMETRY,
@@ -121,21 +124,20 @@ enum class PlayModifierGaugeType : uint8_t
     HARD,
     DEATH,
     EASY,
-    PATTACK,    // placeholder, not included ingame
-    GATTACK,    // placeholder, not included ingame
+    PATTACK, // placeholder, not included ingame
+    GATTACK, // placeholder, not included ingame
     EXHARD,
     ASSISTEASY,
 
     GRADE_NORMAL = 10,
     GRADE_HARD,
     GRADE_DEATH,
-
 };
 
-inline const uint8_t PLAY_MOD_ASSIST_AUTO67     = 1 << 0; // 5keys, not implemented
-inline const uint8_t PLAY_MOD_ASSIST_AUTOSCR    = 1 << 1; // 
-inline const uint8_t PLAY_MOD_ASSIST_LEGACY     = 1 << 2; // LN head -> note, not implemented
-inline const uint8_t PLAY_MOD_ASSIST_NOMINES    = 1 << 3; // from beatoraja, not implemented
+inline const uint8_t PLAY_MOD_ASSIST_AUTO67 = 1 << 0;  // 5keys, not implemented
+inline const uint8_t PLAY_MOD_ASSIST_AUTOSCR = 1 << 1; //
+inline const uint8_t PLAY_MOD_ASSIST_LEGACY = 1 << 2;  // LN head -> note, not implemented
+inline const uint8_t PLAY_MOD_ASSIST_NOMINES = 1 << 3; // from beatoraja, not implemented
 
 enum class PlayModifierHispeedFixType : uint8_t
 {
@@ -182,10 +184,10 @@ struct PlayModifiers
 
 enum class GaugeDisplayType
 {
-    GROOVE,         // 80+20
-    SURVIVAL,       // red
-    EX_SURVIVAL,    // yellow
-    ASSIST_EASY,    // 60+40
+    GROOVE,      // 80+20
+    SURVIVAL,    // red
+    EX_SURVIVAL, // yellow
+    ASSIST_EASY, // 60+40
 };
 
 class ScoreBase
@@ -210,8 +212,8 @@ public:
     int64_t addtime = 0;
     int64_t playcount = 0;
     int64_t clearcount = 0;
-    int64_t reserved[1]{ 0 };
-    double reservedlf[2]{ 0.0 };
+    int64_t reserved[1]{0};
+    double reservedlf[2]{0.0};
 
     std::string replayFileName;
 
@@ -290,6 +292,7 @@ class Ratio
 {
 protected:
     double _data;
+
 public:
     Ratio() : Ratio(0) {}
     Ratio(double d) { _data = std::clamp(d, 0.0, 1.0); }

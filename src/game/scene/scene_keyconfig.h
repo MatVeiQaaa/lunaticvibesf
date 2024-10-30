@@ -1,6 +1,6 @@
 #pragma once
-#include "scene.h"
 #include "common/keymap.h"
+#include "scene.h"
 #include <shared_mutex>
 
 class SceneKeyConfig : public SceneBase
@@ -25,7 +25,7 @@ protected:
     void updateAllText();
 
     std::map<size_t, JoystickMask> joystickPrev;
-    std::array<double, 2>   playerTurntableAngleAdd{ 0 };
+    std::array<double, 2> playerTurntableAngleAdd{0};
 
 protected:
     // Register to InputWrapper: judge / keysound

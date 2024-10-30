@@ -41,7 +41,8 @@ std::vector<std::tuple<int, int, int>> graphics_get_resolution_list();
 void graphics_change_window_mode(int mode);
 
 void graphics_resize_window(int x, int y);
-namespace lunaticvibes::graphics {
+namespace lunaticvibes::graphics
+{
 // save passed windows size as the new one, without applying it (for that refer to graphics_resize_window)
 void save_new_window_size(int x, int y);
 } // namespace lunaticvibes::graphics
@@ -49,30 +50,30 @@ void save_new_window_size(int x, int y);
 // 0: off / 1: vsync (double buffer) / 2: adaptive vsync
 void graphics_change_vsync(int mode);
 
-
 // scaling functions
 void graphics_set_supersample_level(int scale);
-int  graphics_get_supersample_level();
+int graphics_get_supersample_level();
 
 void graphics_resize_canvas(int x, int y);
 double graphics_get_canvas_scale_x();
 double graphics_get_canvas_scale_y();
 
-
 void graphics_set_maxfps(int fps);
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 // Returns true if quit event received.
 bool event_handle();
 } // namespace lunaticvibes
 
 void ImGuiNewFrame();
 
-
 // text input support
-void startTextInput(const RectF& textBox, const std::string& oldText, std::function<void(const std::string&)> funUpdateText);
+void startTextInput(const RectF& textBox, const std::string& oldText,
+                    std::function<void(const std::string&)> funUpdateText);
 void stopTextInput();
 
-namespace lunaticvibes::graphics {
+namespace lunaticvibes::graphics
+{
 void queue_screenshot(Path png);
 } // namespace lunaticvibes::graphics

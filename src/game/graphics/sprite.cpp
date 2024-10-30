@@ -14,18 +14,12 @@ bool checkPanel(int panelIdx)
 {
     switch (panelIdx)
     {
-    case -1:
-    {
-        bool panel =
-            State::get(IndexSwitch::SELECT_PANEL1) ||
-            State::get(IndexSwitch::SELECT_PANEL2) ||
-            State::get(IndexSwitch::SELECT_PANEL3) ||
-            State::get(IndexSwitch::SELECT_PANEL4) ||
-            State::get(IndexSwitch::SELECT_PANEL5) ||
-            State::get(IndexSwitch::SELECT_PANEL6) ||
-            State::get(IndexSwitch::SELECT_PANEL7) ||
-            State::get(IndexSwitch::SELECT_PANEL8) ||
-            State::get(IndexSwitch::SELECT_PANEL9);
+    case -1: {
+        bool panel = State::get(IndexSwitch::SELECT_PANEL1) || State::get(IndexSwitch::SELECT_PANEL2) ||
+                     State::get(IndexSwitch::SELECT_PANEL3) || State::get(IndexSwitch::SELECT_PANEL4) ||
+                     State::get(IndexSwitch::SELECT_PANEL5) || State::get(IndexSwitch::SELECT_PANEL6) ||
+                     State::get(IndexSwitch::SELECT_PANEL7) || State::get(IndexSwitch::SELECT_PANEL8) ||
+                     State::get(IndexSwitch::SELECT_PANEL9);
         return !panel;
     }
     case 0: return true;
@@ -70,7 +64,7 @@ SpriteBase::SpriteBase(const SpriteBuilder& builder)
 bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
 {
     // Check if object is valid
-	// Note that nullptr texture shall pass
+    // Note that nullptr texture shall pass
     if (pTexture != nullptr && !pTexture->loaded)
         return false;
 
@@ -84,7 +78,7 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
     if (time < 0 || time == TIMER_NEVER)
         return false;
 
-	// Check if timer is 140
+    // Check if timer is 140
     if (motionStartTimer != IndexTimer::MUSIC_BEAT)
     {
         time = rawTime - time;
@@ -105,12 +99,12 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
     if (motionLoopTo > motionKeyFrames[frameCount - 1].time)
         time = motionKeyFrames[frameCount - 1].time;
 
-
     // crop time into valid section
     if (time > endTime)
     {
-		if (endTime != motionLoopTo)
-			time = lunaticvibes::Time((time - motionLoopTo).norm() % (endTime - motionLoopTo).norm() + motionLoopTo, false);
+        if (endTime != motionLoopTo)
+            time = lunaticvibes::Time((time - motionLoopTo).norm() % (endTime - motionLoopTo).norm() + motionLoopTo,
+                                      false);
         else
             time = motionLoopTo;
     }
@@ -132,13 +126,14 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
         decltype(motionKeyFrames.begin()) keyFrameCurr, keyFrameNext;
         for (auto it = motionKeyFrames.begin(); it != motionKeyFrames.end(); ++it)
         {
-            if (it->time <= time.norm()) 
+            if (it->time <= time.norm())
                 keyFrameCurr = it;
-            else 
+            else
                 break;
         }
         keyFrameNext = keyFrameCurr;
-        if (keyFrameCurr + 1 != motionKeyFrames.end()) ++keyFrameNext;
+        if (keyFrameCurr + 1 != motionKeyFrames.end())
+            ++keyFrameNext;
 
         // Check if section period is 0
         auto keyFrameLength = keyFrameNext->time - keyFrameCurr->time;
@@ -152,18 +147,16 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             double prog = 1.0 * (time.norm() - keyFrameCurr->time) / keyFrameLength;
             switch (keyFrameCurr->param.accel)
             {
-            case MotionKeyFrameParams::CONSTANT:
-                break;
+            case MotionKeyFrameParams::CONSTANT: break;
             case MotionKeyFrameParams::ACCEL:
-                //prog = -std::cos(prog * 1.57079632679) + 1.0;
+                // prog = -std::cos(prog * 1.57079632679) + 1.0;
                 prog = prog * prog * prog;
                 break;
             case MotionKeyFrameParams::DECEL:
-                //prog = std::sin(prog * 1.57079632679);
+                // prog = std::sin(prog * 1.57079632679);
                 prog = 1.0 - ((1.0 - prog) * (1.0 - prog) * (1.0 - prog));
                 break;
-            case MotionKeyFrameParams::DISCONTINOUS:
-                prog = 0.0;
+            case MotionKeyFrameParams::DISCONTINOUS: prog = 0.0;
             }
 
             // calculate parameters
@@ -177,12 +170,16 @@ bool SpriteBase::updateMotion(const lunaticvibes::Time& rawTime)
             _current.color.b = (Uint8)grad(keyFrameNext->param.color.b, keyFrameCurr->param.color.b, prog);
             _current.color.a = (Uint8)grad(keyFrameNext->param.color.a, keyFrameCurr->param.color.a, prog);
             //_current.color = keyFrameNext->param.color * prog + keyFrameNext->param.color * (1.0 - prog);
-            _current.angle = grad(static_cast<int>(std::round(keyFrameNext->param.angle)), static_cast<int>(std::round(keyFrameCurr->param.angle)), prog);
+            _current.angle = grad(static_cast<int>(std::round(keyFrameNext->param.angle)),
+                                  static_cast<int>(std::round(keyFrameCurr->param.angle)), prog);
             _current.center = keyFrameCurr->param.center;
-            //LOG_DEBUG << "[Skin] Time: " << time << 
-            //    " @ " << _current.rcGrid.x << "," << _current.rcGrid.y << " " << _current.rcGrid.w << "x" << _current.rcGrid.h;
-            //LOG_DEBUG<<"[Skin] keyFrameCurr: " << keyFrameCurr->param.rcGrid.x << "," << keyFrameCurr->param.rcGrid.y << " " << keyFrameCurr->param.rcGrid.w << "x" << keyFrameCurr->param.rcGrid.h;
-            //LOG_DEBUG<<"[Skin] keyFrameNext: " << keyFrameNext->param.rcGrid.x << "," << keyFrameNext->param.rcGrid.y << " " << keyFrameNext->param.rcGrid.w << "x" << keyFrameNext->param.rcGrid.h;
+            // LOG_DEBUG << "[Skin] Time: " << time <<
+            //     " @ " << _current.rcGrid.x << "," << _current.rcGrid.y << " " << _current.rcGrid.w << "x" <<
+            //     _current.rcGrid.h;
+            // LOG_DEBUG<<"[Skin] keyFrameCurr: " << keyFrameCurr->param.rcGrid.x << "," << keyFrameCurr->param.rcGrid.y
+            // << " " << keyFrameCurr->param.rcGrid.w << "x" << keyFrameCurr->param.rcGrid.h; LOG_DEBUG<<"[Skin]
+            // keyFrameNext: " << keyFrameNext->param.rcGrid.x << "," << keyFrameNext->param.rcGrid.y << " " <<
+            // keyFrameNext->param.rcGrid.w << "x" << keyFrameNext->param.rcGrid.h;
             _current.blend = keyFrameCurr->param.blend;
             _current.filter = keyFrameCurr->param.filter;
         }
@@ -195,13 +192,14 @@ bool SpriteBase::update(const lunaticvibes::Time& t)
 {
     _draw = updateMotion(t);
 
-    if (_draw) drawn = true;
+    if (_draw)
+        drawn = true;
     return _draw;
 }
 
 void SpriteBase::setMotionStartTimer(IndexTimer t)
 {
-	motionStartTimer = t;
+    motionStartTimer = t;
 }
 
 void SpriteBase::appendMotionKeyFrame(const MotionKeyFrame& f)
@@ -222,11 +220,10 @@ void SpriteBase::adjustAfterUpdate(int x, int y, int w, int h)
     _current.rect.h += h * 2;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Static
 
-SpriteStatic::SpriteStatic(const SpriteStaticBuilder& builder): SpriteBase(builder)
+SpriteStatic::SpriteStatic(const SpriteStaticBuilder& builder) : SpriteBase(builder)
 {
     _type = SpriteTypes::STATIC;
 
@@ -236,7 +233,8 @@ SpriteStatic::SpriteStatic(const SpriteStaticBuilder& builder): SpriteBase(build
         textureRect = builder.textureRect;
 }
 
-SpriteStatic::SpriteStatic(std::shared_ptr<Texture> texture, const Rect& texRect, int srcLine) : SpriteBase(SpriteTypes::STATIC, srcLine)
+SpriteStatic::SpriteStatic(std::shared_ptr<Texture> texture, const Rect& texRect, int srcLine)
+    : SpriteBase(SpriteTypes::STATIC, srcLine)
 {
     pTexture = std::move(texture);
     if (pTexture && texRect == RECT_FULL)
@@ -247,10 +245,12 @@ SpriteStatic::SpriteStatic(std::shared_ptr<Texture> texture, const Rect& texRect
 
 void SpriteStatic::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (_draw && pTexture->loaded)
-        pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle, _current.center);
+        pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle,
+                       _current.center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -282,12 +282,7 @@ SpriteSelection::SpriteSelection(const SpriteSelectionBuilder& builder) : Sprite
         for (unsigned r = 0; r < textureSheetRows; ++r)
             for (unsigned c = 0; c < textureSheetCols; ++c)
             {
-                textureRects.emplace_back(
-                    rcGrid.x + rcGrid.w * c,
-                    rcGrid.y + rcGrid.h * r,
-                    rcGrid.w,
-                    rcGrid.h
-                );
+                textureRects.emplace_back(rcGrid.x + rcGrid.w * c, rcGrid.y + rcGrid.h * r, rcGrid.w, rcGrid.h);
             }
     }
     else
@@ -296,22 +291,19 @@ SpriteSelection::SpriteSelection(const SpriteSelectionBuilder& builder) : Sprite
         for (unsigned c = 0; c < textureSheetCols; ++c)
             for (unsigned r = 0; r < textureSheetRows; ++r)
             {
-                textureRects.emplace_back(
-                    rcGrid.x + rcGrid.w * c,
-                    rcGrid.y + rcGrid.h * r,
-                    rcGrid.w,
-                    rcGrid.h
-                );
+                textureRects.emplace_back(rcGrid.x + rcGrid.w * c, rcGrid.y + rcGrid.h * r, rcGrid.w, rcGrid.h);
             }
     }
 }
 
 void SpriteSelection::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (_draw && pTexture->loaded)
-        pTexture->draw(textureRects[selectionIndex], _current.rect, _current.color, _current.blend, _current.filter, _current.angle, _current.center);
+        pTexture->draw(textureRects[selectionIndex], _current.rect, _current.color, _current.blend, _current.filter,
+                       _current.angle, _current.center);
 }
 
 void SpriteSelection::updateSelection(size_t frame)
@@ -321,7 +313,7 @@ void SpriteSelection::updateSelection(size_t frame)
 
 bool SpriteSelection::update(const lunaticvibes::Time& t)
 {
-	return SpriteBase::update(t);
+    return SpriteBase::update(t);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -342,21 +334,23 @@ SpriteAnimated::SpriteAnimated(const SpriteAnimatedBuilder& builder) : SpriteSel
 
 bool SpriteAnimated::update(const lunaticvibes::Time& t)
 {
-	if (SpriteSelection::update(t))
-	{
+    if (SpriteSelection::update(t))
+    {
         long long timerAnim = State::get(animationStartTimer);
         if (timerAnim > 0 && timerAnim != TIMER_NEVER)
             updateAnimation(t - lunaticvibes::Time(timerAnim));
 
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 void SpriteAnimated::updateAnimation(const lunaticvibes::Time& time)
 {
-    if (textureRects.empty()) return;
-    if (animationDurationPerLoop == static_cast<unsigned>(-1)) return;
+    if (textureRects.empty())
+        return;
+    if (animationDurationPerLoop == static_cast<unsigned>(-1))
+        return;
 
     if (double timeEachFrame = double(animationDurationPerLoop) / animationFrames; timeEachFrame >= 1.0)
     {
@@ -367,11 +361,13 @@ void SpriteAnimated::updateAnimation(const lunaticvibes::Time& time)
 
 void SpriteAnimated::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (_draw && animationFrameIndex < textureRects.size() && pTexture != nullptr && pTexture->loaded)
     {
-        pTexture->draw(textureRects[selectionIndex * animationFrames + animationFrameIndex], _current.rect, _current.color, _current.blend, _current.filter, _current.angle, _current.center);
+        pTexture->draw(textureRects[selectionIndex * animationFrames + animationFrameIndex], _current.rect,
+                       _current.color, _current.blend, _current.filter, _current.angle, _current.center);
     }
 }
 
@@ -400,11 +396,11 @@ bool SpriteText::update(const lunaticvibes::Time& t)
 
 void SpriteText::updateText()
 {
-    if (!_draw) return;
+    if (!_draw)
+        return;
 
     updateTextTexture(State::get(textInd), _current.color);
     updateTextRect();
-
 }
 
 void SpriteText::updateTextTexture(std::string&& text, const Color& c)
@@ -439,29 +435,25 @@ void SpriteText::updateTextTexture(std::string&& text, const Color& c)
 
 void SpriteText::updateTextRect()
 {
-	// fitting
-	Rect textRect = textureRect;
-	double sizeFactor = (double)_current.rect.h / textRect.h;
-	int text_w = static_cast<int>(std::round(textRect.w * sizeFactor));
-	switch (align)
-	{
-	case TEXT_ALIGN_LEFT:
-		break;
-	case TEXT_ALIGN_CENTER:
-		_current.rect.x -= text_w / 2;
-		break;
-	case TEXT_ALIGN_RIGHT:
-		_current.rect.x -= text_w;
-		break;
-	}
-	_current.rect.w = text_w;
+    // fitting
+    Rect textRect = textureRect;
+    double sizeFactor = (double)_current.rect.h / textRect.h;
+    int text_w = static_cast<int>(std::round(textRect.w * sizeFactor));
+    switch (align)
+    {
+    case TEXT_ALIGN_LEFT: break;
+    case TEXT_ALIGN_CENTER: _current.rect.x -= text_w / 2; break;
+    case TEXT_ALIGN_RIGHT: _current.rect.x -= text_w; break;
+    }
+    _current.rect.w = text_w;
 }
 
 bool SpriteText::OnClick(int x, int y)
 {
-    if (!editable) return false;
-    if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w &&
-        _current.rect.y <= y && y < _current.rect.y + _current.rect.h)
+    if (!editable)
+        return false;
+    if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w && _current.rect.y <= y &&
+        y < _current.rect.y + _current.rect.h)
     {
         return true;
     }
@@ -500,11 +492,13 @@ void SpriteText::updateTextWhileEditing(const std::string& text)
 
 void SpriteText::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (_draw && pTexture && pTexture->loaded)
     {
-        pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle, _current.center);
+        pTexture->draw(textureRect, _current.rect, _current.color, _current.blend, _current.filter, _current.angle,
+                       _current.center);
     }
 }
 
@@ -516,7 +510,7 @@ void SpriteText::setOutline(int width, const Color& c)
 ////////////////////////////////////////////////////////////////////////////////
 // Number
 
-SpriteNumber::SpriteNumber(const SpriteNumberBuilder& builder): SpriteAnimated(builder)
+SpriteNumber::SpriteNumber(const SpriteNumberBuilder& builder) : SpriteAnimated(builder)
 {
     _type = SpriteTypes::NUMBER;
     alignType = builder.align;
@@ -525,7 +519,7 @@ SpriteNumber::SpriteNumber(const SpriteNumberBuilder& builder): SpriteAnimated(b
     hideLeadingZeros = builder.hideLeadingZeros;
 
     // invalid num type guard
-    //numberType = NumberType(numRows * numCols);
+    // numberType = NumberType(numRows * numCols);
     if (animationFrames != 0)
         numberType = NumberType(textureSheetRows * textureSheetCols / animationFrames);
     else
@@ -537,53 +531,61 @@ SpriteNumber::SpriteNumber(const SpriteNumberBuilder& builder): SpriteAnimated(b
 
 bool SpriteNumber::update(const lunaticvibes::Time& t)
 {
-    if (maxDigits == 0) return false;
-    if (numberType == 0) return false;
+    if (maxDigits == 0)
+        return false;
+    if (numberType == 0)
+        return false;
 
-	if (SpriteAnimated::update(t))
-	{
+    if (SpriteAnimated::update(t))
+    {
         updateNumberByInd();
         updateNumberRect();
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 void SpriteNumber::updateNumber(int n)
 {
-    if (n == INT_MIN) n = 0;
+    if (n == INT_MIN)
+        n = 0;
 
     bool positive = n >= 0;
-	int zeroIdx = -1;
+    int zeroIdx = -1;
     unsigned digits = static_cast<unsigned>(digitNumber.size());
-	switch (numberType)
-	{
-	case NUM_TYPE_NORMAL:    zeroIdx = -1; break;
-	case NUM_TYPE_BLANKZERO: zeroIdx = NUM_BZERO; break;
-    case NUM_TYPE_FULL:      zeroIdx = positive ? NUM_FULL_BZERO_POS : NUM_FULL_BZERO_NEG; digits--; break;
-	}
+    switch (numberType)
+    {
+    case NUM_TYPE_NORMAL: zeroIdx = -1; break;
+    case NUM_TYPE_BLANKZERO: zeroIdx = NUM_BZERO; break;
+    case NUM_TYPE_FULL:
+        zeroIdx = positive ? NUM_FULL_BZERO_POS : NUM_FULL_BZERO_NEG;
+        digits--;
+        break;
+    }
 
     // reset by zeroIdx to prevent unexpected glitches
-    for (auto& d : digitNumber) d = zeroIdx;
+    for (auto& d : digitNumber)
+        d = zeroIdx;
 
-	if (n == 0)
-	{
+    if (n == 0)
+    {
         digitNumber[0] = 0;
-		digitCount = 1;
-	}
-	else
-	{
-		digitCount = 0;
-		int abs_n = std::abs(n);
-		for (unsigned i = 0; abs_n && i < digits; ++i)
-		{
-			++digitCount;
-			unsigned digit = abs_n % 10;
-			abs_n /= 10;
-            if (numberType == NUM_TYPE_FULL && !positive) digit += 12;
-			digitNumber[i] = digit;
-		}
-	}
+        digitCount = 1;
+    }
+    else
+    {
+        digitCount = 0;
+        int abs_n = std::abs(n);
+        for (unsigned i = 0; abs_n && i < digits; ++i)
+        {
+            ++digitCount;
+            unsigned digit = abs_n % 10;
+            abs_n /= 10;
+            if (numberType == NUM_TYPE_FULL && !positive)
+                digit += 12;
+            digitNumber[i] = digit;
+        }
+    }
 
     // symbol
     switch (numberType)
@@ -593,15 +595,14 @@ void SpriteNumber::updateNumber(int n)
     case NUM_TYPE_BLANKZERO:
         // ?
         break;
-	/*
+    /*
     case NUM_SYMBOL:
     {
         _digit[_sDigit.size() - 1] = positive ? NUM_SYMBOL_PLUS : NUM_SYMBOL_MINUS;
         break;
     }
-	*/
-    case NUM_TYPE_FULL:
-    {
+    */
+    case NUM_TYPE_FULL: {
         switch (alignType)
         {
 
@@ -612,7 +613,7 @@ void SpriteNumber::updateNumber(int n)
             break;
 
         case NUM_ALIGN_LEFT:
-        case NUM_ALIGN_CENTER: 
+        case NUM_ALIGN_CENTER:
             if (digitCount == maxDigits)
                 --digitCount;
             digitNumber[digitCount++] = positive ? NUM_FULL_PLUS : NUM_FULL_MINUS;
@@ -628,12 +629,8 @@ void SpriteNumber::updateNumberByInd()
     int n;
     switch (numInd)
     {
-    case IndexNumber::RANDOM:
-        n = std::rand();
-        break;
-    case IndexNumber::ZERO:
-        n = 0;
-        break;
+    case IndexNumber::RANDOM: n = std::rand(); break;
+    case IndexNumber::ZERO: n = 0; break;
     default:
         // FIXME: wtf is this for
 #ifndef NDEBUG
@@ -650,9 +647,8 @@ void SpriteNumber::updateNumberRect()
 {
     switch (alignType)
     {
-    case NUM_ALIGN_RIGHT:
-    {
-        RectF offset{ _current.rect.w * (maxDigits - 1),0,0,0 };
+    case NUM_ALIGN_RIGHT: {
+        RectF offset{_current.rect.w * (maxDigits - 1), 0, 0, 0};
         for (size_t i = 0; i < maxDigits; ++i)
         {
             digitOutRect[i] = _current.rect + offset;
@@ -661,9 +657,8 @@ void SpriteNumber::updateNumberRect()
         break;
     }
 
-    case NUM_ALIGN_LEFT:
-    {
-        RectF offset{ _current.rect.w * (digitCount - 1),0,0,0 };
+    case NUM_ALIGN_LEFT: {
+        RectF offset{_current.rect.w * (digitCount - 1), 0, 0, 0};
         for (size_t i = 0; i < digitCount; ++i)
         {
             digitOutRect[i] = _current.rect + offset;
@@ -672,9 +667,8 @@ void SpriteNumber::updateNumberRect()
         break;
     }
 
-    case NUM_ALIGN_CENTER:
-    {
-        RectF offset{ 0,0,0,0 };
+    case NUM_ALIGN_CENTER: {
+        RectF offset{0, 0, 0, 0};
         if (hideLeadingZeros)
             offset.x = int(std::floor(_current.rect.w * 0.5 * (digitCount - 1)));
         else
@@ -696,31 +690,27 @@ void SpriteNumber::appendMotionKeyFrame(const MotionKeyFrame& f)
 
 void SpriteNumber::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (pTexture->loaded && _draw)
     {
-        //for (size_t i = 0; i < _outRectDigit.size(); ++i)
-        //    pTexture->draw(_drawRectDigit[i], _outRectDigit[i], _current.angle);
+        // for (size_t i = 0; i < _outRectDigit.size(); ++i)
+        //     pTexture->draw(_drawRectDigit[i], _outRectDigit[i], _current.angle);
 
         size_t max = 0;
         switch (alignType)
         {
-        case NUM_ALIGN_RIGHT:
-            max = hideLeadingZeros ? digitCount : maxDigits;
-            break;
+        case NUM_ALIGN_RIGHT: max = hideLeadingZeros ? digitCount : maxDigits; break;
         case NUM_ALIGN_LEFT:
-        case NUM_ALIGN_CENTER:
-            max = digitCount;
-            break;
-        default:
-            break;
+        case NUM_ALIGN_CENTER: max = digitCount; break;
+        default: break;
         }
         for (size_t i = 0; i < max; ++i)
         {
             if (digitNumber[i] != -1)
                 pTexture->draw(textureRects[animationFrameIndex * selections + digitNumber[i]], digitOutRect[i],
-                    _current.color, _current.blend, _current.filter, _current.angle);
+                               _current.color, _current.blend, _current.filter, _current.angle);
         }
     }
 }
@@ -751,81 +741,83 @@ SpriteSlider::SpriteSlider(const SpriteSliderBuilder& builder) : SpriteAnimated(
 
 void SpriteSlider::updateVal(double v)
 {
-	value = v;
+    value = v;
 }
 
 void SpriteSlider::updateValByInd()
 {
-	updateVal(State::get(sliderInd));
+    updateVal(State::get(sliderInd));
 }
 
 void SpriteSlider::updatePos()
 {
-	int pos_diff = static_cast<int>(std::floor((valueRange-1) * value));
-	switch (dir)
-	{
-	case SliderDirection::DOWN:
+    int pos_diff = static_cast<int>(std::floor((valueRange - 1) * value));
+    switch (dir)
+    {
+    case SliderDirection::DOWN:
         minValuePos = _current.rect.y + _current.rect.h / 2;
-		_current.rect.y += pos_diff;
-		break;
-	case SliderDirection::UP:
+        _current.rect.y += pos_diff;
+        break;
+    case SliderDirection::UP:
         minValuePos = _current.rect.y + _current.rect.h / 2;
-		_current.rect.y -= pos_diff;
-		break;
-	case SliderDirection::RIGHT:
+        _current.rect.y -= pos_diff;
+        break;
+    case SliderDirection::RIGHT:
         minValuePos = _current.rect.x + _current.rect.w / 2;
-		_current.rect.x += pos_diff;
-		break;
-	case SliderDirection::LEFT:
+        _current.rect.x += pos_diff;
+        break;
+    case SliderDirection::LEFT:
         minValuePos = _current.rect.x + _current.rect.w / 2;
-		_current.rect.x -= pos_diff;
-		break;
-	}
+        _current.rect.x -= pos_diff;
+        break;
+    }
 }
 
 bool SpriteSlider::update(const lunaticvibes::Time& t)
 {
-	if (SpriteAnimated::update(t))
-	{
-		updateValByInd();
-		updatePos();
-		return true;
-	}
-	return false;
+    if (SpriteAnimated::update(t))
+    {
+        updateValByInd();
+        updatePos();
+        return true;
+    }
+    return false;
 }
 
 bool SpriteSlider::OnClick(int x, int y)
 {
-    if (!_draw) return false;
-    if (valueRange == 0) return false;
+    if (!_draw)
+        return false;
+    if (valueRange == 0)
+        return false;
 
     bool inRange = false;
     switch (dir)
     {
     case SliderDirection::UP:
-        if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w &&
-            minValuePos - valueRange <= y && y <= minValuePos)
+        if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w && minValuePos - valueRange <= y &&
+            y <= minValuePos)
         {
             inRange = true;
         }
         break;
     case SliderDirection::DOWN:
-        if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w &&
-            minValuePos <= y && y <= minValuePos + valueRange)
+        if (_current.rect.x <= x && x < _current.rect.x + _current.rect.w && minValuePos <= y &&
+            y <= minValuePos + valueRange)
         {
             inRange = true;
         }
         break;
     case SliderDirection::LEFT:
-        if (_current.rect.y <= y && y < _current.rect.y + _current.rect.h &&
-            minValuePos - valueRange <= x && x <= minValuePos)
+        if (_current.rect.y <= y && y < _current.rect.y + _current.rect.h && minValuePos - valueRange <= x &&
+            x <= minValuePos)
         {
             inRange = true;
         }
         break;
     case SliderDirection::RIGHT:
-        if (_current.rect.y <= y && y < _current.rect.y + _current.rect.h &&
-            minValuePos <= x && x <= minValuePos + valueRange)
+        if (_current.rect.y <= y && y < _current.rect.y + _current.rect.h && minValuePos <= x &&
+            x <= minValuePos + valueRange)
         {
             inRange = true;
         }
@@ -841,27 +833,21 @@ bool SpriteSlider::OnClick(int x, int y)
 
 bool SpriteSlider::OnDrag(int x, int y)
 {
-    if (!_draw) return false;
-    if (valueRange == 0) return false;
+    if (!_draw)
+        return false;
+    if (valueRange == 0)
+        return false;
 
     double val = 0.0;
     switch (dir)
     {
-    case SliderDirection::UP:
-        val = double(minValuePos - y) / valueRange;
-        break;
-    case SliderDirection::DOWN:
-        val = double(y - minValuePos) / valueRange;
-        break;
-    case SliderDirection::LEFT:
-        val = double(minValuePos - x) / valueRange;
-        break;
-    case SliderDirection::RIGHT:
-        val = double(x - minValuePos) / valueRange;
-        break;
+    case SliderDirection::UP: val = double(minValuePos - y) / valueRange; break;
+    case SliderDirection::DOWN: val = double(y - minValuePos) / valueRange; break;
+    case SliderDirection::LEFT: val = double(minValuePos - x) / valueRange; break;
+    case SliderDirection::RIGHT: val = double(x - minValuePos) / valueRange; break;
     }
     val = std::clamp(val, 0.0, 1.0);
-    if (std::abs(value - val) > 0.000001)  // this should be enough
+    if (std::abs(value - val) > 0.000001) // this should be enough
     {
         value = val;
         _callback(value);
@@ -882,63 +868,58 @@ SpriteBargraph::SpriteBargraph(const SpriteBargraphBuilder& builder) : SpriteAni
 
 void SpriteBargraph::updateVal(Ratio v)
 {
-	value = v;
+    value = v;
 }
 
 void SpriteBargraph::updateValByInd()
 {
-	updateVal(State::get(barInd));
+    updateVal(State::get(barInd));
 }
 
 #pragma warning(push)
-#pragma warning(disable: 4244)
+#pragma warning(disable : 4244)
 void SpriteBargraph::updateSize()
 {
-	int tmp;
-	switch (dir)
-	{
-	case BargraphDirection::DOWN:
-		_current.rect.h *= value;
-		break;
-	case BargraphDirection::UP:
-		tmp = _current.rect.h;
-		_current.rect.h *= value;
-		_current.rect.y += tmp - _current.rect.h;
-		break;
-	case BargraphDirection::RIGHT:
-		_current.rect.w *= value;
-		break;
-	case BargraphDirection::LEFT:
-		tmp = _current.rect.w;
-		_current.rect.w *= value;
-		_current.rect.x += tmp - _current.rect.w;
-		break;
-	}
+    int tmp;
+    switch (dir)
+    {
+    case BargraphDirection::DOWN: _current.rect.h *= value; break;
+    case BargraphDirection::UP:
+        tmp = _current.rect.h;
+        _current.rect.h *= value;
+        _current.rect.y += tmp - _current.rect.h;
+        break;
+    case BargraphDirection::RIGHT: _current.rect.w *= value; break;
+    case BargraphDirection::LEFT:
+        tmp = _current.rect.w;
+        _current.rect.w *= value;
+        _current.rect.x += tmp - _current.rect.w;
+        break;
+    }
 }
 #pragma warning(pop)
 
 bool SpriteBargraph::update(const lunaticvibes::Time& t)
 {
-	if (SpriteAnimated::update(t))
-	{
-		updateValByInd();
-		updateSize();
-		return true;
-	}
-	return false;
+    if (SpriteAnimated::update(t))
+    {
+        updateValByInd();
+        updateSize();
+        return true;
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Option
 
-SpriteOption::SpriteOption(const SpriteOptionBuilder& builder): SpriteAnimated(builder)
+SpriteOption::SpriteOption(const SpriteOptionBuilder& builder) : SpriteAnimated(builder)
 {
     _type = SpriteTypes::OPTION;
 
     switch (builder.optionType)
     {
-    case opType::UNDEF:
-        break;
+    case opType::UNDEF: break;
 
     case opType::OPTION:
         indType = opType::OPTION;
@@ -959,65 +940,58 @@ SpriteOption::SpriteOption(const SpriteOptionBuilder& builder): SpriteAnimated(b
 
 bool SpriteOption::setInd(opType type, unsigned ind)
 {
-	if (indType != opType::UNDEF) return false;
-	switch (type)
-	{
-	case opType::UNDEF:
-		return false;
+    if (indType != opType::UNDEF)
+        return false;
+    switch (type)
+    {
+    case opType::UNDEF: return false;
 
-	case opType::OPTION:
-		indType = opType::OPTION;
-		this->ind.op = (IndexOption)ind;
-		return true;
+    case opType::OPTION:
+        indType = opType::OPTION;
+        this->ind.op = (IndexOption)ind;
+        return true;
 
-	case opType::SWITCH:
-		indType = opType::SWITCH;
+    case opType::SWITCH:
+        indType = opType::SWITCH;
         this->ind.sw = (IndexSwitch)ind;
-		return true;
+        return true;
 
     case opType::FIXED:
         indType = opType::FIXED;
         this->ind.fix = ind;
         return true;
-	}
-	return false;
+    }
+    return false;
 }
 
 void SpriteOption::updateVal(unsigned v)
 {
-	value = v;
-	updateSelection(v);
+    value = v;
+    updateSelection(v);
 }
 
 void SpriteOption::updateValByInd()
 {
-	switch (indType)
-	{
-	case opType::UNDEF:
-		break;
+    switch (indType)
+    {
+    case opType::UNDEF: break;
 
-	case opType::OPTION:
-		updateVal(State::get(ind.op));
-		break;
+    case opType::OPTION: updateVal(State::get(ind.op)); break;
 
-	case opType::SWITCH:
-		updateVal(State::get(ind.sw));
-		break;
+    case opType::SWITCH: updateVal(State::get(ind.sw)); break;
 
-    case opType::FIXED:
-        updateVal(ind.fix);
-        break;
-	}
+    case opType::FIXED: updateVal(ind.fix); break;
+    }
 }
 
 bool SpriteOption::update(const lunaticvibes::Time& t)
 {
-	if (SpriteAnimated::update(t))
-	{
-		updateValByInd();
-		return true;
-	}
-	return false;
+    if (SpriteAnimated::update(t))
+    {
+        updateValByInd();
+        return true;
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1033,10 +1007,13 @@ SpriteButton::SpriteButton(const SpriteButtonBuilder& builder) : SpriteOption(bu
 
 bool SpriteButton::OnClick(int x, int y)
 {
-    if (!_draw) return false;
+    if (!_draw)
+        return false;
 
-    if (clickableOnPanel < -1 || clickableOnPanel > 9) return false;
-    if (!checkPanel(clickableOnPanel)) return false;
+    if (clickableOnPanel < -1 || clickableOnPanel > 9)
+        return false;
+    if (!checkPanel(clickableOnPanel))
+        return false;
 
     if (plusonlyDelta == 0)
     {
@@ -1059,9 +1036,7 @@ bool SpriteButton::OnClick(int x, int y)
     }
     else
     {
-        if (x >= _current.rect.x &&
-            x < _current.rect.x + _current.rect.w &&
-            y >= _current.rect.y &&
+        if (x >= _current.rect.x && x < _current.rect.x + _current.rect.w && y >= _current.rect.y &&
             y < _current.rect.y + _current.rect.h)
         {
             // plusonly
@@ -1091,43 +1066,57 @@ SpriteGaugeGrid::SpriteGaugeGrid(const SpriteGaugeGridBuilder& builder) : Sprite
 
 void SpriteGaugeGrid::setFlashType(SpriteGaugeGrid::FlashType t)
 {
-	flashType = t;
+    flashType = t;
 }
 
 void SpriteGaugeGrid::setGaugeType(SpriteGaugeGrid::GaugeType ty)
 {
-	gaugeType = ty;
-	switch (gaugeType)
-	{
+    gaugeType = ty;
+    switch (gaugeType)
+    {
     case GaugeType::ASSIST_EASY:
-        lightFailGridType = NORMAL_LIGHT; darkFailGridType = NORMAL_DARK;
-        lightClearGridType = CLEAR_LIGHT; darkClearGridType = CLEAR_DARK;
-        failGrids = (unsigned short)std::floor(0.6 * totalGrids); break;
+        lightFailGridType = NORMAL_LIGHT;
+        darkFailGridType = NORMAL_DARK;
+        lightClearGridType = CLEAR_LIGHT;
+        darkClearGridType = CLEAR_DARK;
+        failGrids = (unsigned short)std::floor(0.6 * totalGrids);
+        break;
 
-    case GaugeType::GROOVE: 
-        lightFailGridType = NORMAL_LIGHT; darkFailGridType = NORMAL_DARK; 
-        lightClearGridType = CLEAR_LIGHT; darkClearGridType = CLEAR_DARK;
-        failGrids = (unsigned short)std::floor(0.8 * totalGrids); break;
+    case GaugeType::GROOVE:
+        lightFailGridType = NORMAL_LIGHT;
+        darkFailGridType = NORMAL_DARK;
+        lightClearGridType = CLEAR_LIGHT;
+        darkClearGridType = CLEAR_DARK;
+        failGrids = (unsigned short)std::floor(0.8 * totalGrids);
+        break;
 
-    case GaugeType::SURVIVAL:  
-        lightFailGridType = CLEAR_LIGHT; darkFailGridType = CLEAR_DARK;
-        lightClearGridType = CLEAR_LIGHT; darkClearGridType = CLEAR_DARK;
-        failGrids = 1; break;
+    case GaugeType::SURVIVAL:
+        lightFailGridType = CLEAR_LIGHT;
+        darkFailGridType = CLEAR_DARK;
+        lightClearGridType = CLEAR_LIGHT;
+        darkClearGridType = CLEAR_DARK;
+        failGrids = 1;
+        break;
 
-    case GaugeType::EX_SURVIVAL: 
+    case GaugeType::EX_SURVIVAL:
         if (textureRects.size() > EXHARD_LIGHT)
         {
-            lightFailGridType = EXHARD_LIGHT; darkFailGridType = EXHARD_DARK;
-            lightClearGridType = EXHARD_LIGHT; darkClearGridType = EXHARD_DARK;
+            lightFailGridType = EXHARD_LIGHT;
+            darkFailGridType = EXHARD_DARK;
+            lightClearGridType = EXHARD_LIGHT;
+            darkClearGridType = EXHARD_DARK;
         }
         else
         {
-            lightFailGridType = CLEAR_LIGHT; darkFailGridType = CLEAR_DARK;
-            lightClearGridType = CLEAR_LIGHT; darkClearGridType = CLEAR_DARK;
+            lightFailGridType = CLEAR_LIGHT;
+            darkFailGridType = CLEAR_DARK;
+            lightClearGridType = CLEAR_LIGHT;
+            darkClearGridType = CLEAR_DARK;
         }
-        failGrids = 1; break;
-	default: break;
-	}
+        failGrids = 1;
+        break;
+    default: break;
+    }
 
     lunaticvibes::Time t(1);
 
@@ -1150,65 +1139,70 @@ void SpriteGaugeGrid::setGaugeType(SpriteGaugeGrid::GaugeType ty)
 
 void SpriteGaugeGrid::updateVal(unsigned v)
 {
-	value = totalGrids * (v - minValue) / (maxValue - minValue);
+    value = totalGrids * (v - minValue) / (maxValue - minValue);
 }
 
 void SpriteGaugeGrid::updateValByInd()
 {
-	updateVal(State::get(numInd));
+    updateVal(State::get(numInd));
 }
 
 bool SpriteGaugeGrid::update(const lunaticvibes::Time& t)
 {
-	if (SpriteAnimated::update(t))
-	{
+    if (SpriteAnimated::update(t))
+    {
         updateValByInd();
-		switch (flashType)
-		{
-		case FlashType::NONE:
-			for (unsigned i = 0; i < value; ++i)
-				flashing[i] = true;
-			for (unsigned i = value; i < totalGrids; ++i)
-				flashing[i] = false;
-			break;
+        switch (flashType)
+        {
+        case FlashType::NONE:
+            for (unsigned i = 0; i < value; ++i)
+                flashing[i] = true;
+            for (unsigned i = value; i < totalGrids; ++i)
+                flashing[i] = false;
+            break;
 
-		case FlashType::CLASSIC:
-			for (unsigned i = 0; i < value; ++i)
-				flashing[i] = true;
-			if (value - 3 >= 0 && value - 3 < totalGrids && t.norm() / 17 % 2) flashing[value - 3] = false; // -3 grid: 17ms, per 2 units (1 0 1 0)
-			if (value - 2 >= 0 && value - 2 < totalGrids && t.norm() / 17 % 4) flashing[value - 2] = false; // -2 grid: 17ms, per 4 units (1 0 0 0)
-			for (unsigned i = value; i < totalGrids; ++i)
-				flashing[i] = false;
-			break;
-			
-		default: break;
-		}
-		return true;
-	}
-	return false;
+        case FlashType::CLASSIC:
+            for (unsigned i = 0; i < value; ++i)
+                flashing[i] = true;
+            if (value - 3 >= 0 && value - 3 < totalGrids && t.norm() / 17 % 2)
+                flashing[value - 3] = false; // -3 grid: 17ms, per 2 units (1 0 1 0)
+            if (value - 2 >= 0 && value - 2 < totalGrids && t.norm() / 17 % 4)
+                flashing[value - 2] = false; // -2 grid: 17ms, per 4 units (1 0 0 0)
+            for (unsigned i = value; i < totalGrids; ++i)
+                flashing[i] = false;
+            break;
+
+        default: break;
+        }
+        return true;
+    }
+    return false;
 }
 
 void SpriteGaugeGrid::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     if (_draw && pTexture != nullptr && pTexture->isLoaded())
     {
-		RectF r = _current.rect;
+        RectF r = _current.rect;
         unsigned grid_val = unsigned(failGrids - 1);
         for (unsigned i = 0; i < grid_val; ++i)
         {
-            flashing[i] ?
-                pTexture->draw(textureRects[lightFailRectIdxOffset + animationFrameIndex], r, _current.color, _current.blend, _current.filter, _current.angle) :
-                pTexture->draw(textureRects[darkFailRectIdxOffset + animationFrameIndex], r, _current.color, _current.blend, _current.filter, _current.angle);
+            flashing[i] ? pTexture->draw(textureRects[lightFailRectIdxOffset + animationFrameIndex], r, _current.color,
+                                         _current.blend, _current.filter, _current.angle)
+                        : pTexture->draw(textureRects[darkFailRectIdxOffset + animationFrameIndex], r, _current.color,
+                                         _current.blend, _current.filter, _current.angle);
             r.x += gridSizeW;
             r.y += gridSizeH;
         }
         for (unsigned i = grid_val; i < totalGrids; ++i)
         {
-            flashing[i] ?
-                pTexture->draw(textureRects[lightClearRectIdxOffset + animationFrameIndex], r, _current.color, _current.blend, _current.filter, _current.angle) :
-                pTexture->draw(textureRects[darkClearRectIdxOffset + animationFrameIndex], r, _current.color, _current.blend, _current.filter, _current.angle);
+            flashing[i] ? pTexture->draw(textureRects[lightClearRectIdxOffset + animationFrameIndex], r, _current.color,
+                                         _current.blend, _current.filter, _current.angle)
+                        : pTexture->draw(textureRects[darkClearRectIdxOffset + animationFrameIndex], r, _current.color,
+                                         _current.blend, _current.filter, _current.angle);
             r.x += gridSizeW;
             r.y += gridSizeH;
         }
@@ -1227,7 +1221,8 @@ SpriteOnMouse::SpriteOnMouse(const SpriteOnMouseBuilder& builder) : SpriteAnimat
 
 bool SpriteOnMouse::update(const lunaticvibes::Time& t)
 {
-    if (!checkPanel(visibleOnPanel)) return false;
+    if (!checkPanel(visibleOnPanel))
+        return false;
     return SpriteAnimated::update(t);
 }
 
@@ -1237,8 +1232,10 @@ void SpriteOnMouse::OnMouseMove(int x, int y)
     {
         int bx = _current.rect.x + mouseArea.x;
         int by = _current.rect.y + mouseArea.y;
-        if (x < bx || x > bx + mouseArea.w) _draw = false;
-        if (y < by || y > by + mouseArea.h) _draw = false;
+        if (x < bx || x > bx + mouseArea.w)
+            _draw = false;
+        if (y < by || y > by + mouseArea.h)
+            _draw = false;
     }
 }
 

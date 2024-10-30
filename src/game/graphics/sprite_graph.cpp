@@ -18,11 +18,15 @@ SpriteLine::SpriteLine(const SpriteLineBuilder& builder) : SpriteStatic(builder)
     textColor = builder.color;
 }
 
-void SpriteLine::appendPoint(const ColorPoint& c) { _points.push_back(c); }
+void SpriteLine::appendPoint(const ColorPoint& c)
+{
+    _points.push_back(c);
+}
 
 void SpriteLine::draw() const
 {
-    if (isHidden()) return;
+    if (isHidden())
+        return;
 
     for (auto& [p1, p2] : _rects)
     {
@@ -52,8 +56,6 @@ void SpriteLine::updateProgress(const lunaticvibes::Time& t)
     }
 }
 
-
-
 void SpriteLine::updateRects()
 {
     /*
@@ -65,14 +67,17 @@ void SpriteLine::updateRects()
     }
     */
 
-    if (!gPlayContext.ruleset[_player]) return;
+    if (!gPlayContext.ruleset[_player])
+        return;
 
-    auto pushRects = [this](size_t size, const std::vector<int>& points, unsigned maxh, const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; })
-    {
+    auto pushRects = [this](
+                         size_t size, const std::vector<int>& points, unsigned maxh,
+                         const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; }) {
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
         size_t region = static_cast<size_t>(std::floor(size * _progress));
-        if (region == 0) return;
+        if (region == 0)
+            return;
         region--;
 
         if (size > RT_GRAPH_THRESHOLD)
@@ -81,16 +86,10 @@ void SpriteLine::updateRects()
             {
                 if (cond(points[i], points[i + 1]))
                 {
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * (double(points[i]) / maxh)
-                        },
-                        {
-                            r.x + _field_w * (double(i + 1) / (size - 1)),
-                            r.y - _field_h * (double(points[i + 1]) / maxh)
-                        }
-                        });
+                    tmp.push_back(
+                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)},
+                         {r.x + _field_w * (double(i + 1) / (size - 1)),
+                          r.y - _field_h * (double(points[i + 1]) / maxh)}});
                 }
             }
         }
@@ -100,26 +99,13 @@ void SpriteLine::updateRects()
             {
                 if (cond(points[i], points[i + 1]))
                 {
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * (double(points[i]) / maxh)
-                        },
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * (double(points[i + 1]) / maxh)
-                        }
-                        });
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * (double(points[i + 1]) / maxh)
-                        },
-                        {
-                            r.x + _field_w * (double(i + 1) / (size - 1)),
-                            r.y - _field_h * (double(points[i + 1]) / maxh)
-                        }
-                        });
+                    tmp.push_back(
+                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i]) / maxh)},
+                         {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i + 1]) / maxh)}});
+                    tmp.push_back(
+                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * (double(points[i + 1]) / maxh)},
+                         {r.x + _field_w * (double(i + 1) / (size - 1)),
+                          r.y - _field_h * (double(points[i + 1]) / maxh)}});
                 }
             }
         }
@@ -132,12 +118,14 @@ void SpriteLine::updateRects()
         }
     };
 
-    auto pushRectsF = [this](size_t size, const std::vector<double>& points, double maxh, const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; })
-    {
+    auto pushRectsF = [this](
+                          size_t size, const std::vector<double>& points, double maxh,
+                          const std::function<bool(int val1, int val2)>& cond = [](int, int) { return true; }) {
         std::vector<std::pair<Point, Point>> tmp;
         const auto& r = _current.rect;
         size_t region = static_cast<size_t>(std::floor(size * _progress));
-        if (region == 0) return;
+        if (region == 0)
+            return;
         region--;
 
         if (size > RT_GRAPH_THRESHOLD)
@@ -146,16 +134,9 @@ void SpriteLine::updateRects()
             {
                 if (cond(points[i], points[i + 1]))
                 {
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * points[i] / maxh
-                        },
-                        {
-                            r.x + _field_w * (double(i + 1) / (size - 1)),
-                            r.y - _field_h * points[i + 1] / maxh
-                        }
-                        });
+                    tmp.push_back(
+                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh},
+                         {r.x + _field_w * (double(i + 1) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
                 }
             }
         }
@@ -165,26 +146,11 @@ void SpriteLine::updateRects()
             {
                 if (cond(points[i], points[i + 1]))
                 {
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * points[i] / maxh
-                        },
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * points[i + 1] / maxh
-                        }
-                        });
-                    tmp.push_back({
-                        {
-                            r.x + _field_w * (double(i) / (size - 1)),
-                            r.y - _field_h * points[i + 1] / maxh
-                        },
-                        {
-                            r.x + _field_w * (double(i + 1) / (size - 1)),
-                            r.y - _field_h * points[i + 1] / maxh
-                        }
-                        });
+                    tmp.push_back({{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i] / maxh},
+                                   {r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
+                    tmp.push_back(
+                        {{r.x + _field_w * (double(i) / (size - 1)), r.y - _field_h * points[i + 1] / maxh},
+                         {r.x + _field_w * (double(i + 1) / (size - 1)), r.y - _field_h * points[i + 1] / maxh}});
                 }
             }
         }
@@ -199,19 +165,18 @@ void SpriteLine::updateRects()
 
     switch (_ltype)
     {
-    case LineType::GAUGE_F:
-    {
+    case LineType::GAUGE_F: {
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
-        pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 <= h && val2 <= h); });
+        pushRects(p.size(), p, 100.0, [h](int val1, int val2) { return (val1 <= h && val2 <= h); });
         break;
     }
     case LineType::GAUGE_C: {
         const auto h = static_cast<int>(gPlayContext.ruleset[_player]->getClearHealth() * 100);
         std::shared_lock l(gPlayContext._mutex);
         const auto& p = gPlayContext.graphGauge[_player];
-        pushRects(p.size(), p, 100.0, [h](int val1, int val2) {return (val1 >= h && val2 >= h); });
+        pushRects(p.size(), p, 100.0, [h](int val1, int val2) { return (val1 >= h && val2 >= h); });
         break;
     }
     case LineType::SCORE: {

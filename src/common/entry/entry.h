@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include "common/types.h"
 #include "common/hash.h"
+#include "common/types.h"
 
 enum class eEntryType
 {
     UNKNOWN,
     NEW_SONG_FOLDER,
     FOLDER,
-    SONG,   // all charts in folder
-    CHART,  // one chart in folder
+    SONG,  // all charts in folder
+    CHART, // one chart in folder
     CUSTOM_FOLDER,
     COURSE_FOLDER,
     RANDOM_CHART,
@@ -44,7 +44,7 @@ public:
     HashMD5 md5;
     StringContent _name;
     StringContent _name2;
-    unsigned long long _addTime = 0;  // from epoch time
+    unsigned long long _addTime = 0; // from epoch time
 
 public:
     virtual Path getPath() { return Path(); }

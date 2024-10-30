@@ -5,9 +5,7 @@
 #include "game/skin/skin_lr2.h"
 #include <memory>
 
-SkinMgr::SkinMgr() : _sharedSprites(std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>())
-{
-}
+SkinMgr::SkinMgr() : _sharedSprites(std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>()) {}
 
 void SkinMgr::reload(SkinType e, bool simple)
 {

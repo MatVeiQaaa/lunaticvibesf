@@ -1,11 +1,11 @@
 #pragma once
 
+#include <filesystem>
+#include <memory>
 #include <string>
 #include <string_view>
-#include <filesystem>
-#include <vector>
 #include <utility>
-#include <memory>
+#include <vector>
 
 #include "types.h"
 
@@ -24,29 +24,30 @@ bool isParentPath(Path parent, Path dir);
 // string to double
 [[nodiscard]] double toDouble(std::string_view str, double defVal = 0.0) noexcept;
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 // strcasecmp
 [[nodiscard]] bool iequals(std::string_view lhs, std::string_view rhs) noexcept;
 } // namespace lunaticvibes
 
 [[nodiscard]] constexpr unsigned base36(char c)
 {
-	return (c > '9') ? (c >= 'a' ? 10 + c - 'a' : 10 + c - 'A') : (c - '0');
+    return (c > '9') ? (c >= 'a' ? 10 + c - 'a' : 10 + c - 'A') : (c - '0');
 }
 
 [[nodiscard]] constexpr unsigned base36(char first, char second)
 {
-	return 36 * base36(first) + base36(second);
+    return 36 * base36(first) + base36(second);
 }
 
 [[nodiscard]] constexpr unsigned base16(char c)
 {
-	return (c > '9') ? (c >= 'a' ? 10 + c - 'a' : 10 + c - 'A') : (c - '0');
+    return (c > '9') ? (c >= 'a' ? 10 + c - 'a' : 10 + c - 'A') : (c - '0');
 }
 
 [[nodiscard]] constexpr unsigned base16(char first, char second)
 {
-	return 16 * base16(first) + base16(second);
+    return 16 * base16(first) + base16(second);
 }
 
 [[nodiscard]] std::string bin2hex(const void* bin, size_t size);
@@ -67,7 +68,8 @@ void preciseSleep(long long nanoseconds);
 
 double normalizeLinearGrowth(double prev, double curr);
 
-namespace lunaticvibes {
+namespace lunaticvibes
+{
 
 // Trim leading and trailing symbols 'markers' from string 's'.
 [[nodiscard]] constexpr std::string_view trim(const std::string_view s, const std::string_view markers)
@@ -108,4 +110,4 @@ void trim_in_place(std::string& s);
 // `"/tmp/AFileWithUpperCaseInIt"`
 std::string resolve_windows_path(std::string);
 
-} // lunaticvibes
+} // namespace lunaticvibes

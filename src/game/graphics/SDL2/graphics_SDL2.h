@@ -6,6 +6,7 @@
 #include <SDL_ttf.h>
 #include <SDL_video.h>
 
+#include <array>
 #include <filesystem>
 #include <limits>
 #include <memory>
@@ -165,8 +166,8 @@ class Texture
 	friend class SpriteVideo;
 
 protected:
-	std::shared_ptr<SDL_Texture> _pTexture = nullptr;
-    mutable bool _filter; // May be changed in-between _draw calls.
+    mutable std::array<std::shared_ptr<SDL_Texture>, 2> _textures{}; // Only 'mutable' to copy in draw() when needed.
+    mutable bool _didRenderOnce = false; // shows if _textures is sorted by 'filter'. Set on first draw() call.
 	bool loaded = false;
 	Rect textureRect;
 
@@ -207,7 +208,7 @@ public:
 	Texture(int w, int h, PixelFormat fmt, bool target);
 	virtual ~Texture() = default;
 public:
-    void* raw() { return (void*)_pTexture.get(); }
+    void* raw();
 	Rect getRect() const { return textureRect; }
 	bool isLoaded() const { return loaded; }
     int updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* V, int Vpitch);

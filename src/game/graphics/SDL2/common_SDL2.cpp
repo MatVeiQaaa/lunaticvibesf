@@ -289,8 +289,8 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
         V, Vpitch);
 }
 
-void Texture::_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF,
-	const Color c, const BlendMode b, const bool filter, const double angle, const Point* center)
+static void do_draw(SDL_Texture* pTex, bool& texIsFiltered, const Rect* srcRect, RectF dstRectF, const Color c,
+                  const BlendMode b, const bool filter, const double angle, const Point* center)
 {
     int flipFlags = 0;
     if (dstRectF.w < 0) { dstRectF.w = -dstRectF.w; dstRectF.x -= dstRectF.w; /*flipFlags |= SDL_FLIP_HORIZONTAL;*/ }
@@ -307,7 +307,15 @@ void Texture::_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF,
     SDL_FPoint scenter;
     if (center) scenter = { (float)center->x * ssLevel, (float)center->y * ssLevel };
 
-    SDL_SetTextureScaleMode(pTex, filter ? SDL_ScaleModeBest : SDL_ScaleModeNearest);
+    // These calls are very expensive.
+    // TODO: avoid calling this when drawing even with different filter mode.
+    // TODO: check if this call actually has effect across a single render cycle, or only the last call takes effect for
+    // the whole cycle. https://github.com/chown2/lunaticvibesf/issues/123
+    if (texIsFiltered != filter)
+    {
+        SDL_SetTextureScaleMode(pTex, filter ? SDL_ScaleModeBest : SDL_ScaleModeNearest);
+        texIsFiltered = filter;
+    }
 
     if (b == BlendMode::INVERT)
     {
@@ -414,13 +422,13 @@ void Texture::_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF,
 void Texture::draw(RectF dstRect,
     const Color c, const BlendMode b, const bool filter, const double angle) const
 {
-    _draw(_pTexture.get(), NULL, dstRect, c, b, filter, angle, NULL);
+    do_draw(_pTexture.get(), _filter, NULL, dstRect, c, b, filter, angle, NULL);
 }
 
 void Texture::draw(RectF dstRect,
     const Color c, const BlendMode b, const bool filter, const double angle, const Point& center) const
 {
-    _draw(_pTexture.get(), NULL, dstRect, c, b, filter, angle, &center);
+    do_draw(_pTexture.get(), _filter, NULL, dstRect, c, b, filter, angle, &center);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect,
@@ -429,7 +437,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect,
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
-    _draw(_pTexture.get(), &srcRectTmp, dstRect, c, b, filter, angle, NULL);
+    do_draw(_pTexture.get(), _filter, &srcRectTmp, dstRect, c, b, filter, angle, NULL);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect,
@@ -438,7 +446,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect,
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
-    _draw(_pTexture.get(), &srcRectTmp, dstRect, c, b, filter, angle, &center);
+    do_draw(_pTexture.get(), _filter, &srcRectTmp, dstRect, c, b, filter, angle, &center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -475,7 +483,13 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect,
     dstRect.w *= ssLevel;
     dstRect.h *= ssLevel;
 
-    SDL_SetTextureScaleMode(&*_pTexture, filter ? SDL_ScaleModeBest : SDL_ScaleModeNearest);
+    // These calls are very expensive.
+    // TODO: fix same things as Texture::draw
+    if (_filter != filter)
+    {
+        SDL_SetTextureScaleMode(_pTexture.get(), filter ? SDL_ScaleModeBest : SDL_ScaleModeNearest);
+        _filter = filter;
+    }
 
     if (b == BlendMode::MULTIPLY_INVERTED_BACKGROUND)
     {

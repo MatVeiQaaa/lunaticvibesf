@@ -166,12 +166,9 @@ class Texture
 
 protected:
 	std::shared_ptr<SDL_Texture> _pTexture = nullptr;
+    mutable bool _filter; // May be changed in-between _draw calls.
 	bool loaded = false;
 	Rect textureRect;
-
-protected:
-    void static _draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRect,
-        const Color c, const BlendMode blend, const bool filter, const double angleInDegrees, const Point* center = NULL);
 
 public:
 	// Inner draw function.

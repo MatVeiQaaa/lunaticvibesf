@@ -303,7 +303,7 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
 }
 
 static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, const Color c, const BlendMode b,
-                    const bool filter, const double angle, const Point* center)
+                    const double angle, const Point* center)
 {
     int flipFlags = 0;
     if (dstRectF.w < 0) { dstRectF.w = -dstRectF.w; dstRectF.x -= dstRectF.w; /*flipFlags |= SDL_FLIP_HORIZONTAL;*/ }
@@ -464,14 +464,14 @@ void Texture::draw(RectF dstRect,
     const Color c, const BlendMode b, const bool filter, const double angle) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, filter, angle, nullptr);
+    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, nullptr);
 }
 
 void Texture::draw(RectF dstRect,
     const Color c, const BlendMode b, const bool filter, const double angle, const Point& center) const
 {
     copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, filter, angle, &center);
+    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, &center);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect,
@@ -481,7 +481,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect,
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
-    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, filter, angle, nullptr);
+    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, nullptr);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect,
@@ -491,7 +491,7 @@ void Texture::draw(const Rect& srcRect, RectF dstRect,
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w) srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h) srcRectTmp.h = textureRect.h;
-    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, filter, angle, &center);
+    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, &center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -525,7 +525,7 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect,
 {
     (void)ignored;
     copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, filter, angle, nullptr);
+    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, nullptr);
 }
 
 void GraphLine::draw(Point p1, Point p2, Color c) const

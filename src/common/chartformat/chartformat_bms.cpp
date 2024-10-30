@@ -847,7 +847,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
 int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned flags)
 {
-    const size_t length = str.length();;
+    const size_t length = str.length();
     if (length / 2 == 0)
     {
         LOG_VERBOSE << "[BMS] Invalid string length " << str;
@@ -878,7 +878,7 @@ int ChartFormatBMS::seqToLane36(channel& ch, StringContentView str, unsigned fla
 
 int ChartFormatBMS::seqToLane16(channel& ch, StringContentView str)
 {
-    const size_t length = str.length();;
+    const size_t length = str.length();
     if (length / 2 == 0)
     {
         LOG_VERBOSE << "[BMS] Invalid string length " << str;

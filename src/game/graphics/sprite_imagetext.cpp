@@ -6,14 +6,12 @@
 #include "common/beat.h"
 #include "common/encoding.h"
 
-SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder) : SpriteText(builder)
+SpriteImageText::SpriteImageText(const SpriteImageTextBuilder& builder)
+    : SpriteText(builder), _textures(builder.charTextures), _chrList(builder.charMappingList),
+      textHeight(builder.height), _firstLine(0), _margin(builder.margin)
 {
     _type = SpriteTypes::IMAGE_TEXT;
-    _textures = builder.charTextures;
     LVF_DEBUG_ASSERT(builder.charMappingList != nullptr);
-    _chrList = builder.charMappingList;
-    textHeight = builder.height;
-    _margin = builder.margin;
 }
 
 void SpriteImageText::updateTextTexture(const std::string& text, unsigned first_line)

@@ -3617,6 +3617,10 @@ SkinLR2::SkinLR2(std::shared_ptr<std::array<std::shared_ptr<SpriteBase>, SPRITE_
         startSpriteVideoPlayback();
     }
 
+    for (const auto& s : _sprites)
+        if (auto pS = std::dynamic_pointer_cast<iSpriteMouse>(s); pS != nullptr)
+            _mouseSprites.push_back(s);
+
     prevSkinTextureNameMap.clear();
     prevSkinLR2FontNameMap.clear();
 }

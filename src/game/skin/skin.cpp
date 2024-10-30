@@ -1,10 +1,12 @@
 #include "skin.h"
 
-#include "game/graphics/sprite_video.h"
-#include "game/scene/scene_context.h"
-#include "game/skin/skin_lr2_debug.h"
-#include <execution>
 #include <algorithm>
+#include <execution>
+
+#include <common/assert.h>
+#include <game/graphics/sprite_video.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_debug.h>
 
 // FIXME: get rid of preDefinedTextures.
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
@@ -71,14 +73,12 @@ void SkinBase::update_mouse(int x, int y)
         if (s->isDraw() && !s->isHidden())
         {
             auto pS = std::dynamic_pointer_cast<iSpriteMouse>(s);
-            if (pS != nullptr)
-            {
-                pS->OnMouseMove(x, y);
-            }
+            LVF_DEBUG_ASSERT(pS != nullptr);
+            pS->OnMouseMove(x, y);
         }
     };
 
-    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(), clickSpriteLambda);
+    std::for_each(std::execution::par_unseq, _mouseSprites.begin(), _mouseSprites.end(), clickSpriteLambda);
 }
 
 void SkinBase::update_mouse_click(int x, int y)

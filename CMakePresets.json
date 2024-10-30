@@ -43,7 +43,7 @@
             "generator": "Ninja Multi-Config",
             "displayName": "Linux Multi-Config",
             "cacheVariables": {
-                "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+                "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
             },
             "condition": {

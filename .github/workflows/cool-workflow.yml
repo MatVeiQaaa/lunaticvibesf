@@ -16,7 +16,7 @@ jobs:
           - name: "Ubuntu (GCC, Release)"
             os: ubuntu-22.04
             preset: linux-vcpkg-gcc
-            build-args: "--config Release"
+            build-args: "--config RelWithDebInfo"
           - name: "Ubuntu (Clang, Debug)"
             os: ubuntu-22.04
             preset: linux-vcpkg-clang
@@ -24,7 +24,7 @@ jobs:
           - name: "Ubuntu (Clang, Release)"
             os: ubuntu-22.04
             preset: linux-vcpkg-clang
-            build-args: "--config Release"
+            build-args: "--config RelWithDebInfo"
           - name: "Windows (MSVC, Debug)"
             os: windows-2022
             preset: windows-vcpkg-debug

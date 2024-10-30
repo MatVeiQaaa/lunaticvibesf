@@ -149,19 +149,18 @@ bool SpriteImageText::update(const lunaticvibes::Time& t)
     if (_draw)
     {
         updateTextTexture(State::get(textInd), State::get(_lvfLineIdx));
-        if (_draw) updateTextRect();
+        updateTextRect();
     }
     return _draw;
 }
 
 void SpriteImageText::draw() const
 {
-    if (isHidden()) return;
     // OPTIMIZATION: avoid drawing invisible text.
     // Do this in draw() instead of update() as we may want isDraw() && !isHidden() (e.g. empty jukebox text).
     if (_current.blend != BlendMode::NONE && _current.color.a == 0)
         return;
-    if (_draw)
+    if (_draw && !isHidden())
     {
         for (const auto& [c, r] : _drawList)
         {

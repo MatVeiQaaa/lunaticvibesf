@@ -3767,6 +3767,7 @@ bool SkinLR2::loadCSV(Path p)
                     }
                     else if (key.substr(0, 5) == "PLAY_")
                     {
+                        // clang-format off
                         if (key == "PLAY_SKIN_X") adjustPlaySkinX = node.second.as<int>(0);
                         else if (key == "PLAY_SKIN_Y") adjustPlaySkinY = node.second.as<int>(0);
                         else if (key == "PLAY_SKIN_W") adjustPlaySkinW = node.second.as<int>(0);
@@ -3784,6 +3785,7 @@ bool SkinLR2::loadCSV(Path p)
                         else if (key == "PLAY_NOTE_2P_Y") adjustPlayNote2PY = node.second.as<int>(0);
                         else if (key == "PLAY_NOTE_2P_W") adjustPlayNote2PW = node.second.as<int>(0);
                         else if (key == "PLAY_NOTE_2P_H") adjustPlayNote2PH = node.second.as<int>(0);
+                        // clang-format on
                     }
                 }
                 for (auto& itOp : customize)

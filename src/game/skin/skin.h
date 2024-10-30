@@ -2,7 +2,6 @@
 #include "game/graphics/sprite.h"
 #include "game/graphics/video.h"
 #include "common/types.h"
-#include <list>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -52,7 +51,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // Sprite elements
 protected:
-    std::list<std::shared_ptr<SpriteBase>> _sprites;                    // Push instance on parsing
+    std::vector<std::shared_ptr<SpriteBase>> _sprites; // Only modified while parsing the skin.
 
 // functional support
 protected:

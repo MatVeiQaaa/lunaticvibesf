@@ -217,7 +217,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 
         // check new song
         const bool isNewEntry = pEntry->type() == eEntryType::NEW_SONG_FOLDER ||
-                                (pEntry->_addTime > static_cast<unsigned long long>(getFileTimeNow()) -
+                                (pEntry->_addTime > static_cast<unsigned long long>(time.norm()) -
                                                         State::get(IndexNumber::NEW_ENTRY_SECONDS));
 
         static const std::map<eEntryType, size_t> BAR_TYPE_MAP = {

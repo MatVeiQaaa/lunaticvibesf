@@ -2936,7 +2936,6 @@ ParseRet SkinLR2::DST_BAR_BODY()
                 drawQueue.push_back({barSprites[idx], dstOpt, d.op[3]});
             }
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -2972,7 +2971,6 @@ ParseRet SkinLR2::DST_BAR_FLASH()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3017,7 +3015,6 @@ ParseRet SkinLR2::DST_BAR_LEVEL()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3062,7 +3059,6 @@ ParseRet SkinLR2::DST_BAR_RIVAL_MYLAMP()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3106,7 +3102,6 @@ ParseRet SkinLR2::DST_BAR_RIVAL_RIVALLAMP()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3151,7 +3146,6 @@ ParseRet SkinLR2::DST_BAR_LAMP()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3195,7 +3189,6 @@ ParseRet SkinLR2::DST_BAR_TITLE()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3240,7 +3233,6 @@ ParseRet SkinLR2::DST_BAR_RANK()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 
@@ -3285,7 +3277,6 @@ ParseRet SkinLR2::DST_BAR_RIVAL()
             e->setMotionLoopTo(d.loop);
             e->setMotionStartTimer((IndexTimer)d.timer);
 
-            // NOLINTNEXTLINE(modernize-use-emplace): can't use emplace with structs without constructors.
             drawQueue.push_back({e});
         }
 

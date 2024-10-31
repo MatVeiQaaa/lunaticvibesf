@@ -153,6 +153,33 @@ int SpriteBarEntry::setRivalLampRival(BarLampType type, const SpriteAnimated::Sp
     return 0;
 }
 
+static BarType entry_bar_type(eEntryType e)
+{
+    switch (e)
+    {
+    case eEntryType::UNKNOWN: return BarType::SONG;
+    case eEntryType::FOLDER: return BarType::FOLDER;
+    case eEntryType::NEW_SONG_FOLDER: return BarType::NEW_SONG_FOLDER;
+    case eEntryType::CUSTOM_FOLDER: return BarType::CUSTOM_FOLDER;
+    case eEntryType::COURSE_FOLDER: return BarType::COURSE_FOLDER;
+    case eEntryType::SONG: return BarType::SONG;
+    case eEntryType::CHART: return BarType::SONG;
+    case eEntryType::RIVAL: return BarType::RIVAL;
+    case eEntryType::RIVAL_SONG: return BarType::SONG_RIVAL;
+    case eEntryType::RIVAL_CHART: return BarType::SONG_RIVAL;
+    case eEntryType::NEW_COURSE: return BarType::NEW_COURSE;
+    case eEntryType::COURSE: return BarType::COURSE;
+    case eEntryType::RANDOM_COURSE: return BarType::RANDOM_COURSE;
+    case eEntryType::ARENA_FOLDER: return BarType::RIVAL;
+    case eEntryType::ARENA_COMMAND: return BarType::RIVAL;
+    case eEntryType::ARENA_LOBBY: return BarType::SONG;
+    case eEntryType::RANDOM_CHART: return BarType::CUSTOM_FOLDER;
+    case eEntryType::CHART_LINK:
+    case eEntryType::REPLAY: break;
+    }
+    return BarType::SONG;
+}
+
 bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 {
     for (auto& s : sBodyOff)
@@ -220,28 +247,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                                 (pEntry->_addTime > static_cast<unsigned long long>(time.norm()) -
                                                         State::get(IndexNumber::NEW_ENTRY_SECONDS));
 
-        static const std::map<eEntryType, size_t> BAR_TYPE_MAP = {
-            {eEntryType::UNKNOWN, (size_t)BarType::SONG},
-            {eEntryType::FOLDER, (size_t)BarType::FOLDER},
-            {eEntryType::NEW_SONG_FOLDER, (size_t)BarType::NEW_SONG_FOLDER},
-            {eEntryType::CUSTOM_FOLDER, (size_t)BarType::CUSTOM_FOLDER},
-            {eEntryType::COURSE_FOLDER, (size_t)BarType::COURSE_FOLDER},
-            {eEntryType::SONG, (size_t)BarType::SONG},
-            {eEntryType::CHART, (size_t)BarType::SONG},
-            {eEntryType::RIVAL, (size_t)BarType::RIVAL},
-            {eEntryType::RIVAL_SONG, (size_t)BarType::SONG_RIVAL},
-            {eEntryType::RIVAL_CHART, (size_t)BarType::SONG_RIVAL},
-            {eEntryType::NEW_COURSE, (size_t)BarType::NEW_COURSE},
-            {eEntryType::COURSE, (size_t)BarType::COURSE},
-            {eEntryType::RANDOM_COURSE, (size_t)BarType::RANDOM_COURSE},
-            {eEntryType::ARENA_FOLDER, (size_t)BarType::RIVAL},
-            {eEntryType::ARENA_COMMAND, (size_t)BarType::RIVAL},
-            {eEntryType::ARENA_LOBBY, (size_t)BarType::SONG},
-            {eEntryType::RANDOM_CHART, (size_t)BarType::CUSTOM_FOLDER},
-        };
-        size_t barTypeIdx = (size_t)BarType::SONG;
-        if (auto it = BAR_TYPE_MAP.find(pEntry->type()); it != BAR_TYPE_MAP.end())
-            barTypeIdx = it->second;
+        auto barTypeIdx = static_cast<size_t>(entry_bar_type(pEntry->type()));
         if (isNewEntry && (BarType)barTypeIdx == BarType::SONG)
         {
             barTypeIdx = (size_t)BarType::NEW_SONG;

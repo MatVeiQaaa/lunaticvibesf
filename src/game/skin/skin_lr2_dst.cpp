@@ -17,26 +17,6 @@ static bool any_of(std::initializer_list<unsigned> entries, unsigned val)
     return false;
 }
 
-inline bool dst(IndexOption option_entry, std::initializer_list<unsigned> entries)
-{
-    auto op = State::get(option_entry);
-    for (auto e : entries)
-        if (op == e)
-            return true;
-    return false;
-}
-inline bool dst(IndexOption option_entry, unsigned entry)
-{
-    return State::get(option_entry) == entry;
-}
-
-inline bool sw(std::initializer_list<IndexSwitch> entries)
-{
-    for (auto e : entries)
-        if (State::get(e))
-            return true;
-    return false;
-}
 inline bool sw(IndexSwitch entry)
 {
     return State::get(entry);
@@ -49,10 +29,10 @@ inline void set(unsigned idx, bool val = true)
     else
         _op.set(idx, val);
 }
-inline void set(std::initializer_list<unsigned> idx, bool val = true)
+inline void set(std::initializer_list<unsigned> idx)
 {
     for (auto& i : idx)
-        set(i, val);
+        set(i);
 }
 inline bool get(int idx)
 {
@@ -291,7 +271,7 @@ void updateDstOpt()
     // 81 ロード完了
     {
         using namespace Option;
-        set(80, dst(IndexOption::PLAY_SCENE_STAT, {SPLAY_PREPARE, SPLAY_LOADING}));
+        set(80, any_of({SPLAY_PREPARE, SPLAY_LOADING}, State::get(IndexOption::PLAY_SCENE_STAT)));
         set(81, !_op[80]);
     }
 
@@ -749,7 +729,7 @@ void updateDstOpt()
     // 291 ノンストップ
     // 292 エキスパート
     // 293 段位認定
-    if (dst(IndexOption::SELECT_ENTRY_TYPE, Option::ENTRY_COURSE))
+    if (State::get(IndexOption::SELECT_ENTRY_TYPE) == Option::ENTRY_COURSE)
     {
         const unsigned course_type = State::get(IndexOption::COURSE_TYPE);
         set(290);

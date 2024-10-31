@@ -4,10 +4,13 @@
 
 #include "game/ruleset/ruleset_bms.h"
 
+namespace
+{
 static std::shared_mutex _mutex;
 static std::bitset<900> _op;
 static std::bitset<100> _customOp;
 static std::map<size_t, bool> _extendedOp;
+} // namespace
 
 static bool any_of(std::initializer_list<unsigned> entries, unsigned val)
 {

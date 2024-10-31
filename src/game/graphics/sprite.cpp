@@ -1188,21 +1188,21 @@ void SpriteGaugeGrid::draw() const
     {
         RectF r = _current.rect;
         unsigned grid_val = unsigned(failGrids - 1);
+        const Rect clear_tex_flashing = textureRects[lightClearRectIdxOffset + animationFrameIndex];
+        const Rect clear_tex = textureRects[darkClearRectIdxOffset + animationFrameIndex];
+        const Rect fail_tex_flashing = textureRects[lightFailRectIdxOffset + animationFrameIndex];
+        const Rect fail_tex = textureRects[darkFailRectIdxOffset + animationFrameIndex];
         for (unsigned i = 0; i < grid_val; ++i)
         {
-            flashing[i] ? pTexture->draw(textureRects[lightFailRectIdxOffset + animationFrameIndex], r, _current.color,
-                                         _current.blend, _current.filter, _current.angle)
-                        : pTexture->draw(textureRects[darkFailRectIdxOffset + animationFrameIndex], r, _current.color,
-                                         _current.blend, _current.filter, _current.angle);
+            pTexture->draw(flashing[i] ? fail_tex_flashing : fail_tex, r, _current.color, _current.blend,
+                           _current.filter, _current.angle);
             r.x += gridSizeW;
             r.y += gridSizeH;
         }
         for (unsigned i = grid_val; i < totalGrids; ++i)
         {
-            flashing[i] ? pTexture->draw(textureRects[lightClearRectIdxOffset + animationFrameIndex], r, _current.color,
-                                         _current.blend, _current.filter, _current.angle)
-                        : pTexture->draw(textureRects[darkClearRectIdxOffset + animationFrameIndex], r, _current.color,
-                                         _current.blend, _current.filter, _current.angle);
+            pTexture->draw(flashing[i] ? clear_tex_flashing : clear_tex, r, _current.color, _current.blend,
+                           _current.filter, _current.angle);
             r.x += gridSizeW;
             r.y += gridSizeH;
         }

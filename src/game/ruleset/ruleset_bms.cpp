@@ -10,6 +10,7 @@
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
 #include <common/assert.h>
+#include <common/sysutil.h>
 
 using namespace chart;
 
@@ -432,25 +433,33 @@ RulesetBMS::RulesetBMS(std::shared_ptr<ChartFormatBase> format, std::shared_ptr<
     }
 }
 
-void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
+static RulesetBMS::GaugeType get_gauge(PlayModifierGaugeType gauge)
 {
+    using P = PlayModifierGaugeType;
+    using G = RulesetBMS::GaugeType;
     switch (gauge)
     {
-    case PlayModifierGaugeType::HARD: _gauge = GaugeType::HARD; break;
-    case PlayModifierGaugeType::DEATH: _gauge = GaugeType::DEATH; break;
-    case PlayModifierGaugeType::EASY:
-        _gauge = GaugeType::EASY;
-        break;
-        // case PlayModifierGaugeType::PATTACK     : _gauge = GaugeType::P_ATK;   break;
-        // case PlayModifierGaugeType::GATTACK     : _gauge = GaugeType::G_ATK;   break;
-    case PlayModifierGaugeType::ASSISTEASY: _gauge = GaugeType::ASSIST; break;
-    case PlayModifierGaugeType::GRADE_NORMAL: _gauge = GaugeType::GRADE; break;
-    case PlayModifierGaugeType::GRADE_DEATH: _gauge = GaugeType::EXGRADE; break;
-    case PlayModifierGaugeType::EXHARD: _gauge = GaugeType::EXHARD; break;
-    case PlayModifierGaugeType::GRADE_HARD: _gauge = GaugeType::EXGRADE; break;
-    case PlayModifierGaugeType::NORMAL:
-    default: _gauge = GaugeType::GROOVE; break;
+    case P::NORMAL: return G::GROOVE;
+    case P::HARD: return G::HARD;
+    case P::DEATH: return G::DEATH;
+    case P::EASY: return G::EASY;
+    // TODO: check these.
+    case P::PATTACK:
+    case P::GATTACK: return G::GROOVE;
+    // case P::PATTACK: return G::P_ATK;
+    // case P::GATTACK: return G::G_ATK;
+    case P::EXHARD: return G::EXHARD;
+    case P::ASSISTEASY: return G::ASSIST;
+    case P::GRADE_NORMAL: return G::GRADE;
+    case P::GRADE_DEATH:
+    case P::GRADE_HARD: return G::EXGRADE;
     }
+    panic("error", "invalid PlayModifierGaugeType");
+}
+
+void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)
+{
+    _gauge = get_gauge(gauge);
 
     if (_format)
     {

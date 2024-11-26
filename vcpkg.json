@@ -11,6 +11,7 @@
     "boost-algorithm",
     "boost-asio",
     "boost-format",
+    "boost-nowide",
     "boost-property-tree",
     "boost-tokenizer",
     "cereal",

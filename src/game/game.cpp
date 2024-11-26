@@ -34,6 +34,8 @@
 #include <timeapi.h>
 #endif // WIN32
 
+#include <boost/nowide/args.hpp>
+
 #include <curl/curl.h>
 #include <imgui.h>
 
@@ -41,9 +43,10 @@ static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
 void mainLoop();
 
-// SDL_main
 int main(int argc, char* argv[])
 {
+    boost::nowide::args _(argc, argv); // Make arguments UTF-8 encoded on Windows in-place. For CJK file paths.
+
     SetThreadName("LunaticVibesF");
     SetThreadAsMainThread();
 

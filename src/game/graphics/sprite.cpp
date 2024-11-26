@@ -388,10 +388,13 @@ SpriteText::SpriteText(const SpriteTextBuilder& builder) : SpriteBase(builder)
 
 bool SpriteText::update(const lunaticvibes::Time& t)
 {
-    LVF_DEBUG_ASSERT(IsMainThread());
     _draw = updateMotion(t);
-    updateText();
     return _draw;
+}
+
+void SpriteText::update_on_main(const lunaticvibes::Time& t)
+{
+    updateText();
 }
 
 void SpriteText::updateText()
@@ -405,6 +408,8 @@ void SpriteText::updateText()
 
 void SpriteText::updateTextTexture(std::string&& text, const Color& c)
 {
+    LVF_DEBUG_ASSERT(IsMainThread());
+
     if (!pFont || !pFont->loaded)
         return;
 

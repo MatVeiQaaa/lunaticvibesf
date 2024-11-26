@@ -50,13 +50,10 @@ void SkinBase::update()
         State::set(IndexNumber::_TEST3, (int)(gUpdateContext.metre * 1000));
     }
 
-    auto updateSpriteLambda = [](const std::shared_ptr<SpriteBase>& s) {
-        // reset
-        s->_draw = false;
-        s->update(gUpdateContext.updateTime);
-    };
-
-    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(), updateSpriteLambda);
+    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(),
+                  [](const std::shared_ptr<SpriteBase>& s) { s->update(gUpdateContext.updateTime); });
+    std::for_each(_sprites.begin(), _sprites.end(),
+                  [](const std::shared_ptr<SpriteBase>& s) { s->update_on_main(gUpdateContext.updateTime); });
 }
 
 void SkinBase::update_mouse(int x, int y)

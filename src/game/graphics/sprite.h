@@ -131,7 +131,11 @@ public:
     void clearMotionKeyFrames() { motionKeyFrames.clear(); }
 
     bool updateMotion(const lunaticvibes::Time& time);
+    // Called from thread pool awaited in main().
+    // WARNING: do not use pushAndWaitMainThreadTask() here.
     virtual bool update(const lunaticvibes::Time& time);
+    // Called from main thread after update().
+    virtual void update_on_main(const lunaticvibes::Time& time) {};
     virtual void adjustAfterUpdate(int x, int y, int w = 0, int h = 0);
 
 protected:
@@ -370,6 +374,7 @@ private:
 
 public:
     bool update(const lunaticvibes::Time& t) override;
+    void update_on_main(const lunaticvibes::Time& t) override;
     void draw() const override;
 
 public:

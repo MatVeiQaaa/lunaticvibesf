@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <iterator>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -70,6 +71,24 @@ double normalizeLinearGrowth(double prev, double curr);
 
 namespace lunaticvibes
 {
+
+// TODO(C++20): use std::span.
+template <typename T> [[nodiscard]] inline std::string join(char sep, const std::vector<T>& v)
+{
+    using std::begin, std::end;
+    auto it = begin(v);
+    auto e = end(v);
+    if (it == e)
+        return {};
+    std::string s;
+    s += *it++;
+    for (; it != e; ++it)
+    {
+        s += sep;
+        s += *it;
+    }
+    return s;
+}
 
 // Trim leading and trailing symbols 'markers' from string 's'.
 [[nodiscard]] constexpr std::string_view trim(const std::string_view s, const std::string_view markers)

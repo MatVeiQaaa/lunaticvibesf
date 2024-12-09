@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "game/sound/soundset_lr2.h"
+#include <common/utils.h>
 
 [[nodiscard]] inline StringPath operator""_pp(const char* s, size_t len)
 {
@@ -130,11 +131,8 @@ TEST(Lr2SoundSet, CustomFile)
         EXPECT_EQ(opt.id, 0);
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
-        ASSERT_EQ(opt.entries.size(), 3);
-        EXPECT_EQ(opt.entries[0], "mybgm.1");
-        EXPECT_EQ(opt.entries[1], "mybgm.2");
-        EXPECT_EQ(opt.entries[2], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 0);
+        EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_pp);
 }
@@ -152,11 +150,8 @@ TEST(Lr2SoundSet, CustomFileDefaultEntry)
         EXPECT_EQ(opt.id, 0);
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
-        ASSERT_EQ(opt.entries.size(), 3);
-        EXPECT_EQ(opt.entries[0], "mybgm.1");
-        EXPECT_EQ(opt.entries[1], "mybgm.2");
-        EXPECT_EQ(opt.entries[2], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 1);
+        EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.2/mybgm.2.wav"_pp);
 }
@@ -174,11 +169,8 @@ TEST(Lr2SoundSet, CustomFileRandomOption)
         EXPECT_EQ(opt.id, 0);
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
-        ASSERT_EQ(opt.entries.size(), 3);
-        EXPECT_EQ(opt.entries[0], "mybgm.1");
-        EXPECT_EQ(opt.entries[1], "mybgm.2");
-        EXPECT_EQ(opt.entries[2], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 1);
+        EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
     EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_pp);
 }
@@ -196,9 +188,8 @@ TEST(Lr2SoundSet, CustomFileRandomOptionNoFiles)
         EXPECT_EQ(opt.id, 0);
         EXPECT_EQ(opt.displayName, "SELECT BGM");
         EXPECT_EQ(opt.internalName, "FILE_SELECT BGM");
-        ASSERT_EQ(opt.entries.size(), 1);
-        EXPECT_EQ(opt.entries[0], "RANDOM");
         EXPECT_EQ(opt.defaultEntry, 0);
+        EXPECT_EQ(lunaticvibes::join(',', opt.entries), "RANDOM");
     }
     EXPECT_EQ(ss.getPathBGMSelect(), ""_pp);
 }

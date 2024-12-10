@@ -52,7 +52,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
         return res;
     }
 
-    StringPath folder = pstr.substr(0, offset).substr(0, pstr.find_last_of(Path::preferred_separator));
+    StringPath folder = pstr.substr(0, std::min(offset, pstr.find_last_of(Path::preferred_separator, offset)));
     if (fs::is_directory(folder))
     {
         pstr =

@@ -40,6 +40,7 @@ static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]{
 
 std::vector<Path> findFiles(Path p, bool recursive)
 {
+    LOG_VERBOSE << "[Utils] findFiles: '" << p << "' (" << (recursive ? "" : "non-") << "recursive)";
     auto pstr = p.make_preferred().native();
     size_t offset = pstr.find('*');
 
@@ -67,6 +68,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
         if (size_t idx = str.find_last_of('.'); idx != str.npos)
             str.replace(idx, 1, ".(?i)");
 
+        LOG_VERBOSE << "[Utils] findFiles: .. will match '" << str << "' on contents of '" << folder << "'";
         auto pathRegex = RE2(str);
         Path pathFolder(folder);
         if (recursive)
@@ -472,6 +474,7 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
         LOG_WARNING << "[Utils] Absolute LR2 paths are forbidden: " << raw;
         return {};
     }
+    LOG_VERBOSE << "[Utils] convertLR2Path: '" << raw << "'";
 
     std::string_view prefix = raw.substr(0, 2);
     if (prefix == "./" || prefix == ".\\")
@@ -498,6 +501,7 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
     out_path = lunaticvibes::resolve_windows_path(std::move(out_path));
 #endif // _WIN32
 
+    LOG_VERBOSE << "[Utils] convertLR2Path: -> '" << out_path << "'";
     return out_path;
 }
 

@@ -102,3 +102,18 @@ TEST(tLR2Skin, HelpFileParsed)
 
     EXPECT_EQ(s.getHelpFiles(), helpFiles);
 }
+
+TEST(tLR2Skin, CustomFile)
+{
+    mock_SkinLR2 s{"lr2skin/customfile.lr2skin"};
+    ASSERT_EQ(s.isLoaded(), true);
+    ASSERT_EQ(s.getCustomizeOptionCount(), 1);
+    {
+        const auto& opt = s.getCustomizeOptionInfo(0);
+        EXPECT_EQ(opt.id, 0);
+        EXPECT_EQ(opt.displayName, "テスト");
+        EXPECT_EQ(opt.internalName, "FILE_テスト");
+        EXPECT_EQ(opt.defaultEntry, 0);
+        EXPECT_EQ(lunaticvibes::join(',', opt.entries), "1,2,RANDOM");
+    }
+}

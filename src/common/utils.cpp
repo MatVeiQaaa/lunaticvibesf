@@ -63,6 +63,10 @@ std::vector<Path> findFiles(Path p, bool recursive)
             RE2::GlobalReplace(&str, in, out);
         }
 
+        // Case-insensitive file extensions for LR2 paths.
+        if (size_t idx = str.find_last_of('.'); idx != str.npos)
+            str.replace(idx, 1, ".(?i)");
+
         auto pathRegex = RE2(str);
         Path pathFolder(folder);
         if (recursive)

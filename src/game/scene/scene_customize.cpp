@@ -53,6 +53,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     auto skinFileList = findFiles(
         PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin")), true);
+    std::sort(skinFileList.begin(), skinFileList.end());
     auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
     {
@@ -71,6 +72,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     auto soundsetFileList = findFiles(
         PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss")), true);
+    std::sort(soundsetFileList.begin(), soundsetFileList.end());
     for (auto& p : soundsetFileList)
     {
         soundsetList.push_back(fs::absolute(p));

@@ -3388,6 +3388,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         auto& def(parseParamBuf[2]);
 
         auto ls = findFiles(pathf);
+        std::sort(ls.begin(), ls.end());
         size_t defVal = 0;
         for (size_t param = 0; param < ls.size(); ++param)
         {

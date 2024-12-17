@@ -36,6 +36,7 @@ target_link_libraries(common
     PUBLIC plog::plog
     PUBLIC re2::re2
     PUBLIC taocpp::json
+    PRIVATE tinyfiledialogs
 )
 
 if (LINUX)

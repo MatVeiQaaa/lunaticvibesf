@@ -122,6 +122,7 @@ target_link_libraries(gamelib
     PUBLIC PkgConfig::libavformat
     PUBLIC PkgConfig::libavutil
     PUBLIC re2::re2
+    PRIVATE tinyfiledialogs
 )
 
 if (${GRAPHICS_BACKEND} STREQUAL SDL2)

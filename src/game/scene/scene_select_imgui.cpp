@@ -19,6 +19,7 @@
 
 #include <boost/format.hpp>
 #include <imgui.h>
+#include <tinyfiledialogs.h>
 
 #ifdef _WIN32
 #include <VersionHelpers.h>
@@ -1499,58 +1500,31 @@ bool SceneSelect::imguiApplyPlayerName()
 
 bool SceneSelect::imguiAddFolder(const char* path)
 {
-    bool added = false;
-
     if (!path)
+        path = tinyfd_selectFolderDialog(nullptr, nullptr);
+
+    if (!path || path[0] == '\0')
     {
-#ifdef _WIN32
-        // TODO replace with IFileDialog
-        char szDisplayName[MAX_PATH] = {0};
-        BROWSEINFOA lpbi = {0};
-        getWindowHandle(&lpbi.hwndOwner);
-        lpbi.pszDisplayName = szDisplayName;
-        lpbi.lpszTitle = "Select Folder";
-        lpbi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_DONTGOBELOWDOMAIN | BIF_EDITBOX | BIF_USENEWUI;
-        PIDLIST_ABSOLUTE lpiil = SHBrowseForFolderA(&lpbi);
-        if (lpiil)
-        {
-            char szPath[MAX_PATH];
-            if (SHGetPathFromIDList(lpiil, szPath))
-            {
-                imgui_folders.push_back(szPath);
-                imgui_folders_display.push_back(imgui_folders.back().c_str());
-                imgui_folder_index = -1;
-                added = true;
-
-                ConfigMgr::General()->setFolders(std::vector<std::string>(imgui_folders.begin(), imgui_folders.end()));
-
-                // TODO auto refresh?
-            }
-            CoTaskMemFree(lpiil);
-        }
-#else
-        LOG_ERROR << "unimplemented";
-#endif
+        LOG_INFO << "[Select] No path selected";
+        return false;
     }
-    else
-    {
-        if (strnlen(path, 1) == 0)
+
+    for (auto& f : imgui_folders)
+        if (f == path)
+        {
+            LOG_INFO << "[Select] This path is already in the jukebox: " << path;
             return false;
-
-        for (auto& f : imgui_folders)
-        {
-            if (f == path)
-                return false;
         }
 
-        imgui_folders.emplace_back(path);
-        imgui_folders_display.push_back(imgui_folders.back().c_str());
-        imgui_folder_index = -1;
-        added = true;
+    imgui_folders.emplace_back(path);
+    imgui_folders_display.push_back(imgui_folders.back().c_str());
+    imgui_folder_index = -1;
 
-        ConfigMgr::General()->setFolders(std::vector<std::string>(imgui_folders.begin(), imgui_folders.end()));
-    }
-    return added;
+    ConfigMgr::General()->setFolders(std::vector<std::string>(imgui_folders.begin(), imgui_folders.end()));
+
+    LOG_INFO << "[Select] Added path to jukebox: " << path;
+
+    return true;
 }
 
 bool SceneSelect::imguiDelFolder()

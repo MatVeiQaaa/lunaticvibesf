@@ -199,6 +199,10 @@ TEST(ScoreDb, CourseScoreDeleting)
 
 TEST(ScoreDb, ImportFromLr2)
 {
+    {
+        lunaticvibes::Lr2ScoreDb _("/does/not/exist");
+    }
+
     lunaticvibes::Lr2ScoreDb lr2_db(lunaticvibes::Lr2ScoreDb::InMemoryRwTag{});
     ScoreDB score_db{IN_MEMORY_DB_PATH};
     score_db.importScores(lr2_db);

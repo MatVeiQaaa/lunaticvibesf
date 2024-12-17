@@ -340,6 +340,12 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
 bool SQLite::isReadOnly() const
 {
     int ret = sqlite3_db_readonly(_db, nullptr);
+    // TODO: remove this check when SQLite can't construct invalid object.
+    if (ret == -1)
+    {
+        LOG_ERROR << "[sqlite3] isReadOnly() error: " << errmsg();
+        return true;
+    }
     LVF_VERIFY(ret == 0 || ret == 1);
     return ret == 1;
 }

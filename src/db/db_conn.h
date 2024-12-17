@@ -43,9 +43,17 @@ private:
     bool inTransaction = false;
 
 public:
+    enum class OpenMode
+    {
+        ReadWrite,
+        ReadOnly,
+    };
     SQLite() = delete;
-    SQLite(const char* path, std::string tag);
-    SQLite(const Path& path, std::string tag) : SQLite(path.u8string().c_str(), std::move(tag)) {}
+    SQLite(const char* path, std::string tag, OpenMode mode = OpenMode::ReadWrite);
+    SQLite(const Path& path, std::string tag, OpenMode mode = OpenMode::ReadWrite)
+        : SQLite(path.u8string().c_str(), std::move(tag), mode)
+    {
+    }
     virtual ~SQLite();
     SQLite(const SQLite&) = delete;
     SQLite(SQLite&&) = delete;
@@ -61,6 +69,7 @@ protected:
     // For 'name', use YYYYMMDDTHHMMSS format.
     // True on success.
     [[nodiscard]] bool applyMigration(std::string_view name, const std::function<bool()>& migrate);
+    [[nodiscard]] bool isReadOnly() const;
 
 private:
     void commitOrRollback(const std::string_view sql);

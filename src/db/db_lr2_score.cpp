@@ -4,15 +4,16 @@
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
-lunaticvibes::Lr2ScoreDb::Lr2ScoreDb(const char* path)
-    // FIXME: PLS do it in read-only mode
-    : SQLite(path, "Lr2ScoreDb")
+lunaticvibes::Lr2ScoreDb::Lr2ScoreDb(const char* path) : SQLite(path, "Lr2ScoreDb", SQLite::OpenMode::ReadOnly)
 {
+    LVF_DEBUG_ASSERT(isReadOnly());
     LOG_INFO << "[Lr2ScoreDb] Opening database: " << path;
 }
 
 lunaticvibes::Lr2ScoreDb::Lr2ScoreDb(InMemoryRwTag) : SQLite(IN_MEMORY_DB_PATH, "Lr2ScoreDb")
 {
+    LVF_DEBUG_ASSERT(!isReadOnly());
+
     static constexpr auto&& LR2_CREATE_TABLE_SCORE =
         "CREATE TABLE score(hash TEXT primary key,clear INTEGER,perfect INTEGER,great INTEGER,good INTEGER,bad "
         "INTEGER,poor INTEGER,totalnotes INTEGER,maxcombo INTEGER,minbp INTEGER,playcount INTEGER,clearcount "

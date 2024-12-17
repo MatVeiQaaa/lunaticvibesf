@@ -7,9 +7,15 @@
 #include <common/log.h>
 #include <db/db_conn.h>
 
-SQLite::SQLite(const char* path, std::string tag_) : tag(std::move(tag_))
+SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(std::move(tag_))
 {
-    int ret = sqlite3_open(path, &_db);
+    int flags = 0;
+    switch (mode)
+    {
+    case OpenMode::ReadWrite: flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE; break;
+    case OpenMode::ReadOnly: flags = SQLITE_OPEN_READONLY; break;
+    }
+    int ret = sqlite3_open_v2(path, &_db, flags, nullptr);
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[sqlite3] sql failed to open db at path '" << path << "' (tag '" << tag << "'): [" << ret << "] "
@@ -329,4 +335,11 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
     commit();
     LOG_VERBOSE << "[sqlite3] Migration has been successfully applied";
     return true;
+}
+
+bool SQLite::isReadOnly() const
+{
+    int ret = sqlite3_db_readonly(_db, nullptr);
+    LVF_DEBUG_ASSERT(ret == 0 || ret == 1);
+    return ret == 1;
 }

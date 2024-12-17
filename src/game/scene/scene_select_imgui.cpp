@@ -1059,6 +1059,7 @@ void SceneSelect::imguiPageDebugMain()
             updateEntryScore(idx);
             setEntryInfo();
         }
+        SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
     }
     // TODO: rebuild profile stats button.
 

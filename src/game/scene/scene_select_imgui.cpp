@@ -13,6 +13,7 @@
 #include "game/runtime/i18n.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
+#include <db/db_lr2_score.h>
 
 #include "git_version.h"
 #include "imgui.h"
@@ -1050,6 +1051,29 @@ void SceneSelect::imguiPageDebug()
 
 void SceneSelect::imguiPageDebugMain()
 {
+    ImGui::InputTextWithHint("##LR2ProfileImportPath", "LR2files/Score/YourNick.db", _lr2_db_import_path.data(),
+                             _lr2_db_import_path.size(), 0);
+    ImGui::SameLine();
+    if (ImGui::Button("Browse"))
+    {
+        LOG_ERROR << "TODO: browse";
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Import"))
+    {
+        // FIXME: handle SQLite db opening error. Important since path is user-supplied.
+        // TODO: check path encoding on Windows. Works on Linux.
+        lunaticvibes::Lr2ScoreDb lr2_db{_lr2_db_import_path.data()};
+        g_pScoreDB->importScores(lr2_db);
+        for (size_t idx = 0; idx < gSelectContext.entries.size(); ++idx)
+        {
+            std::unique_lock<std::shared_mutex> u(gSelectContext._mutex);
+            updateEntryScore(idx);
+            setEntryInfo();
+        }
+        SoundMgr::playSysSample(SoundChannelType::BGM_SYS, eSoundSample::SOUND_F_OPEN);
+    }
+
     if (ImGui::Button("Rebuild score cache"))
     {
         g_pScoreDB->rebuildBmsPbCache();

@@ -347,6 +347,15 @@ void config_fx()
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void assign(char* arr, size_t arrn, std::string_view s)
+{
+    if (arrn == 0)
+        arrn = 1; // Saturating subtraction.
+    const size_t bytes = std::min(arrn - 1, s.size());
+    strncpy(arr, s.data(), bytes);
+    arr[bytes] = '\0';
+}
+
 SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
@@ -506,6 +515,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     _config_enable_preview_dedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
     _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
     _config_list_scroll_time_initial = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
+    assign(_lr2_db_import_path.data(), _lr2_db_import_path.size(), ConfigMgr::get('P', cfg::P_LR2_DB_IMPORT_PATH, ""));
 }
 
 SceneSelect::~SceneSelect()
@@ -534,6 +544,7 @@ SceneSelect::~SceneSelect()
     config_eq();
     config_freq();
     config_fx();
+    ConfigMgr::set('P', cfg::P_LR2_DB_IMPORT_PATH, _lr2_db_import_path.data());
     ConfigMgr::save();
 
     _input.loopEnd();

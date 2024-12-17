@@ -280,6 +280,9 @@ constexpr char P_IGNORE_5KEYS_IF_7KEYS_EXIST[] = "Ignore5keysIf7keysExist";
 constexpr char P_SELECT_SHOW_RANDOM_ANY[] = "bSelShowRandomSongAny";
 constexpr char P_SELECT_SHOW_RANDOM_FAILED[] = "bSelShowRandomSongFail";
 constexpr char P_SELECT_SHOW_RANDOM_NOPLAY[] = "bSelShowRandomSongNoPlay";
+
+// TODO(C++20): remove inline as it's implied.
+inline constexpr auto&& P_LR2_DB_IMPORT_PATH = "sLr2DbImportPath";
 } // namespace cfg
 
 class ConfigProfile : public vConfig

@@ -290,6 +290,8 @@ private:
     bool imgui_arena_joinLobby = false;
     char imgui_arena_address_buf[256] = {0};
 
+    std::array<char, 256> _lr2_db_import_path;
+
     bool imgui_play_adjustHispeedWithUpDown = false;
     bool imgui_play_adjustHispeedWithSelect = false;
     bool imgui_play_adjustLanecoverWithStart67 = false;

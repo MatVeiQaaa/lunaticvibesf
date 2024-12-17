@@ -1,22 +1,24 @@
-#include "game/scene/scene_context.h"
-#include "game/skin/skin_lr2_debug.h"
 #include "scene_select.h"
 
 #include <array>
 #include <string>
 
-#include "common/log.h"
-#include "config/config_mgr.h"
-#include "game/arena/arena_client.h"
-#include "game/arena/arena_data.h"
-#include "game/arena/arena_host.h"
-#include "game/runtime/i18n.h"
-#include "game/sound/sound_mgr.h"
-#include "game/sound/sound_sample.h"
+#include <common/log.h>
+#include <config/config_mgr.h>
 #include <db/db_lr2_score.h>
+#include <db/db_score.h>
+#include <game/arena/arena_client.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_host.h>
+#include <game/runtime/i18n.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_lr2_debug.h>
+#include <game/sound/sound_mgr.h>
+#include <game/sound/sound_sample.h>
+#include <git_version.h>
 
-#include "git_version.h"
-#include "imgui.h"
+#include <boost/format.hpp>
+#include <imgui.h>
 
 #ifdef _WIN32
 #include <VersionHelpers.h>

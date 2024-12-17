@@ -1,18 +1,20 @@
 #include "arena_client.h"
 
-#include "arena_data.h"
-#include "arena_internal.h"
-#include "common/encoding.h"
-#include "common/hash.h"
-#include "common/log.h"
-#include "game/runtime/i18n.h"
-#include "game/scene/scene_context.h"
-#include "git_version.h"
+#include <common/encoding.h>
+#include <common/hash.h>
+#include <common/log.h>
+#include <db/db_song.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_internal.h>
+#include <game/runtime/i18n.h>
+#include <game/scene/scene_context.h>
+#include <git_version.h>
 
 #include <exception>
 
-#include "cereal/archives/portable_binary.hpp"
-#include "re2/re2.h"
+#include <boost/format.hpp>
+#include <cereal/archives/portable_binary.hpp>
+#include <re2/re2.h>
 
 std::shared_ptr<ArenaClient> g_pArenaClient = nullptr;
 

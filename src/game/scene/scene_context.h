@@ -1,10 +1,8 @@
 #pragma once
 #include "common/chartformat/chartformat.h"
 #include "common/difficultytable/table_bms.h"
-#include "common/entry/entry_folder.h"
+#include "common/entry/entry.h"
 #include "common/types.h"
-#include "db/db_score.h"
-#include "db/db_song.h"
 #include "game/chart/chart.h"
 #include "game/graphics/texture_extra.h"
 #include "game/replay/replay_chart.h"
@@ -15,6 +13,9 @@
 #include <shared_mutex>
 #include <string>
 #include <variant>
+
+class ScoreDB;
+class SongDB;
 
 inline SceneType gNextScene = SceneType::SELECT;
 inline bool gInCustomize = false;

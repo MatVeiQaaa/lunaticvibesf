@@ -17,6 +17,7 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
 
+#include <boost/format.hpp>
 #include <imgui.h>
 
 // prototype

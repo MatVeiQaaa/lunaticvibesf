@@ -6,8 +6,10 @@
 #include <string_view>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include <common/assert.h>
+#include <common/entry/entry_song.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
 #include <game/arena/arena_data.h>

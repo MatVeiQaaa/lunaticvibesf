@@ -3,6 +3,8 @@
 #include <common/assert.h>
 #include <common/types.h>
 #include <config/config_mgr.h>
+#include <db/db_score.h>
+#include <db/db_song.h>
 #include <game/arena/arena_client.h>
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>
@@ -13,6 +15,7 @@
 #include <game/sound/sound_sample.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
 {

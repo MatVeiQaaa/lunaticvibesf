@@ -9,6 +9,7 @@
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <config/config_mgr.h>
+#include <db/db_score.h>
 #include <game/arena/arena_client.h>
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>

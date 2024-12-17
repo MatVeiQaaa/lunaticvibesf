@@ -3,7 +3,6 @@
 #include <array>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -23,7 +22,9 @@ enum class eSelectState
 };
 
 class ChartFormatBase;
+class EntryFolderRegular;
 class SceneCustomize;
+
 class SceneSelect : public SceneBase
 {
 public:

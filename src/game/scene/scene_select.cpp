@@ -16,6 +16,8 @@
 #include <common/entry/entry_types.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
+#include <db/db_score.h>
+#include <db/db_song.h>
 #include <game/arena/arena_client.h>
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_host.h>
@@ -33,6 +35,8 @@
 #include <game/skin/skin_mgr.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/sound_sample.h>
+
+#include <boost/format.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 

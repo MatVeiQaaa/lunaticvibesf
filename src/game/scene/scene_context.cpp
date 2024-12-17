@@ -4,11 +4,14 @@
 #include <random>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 #include <common/assert.h>
 #include <common/chartformat/chartformat_bms.h>
 #include <common/entry/entry_types.h>
 #include <config/config_mgr.h>
+#include <db/db_score.h>
+#include <db/db_song.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/runtime/i18n.h>
 #include <game/runtime/state.h>

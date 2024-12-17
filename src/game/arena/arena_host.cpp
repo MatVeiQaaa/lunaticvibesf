@@ -1,22 +1,24 @@
 #include "arena_host.h"
 
-#include "arena_data.h"
-#include "arena_internal.h"
-#include "cereal/archives/portable_binary.hpp"
-#include "cereal/cereal.hpp"
-#include "cereal/types/string.hpp"
-#include "cereal/types/vector.hpp"
-#include "common/encoding.h"
-#include "common/hash.h"
-#include "common/log.h"
-#include "db/db_song.h"
-#include "game/runtime/i18n.h"
-#include "game/runtime/state.h"
-#include "game/scene/scene_context.h"
-#include "git_version.h"
 #include <common/assert.h>
+#include <common/encoding.h>
+#include <common/hash.h>
+#include <common/log.h>
+#include <db/db_song.h>
+#include <game/arena/arena_data.h>
+#include <game/arena/arena_internal.h>
+#include <game/runtime/i18n.h>
+#include <game/runtime/state.h>
+#include <game/scene/scene_context.h>
+#include <git_version.h>
 
 #include <random>
+
+#include <boost/format.hpp>
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/cereal.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/vector.hpp>
 
 std::shared_ptr<ArenaHost> g_pArenaHost = nullptr;
 

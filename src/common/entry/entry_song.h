@@ -1,7 +1,6 @@
 #pragma once
 #include "common/chartformat/chartformat.h"
 #include "entry_folder.h"
-#include <boost/format.hpp>
 #include <memory>
 #include <utility>
 

@@ -4,31 +4,13 @@
 #include <string>
 #include <vector>
 
-#include "common/entry/entry_folder.h"
-#include "common/entry/entry_song.h"
-#include "common/types.h"
-#include "common/utils.h"
-#include "db_conn.h"
+#include <common/entry/entry_song.h>
+#include <common/types.h>
+#include <db/db_conn.h>
 
 // FIXME: use "__root_folder" or something, currently something somewhere assumes empty string here.
 inline const HashMD5 ROOT_FOLDER_HASH = md5({});
 
-/* TABLE folder:
-    md5(TEXT), parent(TEXT), path(TEXT), name(TEXT), type(INTEGER), removed(INTEGER)
-    md5: hash string, calculated by "relative path to exe" OR "absolute path"
-    parent: parent dir md5
-    path: "relative path to exe" OR "absolute path"
-    name: typically folder name, use path if NULL
-    type: see enum FolderType
-    removed: whether this folder has been removed
-*/
-/* TABLE song:
-    md5(TEXT), folder(TEXT), type(INTEGER), file(TEXT), ...
-    md5: file hash
-    folder: folder hash
-    type: see enum eChartFormat in chartformat.h
-    file: file name (not including path)
-*/
 class SongDB : public SQLite
 {
 public:

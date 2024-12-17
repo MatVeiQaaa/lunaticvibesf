@@ -5,6 +5,7 @@
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/types.h>
+#include <db/db_score.h>
 #include <game/ruleset/ruleset.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/scene/scene_context.h>

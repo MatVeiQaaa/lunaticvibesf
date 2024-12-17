@@ -8,15 +8,17 @@
 #include <boost/format.hpp>
 #include <imgui.h>
 
-#include "common/coursefile/lr2crs.h"
-#include "common/entry/entry_arena.h"
-#include "common/entry/entry_course.h"
-#include "common/entry/entry_table.h"
-#include "common/sysutil.h"
-#include "config/config_mgr.h"
-#include "game/runtime/i18n.h"
-#include "git_version.h"
-#include "scene_context.h"
+#include <common/coursefile/lr2crs.h>
+#include <common/entry/entry_arena.h>
+#include <common/entry/entry_course.h>
+#include <common/entry/entry_table.h>
+#include <common/sysutil.h>
+#include <config/config_mgr.h>
+#include <db/db_score.h>
+#include <db/db_song.h>
+#include <game/runtime/i18n.h>
+#include <game/scene/scene_context.h>
+#include <git_version.h>
 
 ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {

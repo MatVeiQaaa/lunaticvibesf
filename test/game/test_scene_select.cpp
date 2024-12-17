@@ -7,6 +7,8 @@
 #include <common/entry/entry_table.h>
 #include <common/hash.h>
 #include <common/utils.h>
+#include <db/db_score.h>
+#include <db/db_song.h>
 #include <game/scene/scene_context.h>
 #include <game/scene/scene_select.h>
 

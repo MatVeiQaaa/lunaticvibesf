@@ -8,6 +8,8 @@
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2_debug.h>
 
+#include <boost/format.hpp>
+
 // FIXME: get rid of preDefinedTextures.
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::preDefinedTextures;
 std::map<std::string, std::shared_ptr<Texture>> SkinBase::textureNameMap;

@@ -19,6 +19,8 @@ class ScoreBMS;
 namespace lunaticvibes
 {
 
+class Lr2ScoreDb;
+
 struct OverallStats
 {
     int64_t play_count;
@@ -72,6 +74,8 @@ public:
     void deleteCourseScoreBMS(const HashMD5& hash);
     [[nodiscard]] std::shared_ptr<ScoreBMS> getCourseScoreBMS(const HashMD5& hash) const;
     void updateCourseScoreBMS(const HashMD5& hash, const ScoreBMS& score);
+
+    void importScores(lunaticvibes::Lr2ScoreDb& lr2_db);
 
     bool isBmsPbCacheEmpty();
     void rebuildBmsPbCache();

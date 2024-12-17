@@ -1,5 +1,6 @@
 #include <gmock/gmock.h>
 
+#include <db/db_lr2_score.h>
 #include <db/db_score.h>
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
@@ -194,4 +195,52 @@ TEST(ScoreDb, CourseScoreDeleting)
     // Not just cache that was invalidated.
     score_db.rebuildBmsPbCache();
     EXPECT_EQ(score_db.getChartScoreBMS(hash), nullptr);
+}
+
+TEST(ScoreDb, ImportFromLr2)
+{
+    lunaticvibes::Lr2ScoreDb lr2_db(lunaticvibes::Lr2ScoreDb::InMemoryRwTag{});
+    ScoreDB score_db{IN_MEMORY_DB_PATH};
+    score_db.importScores(lr2_db);
+    auto pbp = score_db.fetchCachedPbBMS(HashMD5{"deadbeefdeadbeefdeadbeefdeadbeef"});
+    EXPECT_NE(pbp, nullptr);
+
+    auto pb = *pbp;
+
+    // struct ScoreBase values.
+    EXPECT_EQ(pb.notes, 992);
+    EXPECT_EQ(pb.score, 0);
+    EXPECT_DOUBLE_EQ(pb.rate, static_cast<double>(386 * 2 + 336) / (992 * 2) * 100);
+    EXPECT_EQ(pb.fast, 0);
+    EXPECT_EQ(pb.slow, 0);
+    EXPECT_EQ(pb.first_max_combo, 0);
+    EXPECT_EQ(pb.final_combo, 0);
+    EXPECT_EQ(pb.maxcombo, 172);
+    EXPECT_EQ(pb.addtime, 0);
+    EXPECT_EQ(pb.playcount, 0);
+    EXPECT_EQ(pb.clearcount, 0);
+    // EXPECT_EQ(pb.reserved[1], {0});
+    // EXPECT_EQ(pb.reservedlf[2], {0.0});
+    EXPECT_EQ(pb.replayFileName, "");
+
+    // struct ScoreBMS values.
+    EXPECT_EQ(pb.play_time, 0);
+    EXPECT_EQ(pb.exscore, 386 * 2 + 336);
+    EXPECT_EQ(pb.lamp, ScoreBMS::Lamp::FAILED);
+    EXPECT_EQ(pb.pgreat, 386);
+    EXPECT_EQ(pb.great, 336);
+    EXPECT_EQ(pb.good, 60);
+    EXPECT_EQ(pb.bad, 33);
+    EXPECT_EQ(pb.kpoor, 64);
+    EXPECT_EQ(pb.miss, 0);
+    EXPECT_EQ(pb.bp, 262);
+    EXPECT_EQ(pb.combobreak, 0);
+    EXPECT_EQ(pb.rival_win, 3);
+    EXPECT_EQ(pb.rival_rate, 0);
+    EXPECT_EQ(pb.rival_lamp, ScoreBMS::Lamp::NOPLAY);
+}
+
+TEST(ScoreDb, ImportDanFromLr2)
+{
+    GTEST_SKIP() << "TODO: ImportDanFromLr2";
 }

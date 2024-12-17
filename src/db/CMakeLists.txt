@@ -3,6 +3,7 @@ find_package(SQLite3 REQUIRED)
 
 add_library(db STATIC
     db_conn.cpp
+    db_lr2_score.cpp
     db_score.cpp
     db_song.cpp
 )

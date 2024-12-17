@@ -15,6 +15,7 @@
 #include "common/types.h"
 #include "db/db_conn.h"
 #include <common/assert.h>
+#include <db/db_lr2_score.h>
 
 bool convert_score_bms(ScoreBMS& out, const std::vector<std::any>& in)
 {
@@ -198,32 +199,18 @@ void ScoreDB::insertChartScoreBMS(const HashMD5& hash, const ScoreBMS& score)
     updateStats(score);
 }
 
+static double calculate_rate(int exscore, int notes)
+{
+    return static_cast<double>(exscore) / static_cast<double>(notes * 2) * 100;
+}
+
 std::vector<std::pair<HashMD5, ScoreBMS>> ScoreDB::fetchCachedPbBMSImpl(const std::string& sql_where,
                                                                         std::initializer_list<std::any> params) const
 {
     std::vector<std::pair<HashMD5, ScoreBMS>> out;
-    const auto raw_scores = query(R"(
-        SELECT
-            md5,
-            notes,
-            score,
-            fast,
-            slow,
-            maxcombo,
-            addtime,
-            exscore,
-            lamp,
-            pgreat,
-            great,
-            good,
-            bad,
-            bpoor,
-            miss,
-            bp,
-            cb,
-            playedtime,
-            replay
-        FROM score_cache_bms )" + sql_where,
+    const auto raw_scores = query("SELECT md5, notes, score, fast, slow, maxcombo, addtime, exscore, lamp, pgreat, "
+                                  "great, good, bad, bpoor, miss, bp, cb, playedtime, replay FROM score_cache_bms " +
+                                      sql_where,
                                   params);
     for (const auto& raw_score : raw_scores)
     {
@@ -248,7 +235,7 @@ std::vector<std::pair<HashMD5, ScoreBMS>> ScoreDB::fetchCachedPbBMSImpl(const st
         score.combobreak = ANY_INT(raw_score[16]);
         score.play_time = ANY_INT(raw_score[17]);
         score.replayFileName = ANY_STR(raw_score[18]);
-        score.rate = static_cast<double>(score.exscore) / static_cast<double>(score.notes * 2) * 100;
+        score.rate = calculate_rate(score.exscore, score.notes);
         out.emplace_back(ANY_STR(raw_score[0]), std::move(score));
     }
     return out;
@@ -291,7 +278,7 @@ void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
 
         if (score.exscore > record.exscore)
         {
-            record.rate = score.rate;
+            record.rate = calculate_rate(score.exscore, score.notes);
             record.fast = score.fast;
             record.slow = score.slow;
             record.exscore = score.exscore;
@@ -382,6 +369,58 @@ catch (const std::exception& e)
 {
     LOG_ERROR << e.what();
     return false;
+}
+
+static ScoreBMS::Lamp from_lr2(int clear)
+{
+    using L = ScoreBMS::Lamp;
+    switch (clear)
+    {
+    // Also course plays?
+    case 0x0: return L::NOPLAY;
+    case 0x1: return L::FAILED;
+    case 0x2: return L::EASY;
+    case 0x3: return L::NORMAL;
+    // Also good-attack when not FC?
+    case 0x4: return L::HARD;
+    case 0x5: return L::FULLCOMBO;
+    default: LOG_ERROR << "[ScoreDB] Unknown LR2 clear=" << clear << "; Report this!"; return L::NOPLAY;
+    }
+}
+
+void ScoreDB::importScores(lunaticvibes::Lr2ScoreDb& lr2_db)
+{
+    ScoreBMS score;
+    lr2_db.proc([this, &score](const lunaticvibes::Lr2Score& lr2_score) {
+        // score.ghost = lr2_score.ghost;
+        // score.hash = lr2_score.hash;
+        // score.scorehash = lr2_score.scorehash;
+        score.bad = lr2_score.bad;
+        score.lamp = from_lr2(lr2_score.clear);
+        // score.clear_db = lr2_score.clear_db;
+        // score.clear_ex = lr2_score.clear_ex;
+        // score.clear_sd = lr2_score.clear_sd;
+        score.clearcount = lr2_score.clearcount;
+        // score.complete = lr2_score.complete; // ?
+        // score.failcount = lr2_score.failcount;
+        score.good = lr2_score.good;
+        score.great = lr2_score.great;
+        score.maxcombo = lr2_score.maxcombo;
+        score.bp = lr2_score.minbp;
+        // score.op_best = lr2_score.op_best;
+        // score.op_history = lr2_score.op_history;
+        score.pgreat = lr2_score.perfect;
+        score.playcount = lr2_score.playcount;
+        score.kpoor = lr2_score.poor; // wrong?
+        // score.rank = lr2_score.rank; // ?
+        // lr2_score.rate - calculated within score saving.
+        // score.rseed = lr2_score.rseed; // no
+        score.notes = lr2_score.totalnotes;
+
+        score.exscore = score.pgreat * 2 + score.great;
+        updateCachedChartPbBms(HashMD5{lr2_score.hash}, score);
+    });
+    LOG_INFO << "[ScoreDB] LR2 import done";
 }
 
 bool ScoreDB::isBmsPbCacheEmpty()

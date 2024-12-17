@@ -1054,14 +1054,18 @@ void SceneSelect::imguiPageDebug()
     }
 }
 
+void assign(char* arr, size_t arrn, std::string_view s);
+
 void SceneSelect::imguiPageDebugMain()
 {
-    ImGui::InputTextWithHint("##LR2ProfileImportPath", "LR2files/Score/YourNick.db", _lr2_db_import_path.data(),
-                             _lr2_db_import_path.size(), 0);
+    constexpr auto&& hint = "LR2files/Score/YourNick.db";
+    ImGui::InputTextWithHint("##LR2ProfileImportPath", hint, _lr2_db_import_path.data(), _lr2_db_import_path.size(), 0);
     ImGui::SameLine();
     if (ImGui::Button("Browse"))
     {
-        LOG_ERROR << "TODO: browse";
+        const char* path = tinyfd_openFileDialog(nullptr, nullptr, 0, nullptr, hint, 0);
+        if (path != nullptr)
+            assign(_lr2_db_import_path.data(), _lr2_db_import_path.size(), path);
     }
     ImGui::SameLine();
     if (ImGui::Button("Import"))

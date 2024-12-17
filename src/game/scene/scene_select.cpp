@@ -354,7 +354,9 @@ void config_fx()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void assign(char* arr, size_t arrn, std::string_view s)
+// TODO: move to str utils
+// TODO(C++20): std::span for lhs
+void assign(char* arr, size_t arrn, std::string_view s)
 {
     if (arrn == 0)
         arrn = 1; // Saturating subtraction.

@@ -22,6 +22,8 @@ void verify_failed(const char* file, int line, const char* msg);
             lunaticvibes::verify_failed(__FILE__, __LINE__, #cond);                                                    \
     } while (0)
 
+#define LVF_ASSERT_FALSE(msg) lunaticvibes::assert_failed(__FILE__, __LINE__, msg)
+
 #ifndef NDEBUG
 #define LVF_DEBUG_ASSERT(cond) LVF_ASSERT(cond)
 #else // NDEBUG

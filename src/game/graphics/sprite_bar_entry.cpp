@@ -1,12 +1,10 @@
 #include "sprite_bar_entry.h"
 
-#include <map>
 #include <shared_mutex>
 
 #include "common/chartformat/chartformat_bms.h"
 #include "common/entry/entry_types.h"
 #include "common/log.h"
-#include "common/sysutil.h"
 #include "game/scene/scene_context.h"
 #include <common/assert.h>
 
@@ -180,6 +178,42 @@ static BarType entry_bar_type(eEntryType e)
     return BarType::SONG;
 }
 
+static BarLampType score_to_bar_lamp_lr2(ScoreBMS::Lamp lamp)
+{
+    switch (lamp)
+    {
+    case ScoreBMS::Lamp::NOPLAY: return BarLampType::NOPLAY;
+    case ScoreBMS::Lamp::FAILED:
+    case ScoreBMS::Lamp::ASSIST: return BarLampType::FAILED;
+    case ScoreBMS::Lamp::EASY: return BarLampType::EASY;
+    case ScoreBMS::Lamp::NORMAL: return BarLampType::NORMAL;
+    case ScoreBMS::Lamp::HARD:
+    case ScoreBMS::Lamp::EXHARD: return BarLampType::HARD;
+    case ScoreBMS::Lamp::FULLCOMBO:
+    case ScoreBMS::Lamp::PERFECT:
+    case ScoreBMS::Lamp::MAX: return BarLampType::FULLCOMBO;
+    }
+    LVF_ASSERT_FALSE("score_to_bar_lamp_lr2");
+};
+
+static BarLampType score_to_bar_lamp_lv(ScoreBMS::Lamp lamp)
+{
+    switch (lamp)
+    {
+    case ScoreBMS::Lamp::NOPLAY: return BarLampType::NOPLAY;
+    case ScoreBMS::Lamp::FAILED: return BarLampType::FAILED;
+    case ScoreBMS::Lamp::ASSIST: return BarLampType::ASSIST_EASY;
+    case ScoreBMS::Lamp::EASY: return BarLampType::EASY;
+    case ScoreBMS::Lamp::NORMAL: return BarLampType::NORMAL;
+    case ScoreBMS::Lamp::HARD: return BarLampType::HARD;
+    case ScoreBMS::Lamp::EXHARD: return BarLampType::EXHARD;
+    case ScoreBMS::Lamp::FULLCOMBO: return BarLampType::FULLCOMBO;
+    case ScoreBMS::Lamp::PERFECT:
+    case ScoreBMS::Lamp::MAX: return BarLampType::PERFECT; // TODO(rustbell): separate max lamp?
+    }
+    LVF_ASSERT_FALSE("score_to_bar_lamp_lv");
+};
+
 bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 {
     for (auto& s : sBodyOff)
@@ -333,48 +367,19 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                     auto score = std::reinterpret_pointer_cast<ScoreBMS>(pScore);
                     if (score)
                     {
-                        // lamp
                         // TODO rival entry has two lamps
-                        static const std::map<ScoreBMS::Lamp, BarLampType> BMS_LAMP_TYPE_MAP_OLD = {
-                            {ScoreBMS::Lamp::NOPLAY, BarLampType::NOPLAY},
-                            {ScoreBMS::Lamp::FAILED, BarLampType::FAILED},
-                            {ScoreBMS::Lamp::ASSIST, BarLampType::FAILED},
-                            {ScoreBMS::Lamp::EASY, BarLampType::EASY},
-                            {ScoreBMS::Lamp::NORMAL, BarLampType::NORMAL},
-                            {ScoreBMS::Lamp::HARD, BarLampType::HARD},
-                            {ScoreBMS::Lamp::EXHARD, BarLampType::HARD},
-                            {ScoreBMS::Lamp::FULLCOMBO, BarLampType::FULLCOMBO},
-                            {ScoreBMS::Lamp::PERFECT, BarLampType::FULLCOMBO},
-                            {ScoreBMS::Lamp::MAX, BarLampType::FULLCOMBO}};
-                        static const std::map<ScoreBMS::Lamp, BarLampType> BMS_LAMP_TYPE_MAP = {
-                            {ScoreBMS::Lamp::NOPLAY, BarLampType::NOPLAY},
-                            {ScoreBMS::Lamp::FAILED, BarLampType::FAILED},
-                            {ScoreBMS::Lamp::ASSIST, BarLampType::ASSIST_EASY},
-                            {ScoreBMS::Lamp::EASY, BarLampType::EASY},
-                            {ScoreBMS::Lamp::NORMAL, BarLampType::NORMAL},
-                            {ScoreBMS::Lamp::HARD, BarLampType::HARD},
-                            {ScoreBMS::Lamp::EXHARD, BarLampType::EXHARD}, // FIXME EXHARD
-                            {ScoreBMS::Lamp::FULLCOMBO, BarLampType::FULLCOMBO},
-                            {ScoreBMS::Lamp::PERFECT, BarLampType::FULLCOMBO}, // FIXME PERFECT
-                            {ScoreBMS::Lamp::MAX, BarLampType::FULLCOMBO}      // FIXME MAX
-                        };
-                        size_t lampTypeIdx = (BMS_LAMP_TYPE_MAP.find(score->lamp) != BMS_LAMP_TYPE_MAP.end())
-                                                 ? (size_t)BMS_LAMP_TYPE_MAP.at(score->lamp)
-                                                 : (size_t)BarLampType::NOPLAY;
-                        if (sLamp[lampTypeIdx])
                         {
-                            sLamp[lampTypeIdx]->update(time);
-                            sLamp[lampTypeIdx]->setHideInternal(false);
-                            drawLampType = lampTypeIdx;
-                            drawLamp = true;
-                        }
-                        else
-                        {
-                            lampTypeIdx = (size_t)BMS_LAMP_TYPE_MAP_OLD.at(score->lamp);
-                            if (sLamp[lampTypeIdx])
+                            auto lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lv(score->lamp));
+                            auto sprite = sLamp[lampTypeIdx];
+                            if (sprite == nullptr)
                             {
-                                sLamp[lampTypeIdx]->update(time);
-                                sLamp[lampTypeIdx]->setHideInternal(false);
+                                lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp));
+                                sprite = sLamp[(size_t)score_to_bar_lamp_lr2(score->lamp)];
+                            }
+                            if (sprite != nullptr)
+                            {
+                                sprite->update(time);
+                                sprite->setHideInternal(false);
                                 drawLampType = lampTypeIdx;
                                 drawLamp = true;
                             }
@@ -420,10 +425,7 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
                                 sRivalLampSelf[drawRivalLampSelfType]->setHideInternal(false);
                             }
                             // rival lamp
-                            size_t rivalLampTypeIdx =
-                                (BMS_LAMP_TYPE_MAP.find(score->rival_lamp) != BMS_LAMP_TYPE_MAP.end())
-                                    ? (size_t)BMS_LAMP_TYPE_MAP.at(score->rival_lamp)
-                                    : (size_t)BarLampType::NOPLAY;
+                            const auto rivalLampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lv(score->rival_lamp));
                             if (sRivalLampRival[rivalLampTypeIdx])
                             {
                                 sRivalLampRival[rivalLampTypeIdx]->update(time);
@@ -441,54 +443,22 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
         }
         else if ((BarType)barTypeIdx == BarType::COURSE)
         {
-            auto ps = std::reinterpret_pointer_cast<EntryCourse>(pEntry);
-
             auto score = std::dynamic_pointer_cast<ScoreBMS>(pScore);
             if (score)
             {
-                static const std::map<ScoreBMS::Lamp, BarLampType> BMS_LAMP_TYPE_MAP_OLD = {
-                    {ScoreBMS::Lamp::NOPLAY, BarLampType::NOPLAY},
-                    {ScoreBMS::Lamp::FAILED, BarLampType::FAILED},
-                    {ScoreBMS::Lamp::ASSIST, BarLampType::FAILED},
-                    {ScoreBMS::Lamp::EASY, BarLampType::EASY},
-                    {ScoreBMS::Lamp::NORMAL, BarLampType::NORMAL},
-                    {ScoreBMS::Lamp::HARD, BarLampType::HARD},
-                    {ScoreBMS::Lamp::EXHARD, BarLampType::HARD},
-                    {ScoreBMS::Lamp::FULLCOMBO, BarLampType::FULLCOMBO},
-                    {ScoreBMS::Lamp::PERFECT, BarLampType::FULLCOMBO},
-                    {ScoreBMS::Lamp::MAX, BarLampType::FULLCOMBO}};
-                static const std::map<ScoreBMS::Lamp, BarLampType> BMS_LAMP_TYPE_MAP = {
-                    {ScoreBMS::Lamp::NOPLAY, BarLampType::NOPLAY},
-                    {ScoreBMS::Lamp::FAILED, BarLampType::FAILED},
-                    {ScoreBMS::Lamp::ASSIST, BarLampType::ASSIST_EASY},
-                    {ScoreBMS::Lamp::EASY, BarLampType::EASY},
-                    {ScoreBMS::Lamp::NORMAL, BarLampType::NORMAL},
-                    {ScoreBMS::Lamp::HARD, BarLampType::HARD},
-                    {ScoreBMS::Lamp::EXHARD, BarLampType::EXHARD},
-                    {ScoreBMS::Lamp::FULLCOMBO, BarLampType::FULLCOMBO},
-                    {ScoreBMS::Lamp::PERFECT, BarLampType::FULLCOMBO}, // FIXME PERFECT
-                    {ScoreBMS::Lamp::MAX, BarLampType::FULLCOMBO}      // FIXME MAX
-                };
-                size_t lampTypeIdx = (BMS_LAMP_TYPE_MAP.find(score->lamp) != BMS_LAMP_TYPE_MAP.end())
-                                         ? (size_t)BMS_LAMP_TYPE_MAP.at(score->lamp)
-                                         : (size_t)BarLampType::NOPLAY;
-                if (sLamp[lampTypeIdx])
+                auto lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lv(score->lamp));
+                auto sprite = sLamp[lampTypeIdx];
+                if (sprite == nullptr)
                 {
-                    sLamp[lampTypeIdx]->update(time);
-                    sLamp[lampTypeIdx]->setHideInternal(false);
+                    lampTypeIdx = static_cast<size_t>(score_to_bar_lamp_lr2(score->lamp));
+                    sprite = sLamp[(size_t)score_to_bar_lamp_lr2(score->lamp)];
+                }
+                if (sprite != nullptr)
+                {
+                    sprite->update(time);
+                    sprite->setHideInternal(false);
                     drawLampType = lampTypeIdx;
                     drawLamp = true;
-                }
-                else
-                {
-                    lampTypeIdx = (size_t)BMS_LAMP_TYPE_MAP_OLD.at(score->lamp);
-                    if (sLamp[lampTypeIdx])
-                    {
-                        sLamp[lampTypeIdx]->update(time);
-                        sLamp[lampTypeIdx]->setHideInternal(false);
-                        drawLampType = lampTypeIdx;
-                        drawLamp = true;
-                    }
                 }
             }
         }
@@ -507,20 +477,17 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 
 void SpriteBarEntry::setMotionLoopTo(int t)
 {
-    LOG_ERROR << "[Sprite] setMotionLoopTo(f) of SpriteBarEntry should not be used";
-    LVF_DEBUG_ASSERT(false);
+    LVF_VERIFY(!"[Sprite] setMotionLoopTo(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::setMotionStartTimer(IndexTimer t)
 {
-    LOG_ERROR << "[Sprite] setMotionStartTimer(f) of SpriteBarEntry should not be used";
-    LVF_DEBUG_ASSERT(false);
+    LVF_VERIFY(!"[Sprite] setMotionStartTimer(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::appendMotionKeyFrame(const MotionKeyFrame& f)
 {
-    LOG_ERROR << "[Sprite] appendMotionKeyFrame(f) of SpriteBarEntry should not be used";
-    LVF_DEBUG_ASSERT(false);
+    LVF_VERIFY(!"[Sprite] appendMotionKeyFrame(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::draw() const {}

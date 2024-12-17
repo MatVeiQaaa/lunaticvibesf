@@ -1,10 +1,12 @@
 #include "sysutil.h"
 
-#include <future>
 #include <queue>
 #include <shared_mutex>
 
-#include "common/meta.h"
+#include <common/in_test_mode.h>
+#include <common/meta.h>
+
+#include <tinyfiledialogs.h>
 
 std::shared_mutex mainThreadTaskQueueMutex;
 std::queue<std::function<void()>> mainThreadTaskQueue;
@@ -163,4 +165,12 @@ time_t lunaticvibes::localtime_utc_offset()
     lunaticvibes::safe_gmtime(&seconds, &tmUtc);
     lunaticvibes::safe_localtime(&seconds, &tmLocal);
     return mktime(&tmUtc) - mktime(&tmLocal);
+}
+
+void panic(const char* title, const char* msg)
+{
+    fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
+    if (!lunaticvibes::in_test_mode())
+        tinyfd_messageBox(title, msg, "ok", "error", 0);
+    abort();
 }

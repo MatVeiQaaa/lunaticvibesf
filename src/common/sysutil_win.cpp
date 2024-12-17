@@ -45,12 +45,6 @@ void SetThreadNameWin32(DWORD dwThreadID, const char* threadName)
 #pragma warning(pop)
 }
 
-[[noreturn]] inline void panicWin32(const char* title, const char* msg)
-{
-    MessageBox(NULL, msg, title, MB_OK);
-    abort();
-}
-
 static DWORD dwMainThreadId = 0;
 
 void SetThreadAsMainThread()
@@ -71,10 +65,6 @@ bool IsMainThread()
 void SetThreadName(const char* name)
 {
     SetThreadNameWin32(GetCurrentThreadId(), name);
-}
-void panic(const char* title, const char* msg)
-{
-    panicWin32(title, msg);
 }
 
 Path GetExecutablePath()

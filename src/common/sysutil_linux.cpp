@@ -68,12 +68,6 @@ void SetThreadName(const char* name)
     }
 }
 
-void panic(const char* title, const char* msg)
-{
-    fprintf(stderr, "PANIC! [%s] %s\n", title, msg);
-    abort();
-}
-
 Path GetExecutablePath()
 {
     char fullpath[256] = {0};

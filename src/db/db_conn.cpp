@@ -340,6 +340,6 @@ bool SQLite::applyMigration(std::string_view name, const std::function<bool()>& 
 bool SQLite::isReadOnly() const
 {
     int ret = sqlite3_db_readonly(_db, nullptr);
-    LVF_DEBUG_ASSERT(ret == 0 || ret == 1);
+    LVF_VERIFY(ret == 0 || ret == 1);
     return ret == 1;
 }

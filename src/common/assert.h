@@ -1,22 +1,29 @@
 #pragma once
 
+// TODO(C++20): [[unlikely]] and std::source_location
+
 namespace lunaticvibes
 {
-[[noreturn]] void die_on_assertion_fail(const char* file, int line, const char* msg);
+[[noreturn]] void assert_failed(const char* file, int line, const char* msg);
+void verify_failed(const char* file, int line, const char* msg);
 } // namespace lunaticvibes
 
-#ifndef NDEBUG
-
-// TODO(C++20): [[unlikely]] and std::source_location
-#define LVF_DEBUG_ASSERT(cond)                                                                                         \
+#define LVF_ASSERT(cond)                                                                                               \
     do                                                                                                                 \
     {                                                                                                                  \
         if (!(cond))                                                                                                   \
-            lunaticvibes::die_on_assertion_fail(__FILE__, __LINE__, #cond);                                            \
+            lunaticvibes::assert_failed(__FILE__, __LINE__, #cond);                                                    \
     } while (0)
 
+#define LVF_VERIFY(cond)                                                                                               \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if (!(cond))                                                                                                   \
+            lunaticvibes::verify_failed(__FILE__, __LINE__, #cond);                                                    \
+    } while (0)
+
+#ifndef NDEBUG
+#define LVF_DEBUG_ASSERT(cond) LVF_ASSERT(cond)
 #else // NDEBUG
-
 #define LVF_DEBUG_ASSERT(cond)
-
 #endif // NDEBUG

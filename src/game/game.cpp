@@ -21,6 +21,7 @@
 #include "game/sound/sound_mgr.h"
 #include "git_version.h"
 #include <common/assert.h>
+#include <common/in_test_mode.h>
 
 #include <memory>
 #include <string_view>
@@ -40,6 +41,11 @@
 #include <imgui.h>
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
+
+bool lunaticvibes::in_test_mode()
+{
+    return false;
+}
 
 void mainLoop();
 

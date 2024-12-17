@@ -38,6 +38,9 @@
 
 #include <boost/format.hpp>
 
+// TODO: translations.
+#define _(String) String
+
 ////////////////////////////////////////////////////////////////////////////////
 
 template <class... Ts> struct overloaded : Ts...
@@ -2745,7 +2748,6 @@ void SceneSelect::navigateEnter(const lunaticvibes::Time& t)
         };
         auto addRandomSongEntries = [this](EntryList& entries) {
             using namespace lunaticvibes;
-            // TODO: translations.
             if (_show_random_any)
             {
                 entries.emplace_back(
@@ -3171,22 +3173,19 @@ void SceneSelect::searchSong(const std::string& text)
         [](lunaticvibes::DeleteScoreResult res) {
             if (res == lunaticvibes::DeleteScoreResult::Ok)
             {
-                // TODO: translations.
-                State::set(IndexText::EDIT_JUKEBOX_NAME, "SCORE DELETED");
+                State::set(IndexText::EDIT_JUKEBOX_NAME, _("SCORE DELETED"));
                 updateEntryScore(gSelectContext.selectedEntryIndex);
                 setEntryInfo();
             }
             else
             {
-                // TODO: translations.
-                State::set(IndexText::EDIT_JUKEBOX_NAME, "INVALID USAGE");
+                State::set(IndexText::EDIT_JUKEBOX_NAME, _("INVALID USAGE"));
             }
         },
         [](const lunaticvibes::HashResult& res) {
             if (!res.hash.has_value())
             {
-                // TODO: translations.
-                State::set(IndexText::EDIT_JUKEBOX_NAME, "INVALID USAGE");
+                State::set(IndexText::EDIT_JUKEBOX_NAME, _("INVALID USAGE"));
                 return;
             }
             State::set(IndexText::EDIT_JUKEBOX_NAME, *res.hash);
@@ -3194,16 +3193,12 @@ void SceneSelect::searchSong(const std::string& text)
         [](const lunaticvibes::PathResult& res) {
             if (res.path.empty())
             {
-                // TODO: translations.
-                State::set(IndexText::EDIT_JUKEBOX_NAME, "INVALID USAGE");
+                State::set(IndexText::EDIT_JUKEBOX_NAME, _("INVALID USAGE"));
                 return;
             }
             State::set(IndexText::EDIT_JUKEBOX_NAME, res.path);
         },
-        [](lunaticvibes::BadCommand /* bc */) {
-            // TODO: translations.
-            State::set(IndexText::EDIT_JUKEBOX_NAME, "UNKNOWN COMMAND");
-        },
+        [](lunaticvibes::BadCommand /**/) { State::set(IndexText::EDIT_JUKEBOX_NAME, _("UNKNOWN COMMAND")); },
     };
     std::visit(visit_query, lunaticvibes::execute_search_query(gSelectContext, *g_pSongDB, *g_pScoreDB, text));
 

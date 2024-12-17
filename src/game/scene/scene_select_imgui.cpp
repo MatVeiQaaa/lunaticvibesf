@@ -25,6 +25,9 @@
 #include <VersionHelpers.h>
 #endif
 
+// TODO: translations.
+#define _(String) String
+
 // from imgui_demo.cpp
 // Helper to display a little (?) mark which shows a tooltip when hovered.
 // In your own code you may want to display an actual icon if you are using a merged icon fonts (see docs/FONTS.md)
@@ -1006,16 +1009,15 @@ void SceneSelect::imguiPageOptionsSelect()
         {
             ConfigMgr::set('P', cfg::P_IGNORE_5KEYS_IF_7KEYS_EXIST, imgui_sel_ignore5keysif7keysexist);
         }
-        // TODO: translations.
-        if (ImGui::Checkbox("Show random any", &_show_random_any))
+        if (ImGui::Checkbox(_("Show random any"), &_show_random_any))
         {
             ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_ANY, _show_random_any);
         }
-        if (ImGui::Checkbox("Show random failed", &_show_random_failed))
+        if (ImGui::Checkbox(_("Show random failed"), &_show_random_failed))
         {
             ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_FAILED, _show_random_failed);
         }
-        if (ImGui::Checkbox("Show random noplay", &_show_random_noplay))
+        if (ImGui::Checkbox(_("Show random noplay"), &_show_random_noplay))
         {
             ConfigMgr::set('P', cfg::P_SELECT_SHOW_RANDOM_NOPLAY, _show_random_noplay);
         }

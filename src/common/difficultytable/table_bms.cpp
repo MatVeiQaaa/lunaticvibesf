@@ -27,41 +27,39 @@ enum class GetResult
     ERR_TIMEOUT
 };
 
-static size_t _GETWriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
+static size_t writeCb(void* contents, size_t size, size_t nmemb, void* userp)
 {
     size_t realsize = size * nmemb;
-    std::stringstream& ss = *(std::stringstream*)userp;
-
-    ss.write((char*)contents, realsize);
-
+    std::string& ss = *static_cast<std::string*>(userp);
+    ss.append(static_cast<const char*>(contents), realsize);
     return realsize;
 }
 
 GetResult GET(const std::string& url, std::string& result)
 {
     std::string https, host, port, target;
+
     static LazyRE2 regexURL{R"(http(s?)\:\/\/(.+?)(?:\:([\d]{1,5}))?(\/(?:.*)*))"};
-    if (RE2::FullMatch(url, *regexURL, &https, &host, &port, &target))
-    {
-        if (port.empty())
-        {
-            port = https.empty() ? "80" : "443";
-        }
-    }
-    else
-    {
+    if (!RE2::FullMatch(url, *regexURL, &https, &host, &port, &target))
         return GetResult::ERR_RESOLVE;
-    }
+
+    if (port.empty())
+        port = https.empty() ? "80" : "443";
     int iport = toInt(port);
 
     CURLcode code;
-    CURL* conn = curl_easy_init();
+
+    struct CurlDeleter
+    {
+        void operator()(CURL* conn) { curl_easy_cleanup(conn); }
+    };
+    auto conn_real = std::unique_ptr<CURL, CurlDeleter>(curl_easy_init());
+    CURL* conn = conn_real.get();
 
     code = curl_easy_setopt(conn, CURLOPT_FOLLOWLOCATION, 1);
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_FOLLOWLOCATION " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -69,7 +67,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_TIMEOUT " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -77,7 +74,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_CONNECTTIMEOUT " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -85,7 +81,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_SSL_VERIFYHOST " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -93,7 +88,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_SSL_VERIFYPEER " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -101,7 +95,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_URL " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -109,7 +102,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_PORT " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -121,25 +113,20 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_USERAGENT " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
-    std::stringstream bodyStream;
-
-    code = curl_easy_setopt(conn, CURLOPT_WRITEFUNCTION, _GETWriteCallback);
+    std::string bodyStream;
+    code = curl_easy_setopt(conn, CURLOPT_WRITEFUNCTION, writeCb);
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_WRITEFUNCTION " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
-
     code = curl_easy_setopt(conn, CURLOPT_WRITEDATA, &bodyStream);
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLOPT_WRITEDATA " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
@@ -147,7 +134,6 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] curl_easy_perform " << code;
-        curl_easy_cleanup(conn);
         switch (code)
         {
         case CURLE_OUT_OF_MEMORY: return GetResult::ERR_SYSTEM;
@@ -167,22 +153,17 @@ GetResult GET(const std::string& url, std::string& result)
     if (code != CURLE_OK)
     {
         LOG_ERROR << "[TableBMS] CURLINFO_RESPONSE_CODE " << code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_SYSTEM;
     }
 
-    if (response_code / 100 == 2)
-    {
-        result = bodyStream.str();
-        curl_easy_cleanup(conn);
-        return GetResult::OK;
-    }
-    else
+    if (response_code / 100 != 2)
     {
         LOG_ERROR << "[TableBMS] HTTP " << response_code;
-        curl_easy_cleanup(conn);
         return GetResult::ERR_HTTP;
     }
+
+    result = bodyStream;
+    return GetResult::OK;
 }
 
 void DifficultyTableBMS::updateFromUrl(std::function<void(DifficultyTable::UpdateResult)> finishedCallback)
@@ -308,29 +289,20 @@ void DifficultyTableBMS::updateFromUrl(std::function<void(DifficultyTable::Updat
         std::string body;
 
         LOG_INFO << "[TableBMS] GET body: " << dataUrl;
-        auto result = GET(dataUrl, body);
-        if (result == GetResult::OK)
+        switch (GET(dataUrl, body))
         {
-            parseBody(body);
-        }
-        else
-        {
-            switch (result)
-            {
-            case GetResult::ERR_RESOLVE: finishedCallback(DifficultyTable::UpdateResult::WEB_PATH_ERROR); break;
-            case GetResult::ERR_CONNECT:
-            case GetResult::ERR_WRITE:
-            case GetResult::ERR_READ:
-            case GetResult::ERR_HTTP: finishedCallback(DifficultyTable::UpdateResult::WEB_CONNECT_ERR); break;
-            case GetResult::ERR_TIMEOUT: finishedCallback(DifficultyTable::UpdateResult::WEB_TIMEOUT); break;
-            default: finishedCallback(DifficultyTable::UpdateResult::INTERNAL_ERROR); break;
-            }
+        case GetResult::OK: parseBody(body); break;
+        case GetResult::ERR_RESOLVE: finishedCallback(DifficultyTable::UpdateResult::WEB_PATH_ERROR); return;
+        case GetResult::ERR_CONNECT:
+        case GetResult::ERR_WRITE:
+        case GetResult::ERR_READ:
+        case GetResult::ERR_HTTP: finishedCallback(DifficultyTable::UpdateResult::WEB_CONNECT_ERR); return;
+        case GetResult::ERR_TIMEOUT: finishedCallback(DifficultyTable::UpdateResult::WEB_TIMEOUT); return;
+        case GetResult::ERR_UNKNOWN:
+        case GetResult::ERR_SYSTEM: finishedCallback(DifficultyTable::UpdateResult::INTERNAL_ERROR); return;
         }
 
-        if (!entries.empty())
-        {
-        }
-        else
+        if (entries.empty())
         {
             finishedCallback(UpdateResult::DATA_PARSE_FAILED);
             return;

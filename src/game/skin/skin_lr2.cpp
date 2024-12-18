@@ -4409,7 +4409,7 @@ void SkinLR2::update()
             default: break;
             }
         };
-        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), updateSprite);
+        std::for_each(std::execution::par, drawQueue.begin(), drawQueue.end(), updateSprite);
     }
 
     // update nowjudge/nowcombo
@@ -4552,7 +4552,7 @@ void SkinLR2::update()
     if (move1PX != 0 || move1PY != 0 || move2PX != 0 || move2PY != 0 || adjustPlayNote1PW != 0 ||
         adjustPlayNote1PH != 0 || adjustPlayNote2PW != 0 || adjustPlayNote2PH != 0)
     {
-        std::for_each(std::execution::par_unseq, drawQueue.begin(), drawQueue.end(), [&](element& e) {
+        std::for_each(std::execution::par, drawQueue.begin(), drawQueue.end(), [&](element& e) {
             auto pS = std::dynamic_pointer_cast<SpriteLaneVertical>(e.ps);
             if (pS != nullptr)
             {

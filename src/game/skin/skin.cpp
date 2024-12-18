@@ -52,7 +52,7 @@ void SkinBase::update()
         State::set(IndexNumber::_TEST3, (int)(gUpdateContext.metre * 1000));
     }
 
-    std::for_each(std::execution::par_unseq, _sprites.begin(), _sprites.end(),
+    std::for_each(std::execution::par, _sprites.begin(), _sprites.end(),
                   [](const std::shared_ptr<SpriteBase>& s) { s->update(gUpdateContext.updateTime); });
     std::for_each(_sprites.begin(), _sprites.end(),
                   [](const std::shared_ptr<SpriteBase>& s) { s->update_on_main(gUpdateContext.updateTime); });
@@ -75,7 +75,7 @@ void SkinBase::update_mouse(int x, int y)
         }
     };
 
-    std::for_each(std::execution::par_unseq, _mouseSprites.begin(), _mouseSprites.end(), clickSpriteLambda);
+    std::for_each(std::execution::par, _mouseSprites.begin(), _mouseSprites.end(), clickSpriteLambda);
 }
 
 void SkinBase::update_mouse_click(int x, int y)

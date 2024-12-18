@@ -2,9 +2,8 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "windows-vcpkg-base",
+            "name": "windows-vcpkg",
             "description": "Visual Studio + vcpkg",
-            "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -26,7 +25,7 @@
         {
             "name": "windows-vcpkg-debug",
             "displayName": "Debug",
-            "inherits": "windows-vcpkg-base",
+            "inherits": "windows-vcpkg",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_CXX_FLAGS_INIT": "/fsanitize=address /permissive- /W1"
@@ -35,7 +34,7 @@
         {
             "name": "windows-vcpkg-release",
             "displayName": "RelWithDebInfo",
-            "inherits": "windows-vcpkg-base",
+            "inherits": "windows-vcpkg",
             "cacheVariables": { "CMAKE_BUILD_TYPE": "RelWithDebInfo" }
         },
         {

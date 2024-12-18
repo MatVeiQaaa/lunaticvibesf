@@ -2,9 +2,54 @@ name: cool-workflow
 on: [push, workflow_dispatch]
 
 jobs:
+  prepare-vcpkg:
+    name: Build dependencies (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            preset: linux-vcpkg
+          - os: windows-2022
+            preset: windows-vcpkg
+    steps:
+      # >>>> COPY PASTE
+      - name: Install apt dependencies
+        # nasm - ffmpeg build
+        run: sudo apt-get install nasm
+        if: startsWith(matrix.os, 'ubuntu')
+
+      - name: Install Python dependencies
+        # ninja - our build system
+        run: pip install ninja
+        if: startsWith(matrix.os, 'ubuntu')
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # Treeless, *partial* (not *shallow*) clone, to fetch tags.
+          # https://github.com/actions/checkout/issues/1471
+          fetch-depth: 0
+          filter: tree:0
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: startsWith(matrix.os, 'windows')
+
+      - uses: lukka/get-cmake@v3.29.2
+
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: "vcpkg.json" # Only look for 'vcpkg.json' in the repo root.
+      # <<<< COPY PASTE
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }} -B ./build
+
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    needs: prepare-vcpkg
     strategy:
       fail-fast: false
       matrix:
@@ -32,8 +77,8 @@ jobs:
             os: windows-2022
             preset: windows-vcpkg-release
             package-name: "release-build"
-
     steps:
+      # >>>> COPY PASTE
       - name: Install apt dependencies
         # nasm - ffmpeg build
         run: sudo apt-get install nasm
@@ -60,8 +105,8 @@ jobs:
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11
         with:
-          # Only look for 'vcpkg.json' in the repo root.
-          vcpkgJsonGlob: "vcpkg.json"
+          vcpkgJsonGlob: "vcpkg.json" # Only look for 'vcpkg.json' in the repo root.
+      # <<<< COPY PASTE
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }} -B ./build

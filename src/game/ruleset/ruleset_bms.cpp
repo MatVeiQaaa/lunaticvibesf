@@ -1751,6 +1751,7 @@ void RulesetBMS::updateGlobals()
         State::set(IndexNumber::PLAY_1P_BAD, _basic.judge[JUDGE_BAD]);
         State::set(IndexNumber::PLAY_1P_POOR, _basic.judge[JUDGE_POOR]);
         State::set(IndexNumber::PLAY_1P_GROOVEGAUGE, int(_basic.health * 100));
+        State::set(IndexNumber::PLAY_1P_GROOVEGAUGE_AFTER_DOT, int(_basic.health * 100'00) % 100);
 
         State::set(IndexNumber::PLAY_1P_MISS, _basic.judge[JUDGE_MISS]);
         State::set(IndexNumber::PLAY_1P_FAST_COUNT, _basic.judge[JUDGE_EARLY]);

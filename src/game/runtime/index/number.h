@@ -294,6 +294,9 @@ enum class IndexNumber : unsigned
     GITADORA_STYLE_JUDGE_BAR_MAX = 449, // not implemented; I assume these were imititating the completion bar to the
                                         // right of score results in GITADORA.
 
+    // beatoraja
+    PLAY_1P_GROOVEGAUGE_AFTER_DOT = 407,
+
     // network match
     ARENA_PLAYDATA_BASE = 500,
 

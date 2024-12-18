@@ -226,12 +226,16 @@ enum class Keyboard : unsigned
     K_JP_CONVERT,
     K_JP_KANA,
 
+    // ISO
+    K_NONUS_BACKSLASH,
+    K_NONUS_HASH,
+
     // scancodes with mask (e0)
     K_NUM_SLASH,
     K_NUM_STAR,
     K_NUM_ENTER,
 
-    K_COUNT
+    K_COUNT,
 };
 inline constexpr size_t keyboardKeyCount = static_cast<size_t>(Keyboard::K_COUNT);
 
@@ -366,6 +370,10 @@ inline const char* keyboardNameMap[keyboardKeyCount]{
     "JP_NOCONVERT",
     "JP_CONVERT",
     "JP_KANA",
+
+    // ISO
+    "NONUS_BACKSLASH",
+    "NONUS_HASH",
 };
 
 enum class JoystickAxis

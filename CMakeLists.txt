@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.29.2)
 # PROJECT CONFIG
 
 project(LunaticVibesF
-    VERSION 0.19.0
+    VERSION 0.19.1
     LANGUAGES CXX
 )
 set(PROJECT_TITLE "Lunatic Vibes F")

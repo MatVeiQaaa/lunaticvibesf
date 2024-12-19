@@ -10,11 +10,15 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <numeric>
 #include <queue>
+#include <ranges>
+#include <source_location>
+#include <span>
 #include <sstream>
 #include <stack>
 #include <string>

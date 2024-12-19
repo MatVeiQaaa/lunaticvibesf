@@ -8,6 +8,8 @@
 
 #include "common/beat.h"
 
+namespace fs = std::filesystem;
+
 using Path = std::filesystem::path;
 using StringContent = std::string;          // std::ifstream, std::getline
 using StringContentView = std::string_view; // std::ifstream, std::getline

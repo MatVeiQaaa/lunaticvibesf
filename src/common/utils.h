@@ -7,8 +7,6 @@
 
 #include "types.h"
 
-namespace fs = std::filesystem;
-
 inline Path executablePath;
 
 // path may include wildcard (*, ?)

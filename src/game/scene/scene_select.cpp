@@ -47,8 +47,6 @@ template <class... Ts> struct overloaded : Ts...
 {
     using Ts::operator()...;
 };
-// TODO(C++20): remove.
-template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 #pragma region save config
 

@@ -627,7 +627,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
 
 Path SkinLR2::getCustomizePath(StringContentView input)
 {
-    Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), input));
+    Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), input);
     StringPath pathStr = path.native();
     std::string pathU8Str = lunaticvibes::u8str(path);
 
@@ -711,7 +711,7 @@ int SkinLR2::HELPFILE()
         return 1;
     }
 
-    const auto filePath = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), parseParamBuf[0]));
+    const auto filePath = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), parseParamBuf[0]);
 
     std::ifstream ifs{filePath};
     if (ifs.fail())
@@ -824,7 +824,7 @@ int SkinLR2::LR2FONT()
 
         findAndExtractDXA(path);
 #ifndef _WIN32
-        path = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path)));
+        path = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path));
 #endif // _WIN32
 
         if (!fs::is_regular_file(path))
@@ -3385,7 +3385,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
         auto& title(parseParamBuf[0]);
         auto& path(parseParamBuf[1]);
-        Path pathf = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path));
+        Path pathf = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), path);
         auto& def(parseParamBuf[2]);
 
         auto ls = findFiles(pathf);
@@ -3750,7 +3750,7 @@ bool SkinLR2::loadCSV(Path p)
     auto srcLineNumberParent = csvLineNumber;
     csvLineNumber = 0;
 
-    p = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), p));
+    p = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), p);
 
     std::ifstream ifsFile(p, std::ios::binary);
     if (!ifsFile.is_open())
@@ -4370,7 +4370,7 @@ void SkinLR2::findAndExtractDXA(const Path& path)
             // find dxa file
             Path dxa = folder / PathFromUTF8(archiveName);
 #ifndef _WIN32
-            dxa = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(dxa)));
+            dxa = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(dxa));
 #endif // _WIN32
 
             // extract dxa

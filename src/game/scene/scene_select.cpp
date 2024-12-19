@@ -3448,7 +3448,7 @@ void SceneSelect::updatePreview()
                             }
                             fs::path p{chartDir / pWav};
 #ifndef _WIN32
-                            p = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p)));
+                            p = lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p));
 #endif // _WIN32
                             SoundMgr::loadNoteSample(p, i);
                         });

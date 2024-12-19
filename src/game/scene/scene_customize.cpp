@@ -52,8 +52,8 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     }
     load(selectedMode);
 
-    auto skinFileList = findFiles(
-        PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin")), true);
+    auto skinFileList =
+        findFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin"), true);
     std::sort(skinFileList.begin(), skinFileList.end());
     auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
@@ -71,8 +71,8 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
         }
     }
 
-    auto soundsetFileList = findFiles(
-        PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss")), true);
+    auto soundsetFileList =
+        findFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss"), true);
     std::sort(soundsetFileList.begin(), soundsetFileList.end());
     for (auto& p : soundsetFileList)
     {
@@ -272,9 +272,8 @@ void SceneCustomize::updateMain()
                 int selectedIdx;
                 for (selectedIdx = 0; selectedIdx < (int)soundsetList.size(); selectedIdx++)
                 {
-                    Path path = PathFromUTF8(
-                        convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                       ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+                    Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                               ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
                     if (fs::exists(soundsetList[selectedIdx]) && fs::exists(path) &&
                         fs::equivalent(soundsetList[selectedIdx], path))
                         break;
@@ -443,9 +442,8 @@ void SceneCustomize::setOption(size_t idxOption, size_t idxEntry)
 
     if (selectedMode == SkinType::SOUNDSET)
     {
-        Path path =
-            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
         Path bgmOld = ss.getPathBGMSelect();
@@ -470,9 +468,8 @@ void SceneCustomize::load(SkinType mode)
         optionsMap.clear();
         optionsKeyList.clear();
 
-        Path path =
-            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
 
@@ -578,9 +575,8 @@ void SceneCustomize::save(SkinType mode) const
     Path pCustomize;
     if (mode == SkinType::SOUNDSET)
     {
-        Path path =
-            PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
-                                        ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET)));
+        Path path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."),
+                                   ConfigMgr::get('S', cfg::S_PATH_SOUNDSET, cfg::S_DEFAULT_PATH_SOUNDSET));
 
         SoundSetLR2 ss(path);
 

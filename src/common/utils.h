@@ -55,10 +55,10 @@ void hex2bin(std::string_view hex, unsigned char* buf);
 [[nodiscard]] std::string toLower(std::string_view s);
 [[nodiscard]] std::string toUpper(std::string_view s);
 
-[[nodiscard]] std::string convertLR2Path(const std::string& lr2path, const Path& relative_path);
-[[nodiscard]] std::string convertLR2Path(const std::string& lr2path, const std::string& relative_path_utf8);
-[[nodiscard]] std::string convertLR2Path(const std::string& lr2path, const char* relative_path_utf8);
-[[nodiscard]] std::string convertLR2Path(const std::string& lr2path, std::string_view relative_path_utf8);
+[[nodiscard]] Path convertLR2Path(const std::string& lr2path, const Path& relative_path);
+[[nodiscard]] Path convertLR2Path(const std::string& lr2path, const std::string& relative_path_utf8);
+[[nodiscard]] Path convertLR2Path(const std::string& lr2path, const char* relative_path_utf8);
+[[nodiscard]] Path convertLR2Path(const std::string& lr2path, std::string_view relative_path_utf8);
 
 [[nodiscard]] Path PathFromUTF8(std::string_view s);
 
@@ -124,6 +124,6 @@ void trim_in_place(std::string& s);
 // On your system there is a `/tmp/AFileWithUpperCaseInIt`.
 // `resolvePathCaseInsensitively("/tmp/afilewithuppercaseinit")` =
 // `"/tmp/AFileWithUpperCaseInIt"`
-std::string resolve_windows_path(std::string);
+Path resolve_windows_path(std::string);
 
 } // namespace lunaticvibes

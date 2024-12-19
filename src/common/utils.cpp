@@ -341,14 +341,12 @@ struct DirDeleter
 };
 using DirPtr = std::unique_ptr<DIR, DirDeleter>;
 
-std::string lunaticvibes::resolve_windows_path(std::string input)
+Path lunaticvibes::resolve_windows_path(std::string input)
 {
     std::replace(input.begin(), input.end(), '\\', '/');
 
     if (input == "/" || input == "." || input.empty())
-    {
-        return input;
-    }
+        return PathFromUTF8(input);
 
     static constexpr std::string_view CURRENT_PATH_RELATIVE_PREFIX = "./";
     const char first_character = input[0];
@@ -375,13 +373,9 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
 
         std::string_view prefix;
         if (segment == ".")
-        {
             prefix = CURRENT_PATH_RELATIVE_PREFIX;
-        }
         else if (segment == "..")
-        {
             prefix = "../";
-        }
         if (!prefix.empty())
         {
             if (!out.empty() && out.back() != '/')
@@ -395,13 +389,9 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
 
         const bool is_empty = out.empty();
         if (is_empty && !has_path_prefix)
-        {
             out = CURRENT_PATH_RELATIVE_PREFIX;
-        }
         else if (is_empty || out.back() != '/')
-        {
             out += '/';
-        }
 
         bool found_entry = false;
 
@@ -439,31 +429,29 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
     }
 
     if (!has_path_prefix)
-    {
         out.erase(0, CURRENT_PATH_RELATIVE_PREFIX.length());
-    }
 
-    return out;
+    return PathFromUTF8(out);
 }
 
 #endif // _WIN32
 
-std::string convertLR2Path(const std::string& lr2path, const Path& relative_path)
+Path convertLR2Path(const std::string& lr2path, const Path& relative_path)
 {
     return convertLR2Path(lr2path, lunaticvibes::s(relative_path.u8string()));
 }
 
-std::string convertLR2Path(const std::string& lr2path, const std::string& relative_path_utf8)
+Path convertLR2Path(const std::string& lr2path, const std::string& relative_path_utf8)
 {
     return convertLR2Path(lr2path, std::string_view(relative_path_utf8));
 }
 
-std::string convertLR2Path(const std::string& lr2path, const char* relative_path_utf8)
+Path convertLR2Path(const std::string& lr2path, const char* relative_path_utf8)
 {
     return convertLR2Path(lr2path, std::string_view(relative_path_utf8));
 }
 
-std::string convertLR2Path(const std::string& lr2path, std::string_view relative_path_utf8)
+Path convertLR2Path(const std::string& lr2path, std::string_view relative_path_utf8)
 {
     std::string_view raw = lunaticvibes::trim(relative_path_utf8, "\"");
     if (raw.empty())
@@ -473,35 +461,26 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
         LOG_WARNING << "[Utils] Absolute LR2 paths are forbidden: " << raw;
         return {};
     }
-    LOG_VERBOSE << "[Utils] convertLR2Path: '" << raw << "'";
 
     std::string_view prefix = raw.substr(0, 2);
     if (prefix == "./" || prefix == ".\\")
-    {
         raw = raw.substr(2);
-    }
     else if (prefix[0] == '/' || prefix[0] == '\\')
-    {
         raw = raw.substr(1);
-    }
-    std::string out_path;
+
+    std::string path;
     if (lunaticvibes::iequals(raw.substr(0, 8), "LR2files"))
     {
-        Path path = PathFromUTF8(lr2path);
-        path /= PathFromUTF8(raw);
-        out_path = lunaticvibes::u8str(path);
+        path = lr2path;
+        path += Path::preferred_separator;
     }
-    else
-    {
-        out_path = std::string(raw);
-    }
+    path += raw;
 
 #ifndef _WIN32
-    out_path = lunaticvibes::resolve_windows_path(std::move(out_path));
+    return lunaticvibes::resolve_windows_path(std::move(path));
+#else
+    return PathFromUTF8(path);
 #endif // _WIN32
-
-    LOG_VERBOSE << "[Utils] convertLR2Path: -> '" << out_path << "'";
-    return out_path;
 }
 
 Path PathFromUTF8(std::string_view s)

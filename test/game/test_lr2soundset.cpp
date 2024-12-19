@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "game/sound/soundset_lr2.h"
-#include <common/utils.h>
+#include <common/str_utils.h>
 
 [[nodiscard]] inline StringPath operator""_pp(const char* s, size_t len)
 {

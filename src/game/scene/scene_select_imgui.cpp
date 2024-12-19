@@ -4,6 +4,7 @@
 #include <string>
 
 #include <common/log.h>
+#include <common/str_utils.h>
 #include <config/config_mgr.h>
 #include <db/db_lr2_score.h>
 #include <db/db_score.h>
@@ -1055,8 +1056,6 @@ void SceneSelect::imguiPageDebug()
     }
 }
 
-void assign(char* arr, size_t arrn, std::string_view s);
-
 void SceneSelect::imguiPageDebugMain()
 {
     constexpr auto&& hint = "LR2files/Score/YourNick.db";
@@ -1066,7 +1065,7 @@ void SceneSelect::imguiPageDebugMain()
     {
         const char* path = tinyfd_openFileDialog(nullptr, nullptr, 0, nullptr, hint, 0);
         if (path != nullptr)
-            assign(_lr2_db_import_path.data(), _lr2_db_import_path.size(), path);
+            lunaticvibes::assign(_lr2_db_import_path, path);
     }
     ImGui::SameLine();
     if (ImGui::Button("Import"))

@@ -1,6 +1,9 @@
 #pragma once
-#include "game/skin/skin.h"
+
 #include "soundset.h"
+
+#include <game/skin/skin.h>
+
 #include <random>
 #include <string>
 #include <string_view>
@@ -39,7 +42,7 @@ private:
     unsigned csvLineNumber = 0; // line parsing index
 
     std::map<std::string, Path> soundFilePath;
-    bool loadPath(const std::string& key, const std::string& rawpath);
+    bool loadPath(const std::string& key, std::string_view rawpath);
 
 public:
     Path getPathBGMSelect() const override;

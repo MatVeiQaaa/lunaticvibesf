@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+#include <common/str_utils.h>
+
 class mock_SkinLR2 : public SkinLR2
 {
 public:

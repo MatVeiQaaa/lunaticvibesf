@@ -8,7 +8,9 @@ add_library(common STATIC
     asynclooper.cpp
     encoding.cpp
     fraction.cpp
+    hash.cpp
     log.cpp
+    str_utils.cpp
     types.cpp
     utils.cpp
     keymap.cpp

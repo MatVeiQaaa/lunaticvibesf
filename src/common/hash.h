@@ -6,60 +6,70 @@
 #include <string>
 #include <string_view>
 
-#include "utils.h"
+namespace lunaticvibes
+{
+[[nodiscard]] std::string bin2hex(std::span<const unsigned char> bin);
+[[nodiscard]] inline std::string bin2hex(std::span<const char> bin)
+{
+    return bin2hex({reinterpret_cast<const unsigned char*>(bin.data()), bin.size()});
+};
+void hex2bin(std::string_view hex, std::span<unsigned char> buf);
+[[nodiscard]] std::string hex2bin(std::string_view hex);
 
-template <size_t _Len> class Hash
+} // namespace lunaticvibes
+
+template <size_t Len> class Hash
 {
 private:
-    unsigned char data[_Len] = {0};
+    unsigned char data[Len] = {0};
     bool set = false;
 
 public:
     constexpr Hash() = default;
     explicit Hash(const std::string_view hex)
     {
-        if (hex.size() != _Len * 2)
+        if (hex.size() != Len * 2)
             throw std::runtime_error("invalid 'hex' length");
         set = true;
-        hex2bin(hex, data);
+        lunaticvibes::hex2bin(hex, data);
     }
     template <size_t HexLen> explicit Hash(const char (&hex)[HexLen])
     {
-        static_assert(HexLen - 1 == _Len * 2);
+        static_assert(HexLen - 1 == Len * 2);
         set = true;
-        hex2bin(hex, data);
+        lunaticvibes::hex2bin(hex, data);
     }
 
-    constexpr size_t length() const { return _Len; }
+    constexpr size_t length() const { return Len; }
     // TODO: remove this and use std::optional<Hash> where needed.
     constexpr bool empty() const { return !set; }
-    std::string hexdigest() const { return bin2hex(data, _Len); }
+    std::string hexdigest() const { return lunaticvibes::bin2hex({data, Len}); }
     constexpr const unsigned char* hex() const { return data; }
     void reset()
     {
         set = false;
-        memset(data, 0, _Len);
+        memset(data, 0, Len);
     }
 
-    bool operator<(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) < 0; }
-    bool operator>(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) > 0; }
-    bool operator<=(const Hash<_Len>& rhs) const { return !(*this > rhs); }
-    bool operator>=(const Hash<_Len>& rhs) const { return !(*this > rhs); }
-    bool operator==(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) == 0; }
-    bool operator!=(const Hash<_Len>& rhs) const { return memcmp(data, rhs.data, _Len) != 0; }
+    bool operator<(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) < 0; }
+    bool operator>(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) > 0; }
+    bool operator<=(const Hash<Len>& rhs) const { return !(*this > rhs); }
+    bool operator>=(const Hash<Len>& rhs) const { return !(*this > rhs); }
+    bool operator==(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) == 0; }
+    bool operator!=(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) != 0; }
 
-    friend struct std::hash<Hash<_Len>>;
+    friend struct std::hash<Hash<Len>>;
 };
 
-template <size_t _Len> struct std::hash<Hash<_Len>>
+template <size_t Len> struct std::hash<Hash<Len>>
 {
-    size_t operator()(const Hash<_Len>& obj) const
+    size_t operator()(const Hash<Len>& obj) const
     {
-        return std::hash<std::string_view>()({reinterpret_cast<const char*>(obj.data), _Len});
+        return std::hash<std::string_view>()({reinterpret_cast<const char*>(obj.data), Len});
     }
 };
 
 using HashMD5 = Hash<16>;
 
 HashMD5 md5(std::string_view str);
-HashMD5 md5file(const Path& filePath);
+HashMD5 md5file(const std::filesystem::path& filePath);

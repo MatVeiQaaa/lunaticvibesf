@@ -46,10 +46,6 @@ namespace lunaticvibes
     return 16 * base16(first) + base16(second);
 }
 
-[[nodiscard]] std::string bin2hex(const void* bin, size_t size);
-void hex2bin(std::string_view hex, unsigned char* buf);
-[[nodiscard]] std::string hex2bin(std::string_view hex);
-
 [[nodiscard]] std::string toLower(std::string_view s);
 [[nodiscard]] std::string toUpper(std::string_view s);
 
@@ -66,24 +62,6 @@ double normalizeLinearGrowth(double prev, double curr);
 
 namespace lunaticvibes
 {
-
-// TODO(C++20): use std::span.
-template <typename T> [[nodiscard]] inline std::string join(char sep, const std::vector<T>& v)
-{
-    using std::begin, std::end;
-    auto it = begin(v);
-    auto e = end(v);
-    if (it == e)
-        return {};
-    std::string s;
-    s += *it++;
-    for (; it != e; ++it)
-    {
-        s += sep;
-        s += *it;
-    }
-    return s;
-}
 
 // Trim leading and trailing symbols 'markers' from string 's'.
 [[nodiscard]] constexpr std::string_view trim(const std::string_view s, const std::string_view markers)

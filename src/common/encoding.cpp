@@ -310,7 +310,7 @@ struct IcdDeleter
 };
 using IcdPtr = std::unique_ptr<std::remove_pointer_t<iconv_t>, IcdDeleter>;
 
-static void convert(const std::string& input, eFileEncoding from, eFileEncoding to, std::string& out)
+static void convert(std::string_view input, eFileEncoding from, eFileEncoding to, std::string& out)
 {
     thread_local std::map<std::pair<eFileEncoding, eFileEncoding>, IcdPtr> icds;
 
@@ -338,7 +338,7 @@ static void convert(const std::string& input, eFileEncoding from, eFileEncoding 
     char out_buf[BUF_SIZE] = {0};
 
     // BRUH-cast.
-    char* buf_ptr = const_cast<char*>(input.c_str());
+    char* buf_ptr = const_cast<char*>(input.data());
     std::size_t buf_len = input.length();
     char* out_ptr = static_cast<char*>(out_buf);
     std::size_t out_len = sizeof(out_buf);

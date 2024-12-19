@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iterator>
 #include <random>
+#include <span>
 #include <string_view>
 #include <utility>
 
@@ -119,7 +120,6 @@ void SoundSetLR2::loadCSV(Path p)
     LOG_DEBUG << "[SoundSet] File: " << p << "(Line " << csvLineNumber << "): loading finished";
 }
 
-// TODO: use std::span
 bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
 {
     if (tokens.empty())
@@ -149,7 +149,7 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
 
         return true;
     }
-    else if (lunaticvibes::iequals(key, "#CUSTOMFILE"))
+    if (lunaticvibes::iequals(key, "#CUSTOMFILE"))
     {
         if (tokens.size() < 4)
         {
@@ -192,7 +192,6 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
     return false;
 }
 
-// TODO: use std::span
 bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
 {
     if (tokens.size() < 2)
@@ -215,7 +214,7 @@ bool SoundSetLR2::parseBody(const std::vector<StringContent>& tokens)
     return false;
 }
 
-bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
+bool SoundSetLR2::loadPath(const std::string& key, const std::string_view rawpath)
 {
     if (auto it = soundFilePath.find(key); it != soundFilePath.end())
     {

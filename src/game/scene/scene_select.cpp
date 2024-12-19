@@ -14,6 +14,7 @@
 #include <common/entry/entry_random_song.h>
 #include <common/entry/entry_song.h>
 #include <common/entry/entry_types.h>
+#include <common/str_utils.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
@@ -352,17 +353,6 @@ void config_fx()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// TODO: move to str utils
-// TODO(C++20): std::span for lhs
-void assign(char* arr, size_t arrn, std::string_view s)
-{
-    if (arrn == 0)
-        arrn = 1; // Saturating subtraction.
-    const size_t bytes = std::min(arrn - 1, s.size());
-    strncpy(arr, s.data(), bytes);
-    arr[bytes] = '\0';
-}
-
 SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::MUSIC_SELECT, 250), _skinMgr(skinMgr)
 {
@@ -522,7 +512,7 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     _config_enable_preview_dedicated = ConfigMgr::get('P', cfg::P_PREVIEW_DEDICATED, false);
     _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
     _config_list_scroll_time_initial = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
-    assign(_lr2_db_import_path.data(), _lr2_db_import_path.size(), ConfigMgr::get('P', cfg::P_LR2_DB_IMPORT_PATH, ""));
+    lunaticvibes::assign(_lr2_db_import_path, ConfigMgr::get('P', cfg::P_LR2_DB_IMPORT_PATH, ""));
 }
 
 SceneSelect::~SceneSelect()

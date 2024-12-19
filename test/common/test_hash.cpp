@@ -23,6 +23,6 @@ TEST(Hash, HashStdHash)
 TEST(Hash, HexToBinToHex)
 {
     static const std::string hash = "40e94aa51dc5c0ccc5aad4e6aefdde2a";
-    const std::string hex = hex2bin(hash);
-    EXPECT_EQ(bin2hex(hex.data(), hex.size()), hash);
+    const std::string hex = lunaticvibes::hex2bin(hash);
+    EXPECT_EQ(lunaticvibes::bin2hex({hex.data(), hex.size()}), hash);
 }

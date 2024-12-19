@@ -138,42 +138,6 @@ bool lunaticvibes::iequals(std::string_view lhs, std::string_view rhs) noexcept
                       [](unsigned char l, unsigned char r) { return std::tolower(l) == std::tolower(r); });
 }
 
-// TODO(C++20): use std::span.
-std::string bin2hex(const void* bin, size_t size)
-{
-    std::string res;
-    res.reserve(size * 2 + 1);
-    constexpr char rgbDigits[] = "0123456789abcdef";
-    for (size_t i = 0; i < size; ++i)
-    {
-        unsigned char c = ((unsigned char*)bin)[i];
-        res += rgbDigits[(c >> 4) & 0xf];
-        res += rgbDigits[(c >> 0) & 0xf];
-    }
-    return res;
-}
-
-// TODO(C++20): use std::span.
-// LANDMINE.
-void hex2bin(std::string_view hex, unsigned char* buf)
-{
-    for (size_t i = 0, j = 0; i < hex.length() - 1; i += 2, j++)
-    {
-        unsigned char& c = buf[j];
-        unsigned char c1 = tolower(hex[i]);
-        unsigned char c2 = tolower(hex[i + 1]);
-        c += (c1 + ((c1 >= 'a') ? (10 - 'a') : (-'0'))) << 4;
-        c += (c2 + ((c2 >= 'a') ? (10 - 'a') : (-'0')));
-    }
-}
-std::string hex2bin(std::string_view hex)
-{
-    std::string res;
-    res.resize(hex.length() / 2);
-    hex2bin(hex, reinterpret_cast<unsigned char*>(res.data()));
-    return res;
-}
-
 #ifdef _WIN32
 
 HashMD5 md5(std::string_view s)
@@ -194,7 +158,7 @@ HashMD5 md5(std::string_view s)
     CryptDestroyHash(hHash);
     CryptReleaseContext(hProv, 0);
 
-    return HashMD5{bin2hex(rgbHash, MD5_LEN)};
+    return HashMD5{lunaticvibes::bin2hex({rgbHash, MD5_LEN})};
 }
 
 HashMD5 md5file(const Path& filePath)
@@ -231,16 +195,15 @@ HashMD5 md5file(const Path& filePath)
     CryptDestroyHash(hHash);
     CryptReleaseContext(hProv, 0);
 
-    return HashMD5{bin2hex(rgbHash, MD5_LEN)};
+    return HashMD5{lunaticvibes::bin2hex({rgbHash, MD5_LEN})};
 }
 
 #else
 
-// TODO: std::span
-static HashMD5 format_hash(const unsigned char* digest, size_t digest_size)
+static HashMD5 format_hash(std::span<unsigned char> digest)
 {
     std::string ret;
-    for (size_t i = 0; i < digest_size; ++i)
+    for (size_t i = 0; i < digest.size(); ++i)
     {
         unsigned char high = digest[i] >> 4 & 0xF;
         unsigned char low = digest[i] & 0xF;
@@ -276,10 +239,9 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
         return {};
     };
 
-    return format_hash(digest, digest_len);
+    return format_hash({digest, digest_len});
 }
 
-// TODO(C++20): take std::span instead
 HashMD5 md5(std::string_view s)
 {
     return md5_impl([&](EVP_MD_CTX* context) { return EVP_DigestUpdate(context, s.data(), s.size()) != 0; });

@@ -8,6 +8,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/u8.h>
 
 // Codes are from DXArchive (DX Library -> Tool -> DXArchive -> Source) , with some modification
 // Original author: 山田 巧 (Takumi Yamada)
@@ -440,7 +441,7 @@ int DirectoryDecode(u8* NameP, u8* DirP, u8* FileP, DARC_HEAD_VER5* Head, DARC_D
                     }
                 }
 
-                output[(DirPath / GetOriginalFileName(NameP + File->NameAddress)).u8string()] = DestP;
+                output[lunaticvibes::u8str(DirPath / GetOriginalFileName(NameP + File->NameAddress))] = DestP;
             }
         }
     }

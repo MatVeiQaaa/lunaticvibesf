@@ -1,4 +1,5 @@
 #include "video.h"
+#include "common/u8.h"
 
 #include <chrono>
 #include <thread>
@@ -52,7 +53,7 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
     this->speed = speed;
     loop_playback = loop;
 
-    if (int ret = avformat_open_input(&pFormatCtx, file.u8string().c_str(), NULL, NULL); ret != 0)
+    if (int ret = avformat_open_input(&pFormatCtx, lunaticvibes::cs(file.u8string()), NULL, NULL); ret != 0)
     {
         char buf[256];
         av_strerror(ret, buf, 256);

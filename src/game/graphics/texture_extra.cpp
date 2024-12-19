@@ -1,20 +1,18 @@
+#include "texture_extra.h"
 
 #include <algorithm>
 
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "common/types.h"
-#include "common/utils.h"
-#include "game/chart/chart_bms.h"
-#include "game/scene/scene_context.h"
-#include "texture_extra.h"
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <common/types.h>
+#include <common/u8.h>
+#include <common/utils.h>
+#include <game/chart/chart_bms.h>
+#include <game/scene/scene_context.h>
 
 extern "C"
 {
-#include "libavcodec/avcodec.h"
-#include "libavfilter/avfilter.h"
 #include "libavformat/avformat.h"
-#include "libavutil/avutil.h"
 }
 
 TextureVideo::TextureVideo(std::shared_ptr<sVideo> pv_)
@@ -162,16 +160,17 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
 
     if (!fs::exists(pBmp) && pBmp.has_extension() && lunaticvibes::iequals(pBmp.extension().string(), ".bmp"))
     {
-        pBmp = pBmp.parent_path() / PathFromUTF8(pBmp.filename().stem().u8string() + u8".jpg");
+        pBmp = pBmp.parent_path() / Path(pBmp.filename().stem().u8string() + u8".jpg");
 
         if (!fs::exists(pBmp))
         {
-            pBmp = pBmp.parent_path() / PathFromUTF8(pBmp.filename().stem().u8string() + u8".png");
+            pBmp = pBmp.parent_path() / Path(pBmp.filename().stem().u8string() + u8".png");
         }
     }
     if (fs::exists(pBmp) && fs::is_regular_file(pBmp) && pBmp.has_extension())
     {
-        if (video_file_extensions.find(toLower(pBmp.extension().u8string())) != video_file_extensions.end())
+        if (video_file_extensions.find(toLower(lunaticvibes::s(pBmp.extension().u8string()))) !=
+            video_file_extensions.end())
         {
             objs[idx].type = obj::Ty::VIDEO;
             objs[idx].pt =
@@ -217,7 +216,7 @@ void TextureBmsBga::sortSlot()
     auto less = [](const std::pair<lunaticvibes::Time, size_t>& l, const std::pair<lunaticvibes::Time, size_t>& r) {
         if (l.first < r.first)
             return true;
-        else if (l.first == r.first && l.second < r.second)
+        if (l.first == r.first && l.second < r.second)
             return true;
         return false;
     };

@@ -1245,8 +1245,7 @@ void SceneSelect::imguiRefreshProfileList()
     {
         if (p.is_directory())
         {
-            auto name = p.path().filename().u8string();
-            imgui_profiles.push_back(name);
+            imgui_profiles.push_back(lunaticvibes::u8str(p.path().filename()));
             imgui_profiles_display.push_back(imgui_profiles.back().c_str());
         }
     }
@@ -1554,7 +1553,7 @@ bool SceneSelect::imguiBrowseFolder()
 {
     if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size()))
         return false;
-    std::string pathstr = Path(imgui_folders_display[imgui_folder_index]).u8string();
+    auto pathstr = lunaticvibes::u8str(Path(imgui_folders_display[imgui_folder_index]));
     return lunaticvibes::open(pathstr);
 }
 

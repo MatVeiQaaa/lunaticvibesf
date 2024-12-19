@@ -16,7 +16,7 @@ TEST(Paths, ResolvesLr2PathsCorrectlty)
     EXPECT_EQ(convertLR2Path("/opt/lv", "/opt/lv/LR2files/Config/config.xml"), "");
 #endif // _WIN32
 
-    EXPECT_EQ(convertLR2Path("/home/me/lv", u8" テスト "), u8" テスト ");
+    EXPECT_EQ(convertLR2Path("/home/me/lv", u8" テスト "), " テスト ");
 
     EXPECT_EQ(convertLR2Path("/home/me/lv", ""), "");
     EXPECT_EQ(convertLR2Path("/home/me/lv", "."), ".");

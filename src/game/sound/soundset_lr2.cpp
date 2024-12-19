@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "common/encoding.h"
+#include "common/u8.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
 #include "game/scene/scene_customize.h"
@@ -78,7 +79,7 @@ void SoundSetLR2::loadCSV(Path p)
     try
     {
         std::map<StringContent, StringContent> opFileMap;
-        for (const auto& node : YAML::LoadFile(pCustomize.u8string()))
+        for (const auto& node : YAML::LoadFile(lunaticvibes::u8str(pCustomize)))
         {
             auto key = node.first.as<std::string>();
             if (key.substr(0, 5) == "FILE_")
@@ -166,11 +167,9 @@ bool SoundSetLR2::parseHeader(const std::vector<StringContent>& tokens)
 
         CustomFile c;
         c.title = title;
-        c.filepath = pathf.u8string();
+        c.filepath = lunaticvibes::u8str(pathf);
         for (auto& p : findFiles(pathf))
-        {
-            c.label.push_back(p.filename().u8string());
-        }
+            c.label.push_back(lunaticvibes::u8str(p.filename()));
 
         std::sort(c.label.begin(), c.label.end());
         c.label.emplace_back("RANDOM");
@@ -226,7 +225,7 @@ bool SoundSetLR2::loadPath(const std::string& key, const std::string& rawpath)
     }
 
     Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), rawpath));
-    const std::string pathU8Str = path.u8string();
+    const std::string pathU8Str = lunaticvibes::u8str(path);
     const std::string_view pathU8StrView{pathU8Str};
     if (pathU8StrView.find(u8'*') != pathU8StrView.npos)
     {

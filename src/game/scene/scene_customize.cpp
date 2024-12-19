@@ -1,4 +1,5 @@
 #include "scene_customize.h"
+#include "common/u8.h"
 
 #include <common/assert.h>
 #include <common/hash.h>
@@ -282,7 +283,7 @@ void SceneCustomize::updateMain()
                     wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0, static_cast<int>(soundsetList.size() - 1));
                 const auto& p = fs::relative(soundsetList[selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
 
-                ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, p.u8string());
+                ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, lunaticvibes::u8str(p));
 
                 pSkin->setHandleMouseEvents(false);
                 SoundMgr::stopSysSamples();
@@ -320,7 +321,7 @@ void SceneCustomize::updateMain()
                     fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
                 if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
-                    ConfigMgr::set('S', key, p.u8string());
+                    ConfigMgr::set('S', key, lunaticvibes::u8str(p));
                 }
                 else
                 {
@@ -407,7 +408,7 @@ void SceneCustomize::updateFadeout()
 StringPath SceneCustomize::getConfigFileName(StringPathView skinPath)
 {
     Path p(skinPath);
-    std::string md5 = ::md5(p.u8string()).hexdigest();
+    std::string md5 = ::md5(lunaticvibes::s(p.u8string())).hexdigest();
     md5 += ".yaml";
     return Path(md5).native();
 }
@@ -544,7 +545,7 @@ void SceneCustomize::load(SkinType mode)
         Path pCustomize = ConfigMgr::Profile()->getPath() / "customize" / getConfigFileName(configFilePath);
         try
         {
-            for (const auto& node : YAML::LoadFile(pCustomize.u8string()))
+            for (const auto& node : YAML::LoadFile(lunaticvibes::u8str(pCustomize)))
             {
                 if (auto itOp = optionsMap.find(node.first.as<std::string>()); itOp != optionsMap.end())
                 {

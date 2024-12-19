@@ -31,6 +31,7 @@
 #include <common/log.h>
 #include <common/sysutil.h>
 #include <common/types.h>
+#include <common/u8.h>
 
 static const std::pair<RE2, re2::StringPiece> path_replace_pattern[]{
     {R"(\\)", R"(\\\\)"}, {R"(\.)", R"(\\.)"}, {R"(\^)", R"(\\^)"}, {R"(\$)", R"(\\$)"},     {R"(\|)", R"(\\|)"},
@@ -58,7 +59,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
         pstr =
             pstr.substr(pstr[folder.length() - 1] == Path::preferred_separator ? folder.length() : folder.length() + 1);
 
-        std::string str = Path(pstr).u8string();
+        std::string str = lunaticvibes::u8str(pstr);
         for (const auto& [in, out] : path_replace_pattern)
         {
             RE2::GlobalReplace(&str, in, out);
@@ -76,10 +77,8 @@ std::vector<Path> findFiles(Path p, bool recursive)
             for (auto& f : fs::recursive_directory_iterator(pathFolder))
             {
                 if (f.path().filename().u8string().substr(0, 2) != u8"._" &&
-                    RE2::FullMatch(f.path().filename().u8string(), pathRegex))
-                {
+                    RE2::FullMatch(lunaticvibes::u8str(f.path().filename()), pathRegex))
                     res.push_back(f.path());
-                }
             }
         }
         else
@@ -88,7 +87,7 @@ std::vector<Path> findFiles(Path p, bool recursive)
             {
                 auto relativeFilePath = fs::relative(f, pathFolder);
                 if (relativeFilePath.u8string().substr(0, 2) != u8"._" &&
-                    RE2::FullMatch(relativeFilePath.u8string(), pathRegex))
+                    RE2::FullMatch(lunaticvibes::u8str(relativeFilePath), pathRegex))
                 {
                     res.push_back(f.path());
                 }
@@ -451,7 +450,7 @@ std::string lunaticvibes::resolve_windows_path(std::string input)
 
 std::string convertLR2Path(const std::string& lr2path, const Path& relative_path)
 {
-    return convertLR2Path(lr2path, relative_path.u8string());
+    return convertLR2Path(lr2path, lunaticvibes::s(relative_path.u8string()));
 }
 
 std::string convertLR2Path(const std::string& lr2path, const std::string& relative_path_utf8)
@@ -490,7 +489,7 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
     {
         Path path = PathFromUTF8(lr2path);
         path /= PathFromUTF8(raw);
-        out_path = path.u8string();
+        out_path = lunaticvibes::u8str(path);
     }
     else
     {
@@ -507,7 +506,9 @@ std::string convertLR2Path(const std::string& lr2path, std::string_view relative
 
 Path PathFromUTF8(std::string_view s)
 {
-    return fs::u8path(s);
+    // Casting char to char8_t should be UB (unlike the other way around), but
+    // `_GLIBCXX20_DEPRECATED_SUGGEST("path((const char8_t*)&*source)")`.
+    return fs::path(std::u8string_view{reinterpret_cast<const char8_t*>(s.data()), s.size()});
 }
 
 void preciseSleep(long long sleep_ns)

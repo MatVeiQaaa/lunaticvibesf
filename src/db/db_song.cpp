@@ -8,6 +8,7 @@
 #include "common/hash.h"
 #include "common/log.h"
 #include "common/sysutil.h"
+#include "common/u8.h"
 #include "common/utils.h"
 #include "game/chart/chart_types.h"
 #include <common/assert.h>
@@ -286,7 +287,7 @@ bool SongDB::addChart(const HashMD5& folder, const Path& path)
             std::unique_lock l(addCurrentPathMutex, std::try_to_lock);
             if (l.owns_lock())
             {
-                addCurrentPath = path.u8string();
+                addCurrentPath = lunaticvibes::s(path.u8string());
             }
         }
 
@@ -674,7 +675,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
 
     // check if the folder is already added
     int count = 0;
-    HashMD5 folderHash = md5(path.u8string());
+    HashMD5 folderHash = md5(lunaticvibes::s(path.u8string()));
     long long folderModifyTime = getFileLastWriteTime(path);
 
     if (auto q = query("SELECT pathmd5,path,type,modtime FROM folder WHERE path=?", {path.u8string()}); !q.empty())
@@ -1051,7 +1052,7 @@ HashMD5 SongDB::getFolderParent(const Path& path) const
         return {};
 
     auto parent = (path / "..").lexically_normal();
-    HashMD5 parentHash = md5(parent.u8string());
+    HashMD5 parentHash = md5(lunaticvibes::s(parent.u8string()));
     auto result = query("SELECT type FROM folder WHERE parent=?", {parentHash.hexdigest()});
     for (const auto& leaf : result)
         if (ANY_INT(leaf[0]) == FOLDER)
@@ -1128,7 +1129,7 @@ HashMD5 SongDB::getFolderHash(Path path) const
     {
         path = fs::absolute(path);
     }
-    return md5(path.u8string());
+    return md5(lunaticvibes::s(path.u8string()));
 }
 
 std::shared_ptr<EntryFolderRegular> SongDB::browse(const HashMD5& root, bool recursive)

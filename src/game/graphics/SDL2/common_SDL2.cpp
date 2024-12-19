@@ -10,6 +10,7 @@
 #include <common/assert.h>
 #include <common/log.h>
 #include <common/sysutil.h>
+#include <common/u8.h>
 #include <common/utils.h>
 #include <game/graphics/graphics.h>
 
@@ -114,7 +115,7 @@ static bool isGIF(const std::string_view filePath)
     return lunaticvibes::iequals(filePath.substr(filePath.length() - 3), "gif");
 }
 
-Image::Image(const std::filesystem::path& path) : Image(path.u8string().c_str()) {}
+Image::Image(const std::filesystem::path& path) : Image(lunaticvibes::cs(path.u8string())) {}
 
 // SDL2 leaks memory on non-main threads otherwise:
 // SDL_GetErrBuf

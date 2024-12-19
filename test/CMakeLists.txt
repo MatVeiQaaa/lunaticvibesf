@@ -30,7 +30,7 @@ gtest_discover_tests(apptest
 )
 
 set_target_properties(apptest PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CTEST_OUTPUT_ON_FAILURE TRUE 
     GTEST_COLOR TRUE
 )

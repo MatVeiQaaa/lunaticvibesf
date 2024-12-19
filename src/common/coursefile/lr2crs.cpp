@@ -7,11 +7,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "common/encoding.h"
-#include "common/hash.h"
-#include "common/log.h"
-#include "common/sysutil.h"
-#include "common/utils.h"
+#include <common/encoding.h>
+#include <common/hash.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <common/u8.h>
+#include <common/utils.h>
 
 std::stringstream readIntoUtf8StringStream(const Path& filePath)
 {
@@ -46,7 +47,8 @@ std::stringstream readIntoUtf8StringStream(const Path& filePath)
 }
 
 CourseLr2crs::CourseLr2crs(const Path& filePath)
-    : CourseLr2crs(filePath.filename().u8string(), getFileLastWriteTime(filePath), readIntoUtf8StringStream(filePath))
+    : CourseLr2crs(lunaticvibes::s(filePath.filename().u8string()), getFileLastWriteTime(filePath),
+                   readIntoUtf8StringStream(filePath))
 {
 }
 

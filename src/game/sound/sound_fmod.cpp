@@ -1,4 +1,5 @@
 #include "sound_fmod.h"
+#include "common/u8.h"
 #include <cstdlib>
 #include <type_traits>
 
@@ -617,11 +618,11 @@ int SoundDriverFMOD::setAsyncIO(bool async)
     return 0;
 }
 
-static constexpr const char* wavExtensionList[]{
-    ".wav", ".ogg", ".flac",
+static constexpr const char8_t* wavExtensionList[]{
+    u8".wav", u8".ogg", u8".flac",
 // Alternatively we could try each of these with resolve_windows_path.
 #ifndef _WIN32
-    ".WAV", ".OGG", ".FLAC",
+    u8".WAV", u8".OGG", u8".FLAC",
 #endif //  _WIN32
 };
 
@@ -642,7 +643,7 @@ int SoundDriverFMOD::loadNoteSample(const Path& spath, size_t index)
     FMOD_RESULT r = FMOD_ERR_FILE_NOTFOUND;
     if (fs::exists(spath) && fs::is_regular_file(spath))
     {
-        path = spath.u8string();
+        path = lunaticvibes::s(spath.u8string());
         r = fmodSystem->createSound(path.c_str(), flags, 0, &noteSamples[index].objptr);
     }
 
@@ -652,10 +653,10 @@ int SoundDriverFMOD::loadNoteSample(const Path& spath, size_t index)
         Path dir = spath.parent_path();
         for (auto& ext : wavExtensionList)
         {
-            Path filePath = dir / PathFromUTF8(spath.stem().u8string() + ext);
+            Path filePath = dir / Path(spath.stem().u8string() + ext);
             if (fs::exists(filePath) && fs::is_regular_file(filePath))
             {
-                path = filePath.u8string();
+                path = lunaticvibes::s(filePath.u8string());
                 r = fmodSystem->createSound(path.c_str(), flags, 0, &noteSamples[index].objptr);
                 if (r == FMOD_OK)
                     break;
@@ -739,7 +740,7 @@ int SoundDriverFMOD::loadSysSample(const Path& spath, size_t index, bool isStrea
     FMOD_RESULT r = FMOD_ERR_FILE_NOTFOUND;
     if (fs::exists(spath) && fs::is_regular_file(spath))
     {
-        path = spath.u8string();
+        path = lunaticvibes::s(spath.u8string());
         r = fmodSystem->createSound(path.c_str(), flags, 0, &sysSamples[index].objptr);
     }
 
@@ -749,10 +750,10 @@ int SoundDriverFMOD::loadSysSample(const Path& spath, size_t index, bool isStrea
         Path dir = spath.parent_path();
         for (auto& ext : wavExtensionList)
         {
-            Path filePath = dir / PathFromUTF8(spath.stem().u8string() + ext);
+            Path filePath = dir / Path(spath.stem().u8string() + ext);
             if (fs::exists(filePath) && fs::is_regular_file(filePath))
             {
-                path = filePath.u8string();
+                path = lunaticvibes::s(filePath.u8string());
                 r = fmodSystem->createSound(path.c_str(), flags, 0, &sysSamples[index].objptr);
                 if (r == FMOD_OK)
                     break;

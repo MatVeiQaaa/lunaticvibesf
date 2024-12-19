@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <common/types.h>
+#include <common/u8.h>
 
 struct sqlite3;
 
@@ -51,7 +52,7 @@ public:
     SQLite() = delete;
     SQLite(const char* path, std::string tag, OpenMode mode = OpenMode::ReadWrite);
     SQLite(const Path& path, std::string tag, OpenMode mode = OpenMode::ReadWrite)
-        : SQLite(path.u8string().c_str(), std::move(tag), mode)
+        : SQLite(lunaticvibes::cs(path.u8string()), std::move(tag), mode)
     {
     }
     virtual ~SQLite();

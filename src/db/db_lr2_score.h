@@ -1,6 +1,8 @@
 #pragma once
 
+#include <common/u8.h>
 #include <db/db_conn.h>
+
 #include <functional>
 
 namespace lunaticvibes
@@ -38,7 +40,7 @@ class Lr2ScoreDb : SQLite
 {
 public:
     explicit Lr2ScoreDb(const char* path);
-    explicit Lr2ScoreDb(const Path& path) : Lr2ScoreDb(path.u8string().c_str()) {}
+    explicit Lr2ScoreDb(const Path& path) : Lr2ScoreDb(lunaticvibes::cs(path.u8string().c_str())) {}
     void proc(const std::function<void(const Lr2Score& score)>& cb);
 
     struct InMemoryRwTag

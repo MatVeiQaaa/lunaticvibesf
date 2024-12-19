@@ -14,17 +14,18 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
 
-#include "common/encoding.h"
-#include "common/log.h"
-#include "common/meta.h"
-#include "common/sysutil.h"
-#include "config/config_mgr.h"
-#include "game/graphics/video.h"
-#include "graphics_SDL2.h"
-#include "window_SDL2.h"
 #include <common/assert.h>
+#include <common/encoding.h>
+#include <common/log.h>
+#include <common/meta.h>
+#include <common/sysutil.h>
+#include <common/u8.h>
+#include <config/config_mgr.h>
+#include <game/graphics/SDL2/graphics_SDL2.h>
 #include <game/graphics/SDL2/input.h>
+#include <game/graphics/SDL2/window_SDL2.h>
 #include <game/graphics/graphics.h>
+#include <game/graphics/video.h>
 
 static SDL_Rect canvasRect;
 static SDL_Rect windowRect;
@@ -242,7 +243,7 @@ void graphics_flush()
             {
                 LOG_ERROR << "[SDL2] SDL_RenderReadPixels error: " << SDL_GetError();
             }
-            ret = IMG_SavePNG(sshot, screenshotPath.u8string().c_str());
+            ret = IMG_SavePNG(sshot, lunaticvibes::cs(screenshotPath.u8string()));
             if (ret < 0)
             {
                 LOG_ERROR << "[SDL2] IMG_SavePNG error: " << IMG_GetError();

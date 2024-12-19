@@ -4,10 +4,11 @@
 #include <string>
 #include <utility>
 
-#include "chartformat_bms.h"
-#include "common/encoding.h"
-#include "common/log.h"
-#include "common/utils.h"
+#include <common/chartformat/chartformat_bms.h>
+#include <common/encoding.h>
+#include <common/log.h>
+#include <common/u8.h>
+#include <common/utils.h>
 
 eChartFormat analyzeChartType(const Path& p)
 {
@@ -16,7 +17,7 @@ eChartFormat analyzeChartType(const Path& p)
 
     eChartFormat fmt = eChartFormat::UNKNOWN;
 
-    auto extension = p.extension().u8string();
+    auto extension = p.extension().string();
     if (extension.length() == 4)
     {
         if (lunaticvibes::iequals(extension, ".bms") || lunaticvibes::iequals(extension, ".bme") ||
@@ -123,7 +124,7 @@ try
             utf8_text += line;
             utf8_text += '\n';
         }
-        out.emplace_back(file.filename().u8string(), std::move(utf8_text));
+        out.emplace_back(lunaticvibes::u8str(file.filename()), std::move(utf8_text));
     }
     std::sort(out.begin(), out.end(), [](const Pair& lhs, const Pair& rhs) { return lhs.first < rhs.first; });
     return out;

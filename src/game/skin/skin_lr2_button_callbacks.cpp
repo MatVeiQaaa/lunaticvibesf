@@ -1503,10 +1503,10 @@ std::function<void(int)> getButtonCallback(int type)
     case 12: return std::bind(select_sort_type, _1);
     case 13: return [](auto) { enter_key_config(); };
     case 14: return [](auto) { enter_skin_config(); };
-    case 15: return createUnsupportedCb(u8"プレイ開始");
+    case 15: return createUnsupportedCb("プレイ開始");
     case 16: return [](auto) { autoplay(); };
     case 17: return [](auto) { requestOpenChartReadme(); };
-    case 18: return createUnsupportedCb(u8"タグのリセット");
+    case 18: return createUnsupportedCb("タグのリセット");
     case 19: return [](auto) { replay(); };
     case 20:
     case 21:
@@ -1632,10 +1632,10 @@ std::function<void(int)> getButtonCallback(int type)
     case 227:
     case 228:
     case 229: return std::bind(skinselect_option, type - 220, _1);
-    case 230: return createUnsupportedCb(u8"コースセレクト　決定");
-    case 231: return createUnsupportedCb(u8"コースセレクト　キャンセル");
-    case 232: return createUnsupportedCb(u8"コースビュー　コース編集開始");
-    case 233: return createUnsupportedCb(u8"コースビュー　コース削除");
+    case 230: return createUnsupportedCb("コースセレクト　決定");
+    case 231: return createUnsupportedCb("コースセレクト　キャンセル");
+    case 232: return createUnsupportedCb("コースビュー　コース編集開始");
+    case 233: return createUnsupportedCb("コースビュー　コース削除");
     case 240:
     case 241:
     case 242:
@@ -1645,21 +1645,21 @@ std::function<void(int)> getButtonCallback(int type)
     case 246:
     case 247:
     case 248:
-    case 249: return createUnsupportedCb(u8"コースオプション　つなぎタイプstage1-2変更");
-    case 250: return createUnsupportedCb(u8"コースオプション　ソフランの有無変更");
-    case 251: return createUnsupportedCb(u8"コースオプション　コースゲージの変更");
-    case 252: return createUnsupportedCb(u8"コースオプション　オプション有効・無効の変更");
-    case 253: return createUnsupportedCb(u8"コースオプション IR有効・無効の変更");
-    case 260: return createUnsupportedCb(u8"ランダムコースオプション　最適レベル変更");
-    case 261: return createUnsupportedCb(u8"ランダムコースオプション　レベル上限の変更");
-    case 262: return createUnsupportedCb(u8"ランダムコースオプション　レベル下限の変更");
-    case 263: return createUnsupportedCb(u8"ランダムコースオプション　bpm変動幅の変更");
-    case 264: return createUnsupportedCb(u8"ランダムコースオプション　bpm上限の変更");
-    case 265: return createUnsupportedCb(u8"ランダムコースオプション　bpm下限の変更");
-    case 266: return createUnsupportedCb(u8"ランダムコースオプション　ステージ数の変更");
-    case 267: return createUnsupportedCb(u8"(empty)");
-    case 268: return createUnsupportedCb(u8"全体コースオプション　デフォルトつなぎタイプの変更");
-    case 269: return createUnsupportedCb(u8"全体コースオプション　デフォルトゲージの変更");
+    case 249: return createUnsupportedCb("コースオプション　つなぎタイプstage1-2変更");
+    case 250: return createUnsupportedCb("コースオプション　ソフランの有無変更");
+    case 251: return createUnsupportedCb("コースオプション　コースゲージの変更");
+    case 252: return createUnsupportedCb("コースオプション　オプション有効・無効の変更");
+    case 253: return createUnsupportedCb("コースオプション IR有効・無効の変更");
+    case 260: return createUnsupportedCb("ランダムコースオプション　最適レベル変更");
+    case 261: return createUnsupportedCb("ランダムコースオプション　レベル上限の変更");
+    case 262: return createUnsupportedCb("ランダムコースオプション　レベル下限の変更");
+    case 263: return createUnsupportedCb("ランダムコースオプション　bpm変動幅の変更");
+    case 264: return createUnsupportedCb("ランダムコースオプション　bpm上限の変更");
+    case 265: return createUnsupportedCb("ランダムコースオプション　bpm下限の変更");
+    case 266: return createUnsupportedCb("ランダムコースオプション　ステージ数の変更");
+    case 267: return createUnsupportedCb("(empty)");
+    case 268: return createUnsupportedCb("全体コースオプション　デフォルトつなぎタイプの変更");
+    case 269: return createUnsupportedCb("全体コースオプション　デフォルトゲージの変更");
     }
     return createUnsupportedCb("(undocumented)");
 }

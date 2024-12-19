@@ -85,6 +85,18 @@ void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
         const auto str = std::any_cast<std::string_view>(a);
         ret = sqlite3_bind_text(stmt, i, str.data(), static_cast<int>(str.length()), SQLITE_TRANSIENT);
     }
+    else if (a.type() == typeid(std::u8string))
+    {
+        const auto str = std::any_cast<std::u8string>(a);
+        ret = sqlite3_bind_text(stmt, i, reinterpret_cast<const char*>(str.data()), static_cast<int>(str.length()),
+                                SQLITE_TRANSIENT);
+    }
+    else if (a.type() == typeid(std::u8string_view))
+    {
+        const auto str = std::any_cast<std::u8string_view>(a);
+        ret = sqlite3_bind_text(stmt, i, reinterpret_cast<const char*>(str.data()), static_cast<int>(str.length()),
+                                SQLITE_TRANSIENT);
+    }
     else if (a.type() == typeid(const char*))
         ret = sqlite3_bind_text(stmt, i, std::any_cast<const char*>(a), -1, SQLITE_TRANSIENT);
     else if (a.type() == typeid(nullptr))

@@ -1,11 +1,12 @@
 #include "config.h"
 
-#include <filesystem>
 #include <fstream>
 
-#include "common/log.h"
-#include "common/meta.h"
-#include "common/types.h"
+#include <common/log.h>
+#include <common/meta.h>
+#include <common/types.h>
+#include <common/u8.h>
+#include <common/utils.h>
 
 vConfig::vConfig()
 {
@@ -43,7 +44,7 @@ void vConfig::load()
     setDefaults();
     try
     {
-        for (const auto& node : YAML::LoadFile(_path.u8string()))
+        for (const auto& node : YAML::LoadFile(lunaticvibes::u8str(_path)))
         {
             _yaml[node.first.as<std::string>()] = node.second;
         }

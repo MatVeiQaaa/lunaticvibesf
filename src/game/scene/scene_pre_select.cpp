@@ -368,7 +368,7 @@ void ScenePreSelect::updateLoadCourses()
 
                 const Path& coursePath = courseFile.path();
                 LOG_INFO << "[List] Loading course file: " << coursePath;
-                textHint2 = coursePath.u8string();
+                textHint2 = lunaticvibes::u8str(coursePath);
 
                 CourseLr2crs lr2crs(coursePath);
                 for (auto& c : lr2crs.courses)

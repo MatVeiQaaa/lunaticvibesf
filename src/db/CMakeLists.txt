@@ -13,7 +13,7 @@ target_include_directories(db PRIVATE
 )
 
 set_target_properties(db PROPERTIES
-    CXX_STANDARD 17)
+    CXX_STANDARD 20)
 
 target_link_libraries(db
     PUBLIC SQLite::SQLite3

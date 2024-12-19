@@ -14,7 +14,7 @@ target_include_directories(config PRIVATE
 )
 
 set_target_properties(config PROPERTIES
-    CXX_STANDARD 17)
+    CXX_STANDARD 20)
 
 target_link_libraries(config 
     PUBLIC yaml-cpp::yaml-cpp

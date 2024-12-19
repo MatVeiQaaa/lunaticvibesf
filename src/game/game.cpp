@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     ImFontConfig fontConfig;
     fontConfig.FontNo = fontIndex;
     ImFontAtlas& fontAtlas = *ImGui::GetIO().Fonts;
-    fontAtlas.AddFontFromFileTTF(imguiFontPath.u8string().c_str(), 24, &fontConfig,
+    fontAtlas.AddFontFromFileTTF(lunaticvibes::cs(imguiFontPath.u8string()), 24, &fontConfig,
                                  fontAtlas.GetGlyphRangesChineseFull());
 
     // etc

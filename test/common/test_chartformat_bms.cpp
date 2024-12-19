@@ -48,7 +48,7 @@ TEST(tBMS, utf8_file_path)
     std::shared_ptr<ChartFormatBMS> bms = nullptr;
     ASSERT_NO_THROW(bms = std::make_shared<ChartFormatBMS>(PathFromUTF8("bms/5k_世界.bms")));
     ASSERT_EQ(bms->isLoaded(), true);
-    EXPECT_EQ(bms->title, u8"ザ・ワールド");
+    EXPECT_EQ(bms->title, "ザ・ワールド");
 }
 
 TEST(tBMS, meta_basic)
@@ -67,9 +67,9 @@ TEST(tBMS, meta_basic)
     {
         EXPECT_TRUE(bms->checkHasReadme());
         static const std::vector<std::pair<std::string, std::string>> expected_readme_files{
-            {"readme_euckr.crlf.txt", u8"안녕\n불고기\n"},
-            {"readme_sjis.crlf.txt", u8"桃太郎は桃を食べた。\nと少年が思った、\n"},
-            {"readme_utf8.crlf.txt", u8"Матрёшка.\nВодка.\n"},
+            {"readme_euckr.crlf.txt", "안녕\n불고기\n"},
+            {"readme_sjis.crlf.txt", "桃太郎は桃を食べた。\nと少年が思った、\n"},
+            {"readme_utf8.crlf.txt", "Матрёшка.\nВодка.\n"},
         };
         std::vector<std::pair<std::string, std::string>> files;
         EXPECT_EQ((files = bms->getReadmeFiles()), expected_readme_files);
@@ -94,7 +94,7 @@ TEST(tBMS, meta_basic)
 
     {
         static const std::vector<std::pair<std::string, std::string>> files{
-            {"important.txt", u8"sobaudonramen"},
+            {"important.txt", "sobaudonramen"},
         };
 
         static constexpr std::string_view expected_readme_text = R"(important.txt

@@ -11,7 +11,7 @@ TEST(Lr2crs, ParsesSuccessfully)
     static constexpr long long add_time{12345};
 
     std::stringstream ss;
-    ss << u8R"(<?xml version="1.0" encoding="shift_jis"?>
+    ss << R"(<?xml version="1.0" encoding="shift_jis"?>
 <!--曲は上から順に登録されます。-->
 <courselist>
 
@@ -28,7 +28,7 @@ TEST(Lr2crs, ParsesSuccessfully)
     EXPECT_EQ(lr2crs.addTime, add_time);
     ASSERT_EQ(lr2crs.courses.size(), 1);
     const auto& course = lr2crs.courses[0];
-    EXPECT_EQ(course.title, u8"GENOSIDE 2018 段位認定 発狂初段");
+    EXPECT_EQ(course.title, "GENOSIDE 2018 段位認定 発狂初段");
     EXPECT_EQ(course.line, 7);
     EXPECT_EQ(course.type, CourseLr2crs::Course::COURSE_GRADE);
     EXPECT_EQ(course.hashTop, "00000000002000000000000000005190");

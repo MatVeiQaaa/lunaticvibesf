@@ -107,7 +107,7 @@ target_include_directories(gamelib PUBLIC
 )
 
 set_target_properties(gamelib PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
 )
 
 target_link_libraries(gamelib
@@ -146,7 +146,7 @@ else()
 endif()
 target_link_libraries(LunaticVibesF PRIVATE gamelib)
 set_target_properties(LunaticVibesF PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
 )
 install(TARGETS LunaticVibesF COMPONENT Game)
 

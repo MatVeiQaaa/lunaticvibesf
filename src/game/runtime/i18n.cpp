@@ -11,7 +11,7 @@ size_t i18n::currentLanguage = 0;
 
 i18n::i18n(const Path& translationFile)
 {
-    if (translationFile.stem().u8string() == "zh-cn")
+    if (translationFile.stem() == "zh-cn")
     {
         type = Languages::ZHCN;
     }

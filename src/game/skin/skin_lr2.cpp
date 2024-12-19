@@ -13,6 +13,7 @@
 #include <re2/re2.h>
 
 #include "common/log.h"
+#include "common/u8.h"
 #include "common/utils.h"
 #include "config/config_mgr.h"
 #include "game/graphics/dxa.h"
@@ -628,7 +629,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
 {
     Path path = PathFromUTF8(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), input));
     StringPath pathStr = path.native();
-    std::string pathU8Str = path.u8string();
+    std::string pathU8Str = lunaticvibes::u8str(path);
 
     if (pathStr.find("*"_p) != pathStr.npos)
     {
@@ -761,7 +762,7 @@ int SkinLR2::IMAGE()
         Path pathFile = getCustomizePath(parseParamBuf[0]);
         std::string textureMapKey = std::to_string(imageCount);
 
-        if (video_file_extensions.find(toLower(pathFile.extension().u8string())) != video_file_extensions.end())
+        if (video_file_extensions.contains(toLower(lunaticvibes::u8str(pathFile.extension()))))
         {
             videoNameMap[textureMapKey] = std::make_shared<sVideo>(pathFile, 1.0, true);
             textureNameMap[textureMapKey] = textureNameMap["White"];
@@ -823,7 +824,7 @@ int SkinLR2::LR2FONT()
 
         findAndExtractDXA(path);
 #ifndef _WIN32
-        path = PathFromUTF8(lunaticvibes::resolve_windows_path(path.u8string()));
+        path = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(path)));
 #endif // _WIN32
 
         if (!fs::is_regular_file(path))
@@ -3392,7 +3393,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         size_t defVal = 0;
         for (size_t param = 0; param < ls.size(); ++param)
         {
-            if (ls[param].filename().stem().u8string() == def)
+            if (lunaticvibes::s(ls[param].filename().stem().u8string()) == def)
             {
                 defVal = param;
                 break;
@@ -3405,10 +3406,10 @@ int SkinLR2::parseHeader(const Tokens& raw)
         c.type = Customize::Type::FILE;
         c.title = title;
         c.dst_op = 0;
-        c.filepath = pathf.u8string();
+        c.filepath = lunaticvibes::u8str(pathf);
         for (auto& p : ls)
         {
-            c.label.push_back(p.filename().stem().u8string());
+            c.label.push_back(lunaticvibes::u8str(p.filename().stem()));
             c.pathList.push_back(p);
         }
         c.label.emplace_back("RANDOM");
@@ -3710,7 +3711,7 @@ SkinLR2::~SkinLR2()
             ConfigMgr::Profile()->getPath() / "customize" / SceneCustomize::getConfigFileName(getFilePath());
         try
         {
-            auto yaml = YAML::LoadFile(pCustomize.u8string());
+            auto yaml = YAML::LoadFile(lunaticvibes::u8str(pCustomize));
 
             yaml["PLAY_SKIN_X"] = adjustPlaySkinX;
             yaml["PLAY_SKIN_Y"] = adjustPlaySkinY;
@@ -3829,7 +3830,7 @@ bool SkinLR2::loadCSV(Path p)
             {
                 std::map<size_t, StringContent> opDstMap;
                 std::map<StringContent, StringContent> opFileMap;
-                for (const auto& node : YAML::LoadFile(pCustomize.u8string()))
+                for (const auto& node : YAML::LoadFile(lunaticvibes::u8str(pCustomize)))
                 {
                     auto key = node.first.as<std::string>();
                     if (key.substr(0, 4) == "OPT_")
@@ -4362,14 +4363,14 @@ void SkinLR2::findAndExtractDXA(const Path& path)
         Path::string_type folderStr;
         do
         {
-            archiveName = folder.stem().u8string() + ".dxa";
+            archiveName = lunaticvibes::s(folder.stem().u8string() + u8".dxa");
             folder = folder.parent_path();
             folderStr = fs::absolute(folder).native();
 
             // find dxa file
             Path dxa = folder / PathFromUTF8(archiveName);
 #ifndef _WIN32
-            dxa = PathFromUTF8(lunaticvibes::resolve_windows_path(dxa.u8string()));
+            dxa = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(dxa)));
 #endif // _WIN32
 
             // extract dxa
@@ -4672,7 +4673,7 @@ SkinBase::CustomizeOption SkinLR2::getCustomizeOptionInfo(size_t idx) const
         ret.displayName = op.title;
         ret.entries.reserve(op.pathList.size());
         for (const auto& path : op.pathList)
-            ret.entries.push_back(path.filename().stem().u8string());
+            ret.entries.push_back(lunaticvibes::u8str(path.filename().stem()));
         ret.defaultEntry = op.defIdx;
         break;
     }

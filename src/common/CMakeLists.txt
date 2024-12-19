@@ -29,7 +29,7 @@ target_include_directories(common PRIVATE
 )
 
 set_target_properties(common PROPERTIES
-    CXX_STANDARD 17)
+    CXX_STANDARD 20)
 
 target_link_libraries(common 
     PUBLIC CURL::libcurl

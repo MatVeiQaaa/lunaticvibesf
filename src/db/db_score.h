@@ -11,6 +11,7 @@
 
 #include "common/hash.h"
 #include "common/types.h"
+#include "common/u8.h"
 #include "db/db_conn.h"
 
 class ScoreBase;
@@ -45,7 +46,7 @@ protected:
 public:
     ScoreDB() = delete;
     ScoreDB(const char* path);
-    ScoreDB(const Path& path) : ScoreDB(path.u8string().c_str()) {}
+    ScoreDB(const Path& path) : ScoreDB(lunaticvibes::cs(path.u8string())) {}
     ~ScoreDB() override = default;
     ScoreDB(ScoreDB&) = delete;
     ScoreDB& operator=(ScoreDB&) = delete;

@@ -95,8 +95,8 @@ TEST(tLR2Skin, HelpFileParsed)
     ASSERT_EQ(s.isLoaded(), true);
 
     static const std::vector<std::string> helpFiles{
-        u8"「とわ」とわ\n", u8"(file error)", u8"「とわ」とわ\n", u8"(file error)", u8"(file error)",
-        u8"(file error)",   u8"(file error)", u8"(file error)",   u8"(file error)", u8"UTF-8\nテスト\n",
+        "「とわ」とわ\n", "(file error)", "「とわ」とわ\n", "(file error)", "(file error)",
+        "(file error)",   "(file error)", "(file error)",   "(file error)", "UTF-8\nテスト\n",
         // No tenth.
     };
 

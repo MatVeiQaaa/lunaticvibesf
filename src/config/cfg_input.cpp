@@ -2,6 +2,7 @@
 
 #include "common/log.h"
 #include "common/meta.h"
+#include "common/u8.h"
 
 ConfigInput::ConfigInput(const std::string& profile, GameModeKeys k)
     : vConfig(profile,
@@ -88,7 +89,7 @@ void ConfigInput::setDefaults() noexcept
                         : "";
     try
     {
-        _yaml = YAML::LoadFile(path.u8string());
+        _yaml = YAML::LoadFile(lunaticvibes::u8str(path));
         for (auto p = Input::Pad::S1L; p < Input::Pad::ESC; p = Input::Pad(int(p) + 1))
         {
             const char* mapKey = getBindingKey(p);

@@ -1476,7 +1476,7 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
             {
                 LOG_INFO << "[List] Refreshing folder " << path;
                 State::set(IndexText::_OVERLAY_TOPLEFT,
-                           (boost::format(i18n::c(i18nText::REFRESH_FOLDER)) % path.u8string()).str());
+                           (boost::format(i18n::c(i18nText::REFRESH_FOLDER)) % lunaticvibes::s(path.u8string())).str());
 
                 g_pSongDB->resetAddSummary();
                 g_pSongDB->addSubFolder(path, gSelectContext.backtrace.front().parent);
@@ -1491,8 +1491,8 @@ void SceneSelect::inputGamePressSelect(InputMask& input, const lunaticvibes::Tim
                 int deleted = g_pSongDB->addChartDeleted;
                 if (added || updated || deleted)
                 {
-                    createNotification((boost::format(i18n::c(i18nText::REFRESH_FOLDER_DETAIL)) % path.u8string() %
-                                        added % updated % deleted)
+                    createNotification((boost::format(i18n::c(i18nText::REFRESH_FOLDER_DETAIL)) %
+                                        lunaticvibes::s(path.u8string()) % added % updated % deleted)
                                            .str());
                 }
                 State::set(IndexText::_OVERLAY_TOPLEFT, "");
@@ -3134,7 +3134,7 @@ std::optional<PathResult> try_get_path(const std::string_view query, const Selec
     const auto entryIndex = select_context.selectedEntryIndex;
     const auto& [entry, _score] = select_context.entries.at(entryIndex);
 
-    auto out = PathResult{entry->getPath().u8string()};
+    auto out = PathResult{lunaticvibes::u8str(entry->getPath())};
     LOG_DEBUG << "[Select] /path result: " << out.path;
     return out;
 }
@@ -3448,7 +3448,7 @@ void SceneSelect::updatePreview()
                             }
                             fs::path p{chartDir / pWav};
 #ifndef _WIN32
-                            p = PathFromUTF8(lunaticvibes::resolve_windows_path(p.u8string()));
+                            p = PathFromUTF8(lunaticvibes::resolve_windows_path(lunaticvibes::u8str(p)));
 #endif // _WIN32
                             SoundMgr::loadNoteSample(p, i);
                         });

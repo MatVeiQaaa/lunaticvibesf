@@ -20,7 +20,6 @@ void pollInput()
 
 bool isKeyPressed(Input::Keyboard key)
 {
-    // these are mappings toward enum Input::Keyboard
     // refer to virtual key definitions in MSDN
     // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     static const int vkMap[] = {
@@ -146,10 +145,13 @@ bool isKeyPressed(Input::Keyboard key)
         DIK_CONVERT,
         DIK_KANA,
 
+        DIK_OEM_102, // NONUS_BACKSLASH
+
         DIK_NUMPADSLASH,
         DIK_NUMPADSTAR,
         DIK_NUMPADENTER,
     };
+    static_assert(std::size(vkMap) == static_cast<size_t>(Input::Keyboard::K_COUNT));
 
     int vk = vkMap[static_cast<size_t>(key)];
     return InputDirectInput8::inst().getKeyboardState()[vk] & 0x80;
@@ -172,13 +174,13 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
                 float x = std::sinf(stat.rgdwPOV[c.index & 0xFFFFFFF] / 100.0f * 0.0174532925f);
                 float y = std::cosf(stat.rgdwPOV[c.index & 0xFFFFFFF] / 100.0f * 0.0174532925f);
 
-                if (x < -0.01f && (c.index & (1ul << 31)))
+                if (x < -0.01f && (c.index & (1ULL << 31)))
                     return true;
-                else if (y < -0.01f && (c.index & (1ul << 30)))
+                if (y < -0.01f && (c.index & (1ULL << 30)))
                     return true;
-                else if (y > 0.01f && (c.index & (1ul << 29)))
+                if (y > 0.01f && (c.index & (1ULL << 29)))
                     return true;
-                else if (x > 0.01f && (c.index & (1ul << 28)))
+                if (x > 0.01f && (c.index & (1ULL << 28)))
                     return true;
             }
             return false;

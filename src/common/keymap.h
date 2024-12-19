@@ -228,7 +228,6 @@ enum class Keyboard : unsigned
 
     // ISO
     K_NONUS_BACKSLASH,
-    K_NONUS_HASH,
 
     // scancodes with mask (e0)
     K_NUM_SLASH,
@@ -373,7 +372,6 @@ inline const char* keyboardNameMap[keyboardKeyCount]{
 
     // ISO
     "NONUS_BACKSLASH",
-    "NONUS_HASH",
 };
 
 enum class JoystickAxis

@@ -120,7 +120,6 @@ unsigned char sdl_key_from_common_scancode(Input::Keyboard key)
     case Input::Keyboard::K_NUM_STAR: return SDL_SCANCODE_KP_MULTIPLY;
     case Input::Keyboard::K_NUM_ENTER: return SDL_SCANCODE_KP_EQUALS;
     case Input::Keyboard::K_NONUS_BACKSLASH: return SDL_SCANCODE_NONUSBACKSLASH;
-    case Input::Keyboard::K_NONUS_HASH: return SDL_SCANCODE_NONUSHASH;
     case Input::Keyboard::K_COUNT: break;
     }
     LVF_VERIFY(false && "key is SDL_SCANCODE_UNKNOWN");

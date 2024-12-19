@@ -9,6 +9,8 @@
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 
+#include <vector>
+
 class InputDirectInput8
 {
 public:

@@ -1,6 +1,8 @@
 #include "difficultytable.h"
 
+#include <algorithm>
 #include <climits>
+#include <functional>
 #include <unordered_map>
 
 std::vector<std::string> DifficultyTable::getLevelList() const
@@ -8,23 +10,16 @@ std::vector<std::string> DifficultyTable::getLevelList() const
     std::vector<std::string> levelList;
     levelList.reserve(entries.size());
     for (const auto& entry : entries)
-    {
         levelList.push_back(entry.first);
-    }
-
-    std::sort(levelList.begin(), levelList.end(),
-              std::bind(&DifficultyTable::compareByLevelOrder, this, std::placeholders::_1, std::placeholders::_2));
-
+    std::ranges::sort(levelList, std::bind_front(&DifficultyTable::compareByLevelOrder, this));
     return levelList;
 }
 
 std::vector<std::shared_ptr<EntryBase>> DifficultyTable::getEntryList(const std::string& level)
 {
-    if (entries.find(level) == entries.end())
-    {
-        return {};
-    }
-    return entries.at(level);
+    if (auto it = entries.find(level); it != entries.end())
+        return it->second;
+    return {};
 }
 
 bool DifficultyTable::compareByLevelOrder(const std::string& first, const std::string& second) const

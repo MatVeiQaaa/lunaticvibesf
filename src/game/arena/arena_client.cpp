@@ -4,6 +4,7 @@
 #include <common/hash.h>
 #include <common/log.h>
 #include <db/db_song.h>
+#include <functional>
 #include <game/arena/arena_data.h>
 #include <game/arena/arena_internal.h>
 #include <game/runtime/i18n.h>
@@ -120,8 +121,7 @@ bool ArenaClient::joinLobby(const std::string& address)
     n->playerName = State::get(IndexText::PLAYER_NAME);
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
     addTaskWaitingForResponse(n->messageIndex, payload);
 
     gArenaData.online = true;
@@ -183,8 +183,7 @@ void ArenaClient::leaveLobby()
         n->messageIndex = ++sendMessageIndex;
 
         auto payload = n->pack();
-        socket->async_send_to(boost::asio::buffer(*payload), server,
-                              std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
         // no response
     }
 
@@ -203,8 +202,7 @@ void ArenaClient::requestChart(const HashMD5& reqChart)
     n->chartHashMD5String = !reqChart.empty() ? reqChart.hexdigest() : "";
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     addTaskWaitingForResponse(n->messageIndex, payload);
 }
@@ -221,8 +219,7 @@ void ArenaClient::setLoadingFinished(int playStartTimeMs)
     n->playStartTimeMs = playStartTimeMs;
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     addTaskWaitingForResponse(n->messageIndex, payload);
 }
@@ -239,8 +236,7 @@ void ArenaClient::setCreatedRuleset()
     n->payload = vRulesetNetwork::packInit(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     addTaskWaitingForResponse(n->messageIndex, payload);
 }
@@ -256,8 +252,7 @@ void ArenaClient::setPlayingFinished()
     n->messageIndex = ++sendMessageIndex;
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     addTaskWaitingForResponse(n->messageIndex, payload);
 }
@@ -273,8 +268,7 @@ void ArenaClient::setResultFinished()
     n->messageIndex = ++sendMessageIndex;
 
     auto payload = n->pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     addTaskWaitingForResponse(n->messageIndex, payload);
 }
@@ -282,7 +276,7 @@ void ArenaClient::setResultFinished()
 void ArenaClient::asyncRecv()
 {
     socket->async_receive_from(boost::asio::buffer(recv_buf), remote_endpoint,
-                               std::bind(&ArenaClient::handleRecv, this, std::placeholders::_1, std::placeholders::_2));
+                               std::bind_front(&ArenaClient::handleRecv, this));
 }
 
 void ArenaClient::handleRecv(const boost::system::error_code& error, size_t bytes_transferred)
@@ -408,8 +402,7 @@ void ArenaClient::handleHeartbeat(const std::shared_ptr<ArenaMessage>& msg)
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleNotice(const std::shared_ptr<ArenaMessage>& msg)
@@ -448,8 +441,7 @@ void ArenaClient::handleNotice(const std::shared_ptr<ArenaMessage>& msg)
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleDisbandLobby(const std::shared_ptr<ArenaMessage>& msg)
@@ -472,8 +464,7 @@ void ArenaClient::handlePlayerJoined(const std::shared_ptr<ArenaMessage>& msg)
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     if (gArenaData.data.find(pMsg->playerID) != gArenaData.data.end())
     {
@@ -504,8 +495,7 @@ void ArenaClient::handlePlayerLeft(const std::shared_ptr<ArenaMessage>& msg)
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     if (gArenaData.data.find(pMsg->playerID) == gArenaData.data.end())
     {
@@ -555,8 +545,7 @@ void ArenaClient::handleCheckChartExist(const std::shared_ptr<ArenaMessage>& msg
     ss.read(reinterpret_cast<char*>(resp.payload.data()), length);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleHostRequestChart(const std::shared_ptr<ArenaMessage>& msg)
@@ -566,8 +555,7 @@ void ArenaClient::handleHostRequestChart(const std::shared_ptr<ArenaMessage>& ms
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     if (!pMsg->chartHashMD5String.empty())
     {
@@ -597,8 +585,7 @@ void ArenaClient::handleHostReadyStat(const std::shared_ptr<ArenaMessage>& msg)
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     // select chart
     for (auto& [id, ready] : pMsg->ready)
@@ -619,8 +606,7 @@ void ArenaClient::handleHostStartPlaying(const std::shared_ptr<ArenaMessage>& ms
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     gArenaData.randomSeed = pMsg->randomSeed;
     gArenaData.initPlaying(RulesetType(pMsg->rulesetType));
@@ -643,8 +629,7 @@ void ArenaClient::handleHostPlayInit(const std::shared_ptr<ArenaMessage>& msg)
     }
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleHostFinishedLoading(const std::shared_ptr<ArenaMessage>& msg)
@@ -657,8 +642,7 @@ void ArenaClient::handleHostFinishedLoading(const std::shared_ptr<ArenaMessage>&
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleHostPlayData(const std::shared_ptr<ArenaMessage>& msg)
@@ -685,8 +669,7 @@ void ArenaClient::handleHostFinishedPlaying(const std::shared_ptr<ArenaMessage>&
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaClient::handleHostFinishedResult(const std::shared_ptr<ArenaMessage>& msg)
@@ -696,8 +679,7 @@ void ArenaClient::handleHostFinishedResult(const std::shared_ptr<ArenaMessage>& 
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    socket->async_send_to(boost::asio::buffer(*payload), server,
-                          std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
 
     gSelectContext.isArenaReady = false;
     gArenaData.stopPlaying();
@@ -738,9 +720,8 @@ void ArenaClient::update()
                     {
                         task.retryTimes++;
                         task.t = now;
-                        socket->async_send_to(
-                            boost::asio::buffer(*task.sentMessage), server,
-                            std::bind(emptyHandleSend, task.sentMessage, std::placeholders::_1, std::placeholders::_2));
+                        socket->async_send_to(boost::asio::buffer(*task.sentMessage), server,
+                                              std::bind_front(emptyHandleSend, task.sentMessage));
                     }
                 }
             }
@@ -772,8 +753,7 @@ void ArenaClient::update()
             n->payload = vRulesetNetwork::packFrame(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
 
             auto payload = n->pack();
-            socket->async_send_to(boost::asio::buffer(*payload), server,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            socket->async_send_to(boost::asio::buffer(*payload), server, std::bind_front(emptyHandleSend, payload));
             // no resp
         }
     }

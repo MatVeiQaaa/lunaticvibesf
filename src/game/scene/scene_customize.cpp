@@ -140,8 +140,7 @@ void SceneCustomize::updateStart()
 
         if (gInCustomize)
         {
-            using namespace std::placeholders;
-            _input.register_p("SCENE_PRESS_CUSTOMIZE", std::bind(&SceneCustomize::inputGamePress, this, _1, _2));
+            _input.register_p("SCENE_PRESS_CUSTOMIZE", std::bind_front(&SceneCustomize::inputGamePress, this));
         }
 
         LOG_DEBUG << "[Customize] State changed to Main";
@@ -382,7 +381,6 @@ void SceneCustomize::updateMain()
         State::set(IndexTimer::_SCENE_CUSTOMIZE_FADEOUT, t.norm());
         SoundMgr::setSysVolume(0.0, 1000);
         _state = lunaticvibes::CustomizeState::Fadeout;
-        using namespace std::placeholders;
         _input.unregister_p("SCENE_PRESS_CUSTOMIZE");
         LOG_DEBUG << "[Customize] State changed to Fadeout";
     }

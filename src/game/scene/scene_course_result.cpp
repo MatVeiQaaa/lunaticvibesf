@@ -258,10 +258,9 @@ SceneCourseResult::SceneCourseResult(const std::shared_ptr<SkinMgr>& skinMgr)
         State::set(IndexSwitch::RESULT_UPDATED_BP, param["updatedbp"]);
     }
 
-    using namespace std::placeholders;
-    _input.register_p("SCENE_PRESS", std::bind(&SceneCourseResult::inputGamePress, this, _1, _2));
-    _input.register_h("SCENE_HOLD", std::bind(&SceneCourseResult::inputGameHold, this, _1, _2));
-    _input.register_r("SCENE_RELEASE", std::bind(&SceneCourseResult::inputGameRelease, this, _1, _2));
+    _input.register_p("SCENE_PRESS", std::bind_front(&SceneCourseResult::inputGamePress, this));
+    _input.register_h("SCENE_HOLD", std::bind_front(&SceneCourseResult::inputGameHold, this));
+    _input.register_r("SCENE_RELEASE", std::bind_front(&SceneCourseResult::inputGameRelease, this));
 
     lunaticvibes::Time t;
     State::set(IndexTimer::RESULT_GRAPH_START, t.norm());

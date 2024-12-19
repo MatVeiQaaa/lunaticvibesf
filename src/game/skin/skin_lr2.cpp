@@ -28,7 +28,6 @@
 #include <common/assert.h>
 
 using uint8_t = std::uint8_t;
-using namespace std::placeholders;
 
 [[nodiscard]] static MotionKeyFrameParams::accelType parseAccelType(const int value)
 {

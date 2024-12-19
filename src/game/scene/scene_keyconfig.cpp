@@ -3,6 +3,8 @@
 #include "game/runtime/i18n.h"
 #include "game/sound/sound_mgr.h"
 #include "scene_context.h"
+
+#include <functional>
 #include <string_view>
 
 SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::KEY_CONFIG, 240)
@@ -12,7 +14,7 @@ SceneKeyConfig::SceneKeyConfig(const std::shared_ptr<SkinMgr>& skinMgr) : SceneB
 
     InputMgr::updateDevices();
 
-    _updateCallback = std::bind(&SceneKeyConfig::updateStart, this);
+    _updateCallback = std::bind_front(&SceneKeyConfig::updateStart, this);
 
     State::set(IndexSwitch::K11_CONFIG, false);
     State::set(IndexSwitch::K12_CONFIG, false);
@@ -151,13 +153,12 @@ void SceneKeyConfig::updateStart()
     lunaticvibes::Time rt = t - State::get(IndexTimer::SCENE_START);
     if (rt.norm() > pSkin->info.timeIntro)
     {
-        _updateCallback = std::bind(&SceneKeyConfig::updateMain, this);
-        using namespace std::placeholders;
-        _input.register_p("SCENE_PRESS", std::bind(&SceneKeyConfig::inputGamePress, this, _1, _2));
-        _input.register_a("SCENE_AXIS", std::bind(&SceneKeyConfig::inputGameAxis, this, _1, _2, _3));
-        _input.register_kb("SCENE_KEYPRESS", std::bind(&SceneKeyConfig::inputGamePressKeyboard, this, _1, _2));
-        _input.register_joy("SCENE_JOYPRESS", std::bind(&SceneKeyConfig::inputGamePressJoystick, this, _1, _2, _3));
-        _input.register_aa("SCENE_ABSOLUTEAXIS", std::bind(&SceneKeyConfig::inputGameAbsoluteAxis, this, _1, _2, _3));
+        _updateCallback = std::bind_front(&SceneKeyConfig::updateMain, this);
+        _input.register_p("SCENE_PRESS", std::bind_front(&SceneKeyConfig::inputGamePress, this));
+        _input.register_a("SCENE_AXIS", std::bind_front(&SceneKeyConfig::inputGameAxis, this));
+        _input.register_kb("SCENE_KEYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressKeyboard, this));
+        _input.register_joy("SCENE_JOYPRESS", std::bind_front(&SceneKeyConfig::inputGamePressJoystick, this));
+        _input.register_aa("SCENE_ABSOLUTEAXIS", std::bind_front(&SceneKeyConfig::inputGameAbsoluteAxis, this));
         LOG_DEBUG << "[KeyConfig] State changed to Main";
     }
 }
@@ -168,8 +169,7 @@ void SceneKeyConfig::updateMain()
     if (exiting)
     {
         State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
-        _updateCallback = std::bind(&SceneKeyConfig::updateFadeout, this);
-        using namespace std::placeholders;
+        _updateCallback = std::bind_front(&SceneKeyConfig::updateFadeout, this);
         _input.unregister_p("SCENE_PRESS");
         _input.unregister_a("SCENE_AXIS");
         _input.unregister_kb("SCENE_KEYPRESS");

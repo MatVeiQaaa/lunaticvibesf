@@ -3,6 +3,7 @@ Checks: |
     -*,
     bugprone-*,
     concurrency-*,
+    modernize-avoid-bind,
     modernize-raw-string-literal,
     modernize-use-emplace,
     modernize-use-override,

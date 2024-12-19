@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <boost/asio.hpp>
+#include <functional>
 #include <future>
 #include <shared_mutex>
 #include <utility>
@@ -9,6 +9,8 @@
 #include "common/asynclooper.h"
 #include "common/beat.h"
 #include "common/hash.h"
+
+#include <boost/asio.hpp>
 
 class SceneSelect;
 class ArenaMessage;
@@ -19,7 +21,7 @@ class ArenaHost : public AsyncLooper
 #endif
 
 public:
-    ArenaHost() : AsyncLooper("ArenaHost", std::bind(&ArenaHost::update, this), 60) {}
+    ArenaHost() : AsyncLooper("ArenaHost", std::bind_front(&ArenaHost::update, this), 60) {}
     ~ArenaHost() override;
 
 private:

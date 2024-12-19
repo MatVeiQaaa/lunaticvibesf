@@ -1,6 +1,7 @@
 #include "scene_play.h"
 
 #include <array>
+#include <functional>
 #include <future>
 #include <random>
 
@@ -566,11 +567,10 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
-    using namespace std::placeholders;
-    _input.register_p("SCENE_PRESS", std::bind(&ScenePlay::inputGamePress, this, _1, _2));
-    _input.register_h("SCENE_HOLD", std::bind(&ScenePlay::inputGameHold, this, _1, _2));
-    _input.register_r("SCENE_RELEASE", std::bind(&ScenePlay::inputGameRelease, this, _1, _2));
-    _input.register_a("SCENE_AXIS", std::bind(&ScenePlay::inputGameAxis, this, _1, _2, _3));
+    _input.register_p("SCENE_PRESS", std::bind_front(&ScenePlay::inputGamePress, this));
+    _input.register_h("SCENE_HOLD", std::bind_front(&ScenePlay::inputGameHold, this));
+    _input.register_r("SCENE_RELEASE", std::bind_front(&ScenePlay::inputGameRelease, this));
+    _input.register_a("SCENE_AXIS", std::bind_front(&ScenePlay::inputGameAxis, this));
 
     //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1323,16 +1323,15 @@ void ScenePlay::loadChart()
 
 void ScenePlay::setInputJudgeCallback()
 {
-    using namespace std::placeholders;
     if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr)
     {
-        auto fp = std::bind(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER], _1, _2);
+        auto fp = std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
         _input.register_p("JUDGE_PRESS_1", fp);
-        auto fh = std::bind(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER], _1, _2);
+        auto fh = std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
         _input.register_h("JUDGE_HOLD_1", fh);
-        auto fr = std::bind(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_PLAYER], _1, _2);
+        auto fr = std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
         _input.register_r("JUDGE_RELEASE_1", fr);
-        auto fa = std::bind(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_PLAYER], _1, _2, _3);
+        auto fa = std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
         _input.register_a("JUDGE_AXIS_1", fa);
     }
     else
@@ -1342,13 +1341,13 @@ void ScenePlay::setInputJudgeCallback()
 
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr)
     {
-        auto fp = std::bind(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET], _1, _2);
+        auto fp = std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
         _input.register_p("JUDGE_PRESS_2", fp);
-        auto fh = std::bind(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET], _1, _2);
+        auto fh = std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
         _input.register_h("JUDGE_HOLD_2", fh);
-        auto fr = std::bind(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_TARGET], _1, _2);
+        auto fr = std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
         _input.register_r("JUDGE_RELEASE_2", fr);
-        auto fa = std::bind(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_TARGET], _1, _2, _3);
+        auto fa = std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
         _input.register_a("JUDGE_AXIS_2", fa);
     }
     else if (!gPlayContext.isAuto)
@@ -1981,7 +1980,7 @@ void ScenePlay::updatePrepare()
     {
         State::set(IndexTimer::_LOAD_START, t.norm());
         State::set(IndexOption::PLAY_SCENE_STAT, Option::SPLAY_LOADING);
-        _loadChartFuture = std::async(std::launch::async, std::bind(&ScenePlay::loadChart, this));
+        _loadChartFuture = std::async(std::launch::async, std::bind_front(&ScenePlay::loadChart, this));
         state = ePlayState::LOADING;
         LOG_DEBUG << "[Play] State changed to LOADING";
     }

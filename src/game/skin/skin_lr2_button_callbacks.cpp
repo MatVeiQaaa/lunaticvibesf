@@ -1,5 +1,6 @@
 #include "skin_lr2_button_callbacks.h"
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -178,7 +179,7 @@ void panel_switch(int idx, int plus)
 }
 
 // 10
-void select_difficulty_filter(int plus, int iterateCount)
+void select_difficulty_filter(int iterateCount, int plus)
 {
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 6)
     {
@@ -201,7 +202,7 @@ void select_difficulty_filter(int plus, int iterateCount)
         }
         if (gSelectContext.entries.empty())
         {
-            return select_difficulty_filter(plus, iterateCount + 1);
+            return select_difficulty_filter(iterateCount + 1, plus);
         }
     }
 
@@ -217,7 +218,7 @@ static bool isChartEntry(const Entry& entry)
 }
 
 // 11
-void select_keys_filter(int plus, int iterateCount)
+void select_keys_filter(int iterateCount, int plus)
 {
     if (!gSelectContext.backtrace.front().ignoreFilters && iterateCount < 8)
     {
@@ -261,7 +262,7 @@ void select_keys_filter(int plus, int iterateCount)
         }
 
         if (std::none_of(gSelectContext.entries.begin(), gSelectContext.entries.end(), isChartEntry))
-            return select_keys_filter(plus, iterateCount + 1);
+            return select_keys_filter(iterateCount + 1, plus);
 
         if (true)
         {
@@ -1485,8 +1486,8 @@ std::function<void(int)> getButtonCallback(int type)
         };
     };
 
+    // NOLINTBEGIN(modernize-avoid-bind) - lambads here are ugly. Maybe later.
     using namespace lr2skin::button;
-    using namespace std::placeholders;
     switch (type)
     {
     case 1:
@@ -1497,10 +1498,10 @@ std::function<void(int)> getButtonCallback(int type)
     case 6:
     case 7:
     case 8:
-    case 9: return std::bind(panel_switch, type, _1);
-    case 10: return std::bind(select_difficulty_filter, _1, 0);
-    case 11: return std::bind(select_keys_filter, _1, 0);
-    case 12: return std::bind(select_sort_type, _1);
+    case 9: return std::bind_front(panel_switch, type);
+    case 10: return std::bind_front(select_difficulty_filter, 0);
+    case 11: return std::bind_front(select_keys_filter, 0);
+    case 12: return std::bind_front(select_sort_type);
     case 13: return [](auto) { enter_key_config(); };
     case 14: return [](auto) { enter_skin_config(); };
     case 15: return createUnsupportedCb("プレイ開始");
@@ -1510,51 +1511,51 @@ std::function<void(int)> getButtonCallback(int type)
     case 19: return [](auto) { replay(); };
     case 20:
     case 21:
-    case 22: return std::bind(fx_type, type - 20, _1);
+    case 22: return std::bind_front(fx_type, type - 20);
     case 23:
     case 24:
-    case 25: return std::bind(fx_switch, type - 23, _1);
+    case 25: return std::bind_front(fx_switch, type - 23);
     case 26:
     case 27:
-    case 28: return std::bind(fx_target, type - 26, _1);
-    case 29: return std::bind(eq_switch, _1);
-    case 31: return std::bind(vol_switch, _1);
-    case 32: return std::bind(pitch_switch, _1);
-    case 33: return std::bind(pitch_type, _1);
-    case 40: return std::bind(gauge_type, 0, _1);
-    case 41: return std::bind(gauge_type, 1, _1);
-    case 42: return std::bind(random_type, 0, _1);
-    case 43: return std::bind(random_type, 1, _1);
-    case 44: return std::bind(autoscr, 0, _1);
-    case 45: return std::bind(autoscr, 1, _1);
-    case 46: return std::bind(shutter, _1);
-    case 47: return std::bind(lock_speed_value, 0, _1);
-    case 48: return std::bind(lock_speed_value, 1, _1);
-    case 50: return std::bind(lane_effect, 0, _1);
-    case 51: return std::bind(lane_effect, 1, _1);
-    case 54: return std::bind(flip, _1);
-    case 55: return std::bind(hs_fix, _1);
-    case 56: return std::bind(battle, _1);
-    case 57: return std::bind(hs, 0, _1);
-    case 58: return std::bind(hs, 1, _1);
-    case 70: return std::bind(score_graph, _1);
-    case 71: return std::bind(ghost_type, _1);
-    case 72: return std::bind(bga, _1);
-    case 73: return std::bind(bga_size, _1);
-    case 74: return std::bind(number_change_clamp, IndexNumber::TIMING_ADJUST_VISUAL, -99, 99, _1);
-    case 75: return std::bind(judge_auto_adjust, _1);
-    case 76: return std::bind(default_target_rate, _1);
-    case 77: return std::bind(target_type, _1);
-    case 80: return std::bind(window_mode, _1);
-    case 82: return std::bind(vsync, _1);
-    case 83: return std::bind(save_replay_type, _1);
-    case 90: return std::bind(favorite_ignore, _1);
+    case 28: return std::bind_front(fx_target, type - 26);
+    case 29: return std::bind_front(eq_switch);
+    case 31: return std::bind_front(vol_switch);
+    case 32: return std::bind_front(pitch_switch);
+    case 33: return std::bind_front(pitch_type);
+    case 40: return std::bind_front(gauge_type, 0);
+    case 41: return std::bind_front(gauge_type, 1);
+    case 42: return std::bind_front(random_type, 0);
+    case 43: return std::bind_front(random_type, 1);
+    case 44: return std::bind_front(autoscr, 0);
+    case 45: return std::bind_front(autoscr, 1);
+    case 46: return std::bind_front(shutter);
+    case 47: return std::bind_front(lock_speed_value, 0);
+    case 48: return std::bind_front(lock_speed_value, 1);
+    case 50: return std::bind_front(lane_effect, 0);
+    case 51: return std::bind_front(lane_effect, 1);
+    case 54: return std::bind_front(flip);
+    case 55: return std::bind_front(hs_fix);
+    case 56: return std::bind_front(battle);
+    case 57: return std::bind_front(hs, 0);
+    case 58: return std::bind_front(hs, 1);
+    case 70: return std::bind_front(score_graph);
+    case 71: return std::bind_front(ghost_type);
+    case 72: return std::bind_front(bga);
+    case 73: return std::bind_front(bga_size);
+    case 74: return std::bind_front(number_change_clamp, IndexNumber::TIMING_ADJUST_VISUAL, -99, 99);
+    case 75: return std::bind_front(judge_auto_adjust);
+    case 76: return std::bind_front(default_target_rate);
+    case 77: return std::bind_front(target_type);
+    case 80: return std::bind_front(window_mode);
+    case 82: return std::bind_front(vsync);
+    case 83: return std::bind_front(save_replay_type);
+    case 90: return std::bind_front(favorite_ignore);
     case 91:
     case 92:
     case 93:
     case 94:
     case 95:
-    case 96: return std::bind(difficulty, type - 91, _1);
+    case 96: return std::bind_front(difficulty, type - 91);
     case 101:
     case 102:
     case 103:
@@ -1610,7 +1611,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 183:
     case 184:
     case 185: return std::bind(skinselect_mode, type - 170);
-    case 190: return std::bind(skinselect_skin, _1);
+    case 190: return std::bind_front(skinselect_skin);
     case 200:
     case 201:
     case 202:
@@ -1631,7 +1632,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 226:
     case 227:
     case 228:
-    case 229: return std::bind(skinselect_option, type - 220, _1);
+    case 229: return std::bind_front(skinselect_option, type - 220);
     case 230: return createUnsupportedCb("コースセレクト　決定");
     case 231: return createUnsupportedCb("コースセレクト　キャンセル");
     case 232: return createUnsupportedCb("コースビュー　コース編集開始");
@@ -1662,6 +1663,7 @@ std::function<void(int)> getButtonCallback(int type)
     case 269: return createUnsupportedCb("全体コースオプション　デフォルトゲージの変更");
     }
     return createUnsupportedCb("(undocumented)");
+    // NOLINTEND(modernize-avoid-bind)
 }
 
 } // namespace lr2skin::button

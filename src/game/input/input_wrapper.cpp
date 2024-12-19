@@ -1,5 +1,6 @@
 #include "input_wrapper.h"
 
+#include <functional>
 #include <mutex>
 #include <utility>
 
@@ -9,7 +10,7 @@
 #include <game/runtime/generic_info.h>
 
 InputWrapper::InputWrapper(unsigned rate, bool background)
-    : AsyncLooper("InputLoop", std::bind(&InputWrapper::_loop, this), rate), _background(background)
+    : AsyncLooper("InputLoop", std::bind_front(&InputWrapper::_loop, this), rate), _background(background)
 {
 }
 

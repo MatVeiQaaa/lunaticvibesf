@@ -1,6 +1,7 @@
 #include "scene_pre_select.h"
 
 #include <cstdlib>
+#include <functional>
 #include <future>
 #include <string_view>
 #include <utility>
@@ -24,7 +25,7 @@ ScenePreSelect::ScenePreSelect() : SceneBase(nullptr, SkinType::PRE_SELECT, 240)
 {
     _type = SceneType::PRE_SELECT;
 
-    _updateCallback = std::bind(&ScenePreSelect::updateLoadSongs, this);
+    _updateCallback = std::bind_front(&ScenePreSelect::updateLoadSongs, this);
 
     rootFolderProp = SongListProperties{{}, ROOT_FOLDER_HASH, "", {}, {}, 0};
 
@@ -225,7 +226,7 @@ void ScenePreSelect::updateLoadSongs()
         LOG_INFO << "[List] Loading songs complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
 
-        _updateCallback = std::bind(&ScenePreSelect::updateLoadTables, this);
+        _updateCallback = std::bind_front(&ScenePreSelect::updateLoadTables, this);
     }
 }
 
@@ -338,7 +339,7 @@ void ScenePreSelect::updateLoadTables()
         LOG_INFO << "[List] Loading tables complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
 
-        _updateCallback = std::bind(&ScenePreSelect::updateLoadCourses, this);
+        _updateCallback = std::bind_front(&ScenePreSelect::updateLoadCourses, this);
     }
 }
 
@@ -418,7 +419,7 @@ void ScenePreSelect::updateLoadCourses()
         LOG_INFO << "[List] Loading courses complete.";
         LOG_INFO << "[List] ------------------------------------------------------------";
 
-        _updateCallback = std::bind(&ScenePreSelect::updateUpdateScoreCache, this);
+        _updateCallback = std::bind_front(&ScenePreSelect::updateUpdateScoreCache, this);
     }
 }
 
@@ -444,7 +445,7 @@ void ScenePreSelect::updateUpdateScoreCache()
         LOG_INFO << "[List] Finished updating score cache";
         LOG_INFO << "[List] ------------------------------------------------------------";
 
-        _updateCallback = std::bind(&ScenePreSelect::loadFinished, this);
+        _updateCallback = std::bind_front(&ScenePreSelect::loadFinished, this);
     }
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <boost/asio.hpp>
+#include <functional>
 #include <future>
 #include <string>
 #include <utility>
@@ -32,7 +33,7 @@ class ArenaClient : public AsyncLooper
 #endif
 
 public:
-    ArenaClient() : AsyncLooper("ArenaClient", std::bind(&ArenaClient::update, this), 60) {}
+    ArenaClient() : AsyncLooper("ArenaClient", std::bind_front(&ArenaClient::update, this), 60) {}
     ~ArenaClient() override;
 
 private:

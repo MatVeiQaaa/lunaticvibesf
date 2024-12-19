@@ -326,14 +326,13 @@ void deadzone(int type, double p)
 std::function<void(double)> getSliderCallback(int type)
 {
     using namespace lr2skin::slider;
-    using namespace std::placeholders;
     switch (type)
     {
-    case 1: return std::bind(select_pos, _1);
+    case 1: return std::bind_front(select_pos);
 
-    case 7: return std::bind(customize_scrollbar, _1);
+    case 7: return std::bind_front(customize_scrollbar);
 
-    case 8: return std::bind(ir_ranking_scrollbar, _1);
+    case 8: return std::bind_front(ir_ranking_scrollbar);
 
     case 10:
     case 11:
@@ -341,19 +340,19 @@ std::function<void(double)> getSliderCallback(int type)
     case 13:
     case 14:
     case 15:
-    case 16: return std::bind(eq, type - 10, _1);
+    case 16: return std::bind_front(eq, type - 10);
 
-    case 17: return std::bind(master_volume, _1);
-    case 18: return std::bind(key_volume, _1);
-    case 19: return std::bind(bgm_volume, _1);
+    case 17: return std::bind_front(master_volume);
+    case 18: return std::bind_front(key_volume);
+    case 19: return std::bind_front(bgm_volume);
 
-    case 20: return std::bind(fx0, 0, _1);
-    case 21: return std::bind(fx0, 1, _1);
-    case 22: return std::bind(fx1, 0, _1);
-    case 23: return std::bind(fx1, 1, _1);
-    case 24: return std::bind(fx2, 0, _1);
-    case 25: return std::bind(fx2, 1, _1);
-    case 26: return std::bind(pitch, _1);
+    case 20: return std::bind_front(fx0, 0);
+    case 21: return std::bind_front(fx0, 1);
+    case 22: return std::bind_front(fx1, 0);
+    case 23: return std::bind_front(fx1, 1);
+    case 24: return std::bind_front(fx2, 0);
+    case 25: return std::bind_front(fx2, 1);
+    case 26: return std::bind_front(pitch);
 
     case 31:
     case 32:
@@ -382,7 +381,7 @@ std::function<void(double)> getSliderCallback(int type)
     case 61:
     case 62:
     case 63:
-    case 64: return std::bind(deadzone, type, _1);
+    case 64: return std::bind_front(deadzone, type);
 
     default: return [](double) {};
     }

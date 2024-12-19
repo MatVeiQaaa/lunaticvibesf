@@ -7,6 +7,8 @@
 #include "common/log.h"
 #include "game/arena/arena_data.h"
 
+#include <functional>
+
 SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::DECIDE, 1000)
 {
     _type = SceneType::DECIDE;
@@ -14,13 +16,12 @@ SceneDecide::SceneDecide(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(sk
     _inputAvailable = INPUT_MASK_FUNC;
     _inputAvailable |= INPUT_MASK_1P | INPUT_MASK_2P;
 
-    using namespace std::placeholders;
-    _input.register_p("SCENE_PRESS", std::bind(&SceneDecide::inputGamePress, this, _1, _2));
-    _input.register_h("SCENE_HOLD", std::bind(&SceneDecide::inputGameHold, this, _1, _2));
-    _input.register_r("SCENE_RELEASE", std::bind(&SceneDecide::inputGameRelease, this, _1, _2));
+    _input.register_p("SCENE_PRESS", std::bind_front(&SceneDecide::inputGamePress, this));
+    _input.register_h("SCENE_HOLD", std::bind_front(&SceneDecide::inputGameHold, this));
+    _input.register_r("SCENE_RELEASE", std::bind_front(&SceneDecide::inputGameRelease, this));
 
     state = eDecideState::START;
-    _updateCallback = std::bind(&SceneDecide::updateStart, this);
+    _updateCallback = std::bind_front(&SceneDecide::updateStart, this);
 
     if (!gInCustomize)
     {
@@ -103,7 +104,7 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
         {
         case eDecideState::START:
             State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
-            _updateCallback = std::bind(&SceneDecide::updateSkip, this);
+            _updateCallback = std::bind_front(&SceneDecide::updateSkip, this);
             state = eDecideState::SKIP;
             LOG_DEBUG << "[Decide] State changed to SKIP";
             break;
@@ -121,7 +122,7 @@ void SceneDecide::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             case eDecideState::START:
                 State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
                 SoundMgr::stopSysSamples();
-                _updateCallback = std::bind(&SceneDecide::updateCancel, this);
+                _updateCallback = std::bind_front(&SceneDecide::updateCancel, this);
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;
@@ -150,7 +151,7 @@ void SceneDecide::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
             case eDecideState::START:
                 State::set(IndexTimer::FADEOUT_BEGIN, t.norm());
                 SoundMgr::stopSysSamples();
-                _updateCallback = std::bind(&SceneDecide::updateCancel, this);
+                _updateCallback = std::bind_front(&SceneDecide::updateCancel, this);
                 state = eDecideState::CANCEL;
                 LOG_DEBUG << "[Decide] State changed to CANCEL";
                 break;

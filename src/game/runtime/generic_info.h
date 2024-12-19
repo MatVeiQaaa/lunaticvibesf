@@ -1,9 +1,12 @@
 #pragma once
+
 #include "common/asynclooper.h"
 #include "common/sysutil.h"
 #include "state.h"
+
 #include <chrono>
 #include <ctime>
+#include <functional>
 
 inline unsigned gFrameCount[10]{0};
 constexpr size_t FRAMECOUNT_IDX_FPS = 0;
@@ -15,7 +18,7 @@ class GenericInfoUpdater : public AsyncLooper
 {
 public:
     GenericInfoUpdater(unsigned rate)
-        : AsyncLooper("GenericInfoUpdater", std::bind(&GenericInfoUpdater::_loop, this), rate)
+        : AsyncLooper("GenericInfoUpdater", std::bind_front(&GenericInfoUpdater::_loop, this), rate)
     {
     }
 

@@ -8,6 +8,8 @@
 #include <common/types.h>
 #include <common/u8.h>
 
+#include <functional>
+
 TTFFont::TTFFont(const Path& filePath, int ptsize) : _filePath(lunaticvibes::cs(filePath.u8string())), _ptsize(ptsize)
 {
     pushAndWaitMainThreadTask<void>([&]() { _pFont = TTF_OpenFont(_filePath.c_str(), ptsize); });
@@ -33,9 +35,9 @@ TTFFont::~TTFFont()
         return;
 
     if (_pFontOutline)
-        pushAndWaitMainThreadTask<void>(std::bind(TTF_CloseFont, _pFontOutline));
+        pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, _pFontOutline));
     if (_pFont)
-        pushAndWaitMainThreadTask<void>(std::bind(TTF_CloseFont, _pFont));
+        pushAndWaitMainThreadTask<void>(std::bind_front(TTF_CloseFont, _pFont));
 }
 
 void TTFFont::setStyle(TTFStyle style)

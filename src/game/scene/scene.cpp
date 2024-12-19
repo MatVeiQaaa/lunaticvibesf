@@ -1,5 +1,6 @@
 #include "scene.h"
 
+#include <functional>
 #include <memory>
 
 #include <common/assert.h>
@@ -22,7 +23,7 @@
 
 // prototype
 SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType, unsigned rate, bool backgroundInput)
-    : AsyncLooper("UpdateLoop", std::bind(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
+    : AsyncLooper("UpdateLoop", std::bind_front(&SceneBase::_updateAsync1, this), rate), _type(SceneType::NOT_INIT),
       _input(ConfigMgr::get('P', cfg::P_INPUT_POLLING_RATE, 1000), backgroundInput)
 {
     // Disable skin caching for now. dst options are changing all the time
@@ -92,18 +93,13 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
         }
     }
 
-    _input.register_p("DEBUG_TOGGLE",
-                      std::bind(&SceneBase::DebugToggle, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("DEBUG_TOGGLE", std::bind_front(&SceneBase::DebugToggle, this));
 
-    _input.register_p("GLOBALFUNC",
-                      std::bind(&SceneBase::GlobalFuncKeys, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("GLOBALFUNC", std::bind_front(&SceneBase::GlobalFuncKeys, this));
 
-    _input.register_p("SKIN_MOUSE_CLICK",
-                      std::bind(&SceneBase::MouseClick, this, std::placeholders::_1, std::placeholders::_2));
-    _input.register_h("SKIN_MOUSE_DRAG",
-                      std::bind(&SceneBase::MouseDrag, this, std::placeholders::_1, std::placeholders::_2));
-    _input.register_r("SKIN_MOUSE_RELEASE",
-                      std::bind(&SceneBase::MouseRelease, this, std::placeholders::_1, std::placeholders::_2));
+    _input.register_p("SKIN_MOUSE_CLICK", std::bind_front(&SceneBase::MouseClick, this));
+    _input.register_h("SKIN_MOUSE_DRAG", std::bind_front(&SceneBase::MouseDrag, this));
+    _input.register_r("SKIN_MOUSE_RELEASE", std::bind_front(&SceneBase::MouseRelease, this));
 
     if (pSkin && !(gNextScene == SceneType::SELECT && skinType == SkinType::THEME_SELECT))
     {

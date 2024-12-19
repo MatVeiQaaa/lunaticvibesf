@@ -12,6 +12,7 @@
 #include <game/scene/scene_context.h>
 #include <git_version.h>
 
+#include <functional>
 #include <random>
 
 #include <boost/format.hpp>
@@ -123,9 +124,8 @@ void ArenaHost::disbandLobby()
             n->messageIndex = ++cc.sendMessageIndex;
 
             auto payload = n->pack();
-            cc.serverSocket->async_send_to(
-                boost::asio::buffer(*payload), cc.endpoint,
-                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                           std::bind_front(emptyHandleSend, payload));
             // no response
         }
 
@@ -173,9 +173,8 @@ void ArenaHost::requestChart(const HashMD5& reqChart, const std::string& clientK
             n1->messageIndex = ++cc.sendMessageIndex;
 
             auto payload = n1->pack();
-            cc.serverSocket->async_send_to(
-                boost::asio::buffer(*payload), cc.endpoint,
-                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                           std::bind_front(emptyHandleSend, payload));
             cc.addTaskWaitingForResponse(n1->messageIndex, payload);
         }
         gSelectContext.isArenaCancellingRequest = true;
@@ -227,9 +226,8 @@ void ArenaHost::requestChart(const HashMD5& reqChart, const std::string& clientK
             n->ready = ready;
 
             auto payload = n->pack();
-            cc.serverSocket->async_send_to(
-                boost::asio::buffer(*payload), cc.endpoint,
-                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                           std::bind_front(emptyHandleSend, payload));
 
             cc.addTaskWaitingForResponse(n->messageIndex, payload);
         }
@@ -256,9 +254,8 @@ void ArenaHost::requestChart(const HashMD5& reqChart, const std::string& clientK
                 n->chartHashMD5String = hashStr;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
 
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
@@ -277,9 +274,8 @@ void ArenaHost::requestChart(const HashMD5& reqChart, const std::string& clientK
                 n->s1 = State::get(IndexText::PLAYER_NAME);
 
                 auto payload = n->pack();
-                c.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), c.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
+                                              std::bind_front(emptyHandleSend, payload));
 
                 c.addTaskWaitingForResponse(n->messageIndex, payload);
             }
@@ -298,9 +294,8 @@ void ArenaHost::startPlaying()
         n->randomSeed = gArenaData.getRandomSeed();
 
         auto payload = n->pack();
-        cc.serverSocket->async_send_to(
-            boost::asio::buffer(*payload), cc.endpoint,
-            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                       std::bind_front(emptyHandleSend, payload));
 
         cc.addTaskWaitingForResponse(n->messageIndex, payload);
     }
@@ -333,13 +328,13 @@ void ArenaHost::setResultFinished()
 void ArenaHost::asyncRecv4()
 {
     v4->async_receive_from(boost::asio::buffer(v4_recv_buf), v4_remote_endpoint,
-                           std::bind(&ArenaHost::handleRecv4, this, std::placeholders::_1, std::placeholders::_2));
+                           std::bind_front(&ArenaHost::handleRecv4, this));
 }
 
 void ArenaHost::asyncRecv6()
 {
     v6->async_receive_from(boost::asio::buffer(v6_recv_buf), v6_remote_endpoint,
-                           std::bind(&ArenaHost::handleRecv6, this, std::placeholders::_1, std::placeholders::_2));
+                           std::bind_front(&ArenaHost::handleRecv6, this));
 }
 
 void ArenaHost::handleRecv4(const boost::system::error_code& error, size_t bytes_transferred)
@@ -456,7 +451,7 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
             auto socket = addr.is_v4() ? v4 : v6;
             auto payload = resp.pack();
             socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                                  std::bind_front(emptyHandleSend, payload));
 
             return;
         }
@@ -485,9 +480,8 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
                             ArenaMessageResponse resp(*pMsg);
                             resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::NotEnoughSlots);
                             auto payload = resp.pack();
-                            socket->async_send_to(
-                                boost::asio::buffer(*payload), remote_endpoint,
-                                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                            socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint,
+                                                  std::bind_front(emptyHandleSend, payload));
                         }
                     }
                     else
@@ -495,9 +489,8 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
                         ArenaMessageResponse resp(*pMsg);
                         resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::DuplicateAddress);
                         auto payload = resp.pack();
-                        socket->async_send_to(
-                            boost::asio::buffer(*payload), remote_endpoint,
-                            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                        socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint,
+                                              std::bind_front(emptyHandleSend, payload));
                     }
                 }
                 else
@@ -505,9 +498,8 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
                     ArenaMessageResponse resp(*pMsg);
                     resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::HostIsPlaying);
                     auto payload = resp.pack();
-                    socket->async_send_to(
-                        boost::asio::buffer(*payload), remote_endpoint,
-                        std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                    socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint,
+                                          std::bind_front(emptyHandleSend, payload));
                 }
             }
             else
@@ -515,9 +507,8 @@ void ArenaHost::handleRequest(const unsigned char* recv_buf, size_t recv_buf_len
                 ArenaMessageResponse resp(*pMsg);
                 resp.errorCode = static_cast<uint8_t>(ArenaErrorCode::VersionMismatch);
                 auto payload = resp.pack();
-                socket->async_send_to(
-                    boost::asio::buffer(*payload), remote_endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                socket->async_send_to(boost::asio::buffer(*payload), remote_endpoint,
+                                      std::bind_front(emptyHandleSend, payload));
             }
         }
         std::shared_lock l(clientsMutex);
@@ -629,8 +620,7 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
     ss.read(reinterpret_cast<char*>(resp.payload.data()), length);
 
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 
     createNotification((boost::format(i18n::c(i18nText::ARENA_PLAYER_JOINED)) % c.name).str());
 
@@ -646,9 +636,8 @@ void ArenaHost::handleJoinLobby(const std::string& clientKey, const std::shared_
         n->playerName = c.name;
 
         auto payload = n->pack();
-        cc.serverSocket->async_send_to(
-            boost::asio::buffer(*payload), cc.endpoint,
-            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                       std::bind_front(emptyHandleSend, payload));
         cc.addTaskWaitingForResponse(n->messageIndex, payload);
     }
 }
@@ -661,8 +650,7 @@ void ArenaHost::handlePlayerLeft(const std::string& clientKey, const std::shared
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 
     c.alive = false;
 
@@ -677,9 +665,8 @@ void ArenaHost::handlePlayerLeft(const std::string& clientKey, const std::shared
         n->playerID = c.id;
 
         auto payload = n->pack();
-        cc.serverSocket->async_send_to(
-            boost::asio::buffer(*payload), cc.endpoint,
-            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                       std::bind_front(emptyHandleSend, payload));
         cc.addTaskWaitingForResponse(n->messageIndex, payload);
     }
 }
@@ -697,8 +684,7 @@ void ArenaHost::handleRequestChart(const std::string& clientKey, const std::shar
     requestChart(reqChart, clientKey);
 
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaHost::handleCheckChartExistResp(const std::string& clientKey, const std::shared_ptr<ArenaMessage>& msg)
@@ -738,9 +724,8 @@ void ArenaHost::handleCheckChartExistResp(const std::string& clientKey, const st
         n.s1 = c.name;
 
         auto payload = n.pack();
-        cc.serverSocket->async_send_to(
-            boost::asio::buffer(*payload), cc.endpoint,
-            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                       std::bind_front(emptyHandleSend, payload));
     }
 }
 
@@ -775,17 +760,15 @@ void ArenaHost::handlePlayInit(const std::string& clientKey, const std::shared_p
         n->rulesetPayload = pMsg->payload;
 
         auto payload = n->pack();
-        cc.serverSocket->async_send_to(
-            boost::asio::buffer(*payload), cc.endpoint,
-            std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+        cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                       std::bind_front(emptyHandleSend, payload));
         cc.addTaskWaitingForResponse(n->messageIndex, payload);
     }
 
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaHost::handleFinishedLoading(const std::string& clientKey, const std::shared_ptr<ArenaMessage>& msg)
@@ -799,8 +782,7 @@ void ArenaHost::handleFinishedLoading(const std::string& clientKey, const std::s
     ArenaMessageResponse resp(*pMsg);
 
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaHost::handlePlayData(const std::string& clientKey, const std::shared_ptr<ArenaMessage>& msg)
@@ -839,8 +821,7 @@ void ArenaHost::handleFinishedPlaying(const std::string& clientKey, const std::s
 
     resp.errorCode = 0;
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaHost::handleFinishedResult(const std::string& clientKey, const std::shared_ptr<ArenaMessage>& msg)
@@ -854,8 +835,7 @@ void ArenaHost::handleFinishedResult(const std::string& clientKey, const std::sh
 
     resp.errorCode = 0;
     auto payload = resp.pack();
-    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint,
-                                  std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+    c.serverSocket->async_send_to(boost::asio::buffer(*payload), c.endpoint, std::bind_front(emptyHandleSend, payload));
 }
 
 void ArenaHost::update()
@@ -888,8 +868,7 @@ void ArenaHost::update()
                             task.retryTimes++;
                             task.t = now;
                             cc.serverSocket->async_send_to(boost::asio::buffer(*task.sentMessage), cc.endpoint,
-                                                           std::bind(emptyHandleSend, task.sentMessage,
-                                                                     std::placeholders::_1, std::placeholders::_2));
+                                                           std::bind_front(emptyHandleSend, task.sentMessage));
                         }
                     }
                 }
@@ -918,9 +897,8 @@ void ArenaHost::update()
                 n->messageIndex = ++cc.sendMessageIndex;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
             if ((now - cc.heartbeatRecvTime).norm() > 30000)
@@ -1004,9 +982,8 @@ void ArenaHost::update()
                 n->chartHashMD5String = requestChartHash.hexdigest();
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
 
@@ -1024,9 +1001,8 @@ void ArenaHost::update()
                 n->ready = ready;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
 
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
@@ -1068,9 +1044,8 @@ void ArenaHost::update()
             n->rulesetPayload = vRulesetNetwork::packInit(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
 
             auto payload = n->pack();
-            cc.serverSocket->async_send_to(
-                boost::asio::buffer(*payload), cc.endpoint,
-                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                           std::bind_front(emptyHandleSend, payload));
             cc.addTaskWaitingForResponse(n->messageIndex, payload);
         }
     }
@@ -1105,9 +1080,8 @@ void ArenaHost::update()
                 n->playStartTimeMs = playStartTimeMs - cc.ping / 2;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
 
@@ -1138,9 +1112,8 @@ void ArenaHost::update()
             }
 
             auto payload = n->pack();
-            cc.serverSocket->async_send_to(
-                boost::asio::buffer(*payload), cc.endpoint,
-                std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+            cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                           std::bind_front(emptyHandleSend, payload));
             // no resp
         }
     }
@@ -1164,9 +1137,8 @@ void ArenaHost::update()
                 n->messageIndex = ++cc.sendMessageIndex;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
             }
         }
@@ -1193,9 +1165,8 @@ void ArenaHost::update()
                 n->messageIndex = ++cc.sendMessageIndex;
 
                 auto payload = n->pack();
-                cc.serverSocket->async_send_to(
-                    boost::asio::buffer(*payload), cc.endpoint,
-                    std::bind(emptyHandleSend, payload, std::placeholders::_1, std::placeholders::_2));
+                cc.serverSocket->async_send_to(boost::asio::buffer(*payload), cc.endpoint,
+                                               std::bind_front(emptyHandleSend, payload));
                 cc.addTaskWaitingForResponse(n->messageIndex, payload);
 
                 cc.requestChartHash.reset();

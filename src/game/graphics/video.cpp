@@ -2,19 +2,19 @@
 #include "common/u8.h"
 
 #include <chrono>
+#include <functional>
 #include <thread>
 
 extern "C"
 {
-#include "libavcodec/avcodec.h"
-#include "libavfilter/avfilter.h"
-#include "libavformat/avformat.h"
-#include "libavutil/avutil.h"
-#include "libavutil/frame.h"
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/avutil.h>
+#include <libavutil/frame.h>
 }
 
-#include "common/log.h"
-#include "common/utils.h"
+#include <common/log.h>
+#include <common/types.h>
 
 void lunaticvibes::AVFrameDeleter::operator()(AVFrame* avp)
 {
@@ -156,7 +156,7 @@ void sVideo::startPlaying()
         return;
     playing = true;
     startTime = std::chrono::system_clock::now();
-    decodeEnd = std::async(std::launch::async, std::bind(&sVideo::decodeLoop, this));
+    decodeEnd = std::async(std::launch::async, std::bind_front(&sVideo::decodeLoop, this));
 }
 
 void sVideo::stopPlaying()

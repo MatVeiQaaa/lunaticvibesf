@@ -1,6 +1,8 @@
 #include "sound_fmod.h"
 #include "common/u8.h"
+
 #include <cstdlib>
+#include <functional>
 #include <type_traits>
 
 #include <common/assert.h>
@@ -16,7 +18,7 @@
 #include <windows.h>
 #endif
 
-SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind(&SoundDriverFMOD::update, this))
+SoundDriverFMOD::SoundDriverFMOD() : SoundDriver(std::bind_front(&SoundDriverFMOD::update, this))
 {
     // load device
     int driver = -1;

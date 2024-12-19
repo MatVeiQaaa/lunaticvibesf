@@ -1,6 +1,7 @@
 #include "db_song.h"
 
 #include <algorithm>
+#include <functional>
 #include <thread>
 #include <vector>
 
@@ -813,7 +814,7 @@ int SongDB::addNewFolder(const HashMD5& hash, const Path& path, const HashMD5& p
                 threadPool = (void*)new boost::asio::thread_pool(poolThreadCount);
             }
             boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-            boost::asio::post(pool, std::bind(&SongDB::addChart, this, hash, f));
+            boost::asio::post(pool, std::bind_front(&SongDB::addChart, this, hash, f));
             ++count;
         }
     }
@@ -953,7 +954,7 @@ int SongDB::refreshExistingFolder(const HashMD5& hash, const Path& path, FolderT
                 threadPool = (void*)new boost::asio::thread_pool(poolThreadCount);
             }
             boost::asio::thread_pool& pool = *(boost::asio::thread_pool*)threadPool;
-            boost::asio::post(pool, std::bind(&SongDB::addChart, this, hash, p));
+            boost::asio::post(pool, std::bind_front(&SongDB::addChart, this, hash, p));
             count++;
         }
 

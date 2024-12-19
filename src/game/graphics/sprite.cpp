@@ -467,13 +467,12 @@ bool SpriteText::OnClick(int x, int y)
 
 void SpriteText::startEditing(bool clear)
 {
-    using namespace std::placeholders;
     if (!isEditing())
     {
         editing = true;
         textBeforeEdit = State::get(textInd);
         textAfterEdit = (clear ? "" : _text);
-        startTextInput(_current.rect, textAfterEdit, std::bind(&SpriteText::updateTextWhileEditing, this, _1));
+        startTextInput(_current.rect, textAfterEdit, std::bind_front(&SpriteText::updateTextWhileEditing, this));
     }
 }
 

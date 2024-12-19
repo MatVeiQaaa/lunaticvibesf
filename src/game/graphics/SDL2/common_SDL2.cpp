@@ -21,8 +21,6 @@
 #define strcpy strcpy_s
 #endif
 
-using namespace std::placeholders;
-
 Color::Color(uint32_t rgba)
 {
     r = (rgba & 0xff000000) >> 24;
@@ -218,14 +216,14 @@ Texture::Texture(const Image& srcImage)
     if (!srcImage.loaded)
         return;
 
-    _textures[0] =
-        std::shared_ptr<SDL_Texture>(pushAndWaitMainThreadTask<SDL_Texture*>(
-                                         std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
-                                     std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
-    _textures[1] =
-        std::shared_ptr<SDL_Texture>(pushAndWaitMainThreadTask<SDL_Texture*>(
-                                         std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
-                                     std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+    _textures[0] = std::shared_ptr<SDL_Texture>(
+        pushAndWaitMainThreadTask<SDL_Texture*>(
+            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
+    _textures[1] = std::shared_ptr<SDL_Texture>(
+        pushAndWaitMainThreadTask<SDL_Texture*>(
+            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (_textures[0] || _textures[1])
     {
         textureRect = srcImage.getRect();
@@ -243,14 +241,14 @@ Texture::Texture(const SDL_Surface* pSurface)
 {
     _textures[0] = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (!_textures[0])
         return;
     _textures[1] = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (!_textures[1])
         return;
     textureRect = pSurface->clip_rect;
@@ -260,7 +258,7 @@ Texture::Texture(const SDL_Surface* pSurface)
 Texture::Texture(SDL_Texture* pTexture, int w, int h)
 {
     _textures[0] = std::shared_ptr<SDL_Texture>(
-        pTexture, std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+        pTexture, std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (!pTexture)
         return;
     textureRect = {0, 0, w, h};
@@ -287,9 +285,9 @@ Texture::Texture(int w, int h, PixelFormat fmt, bool target)
     {
         _textures[0] = std::shared_ptr<SDL_Texture>(
             pushAndWaitMainThreadTask<SDL_Texture*>(
-                std::bind(SDL_CreateTexture, gFrameRenderer, sdlfmt,
-                          target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, w, h)),
-            std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+                std::bind_front(SDL_CreateTexture, gFrameRenderer, sdlfmt,
+                                target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, w, h)),
+            std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
         if (_textures[0])
         {
             textureRect = {0, 0, w, h};
@@ -357,7 +355,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
 
         static auto pTextureInverted = std::shared_ptr<SDL_Texture>(
             SDL_CreateTexture(gFrameRenderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_TARGET, rc.w, rc.h),
-            std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+            std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
 
         auto oldTarget = SDL_GetRenderTarget(gFrameRenderer);
         SDL_SetRenderTarget(gFrameRenderer, &*pTextureInverted);
@@ -462,7 +460,7 @@ static void copy_if_needed(const bool filter, std::array<std::shared_ptr<SDL_Tex
         SDL_SetTextureBlendMode(newTex, blendmode);
         SDL_SetRenderTarget(renderer, oldTarget);
         return std::shared_ptr<SDL_Texture>(
-            newTex, std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+            newTex, std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     };
 
     // SDL_SetTextureScaleMode calls are expensive and only the last call on the same texture within the rendering cycle
@@ -527,11 +525,11 @@ TextureFull::TextureFull(const Color& c) : Texture(nullptr)
     textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
     _textures[0] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture, _1));
+        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
+        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     loaded = true;
     SDL_FreeSurface(surface);
 }

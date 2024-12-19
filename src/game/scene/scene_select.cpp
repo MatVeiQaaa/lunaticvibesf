@@ -965,11 +965,10 @@ void SceneSelect::updatePrepare()
     {
         state = eSelectState::SELECT;
 
-        using namespace std::placeholders;
-        _input.register_p("SCENE_PRESS", std::bind(&SceneSelect::inputGamePress, this, _1, _2));
-        _input.register_h("SCENE_HOLD", std::bind(&SceneSelect::inputGameHold, this, _1, _2));
-        _input.register_r("SCENE_RELEASE", std::bind(&SceneSelect::inputGameRelease, this, _1, _2));
-        _input.register_a("SCENE_AXIS", std::bind(&SceneSelect::inputGameAxisSelect, this, _1, _2, _3));
+        _input.register_p("SCENE_PRESS", std::bind_front(&SceneSelect::inputGamePress, this));
+        _input.register_h("SCENE_HOLD", std::bind_front(&SceneSelect::inputGameHold, this));
+        _input.register_r("SCENE_RELEASE", std::bind_front(&SceneSelect::inputGameRelease, this));
+        _input.register_a("SCENE_AXIS", std::bind_front(&SceneSelect::inputGameAxisSelect, this));
 
         State::set(IndexTimer::LIST_MOVE, t.norm());
         State::set(IndexTimer::LIST_MOVE_STOP, t.norm());

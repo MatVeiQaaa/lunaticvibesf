@@ -193,7 +193,7 @@ static BarLampType score_to_bar_lamp_lr2(ScoreBMS::Lamp lamp)
     case ScoreBMS::Lamp::PERFECT:
     case ScoreBMS::Lamp::MAX: return BarLampType::FULLCOMBO;
     }
-    LVF_ASSERT_FALSE("score_to_bar_lamp_lr2");
+    lunaticvibes::assert_failed("score_to_bar_lamp_lr2");
 };
 
 static BarLampType score_to_bar_lamp_lv(ScoreBMS::Lamp lamp)
@@ -211,7 +211,7 @@ static BarLampType score_to_bar_lamp_lv(ScoreBMS::Lamp lamp)
     case ScoreBMS::Lamp::PERFECT:
     case ScoreBMS::Lamp::MAX: return BarLampType::PERFECT; // TODO(rustbell): separate max lamp?
     }
-    LVF_ASSERT_FALSE("score_to_bar_lamp_lv");
+    lunaticvibes::assert_failed("score_to_bar_lamp_lv");
 };
 
 bool SpriteBarEntry::update(const lunaticvibes::Time& time)

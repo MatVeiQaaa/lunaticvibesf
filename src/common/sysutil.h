@@ -59,14 +59,8 @@ template <> inline void pushAndWaitMainThreadTask(std::function<void()> f)
 template <typename T, typename... Arg> inline T pushAndWaitMainThreadTask(std::function<T(Arg...)> f, Arg... arg)
 {
     if (CanHandleMainThreadTask())
-    {
-        // TODO(C++20): bind_front
-        return pushAndWaitMainThreadTask<T>(std::bind(f, arg...));
-    }
-    else
-    {
-        return T();
-    }
+        return pushAndWaitMainThreadTask<T>(std::bind_front(f, arg...));
+    return T();
 }
 
 // Unix epoch time.

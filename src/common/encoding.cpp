@@ -12,7 +12,7 @@
 #include "common/log.h"
 #include "common/sysutil.h"
 
-bool is_ascii(const std::string_view str)
+static bool is_ascii(const std::string_view str)
 {
     for (auto it = str.begin(); it != str.end(); ++it)
     {
@@ -23,7 +23,7 @@ bool is_ascii(const std::string_view str)
     return true;
 }
 
-bool is_shiftjis(const std::string_view str)
+static bool is_shiftjis(const std::string_view str)
 {
     for (auto it = str.begin(); it != str.end(); ++it)
     {
@@ -64,7 +64,7 @@ bool is_shiftjis(const std::string_view str)
     return true;
 }
 
-bool is_euckr(const std::string_view str)
+static bool is_euckr(const std::string_view str)
 {
     for (auto it = str.begin(); it != str.end(); ++it)
     {
@@ -95,7 +95,7 @@ bool is_euckr(const std::string_view str)
     return true;
 }
 
-bool is_utf8(const std::string_view str)
+static bool is_utf8(const std::string_view str)
 {
     for (auto it = str.begin(); it != str.end(); ++it)
     {

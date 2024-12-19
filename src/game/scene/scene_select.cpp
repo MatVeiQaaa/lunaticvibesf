@@ -3424,7 +3424,6 @@ void SceneSelect::updatePreview()
                     };
 
                     boost::asio::thread_pool pool(std::max(1u, std::thread::hardware_concurrency() - 2));
-                    // TODO(C++20): use std::span.
                     for (size_t i = 0; i < bms->wavFiles.size(); ++i)
                     {
                         const auto& wav = bms->wavFiles[i];

@@ -185,6 +185,7 @@ public:
 
     template <class Ty_v> static Ty_v get(char type, const std::string& key, const Ty_v& fallback)
     {
+        static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
         return getInst()._get(type, key, fallback);
     }
 
@@ -195,6 +196,7 @@ public:
 
     template <class Ty_v> static void set(char type, const std::string& key, const Ty_v& value) noexcept
     {
+        static_assert(!std::is_same_v<Ty_v, std::string_view>, "string_view isn't supported by YAML-cpp");
         return getInst()._set(type, key, value);
     }
 

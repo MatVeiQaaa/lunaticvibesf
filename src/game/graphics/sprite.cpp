@@ -635,14 +635,7 @@ void SpriteNumber::updateNumberByInd()
     {
     case IndexNumber::RANDOM: n = std::rand(); break;
     case IndexNumber::ZERO: n = 0; break;
-    default:
-        // FIXME: wtf is this for
-#ifndef NDEBUG
-        n = (int)numInd >= 10000 ? (int)State::get((IndexTimer)((int)numInd - 10000)) : State::get(numInd);
-#else
-        n = State::get(numInd);
-#endif
-        break;
+    default: n = State::get(numInd); break;
     }
     updateNumber(n);
 }

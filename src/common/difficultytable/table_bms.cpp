@@ -13,6 +13,8 @@
 #include <common/hash.h>
 #include <common/log.h>
 #include <common/meta.h>
+#include <common/types.h>
+#include <common/utils.h>
 
 enum class GetResult
 {

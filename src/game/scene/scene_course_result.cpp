@@ -458,8 +458,7 @@ void SceneCourseResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t
             }
             break;
 
-        case eCourseResultState::FADEOUT: break;
-
+        case eCourseResultState::FADEOUT:
         default: break;
         }
     }

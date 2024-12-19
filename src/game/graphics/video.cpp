@@ -84,7 +84,8 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
         return -3;
     }
 
-    if ((pCodec = avcodec_find_decoder(pFormatCtx->streams[videoIndex]->codecpar->codec_id)) == NULL)
+    pCodec = avcodec_find_decoder(pFormatCtx->streams[videoIndex]->codecpar->codec_id);
+    if (pCodec == nullptr)
     {
         auto id = pFormatCtx->streams[videoIndex]->codecpar->codec_id;
         auto desc = avcodec_descriptor_get(id);
@@ -96,7 +97,8 @@ int sVideo::setVideo(const Path& file, double speed, bool loop)
         return -3;
     }
 
-    if ((pCodecCtx = avcodec_alloc_context3(pCodec)) == nullptr)
+    pCodecCtx = avcodec_alloc_context3(pCodec);
+    if (pCodecCtx == nullptr)
     {
         LOG_WARNING << "[Video] Could not alloc codec context of " << file;
         return -4;

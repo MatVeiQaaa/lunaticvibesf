@@ -207,8 +207,8 @@ static HashMD5 format_hash(std::span<unsigned char> digest)
     {
         unsigned char high = digest[i] >> 4 & 0xF;
         unsigned char low = digest[i] & 0xF;
-        ret += (high <= 9 ? ('0' + high) : ('A' - 10 + high));
-        ret += (low <= 9 ? ('0' + low) : ('A' - 10 + low));
+        ret += static_cast<char>(high <= 9 ? ('0' + high) : ('A' - 10 + high));
+        ret += static_cast<char>(low <= 9 ? ('0' + low) : ('A' - 10 + low));
     }
     return HashMD5{ret};
 }

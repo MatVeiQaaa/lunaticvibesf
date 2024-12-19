@@ -6,15 +6,15 @@
 #include "common/entry/entry.h"
 #include "common/hash.h"
 
-lunaticvibes::EntryRandomChart::EntryRandomChart(std::string name, std::string name2, Filter filter) : _filter(filter)
+lunaticvibes::EntryRandomChart::EntryRandomChart(std::string name_, std::string name2_, Filter filter) : _filter(filter)
 {
     _type = eEntryType::RANDOM_CHART;
-    _name = std::move(name);
-    _name2 = std::move(name2);
+    _name = std::move(name_);
+    _name2 = std::move(name2_);
 
     std::stringstream ss;
     ss << static_cast<int>(filter);
-    ss << name;
-    ss << name2;
+    ss << _name;
+    ss << _name2;
     this->md5 = ::md5(ss.str());
 };

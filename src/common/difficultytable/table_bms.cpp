@@ -16,7 +16,7 @@
 #include <common/types.h>
 #include <common/utils.h>
 
-enum class GetResult
+enum class GetResult : uint8_t
 {
     OK,
     ERR_UNKNOWN,
@@ -382,11 +382,9 @@ void DifficultyTableBMS::parseHeader(const std::string& content)
     try
     {
         std::string_view bodyview = content;
-        if (bodyview.substr(0, 3) == "\xef\xbb\xbf")
-        {
-            // Some tables start with a BOM, which needs to be removed
+        // Some tables start with a BOM, which needs to be removed
+        if (bodyview.starts_with("\xef\xbb\xbf"))
             bodyview = bodyview.substr(3);
-        }
 
         tao::json::value header = tao::json::from_string(bodyview);
         try

@@ -607,8 +607,7 @@ void SceneResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             }
             break;
 
-        case eResultState::FADEOUT: break;
-
+        case eResultState::FADEOUT:
         default: break;
         }
     }

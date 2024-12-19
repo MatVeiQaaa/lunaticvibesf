@@ -1,10 +1,10 @@
 #pragma once
 
-#include "common/types.h"
-#include "game/input/input_wrapper.h"
-#include "game/runtime/state.h"
-#include "game/skin/skin.h"
-#include "game/skin/skin_mgr.h"
+#include <common/types.h>
+#include <game/input/input_wrapper.h>
+#include <game/skin/skin.h>
+#include <game/skin/skin_mgr.h>
+
 #include <array>
 #include <atomic>
 #include <memory>

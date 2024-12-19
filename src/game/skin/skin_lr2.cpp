@@ -3314,12 +3314,7 @@ int SkinLR2::parseHeader(const Tokens& raw)
         while (parseParamBuf.size() < 4)
             parseParamBuf.emplace_back("");
 
-        int type = toInt(parseParamBuf[0]);
-        const auto title = StringContent(parseParamBuf[1]);
-        const auto maker = StringContent(parseParamBuf[2]);
-        StringContent thumbnail(parseParamBuf[3]);
-
-        switch (type)
+        switch (toInt(parseParamBuf[0]))
         {
         case 0: info.mode = SkinType::PLAY7; break;
         case 1: info.mode = SkinType::PLAY5; break;
@@ -3339,11 +3334,12 @@ int SkinLR2::parseHeader(const Tokens& raw)
 
         case 17: info.mode = SkinType::TITLE; break;
         }
-        info.name = title;
-        info.maker = maker;
+        info.name = parseParamBuf[1];
+        info.maker = parseParamBuf[2];
+        // auto thumbnail = parseParamBuf[3];
 
-        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded metadata: mode='" << info.mode << "' title='" << title
-                  << " maker='" << maker << "'";
+        LOG_DEBUG << "[Skin] " << csvLineNumber << ": Loaded metadata: mode='" << info.mode << "' name='" << info.name
+                  << " maker='" << info.maker << "'";
 
         return 1;
     }
@@ -3637,17 +3633,12 @@ void SkinLR2::IF(const Tokens& t, std::istream& lr2skin, eFileEncoding enc, bool
                 // nesting #IF
                 IF(tokens, lr2skin, enc, false, true);
             }
-            else if (matchToken(*tokens.begin(), "#ELSEIF"))
+            if (matchToken(*tokens.begin(), "#ELSE") || matchToken(*tokens.begin(), "#ELSEIF"))
             {
                 IF(tokens, lr2skin, enc, true, false);
                 return;
             }
-            else if (matchToken(*tokens.begin(), "#ELSE"))
-            {
-                IF(tokens, lr2skin, enc, true, false);
-                return;
-            }
-            else if (matchToken(*tokens.begin(), "#ENDIF"))
+            if (matchToken(*tokens.begin(), "#ENDIF"))
             {
                 return;
             }

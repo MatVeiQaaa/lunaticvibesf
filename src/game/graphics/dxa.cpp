@@ -1,5 +1,6 @@
 #include "dxa.h"
 
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
@@ -122,7 +123,7 @@ typedef struct tagDARC_DIRECTORY_VER5
 // ファイル名データから元のファイル名の文字列を取得する
 const char* GetOriginalFileName(u8* FileNameTable)
 {
-    return (char*)FileNameTable + *((u16*)&FileNameTable[0]) * 4 + 4;
+    return (char*)FileNameTable + static_cast<ptrdiff_t>(*((u16*)&FileNameTable[0]) * 4) + 4;
 }
 
 // 鍵文字列を作成

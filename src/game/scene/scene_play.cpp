@@ -1819,22 +1819,7 @@ void ScenePlay::updateAsyncAbsoluteAxis(const lunaticvibes::Time& t)
 
         if (playerState[slot].scratchDirection != axisDir)
         {
-            if (axisDir == AxisDir::AXIS_DOWN)
-            {
-                if (slot == PLAYER_SLOT_PLAYER)
-                {
-                    State::set(IndexTimer::S1_DOWN, t.norm());
-                    State::set(IndexTimer::S1_UP, TIMER_NEVER);
-                    State::set(IndexSwitch::S1_DOWN, true);
-                }
-                else
-                {
-                    State::set(IndexTimer::S2_DOWN, t.norm());
-                    State::set(IndexTimer::S2_UP, TIMER_NEVER);
-                    State::set(IndexSwitch::S2_DOWN, true);
-                }
-            }
-            else if (axisDir == AxisDir::AXIS_UP)
+            if (axisDir == AxisDir::AXIS_DOWN || axisDir == AxisDir::AXIS_UP)
             {
                 if (slot == PLAYER_SLOT_PLAYER)
                 {

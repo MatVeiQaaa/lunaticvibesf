@@ -48,8 +48,8 @@ private:
     lunaticvibes::Time selectDownTimestamp;
 
     // preview
-    std::thread _previewLoading;      // TODO(C++20): use std::jthread
-    std::thread _previewChartLoading; // TODO(C++20): use std::jthread
+    std::jthread _previewLoading;
+    std::jthread _previewChartLoading;
     std::shared_mutex previewMutex;
     enum
     {

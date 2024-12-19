@@ -3333,9 +3333,7 @@ void SceneSelect::updatePreview()
             previewChart.reset();
         }
 
-        if (_previewChartLoading.joinable())
-            _previewChartLoading.join();
-        _previewChartLoading = std::thread([&, previewChartPath, entryIndex]() {
+        _previewChartLoading = std::jthread([&, previewChartPath, entryIndex]() {
             SetThreadName("PreviewChartLoad");
             std::shared_ptr<ChartFormatBase> previewChartTmp =
                 ChartFormatBase::createFromFile(previewChartPath, gPlayContext.randomSeed);
@@ -3394,9 +3392,7 @@ void SceneSelect::updatePreview()
                 gChartContext.isSampleLoaded = false;
                 gChartContext.sampleLoadedHash.reset();
 
-                if (_previewLoading.joinable())
-                    _previewLoading.join();
-                _previewLoading = std::thread([&, bms] {
+                _previewLoading = std::jthread([&, bms] {
                     SetThreadName("PreviewSampleLoad");
                     auto previewChartObjTmp = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_PLAYER, *bms);
                     auto previewRulesetTmp = std::make_shared<RulesetBMSAuto>(

@@ -226,7 +226,8 @@ void SceneSelect::imguiSettings()
                     float height = 40.0f;
                     float interval = 5.0f;
 
-                    ImGui::Dummy({mainTagWidth, ImGui::GetWindowHeight() - (height + interval) * MENU_COUNT - 20.0f});
+                    ImGui::Dummy({mainTagWidth, ImGui::GetWindowHeight() -
+                                                    (height + interval) * static_cast<float>(MENU_COUNT) - 20.0f});
 
                     if (ImGui::InvisibleButton("##dummy123123122", {-1.f, height}))
                     {

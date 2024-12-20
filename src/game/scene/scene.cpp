@@ -159,7 +159,8 @@ void SceneBase::update()
 
             // notifications expire check
             while (!gOverlayContext.notifications.empty() &&
-                   (t - gOverlayContext.notifications.begin()->first).norm() > static_cast<decltype(std::declval<timeNormRes>().count())>(10 * 1000)) // 10s
+                   (t - gOverlayContext.notifications.begin()->first).norm() >
+                       static_cast<decltype(std::declval<timeNormRes>().count())>(10 * 1000)) // 10s
             {
                 gOverlayContext.notifications.pop_front();
             }

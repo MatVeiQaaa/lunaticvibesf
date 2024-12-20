@@ -452,11 +452,10 @@ std::vector<std::shared_ptr<ChartFormatBase>> SongDB::findChartByHash(const Hash
 
     std::vector<std::shared_ptr<ChartFormatBase>> ret;
 
-    if (songQueryHashMap.find(target) == songQueryHashMap.end())
-    {
+    auto it = songQueryHashMap.find(target);
+    if (it == songQueryHashMap.end())
         return ret;
-    }
-    for (const auto& index : songQueryHashMap.at(target))
+    for (const auto& index : it->second)
         try
         {
             const auto& r = songQueryPool[index];
@@ -1084,9 +1083,9 @@ std::pair<bool, Path> SongDB::getFolderPath(const HashMD5& folder) const
 {
     if (!folderQueryHashMap.empty())
     {
-        if (folderQueryHashMap.find(folder) != folderQueryHashMap.end())
+        if (auto it = folderQueryHashMap.find(folder); it != folderQueryHashMap.end())
         {
-            auto cols = folderQueryPool[folderQueryHashMap.at(folder)[0]];
+            auto cols = folderQueryPool[it->second[0]];
             return {true, PathFromUTF8(ANY_STR(cols[4]))};
         }
     }
@@ -1211,9 +1210,9 @@ std::shared_ptr<EntryFolderSong> SongDB::browseSong(const HashMD5& root)
     std::shared_ptr<EntryFolderSong> list = std::make_shared<EntryFolderSong>(root, path);
     bool isNameSet = false;
 
-    if (songQueryParentMap.find(root) != songQueryParentMap.end())
+    if (auto it = songQueryParentMap.find(root); it != songQueryParentMap.end())
     {
-        for (const auto& index : songQueryParentMap.at(root))
+        for (const auto& index : it->second)
             try
             {
                 const auto& c = songQueryPool[index];

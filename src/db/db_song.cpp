@@ -656,22 +656,8 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
         return -1;
     }
 
-    if (isParentPath(executablePath, path))
-    {
-        if (parentHash.empty())
-        {
-            // parent is empty, add with absolute path
-            path = fs::absolute(path);
-        }
-        else
-        {
-            // parent is not empty, add with relative path
-        }
-    }
-    else
-    {
+    if (!isParentPath(executablePath, path) || parentHash.empty())
         path = fs::absolute(path);
-    }
 
     // check if the folder is already added
     int count = 0;

@@ -30,10 +30,7 @@ eChartFormat analyzeChartType(const Path& p)
             fmt = eChartFormat::BMSON;
     }
 
-    if (!fs::is_regular_file(p))
-        return eChartFormat::UNKNOWN;
-    else
-        return fmt;
+    return fmt;
 }
 
 std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& path, uint64_t randomSeed)
@@ -46,7 +43,6 @@ std::shared_ptr<ChartFormatBase> ChartFormatBase::createFromFile(const Path& pat
         return nullptr;
     }
 
-    // dispatch Chart object upon filename extension
     switch (analyzeChartType(path))
     {
     case eChartFormat::BMS:

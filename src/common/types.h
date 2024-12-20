@@ -22,7 +22,7 @@ const size_t INDEX_INVALID = ~0;
 
 [[nodiscard]] inline StringPath operator""_p(const char* s, size_t len)
 {
-    return Path(std::string_view(s, len));
+    return Path(std::string_view(s, len)).make_preferred();
 }
 
 // Exhaustive.

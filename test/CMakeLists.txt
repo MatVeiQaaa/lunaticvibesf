@@ -9,6 +9,7 @@ add_executable(apptest
     common/test_beat.cpp
     common/test_encoding.cpp
     common/test_fraction.cpp
+    common/test_chartformat.cpp
     common/test_chartformat_bms.cpp
     common/test_hash.cpp
     common/test_lr2crs.cpp

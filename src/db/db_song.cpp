@@ -669,7 +669,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
         LOG_VERBOSE << "[SongDB] Sub folder already exists (" << path << ")";
 
         HashMD5 folderMD5{ANY_STR(q[0][0])};
-        std::string folderPath = ANY_STR(q[0][1]);
+        // std::string folderPath = ANY_STR(q[0][1]);
         FolderType folderType = (FolderType)ANY_INT(q[0][2]);
         long long folderModifyTimeDB = ANY_INT(q[0][3]);
 
@@ -682,7 +682,7 @@ int SongDB::addSubFolder(Path path, const HashMD5& parentHash)
             }
             else
             {
-                LOG_VERBOSE << "[SongDB] Skip refreshing song folder: " << folderPath;
+                LOG_VERBOSE << "[SongDB] Skip refreshing song folder: " << path;
             }
         }
         else

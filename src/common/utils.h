@@ -13,7 +13,7 @@ inline Path executablePath;
 // Very expensive, use fs::directory_iterator or fs::recursive_directory_iterator when possible.
 [[nodiscard]] std::vector<Path> findFiles(Path path, bool recursive = false);
 
-bool isParentPath(Path parent, Path dir);
+bool isParentPath(const Path& parent, const Path& dir);
 
 // string to int
 [[nodiscard]] int toInt(std::string_view str, int defVal = 0) noexcept;

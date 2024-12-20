@@ -98,11 +98,11 @@ std::vector<Path> findFiles(Path p, bool recursive)
     return res;
 }
 
-bool isParentPath(Path parent, Path dir)
+bool isParentPath(const Path& parent_, const Path& dir_)
 try
 {
-    parent = fs::absolute(parent);
-    dir = fs::absolute(dir);
+    const Path parent = fs::absolute(parent_);
+    const Path dir = fs::absolute(dir_);
 
     if (parent.root_directory() != dir.root_directory())
         return false;

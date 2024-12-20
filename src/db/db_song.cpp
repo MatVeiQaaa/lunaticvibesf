@@ -1,6 +1,7 @@
 #include "db_song.h"
 
 #include <algorithm>
+#include <atomic>
 #include <functional>
 #include <thread>
 #include <vector>
@@ -611,7 +612,7 @@ int SongDB::initializeFolders(const std::vector<Path>& paths)
     std::future<void> sessionFuture;
     std::chrono::system_clock::time_point sessionTimestamp = std::chrono::system_clock::now();
 
-    bool inAddFolderSession = true;
+    std::atomic<bool> inAddFolderSession = true;
     transactionStart();
     sessionFuture = std::async(std::launch::async, [&]() {
         SetThreadName("SongFolderInit");

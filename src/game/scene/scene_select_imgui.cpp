@@ -5,6 +5,7 @@
 
 #include <common/log.h>
 #include <common/str_utils.h>
+#include <common/utils.h>
 #include <config/config_mgr.h>
 #include <db/db_lr2_score.h>
 #include <db/db_score.h>
@@ -1552,7 +1553,7 @@ bool SceneSelect::imguiBrowseFolder()
 {
     if (imgui_folder_index < 0 || imgui_folder_index >= static_cast<int>(imgui_folders_display.size()))
         return false;
-    auto pathstr = lunaticvibes::u8str(Path(imgui_folders_display[imgui_folder_index]));
+    auto pathstr = lunaticvibes::u8str(PathFromUTF8(imgui_folders_display[imgui_folder_index]));
     return lunaticvibes::open(pathstr);
 }
 

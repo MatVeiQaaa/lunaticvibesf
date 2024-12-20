@@ -630,7 +630,7 @@ Path SkinLR2::getCustomizePath(StringContentView input)
     StringPath pathStr = path.native();
     std::string pathU8Str = lunaticvibes::u8str(path);
 
-    if (pathStr.find("*"_p) != pathStr.npos)
+    if (pathStr.find(u8"*"_p) != pathStr.npos)
     {
         // Check if the wildcard path is specified by custom settings
         std::srand(std::time(NULL));
@@ -875,7 +875,7 @@ int SkinLR2::LR2FONT()
                 pf->T_id[toInt(tokens[1])] = idx;
 
                 // スキンcsvとは違って「lr2fontファイルからの相対参照」で画像ファイルを指定します。
-                Path p = path.parent_path() / Path(tokens[2]);
+                Path p = path.parent_path() / PathFromUTF8(tokens[2]);
                 findAndExtractDXA(p);
                 pf->T_texture.push_back(std::make_shared<Texture>(Image{p}));
             }

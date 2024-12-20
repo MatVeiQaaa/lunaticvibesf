@@ -78,7 +78,7 @@ Path GetExecutablePath()
     if (bytes >= 0)
         fullpath[bytes] = '\0';
 
-    return fs::path(fullpath).parent_path();
+    return PathFromUTF8(fullpath).parent_path();
 }
 
 long long getFileLastWriteTime(const Path& p)

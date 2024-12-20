@@ -1,10 +1,13 @@
 #include "i18n.h"
+
 #include <fstream>
-#include <re2/re2.h>
 #include <sstream>
 
-#include "common/meta.h"
-#include "common/utils.h"
+#include <common/meta.h>
+#include <common/u8.h>
+#include <common/utils.h>
+
+#include <re2/re2.h>
 
 std::vector<i18n> i18n::languages;
 size_t i18n::currentLanguage = 0;
@@ -51,7 +54,7 @@ void i18n::init()
         if (fs::equivalent(f.path(), en))
             continue;
 
-        if (lunaticvibes::iequals(f.path().extension().string(), ".txt"))
+        if (lunaticvibes::iequals(lunaticvibes::s(f.path().extension().u8string()), ".txt"))
         {
             languages.push_back(i18n(f.path()));
         }

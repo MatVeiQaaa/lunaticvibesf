@@ -14,7 +14,7 @@ TEST(Lr2SoundSet, HeaderInformationParsing)
             {"#INFORMATION", "10", "SoundSetName", "SoundSetMaker", "LR2files\\Sound\\SoundSetThumbnail.png"}));
         EXPECT_EQ(ss.maker, "SoundSetMaker");
         EXPECT_EQ(ss.name, "SoundSetName");
-        EXPECT_EQ(ss.getThumbnailPath(), "./LR2files/Sound/SoundSetThumbnail.png"_p);
+        EXPECT_EQ(ss.getThumbnailPath(), u8"./LR2files/Sound/SoundSetThumbnail.png"_p);
     }
     EXPECT_FALSE(SoundSetLR2{}.parseHeader({}));
     EXPECT_FALSE(SoundSetLR2{}.parseHeader({"#INFORMATION"}));
@@ -90,23 +90,23 @@ TEST(Lr2SoundSet, StaticOptionValues)
     EXPECT_FALSE(ss.parseBody({"#COURSECLEAR", R"(LR2files\Sound\lol.wav)", ""}));
     EXPECT_FALSE(ss.parseBody({"#COURSEFAIL", R"(LR2files\Sound\lol.wav)", ""}));
 
-    EXPECT_EQ(ss.getPathBGMSelect(), "./LR2files/Sound/lol/select.wav"_p);
-    EXPECT_EQ(ss.getPathBGMDecide(), "./LR2files/Sound/lol/decide.wav"_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8"./LR2files/Sound/lol/select.wav"_p);
+    EXPECT_EQ(ss.getPathBGMDecide(), u8"./LR2files/Sound/lol/decide.wav"_p);
 
-    EXPECT_EQ(ss.getPathSoundOpenFolder(), "./LR2files/Sound/lr2/f-open.wav"_p);
-    EXPECT_EQ(ss.getPathSoundCloseFolder(), "./LR2files/Sound/lr2/f-close.wav"_p);
-    EXPECT_EQ(ss.getPathSoundOpenPanel(), "./LR2files/Sound/lr2/o-open.wav"_p);
-    EXPECT_EQ(ss.getPathSoundClosePanel(), "./LR2files/Sound/lr2/o-close.wav"_p);
-    EXPECT_EQ(ss.getPathSoundOptionChange(), "./LR2files/Sound/lr2/o-change.wav"_p);
-    EXPECT_EQ(ss.getPathSoundDifficultyChange(), "./LR2files/Sound/lr2/difficulty.wav"_p);
-    EXPECT_EQ(ss.getPathSoundScreenshot(), "./LR2files/Sound/lr2/screenshot.wav"_p);
-    EXPECT_EQ(ss.getPathBGMResultClear(), "./LR2files/Sound/lr2/clear.wav"_p);
-    EXPECT_EQ(ss.getPathBGMResultFailed(), "./LR2files/Sound/lr2/fail.wav"_p);
-    EXPECT_EQ(ss.getPathSoundFailed(), "./LR2files/Sound/lr2/playstop.wav"_p);
-    EXPECT_EQ(ss.getPathSoundLandmine(), "./LR2files/Sound/lr2/mine.wav"_p);
-    EXPECT_EQ(ss.getPathSoundScratch(), "./LR2files/Sound/lr2/scratch.wav"_p);
-    EXPECT_EQ(ss.getPathBGMCourseClear(), "./LR2files/Sound/lr2/course_clear.wav"_p);
-    EXPECT_EQ(ss.getPathBGMCourseFailed(), "./LR2files/Sound/lr2/course_fail.wav"_p);
+    EXPECT_EQ(ss.getPathSoundOpenFolder(), u8"./LR2files/Sound/lr2/f-open.wav"_p);
+    EXPECT_EQ(ss.getPathSoundCloseFolder(), u8"./LR2files/Sound/lr2/f-close.wav"_p);
+    EXPECT_EQ(ss.getPathSoundOpenPanel(), u8"./LR2files/Sound/lr2/o-open.wav"_p);
+    EXPECT_EQ(ss.getPathSoundClosePanel(), u8"./LR2files/Sound/lr2/o-close.wav"_p);
+    EXPECT_EQ(ss.getPathSoundOptionChange(), u8"./LR2files/Sound/lr2/o-change.wav"_p);
+    EXPECT_EQ(ss.getPathSoundDifficultyChange(), u8"./LR2files/Sound/lr2/difficulty.wav"_p);
+    EXPECT_EQ(ss.getPathSoundScreenshot(), u8"./LR2files/Sound/lr2/screenshot.wav"_p);
+    EXPECT_EQ(ss.getPathBGMResultClear(), u8"./LR2files/Sound/lr2/clear.wav"_p);
+    EXPECT_EQ(ss.getPathBGMResultFailed(), u8"./LR2files/Sound/lr2/fail.wav"_p);
+    EXPECT_EQ(ss.getPathSoundFailed(), u8"./LR2files/Sound/lr2/playstop.wav"_p);
+    EXPECT_EQ(ss.getPathSoundLandmine(), u8"./LR2files/Sound/lr2/mine.wav"_p);
+    EXPECT_EQ(ss.getPathSoundScratch(), u8"./LR2files/Sound/lr2/scratch.wav"_p);
+    EXPECT_EQ(ss.getPathBGMCourseClear(), u8"./LR2files/Sound/lr2/course_clear.wav"_p);
+    EXPECT_EQ(ss.getPathBGMCourseFailed(), u8"./LR2files/Sound/lr2/course_fail.wav"_p);
 }
 
 TEST(Lr2SoundSet, CustomFile)
@@ -129,7 +129,7 @@ TEST(Lr2SoundSet, CustomFile)
         EXPECT_EQ(opt.defaultEntry, 0);
         EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
-    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8"lr2soundset/bgm/mybgm.1/mybgm.1.wav"_p);
 }
 
 TEST(Lr2SoundSet, CustomFileDefaultEntry)
@@ -148,7 +148,7 @@ TEST(Lr2SoundSet, CustomFileDefaultEntry)
         EXPECT_EQ(opt.defaultEntry, 1);
         EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
-    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.2/mybgm.2.wav"_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8"lr2soundset/bgm/mybgm.2/mybgm.2.wav"_p);
 }
 
 TEST(Lr2SoundSet, CustomFileRandomOption)
@@ -167,7 +167,7 @@ TEST(Lr2SoundSet, CustomFileRandomOption)
         EXPECT_EQ(opt.defaultEntry, 1);
         EXPECT_EQ(lunaticvibes::join(',', opt.entries), "mybgm.1,mybgm.2,RANDOM");
     }
-    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8"lr2soundset/bgm/mybgm.1/mybgm.1.wav"_p);
 }
 
 TEST(Lr2SoundSet, CustomFileRandomOptionNoFiles)
@@ -186,7 +186,7 @@ TEST(Lr2SoundSet, CustomFileRandomOptionNoFiles)
         EXPECT_EQ(opt.defaultEntry, 0);
         EXPECT_EQ(lunaticvibes::join(',', opt.entries), "RANDOM");
     }
-    EXPECT_EQ(ss.getPathBGMSelect(), ""_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8""_p);
 }
 
 TEST(Lr2SoundSet, MissingCustomFileRandomFallbackNotFound)
@@ -195,7 +195,7 @@ TEST(Lr2SoundSet, MissingCustomFileRandomFallbackNotFound)
     EXPECT_TRUE(ss.parseHeader({"#INFORMATION", "10", "", "", ""}));
     EXPECT_TRUE(ss.parseBody({"#SELECT", R"(no\such\path\*.wav)", ""}));
     ASSERT_EQ(ss.getCustomizeOptionCount(), 0);
-    EXPECT_EQ(ss.getPathBGMSelect(), ""_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8""_p);
 }
 
 TEST(Lr2SoundSet, MissingCustomFileRandomFallback)
@@ -208,5 +208,5 @@ TEST(Lr2SoundSet, MissingCustomFileRandomFallback)
     EXPECT_TRUE(ss.parseBody({"#SELECT", R"(lr2soundset\bgm\*)", ""}));
     ASSERT_EQ(ss.getCustomizeOptionCount(), 0);
     // EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1/mybgm.1.wav"_p);
-    EXPECT_EQ(ss.getPathBGMSelect(), "lr2soundset/bgm/mybgm.1"_p);
+    EXPECT_EQ(ss.getPathBGMSelect(), u8"lr2soundset/bgm/mybgm.1"_p);
 }

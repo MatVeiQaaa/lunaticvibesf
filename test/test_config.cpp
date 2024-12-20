@@ -24,7 +24,7 @@ public:
 
 TEST(Config, file_create)
 {
-    auto file = "test_create.cfg"_p;
+    auto file = u8"test_create.cfg"_p;
     {
         tConfig c(file);
         c.setDefaults();
@@ -37,7 +37,7 @@ TEST(Config, file_create)
 
 TEST(Config, modify)
 {
-    auto file = "test_modify.cfg"_p;
+    auto file = u8"test_modify.cfg"_p;
     {
         using namespace std::string_literals;
         tConfig c(file);
@@ -62,7 +62,7 @@ TEST(Config, modify)
 
 TEST(Config, add)
 {
-    auto file = "test_add.cfg"_p;
+    auto file = u8"test_add.cfg"_p;
     {
         tConfig c(file);
         c.setDefaults();
@@ -84,7 +84,7 @@ TEST(Config, add)
 
 TEST(Config, get_type_mismatch)
 {
-    auto file = "test.cfg"_p;
+    auto file = u8"test.cfg"_p;
     {
         using namespace std::string_literals;
         tConfig c(file);
@@ -100,7 +100,7 @@ TEST(Config, get_type_mismatch)
 
 TEST(Config, set_type_override)
 {
-    auto file = "test.cfg"_p;
+    auto file = u8"test.cfg"_p;
     {
         using namespace std::string_literals;
         tConfig c(file);

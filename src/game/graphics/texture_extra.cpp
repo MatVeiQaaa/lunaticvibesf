@@ -158,7 +158,8 @@ bool TextureBmsBga::addBmp(size_t idx, Path pBmp)
     if (idx == size_t(-1))
         return false;
 
-    if (!fs::exists(pBmp) && pBmp.has_extension() && lunaticvibes::iequals(pBmp.extension().string(), ".bmp"))
+    if (!fs::exists(pBmp) && pBmp.has_extension() &&
+        lunaticvibes::iequals(lunaticvibes::s(pBmp.extension().u8string()), ".bmp"))
     {
         pBmp = pBmp.parent_path() / Path(pBmp.filename().stem().u8string() + u8".jpg");
 

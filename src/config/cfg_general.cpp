@@ -1,6 +1,7 @@
 #include "cfg_general.h"
 
-#include "config/config_mgr.h"
+#include <common/meta.h>
+#include <common/utils.h>
 
 #include <string>
 #include <vector>
@@ -34,15 +35,13 @@ void ConfigGeneral::setTables(const std::vector<std::string>& urls)
     _yaml[cfg::E_TABLES] = urls;
 }
 
-std::vector<StringPath> ConfigGeneral::getFoldersPath()
+std::vector<Path> ConfigGeneral::getFoldersPath()
 {
     auto folderList = _yaml[cfg::E_FOLDERS].as<std::vector<std::string>>(std::vector<std::string>());
-    std::vector<StringPath> ret;
+    std::vector<Path> ret;
     ret.reserve(folderList.size());
     for (const auto& p : folderList)
-    {
-        ret.push_back(Path(p).native());
-    }
+        ret.push_back(PathFromUTF8(p));
     return ret;
 }
 

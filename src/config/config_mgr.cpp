@@ -7,6 +7,7 @@
 
 #include "common/log.h"
 #include "common/meta.h"
+#include "common/u8.h"
 #include "common/utils.h"
 #include "game/runtime/state.h"
 
@@ -790,7 +791,7 @@ void setText()
 
 int ConfigMgr::_selectProfile(const std::string& name)
 {
-    Path folder = Path(GAMEDATA_PATH) / "profile" / name;
+    Path folder = Path(GAMEDATA_PATH) / "profile" / name; // utf-8 name?
     if (!fs::exists(folder))
         fs::create_directories(folder);
 
@@ -852,7 +853,7 @@ int ConfigMgr::_selectProfile(const std::string& name)
 
 int ConfigMgr::_createProfile(const std::string& newProfile, const std::string& oldProfile)
 {
-    Path newFolder = Path(GAMEDATA_PATH) / "profile" / newProfile;
+    Path newFolder = Path(GAMEDATA_PATH) / "profile" / newProfile; // utf-8 name?
     if (fs::exists(newFolder))
     {
         LOG_WARNING << "[Config] Profile name duplicate: " << newProfile;
@@ -861,13 +862,13 @@ int ConfigMgr::_createProfile(const std::string& newProfile, const std::string& 
 
     fs::create_directories(newFolder);
 
-    Path oldFolder = Path(GAMEDATA_PATH) / "profile" / oldProfile;
+    Path oldFolder = Path(GAMEDATA_PATH) / "profile" / oldProfile; // utf-8 name?
     if (!oldProfile.empty() && fs::exists(oldFolder))
     {
         for (auto& f : fs::directory_iterator(oldFolder))
         {
-            if (lunaticvibes::iequals(f.path().extension().string(), ".yml") ||
-                lunaticvibes::iequals(f.path().filename().string(), "customize"))
+            if (lunaticvibes::iequals(lunaticvibes::s(f.path().extension().u8string()), ".yml") ||
+                lunaticvibes::iequals(lunaticvibes::s(f.path().filename().u8string()), "customize"))
             {
                 fs::copy(f, newFolder / f.path().lexically_relative(oldFolder));
             }

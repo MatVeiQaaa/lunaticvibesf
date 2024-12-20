@@ -1,6 +1,11 @@
 #pragma once
 #include "config.h"
 
+#include <common/types.h>
+
+#include <string>
+#include <vector>
+
 constexpr char CONFIG_FILE_GENERAL[] = "config.yml";
 
 namespace cfg
@@ -95,7 +100,7 @@ public:
 
     void setFolders(const std::vector<std::string>& path);
     void setTables(const std::vector<std::string>& urls);
-    std::vector<StringPath> getFoldersPath();
+    std::vector<Path> getFoldersPath();
     std::vector<std::string> getFoldersStr();
     std::vector<std::string> getTablesUrl();
 };

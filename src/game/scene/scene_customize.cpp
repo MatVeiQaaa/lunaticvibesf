@@ -1,9 +1,10 @@
 #include "scene_customize.h"
-#include "common/u8.h"
 
 #include <common/assert.h>
 #include <common/hash.h>
 #include <common/types.h>
+#include <common/u8.h>
+#include <common/utils.h>
 #include <config/config_mgr.h>
 #include <game/scene/scene_context.h>
 #include <game/skin/skin_lr2.h>
@@ -279,7 +280,8 @@ void SceneCustomize::updateMain()
                 }
                 selectedIdx =
                     wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0, static_cast<int>(soundsetList.size() - 1));
-                const auto& p = fs::relative(soundsetList[selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
+                const auto& p =
+                    fs::relative(soundsetList[selectedIdx], PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
 
                 ConfigMgr::set('S', cfg::S_PATH_SOUNDSET, lunaticvibes::u8str(p));
 
@@ -315,8 +317,8 @@ void SceneCustomize::updateMain()
                 selectedIdx = wrappingAdd(selectedIdx, gCustomizeContext.skinDir, 0,
                                           static_cast<int>(skinList[selectedMode].size()) - 1);
 
-                const auto& p =
-                    fs::relative(skinList[selectedMode][selectedIdx], ConfigMgr::get('E', cfg::E_LR2PATH, "."));
+                const auto p = fs::relative(skinList[selectedMode][selectedIdx],
+                                            PathFromUTF8(ConfigMgr::get('E', cfg::E_LR2PATH, ".")));
                 if (const char* key = configOptionNameForSkinType(selectedMode); key != nullptr)
                 {
                     ConfigMgr::set('S', key, lunaticvibes::u8str(p));

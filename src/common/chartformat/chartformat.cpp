@@ -17,7 +17,7 @@ eChartFormat analyzeChartType(const Path& p)
 
     eChartFormat fmt = eChartFormat::UNKNOWN;
 
-    auto extension = p.extension().string();
+    auto extension = lunaticvibes::u8str(p.extension());
     if (extension.length() == 4)
     {
         if (lunaticvibes::iequals(extension, ".bms") || lunaticvibes::iequals(extension, ".bme") ||
@@ -83,7 +83,7 @@ try
 {
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
-        if (lunaticvibes::iequals(entry.path().extension().string(), ".txt"))
+        if (lunaticvibes::iequals(lunaticvibes::s(entry.path().extension().u8string()), ".txt"))
             return true;
     }
     return false;
@@ -103,7 +103,7 @@ try
     for (const auto& entry : fs::directory_iterator(getDirectory()))
     {
         const auto& file = entry.path();
-        if (!lunaticvibes::iequals(file.extension().string(), ".txt"))
+        if (!lunaticvibes::iequals(lunaticvibes::s(file.extension().u8string()), ".txt"))
             continue;
         std::ifstream ifs{file};
         if (ifs.fail())

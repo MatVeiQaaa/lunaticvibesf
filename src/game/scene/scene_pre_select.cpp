@@ -111,13 +111,7 @@ void ScenePreSelect::updateLoadSongs()
             loadSongTimer = std::chrono::system_clock::now();
 
             // get folders from config
-            auto folderList = ConfigMgr::General()->getFoldersPath();
-            std::vector<Path> pathList;
-            pathList.reserve(folderList.size());
-            for (auto& f : folderList)
-            {
-                pathList.emplace_back(f);
-            }
+            const std::vector<Path> pathList = ConfigMgr::General()->getFoldersPath();
 
             LOG_INFO << "[List] Refreshing folders...";
             g_pSongDB->initializeFolders(pathList);
@@ -138,7 +132,7 @@ void ScenePreSelect::updateLoadSongs()
                     auto entry = top->getEntry(i);
 
                     bool deleted = true;
-                    for (auto& f : folderList)
+                    for (const auto& f : pathList)
                     {
                         if (gAppIsExiting)
                             break;
@@ -364,7 +358,7 @@ void ScenePreSelect::updateLoadCourses()
             for (auto& courseFile : fs::recursive_directory_iterator(coursePath))
             {
                 if (!(fs::is_regular_file(courseFile) &&
-                      lunaticvibes::iequals(courseFile.path().extension().string(), ".lr2crs")))
+                      lunaticvibes::iequals(lunaticvibes::s(courseFile.path().extension().u8string()), ".lr2crs")))
                     continue;
 
                 const Path& coursePath = courseFile.path();

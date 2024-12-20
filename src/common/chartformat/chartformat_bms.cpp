@@ -12,9 +12,11 @@
 
 #include "common/encoding.h"
 #include "common/utils.h"
+#include <common/assert.h>
+#include <common/u8.h>
+
 #include "re2/re2.h"
 #include <boost/algorithm/string.hpp>
-#include <common/assert.h>
 
 class noteLineException : public std::exception
 {
@@ -86,7 +88,7 @@ int ChartFormatBMS::initWithFile(const Path& filePath, uint64_t randomSeed)
 
     LOG_DEBUG << "[BMS] File (" << getFileEncodingName(encoding) << "): " << absolutePath;
 
-    if (lunaticvibes::iequals(filePath.extension().string(), ".pms"))
+    if (lunaticvibes::iequals(lunaticvibes::s(filePath.extension().u8string()), ".pms"))
     {
         isPMS = true;
     }

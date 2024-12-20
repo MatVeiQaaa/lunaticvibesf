@@ -11,18 +11,21 @@
 namespace fs = std::filesystem;
 
 using Path = std::filesystem::path;
-using StringContent = std::string;          // std::ifstream, std::getline
-using StringContentView = std::string_view; // std::ifstream, std::getline
-using StringPath = Path::string_type;
-using StringPathView = std::basic_string_view<Path::value_type>;
+using StringContent = std::string;                               // std::ifstream, std::getline
+using StringContentView = std::string_view;                      // std::ifstream, std::getline
+using StringPath = Path::string_type;                            // natively-encoded path string
+using StringPathView = std::basic_string_view<Path::value_type>; // natively-encoded path string
 using uint8_t = std::uint8_t;
+using uint16_t = std::uint16_t;
+using uint32_t = std::uint32_t;
+using uint64_t = std::uint64_t;
 using namespace std::string_literals;
 
 const size_t INDEX_INVALID = ~0;
 
-[[nodiscard]] inline StringPath operator""_p(const char* s, size_t len)
+[[nodiscard]] inline StringPath operator""_p(const char8_t* s, size_t len)
 {
-    return Path(std::string_view(s, len)).make_preferred();
+    return Path(std::u8string_view(s, len)).make_preferred();
 }
 
 // Exhaustive.

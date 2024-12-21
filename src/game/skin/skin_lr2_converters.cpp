@@ -122,7 +122,7 @@ static const std::vector<std::variant<std::monostate, IndexSwitch, IndexOption, 
     IndexOption::PLAY_BGA_TYPE,    // bga off/on/autoplay only, special
     IndexOption::PLAY_BGA_SIZE,    // bga normal/extend, special
     IndexSwitch::_FALSE,           // JUDGE TIMING
-    IndexSwitch::_FALSE,           // AUTO ADJUST, not supported
+    IndexOption::PLAY_AUTOADJUST,  // AUTO ADJUST
     IndexSwitch::_FALSE,           // default target rate
     IndexOption::PLAY_TARGET_TYPE, // target
 

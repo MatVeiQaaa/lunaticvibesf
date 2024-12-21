@@ -9,6 +9,7 @@
 #include "game/scene/scene_context.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
+#include <config/config_mgr.h>
 #include <common/assert.h>
 #include <common/sysutil.h>
 
@@ -834,6 +835,8 @@ void RulesetBMS::_judgePress(NoteLaneCategory cat, NoteLaneIndex idx, HitableNot
         }
     }
 }
+
+// Judges LNs in the case of overhold.
 void RulesetBMS::_judgeHold(NoteLaneCategory cat, NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
                             const lunaticvibes::Time& t, int slot)
 {
@@ -1181,6 +1184,27 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     }
 }
 
+void RulesetBMS::updateAutoadjust(const HitableNote& pNote, const lunaticvibes::Time& rt)
+{
+    if (!State::get(IndexOption::PLAY_AUTOADJUST)) {
+        return;
+    }
+    bool isOffsetPositive = (rt - pNote.time).norm() >= 0; 
+    lunaticvibes::Time hitOffset = rt > pNote.time ? rt - pNote.time : pNote.time - rt;
+    if (hitOffset <= judgeTime[(int)_judgeDifficulty].BAD) {
+        _notesSinceLastAutoadjust++;
+        if (_notesSinceLastAutoadjust > 9)
+        {
+            if (hitOffset.norm() != 0)
+            {
+                int newAdjust = State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1);
+                State::set(IndexNumber::TIMING_ADJUST_VISUAL, newAdjust );
+            }
+            _notesSinceLastAutoadjust = 0;
+        }
+    }
+}
+
 void RulesetBMS::judgeNotePress(const Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt,
                                 const int slot)
 {
@@ -1209,11 +1233,13 @@ void RulesetBMS::judgeNotePress(const Input::Pad k, const lunaticvibes::Time& t,
     if (pNote1 && (pNote2 == nullptr || pNote1->time < pNote2->time) && !pNote1->expired)
     {
         j = _calcJudgeByTimes(*pNote1, rt);
+        updateAutoadjust(*pNote1, rt);
         _judgePress(NoteLaneCategory::Note, idx1, *pNote1, j, t, slot);
     }
     else if (pNote2 && !pNote2->expired)
     {
         j = _calcJudgeByTimes(*pNote2, rt);
+        updateAutoadjust(*pNote2, rt);
         _judgePress(NoteLaneCategory::LN, idx2, *pNote2, j, t, slot);
     }
 }
@@ -1247,7 +1273,6 @@ void RulesetBMS::judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, con
         {
             if (!itNote->expired)
             {
-                ;
                 auto j = _calcJudgeByTimes(*itNote, rt);
                 _judgeRelease(NoteLaneCategory::LN, idx, *itNote, j, t, slot);
                 break;

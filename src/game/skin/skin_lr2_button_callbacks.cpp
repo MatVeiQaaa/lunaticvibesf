@@ -1000,8 +1000,14 @@ void bga_size(int plus)
 // 75
 void judge_auto_adjust(int plus)
 {
+    int val = (State::get(IndexOption::PLAY_AUTOADJUST) + 2 + plus) % 2;
+
+    State::set(IndexOption::PLAY_AUTOADJUST, val);
+    State::set(IndexText::AUTOADJUST, Option::s_autoadjust[val]);
 
     SoundMgr::playSysSample(SoundChannelType::KEY_SYS, eSoundSample::SOUND_O_CHANGE);
+
+    ConfigMgr::set('P', cfg::P_JUDGE_AUTOADJUST, State::get(IndexOption::PLAY_AUTOADJUST));
 }
 
 // 76

@@ -54,6 +54,7 @@ enum class IndexOption : unsigned
     PLAY_HSFIX_TYPE,          // OFF/MAXBPM/MINBPM/AVERAGE/CONSTANT/START(new)/MAIN(new)
     PLAY_BATTLE_TYPE,         // OFF/BATTLE/DB/SPtoDP,9to7/GhostBattle
     PLAY_TARGET_TYPE,         // 0%/MYBEST/AAA/AA/A/DEFAULT/IRTOP/IRNEXT/IRAVERAGE
+    PLAY_AUTOADJUST,          // OFF/ON/SILENT(not supported)
 
     PLAY_RANK_ESTIMATED_1P,
     PLAY_RANK_ESTIMATED_2P,
@@ -287,6 +288,8 @@ enum e_target_type
 static constexpr const char* s_target_type[] = {
     "NO TARGET", "MY BEST", "RANK AAA", "RANK AA", "RANK A", "50%", "IR TOP", "IR NEXT", "IR AVERAGE",
 };
+
+static constexpr const char* s_autoadjust[] = { "OFF", "ON", "SILENT" };
 
 enum e_gauge_type
 {

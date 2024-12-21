@@ -69,7 +69,7 @@ enum class IndexText : unsigned
     COLOR_DEPTH,
     VSYNC,
     WINDOWMODE, // Fullscreen, Windowed
-    JUDGE_AUTO,
+    AUTOADJUST,
     REPLAY_SAVE_TYPE,
     TRIAL1,
     TRIAL2,

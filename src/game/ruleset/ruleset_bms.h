@@ -181,6 +181,9 @@ protected:
     std::string modifierText, modifierTextShort;
     Option::e_lamp_type saveLampMax;
 
+private:
+    unsigned int _notesSinceLastAutoadjust = 0;
+
 protected:
     // members change in game
     std::array<JudgeArea, chart::NOTELANEINDEX_COUNT> _lnJudge{JudgeArea::NOTHING};
@@ -206,10 +209,11 @@ public:
 
     void initGaugeParams(PlayModifierGaugeType gauge);
 
-protected:
+private:
     JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
 
-private:
+    void updateAutoadjust(const HitableNote& pNote, const lunaticvibes::Time& rt);
+
     void _judgePress(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
                      const lunaticvibes::Time& t, int slot);
     void _judgeHold(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,

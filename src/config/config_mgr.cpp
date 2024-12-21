@@ -132,6 +132,11 @@ void setOptions()
         }
     }
 
+    // autoadjust
+    {
+        State::set(IndexOption::PLAY_AUTOADJUST, ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0));
+    }
+
     // chart op
     {
         static const std::map<string, e_random_type> smap = {
@@ -780,9 +785,14 @@ void setText()
             State::set(IndexText::VSYNC, Option::s_vsync_mode[Option::VSYNC_OFF]);
     }
 
+    //autoadjust
+    {
+        State::set(IndexText::AUTOADJUST,
+                   Option::s_autoadjust[std::min((unsigned int)std::size(Option::s_autoadjust), (unsigned int)ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0))]);
+    }
+
     // fixed tokens
     State::set(IndexText::COLOR_DEPTH, "WHAT DO YOU WANT FROM THIS");
-    State::set(IndexText::JUDGE_AUTO, "NOT SUPPORTED");
     State::set(IndexText::REPLAY_SAVE_TYPE, "BEST EXSCORE");
 
     State::set(IndexText::TRIAL1, "NOT SUPPORTED");

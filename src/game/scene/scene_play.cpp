@@ -2493,7 +2493,7 @@ void ScenePlay::updateFadeout()
             State::set(IndexSlider::HISPEED_2P, gPlayContext.playerState[PLAYER_SLOT_TARGET].hispeed / 10.0);
         }
 
-        // save lanecover settings
+        // save play settings
         if (!gPlayContext.isReplay)
         {
             auto saveLanecoverSide = [&](int slot) {
@@ -2559,6 +2559,8 @@ void ScenePlay::updateFadeout()
             saveLanecoverSide(PLAYER_SLOT_PLAYER);
             if (gPlayContext.isBattle)
                 saveLanecoverSide(PLAYER_SLOT_TARGET);
+
+            ConfigMgr::set('P', cfg::P_JUDGE_OFFSET, State::get(IndexNumber::TIMING_ADJUST_VISUAL));
         }
 
         // reset BGA

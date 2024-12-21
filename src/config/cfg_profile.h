@@ -89,6 +89,8 @@ enum class eTargetType
     IR_AVERAGE,
 };
 
+constexpr char P_JUDGE_AUTOADJUST[] = "uAutoAdjust";
+
 constexpr char P_CHART_OP[] = "ChartOption";
 constexpr char P_CHART_OP_2P[] = "ChartOption2P";
 constexpr char P_CHART_OP_NORMAL[] = "Normal";

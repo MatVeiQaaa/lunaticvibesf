@@ -1,8 +1,8 @@
 find_package(PkgConfig REQUIRED)
-if (${GRAPHICS_BACKEND} STREQUAL SDL2)
+if(${GRAPHICS_BACKEND} STREQUAL SDL2)
     pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2>=2.30.1)
     pkg_check_modules(SDL2_gfx IMPORTED_TARGET SDL2_gfx>=1.0.2)
-    if (SDL2_gfx_FOUND)
+    if(SDL2_gfx_FOUND)
         set(LVF_SDL2_GFX_TARGET PkgConfig::SDL2_gfx)
     else()
         # vcpkg doesn't make pkg-config file for SDL2_gfx.
@@ -20,7 +20,7 @@ find_package(cereal 1.3.2 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 
-if (${GRAPHICS_BACKEND} STREQUAL SDL2)
+if(${GRAPHICS_BACKEND} STREQUAL SDL2)
     set(GRAPHICS_BACKEND_SRC
         graphics/SDL2/common_SDL2.cpp
         graphics/SDL2/input.cpp
@@ -31,14 +31,13 @@ if (${GRAPHICS_BACKEND} STREQUAL SDL2)
 endif()
 
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/git_version.cpp
-           ${CMAKE_BINARY_DIR}/_dummy.cpp
-    COMMAND ${CMAKE_COMMAND} -P 
-            ${CMAKE_CURRENT_SOURCE_DIR}/git_version.cmake
+    OUTPUT ${CMAKE_BINARY_DIR}/git_version.cpp ${CMAKE_BINARY_DIR}/_dummy.cpp
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/git_version.cmake
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 
-add_library(gamelib
+add_library(
+    gamelib
     ${CMAKE_BINARY_DIR}/git_version.cpp
     runtime/state.cpp
     chart/chart.cpp
@@ -90,27 +89,23 @@ add_library(gamelib
     sound/sound_fmod.cpp
     sound/sound_fmod_callback.cpp
     sound/sound_mgr.cpp
-    sound/sound_sample.cpp  
+    sound/sound_sample.cpp
     sound/soundset.cpp
     sound/soundset_lr2.cpp
     replay/replay_chart.cpp
-    runtime/i18n.cpp 
+    runtime/i18n.cpp
     arena/arena_data.cpp
     arena/arena_internal.cpp
     arena/arena_host.cpp
     arena/arena_client.cpp
 )
 
+target_include_directories(gamelib PUBLIC ${PROJECT_INCLUDE_DIR})
 
-target_include_directories(gamelib PUBLIC 
-    ${PROJECT_INCLUDE_DIR}
-)
+set_target_properties(gamelib PROPERTIES CXX_STANDARD 20)
 
-set_target_properties(gamelib PROPERTIES
-    CXX_STANDARD 20
-)
-
-target_link_libraries(gamelib
+target_link_libraries(
+    gamelib
     PUBLIC cereal::cereal
     PUBLIC common
     PUBLIC config
@@ -125,13 +120,15 @@ target_link_libraries(gamelib
     PRIVATE tinyfiledialogs
 )
 
-if (${GRAPHICS_BACKEND} STREQUAL SDL2)
-    target_link_libraries(gamelib
+if(${GRAPHICS_BACKEND} STREQUAL SDL2)
+    target_link_libraries(
+        gamelib
         PUBLIC ${LVF_SDL2_GFX_TARGET}
         PUBLIC PkgConfig::SDL2
         PUBLIC PkgConfig::SDL2_image
         PUBLIC PkgConfig::SDL2_ttf
-        PRIVATE $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> # vcpkg
+        PRIVATE
+            $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main> # vcpkg
     )
 endif()
 
@@ -139,48 +136,56 @@ target_precompile_headers(gamelib REUSE_FROM common)
 
 #############################################################
 
-if (WIN32)
+if(WIN32)
     add_executable(LunaticVibesF game.cpp LunaticVibesF.exe.manifest)
 else()
     add_executable(LunaticVibesF game.cpp)
 endif()
 target_link_libraries(LunaticVibesF PRIVATE gamelib)
-set_target_properties(LunaticVibesF PROPERTIES
-    CXX_STANDARD 20
-)
+set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 20)
 install(TARGETS LunaticVibesF COMPONENT Game)
 
-add_custom_command(TARGET LunaticVibesF POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    $<TARGET_FILE:fmod>
-    $<TARGET_FILE_DIR:LunaticVibesF>
+add_custom_command(
+    TARGET LunaticVibesF
+    POST_BUILD
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:fmod>
+        $<TARGET_FILE_DIR:LunaticVibesF>
 )
-install(IMPORTED_RUNTIME_ARTIFACTS fmod
-    COMPONENT Game
-    LIBRARY DESTINATION bin
-)
+install(IMPORTED_RUNTIME_ARTIFACTS fmod COMPONENT Game LIBRARY DESTINATION bin)
 
-if (MSVC)
-    install(FILES $<TARGET_PDB_FILE:LunaticVibesF> DESTINATION bin COMPONENT Symbols)
+if(MSVC)
+    install(
+        FILES $<TARGET_PDB_FILE:LunaticVibesF>
+        DESTINATION bin
+        COMPONENT Symbols
+    )
 endif()
 
-add_custom_command(TARGET LunaticVibesF POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/res
-    $<TARGET_FILE_DIR:LunaticVibesF>/gamedata/resources
+add_custom_command(
+    TARGET LunaticVibesF
+    POST_BUILD
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res
+        $<TARGET_FILE_DIR:LunaticVibesF>/gamedata/resources
 )
 # NOTE: trailing slash is significant.
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/res/
+install(
+    DIRECTORY ${CMAKE_SOURCE_DIR}/res/
     DESTINATION bin/gamedata/resources
     COMPONENT Game
 )
 
-add_custom_command(TARGET LunaticVibesF POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    ${CMAKE_SOURCE_DIR}/LICENSE_3RD_PARTY
-    $<TARGET_FILE_DIR:LunaticVibesF>/gamedata/resources/LICENSE_3RD_PARTY
+add_custom_command(
+    TARGET LunaticVibesF
+    POST_BUILD
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/LICENSE_3RD_PARTY
+        $<TARGET_FILE_DIR:LunaticVibesF>/gamedata/resources/LICENSE_3RD_PARTY
 )
-install(FILES ${CMAKE_SOURCE_DIR}/LICENSE_3RD_PARTY
+install(
+    FILES ${CMAKE_SOURCE_DIR}/LICENSE_3RD_PARTY
     DESTINATION bin
     COMPONENT Game
 )

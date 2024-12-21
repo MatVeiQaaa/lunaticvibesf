@@ -3,7 +3,9 @@ find_package(plog CONFIG REQUIRED)
 find_package(re2 CONFIG REQUIRED)
 find_package(taocpp-json CONFIG REQUIRED)
 
-add_library(common STATIC
+add_library(
+    common
+    STATIC
     assert.cpp
     asynclooper.cpp
     encoding.cpp
@@ -24,16 +26,15 @@ add_library(common STATIC
     entry/entry_song.cpp
     difficultytable/difficultytable.cpp
     difficultytable/table_bms.cpp
-    coursefile/lr2crs.cpp)
-
-target_include_directories(common PRIVATE
-    ${PROJECT_INCLUDE_DIR}
+    coursefile/lr2crs.cpp
 )
 
-set_target_properties(common PROPERTIES
-    CXX_STANDARD 20)
+target_include_directories(common PRIVATE ${PROJECT_INCLUDE_DIR})
 
-target_link_libraries(common 
+set_target_properties(common PROPERTIES CXX_STANDARD 20)
+
+target_link_libraries(
+    common
     PUBLIC CURL::libcurl
     PUBLIC plog::plog
     PUBLIC re2::re2
@@ -41,8 +42,9 @@ target_link_libraries(common
     PRIVATE tinyfiledialogs
 )
 
-if (LINUX)
-    target_compile_options(common
+if(LINUX)
+    target_compile_options(
+        common
         # Set by SDL2 pkg-config. Needed to fix -Winvalid-pch `not used because `_REENTRANT' is defined`.
         PUBLIC -D_REENTRANT
     )

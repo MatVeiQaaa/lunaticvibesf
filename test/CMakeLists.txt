@@ -3,7 +3,8 @@ find_package(GTest CONFIG REQUIRED)
 
 include(GoogleTest)
 
-add_executable(apptest
+add_executable(
+    apptest
     test_main.cpp
     test_config.cpp
     common/test_beat.cpp
@@ -23,37 +24,32 @@ add_executable(apptest
     game/test_ruleset_bms.cpp
     game/test_scene_select.cpp
 )
-target_link_libraries(apptest PUBLIC
-    GTest::gtest GTest::gmock)
+target_link_libraries(apptest PUBLIC GTest::gtest GTest::gmock)
 
-gtest_discover_tests(apptest
-    WORKING_DIRECTORY "$<TARGET_FILE_DIR:apptest>"
+gtest_discover_tests(apptest WORKING_DIRECTORY "$<TARGET_FILE_DIR:apptest>")
+
+set_target_properties(
+    apptest
+    PROPERTIES CXX_STANDARD 20 CTEST_OUTPUT_ON_FAILURE TRUE GTEST_COLOR TRUE
 )
 
-set_target_properties(apptest PROPERTIES
-    CXX_STANDARD 20
-    CTEST_OUTPUT_ON_FAILURE TRUE 
-    GTEST_COLOR TRUE
-)
-    
-target_link_libraries(apptest 
-    PUBLIC gamelib
-    PUBLIC plog::plog
-)
-target_include_directories(apptest PRIVATE
-    ${PROJECT_INCLUDE_DIR}
-)
+target_link_libraries(apptest PUBLIC gamelib PUBLIC plog::plog)
+target_include_directories(apptest PRIVATE ${PROJECT_INCLUDE_DIR})
 
 # NOTE: we need to copy dependencies before gtest_discover_tests runs, as it will launch the executable, which will fail
 # as the libraries weren't installed yet..
-add_custom_command(TARGET apptest PRE_LINK
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    $<TARGET_FILE:fmod>
-    $<TARGET_FILE_DIR:apptest>
+add_custom_command(
+    TARGET apptest
+    PRE_LINK
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:fmod>
+        $<TARGET_FILE_DIR:apptest>
 )
 
-add_custom_command(TARGET apptest PRE_LINK
-    COMMAND ${CMAKE_COMMAND} -E copy_directory 
-    "${CMAKE_CURRENT_SOURCE_DIR}/test"
-    "$<TARGET_FILE_DIR:apptest>/test"
+add_custom_command(
+    TARGET apptest
+    PRE_LINK
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/test"
+        "$<TARGET_FILE_DIR:apptest>/test"
 )

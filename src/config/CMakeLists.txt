@@ -1,6 +1,8 @@
 find_package(yaml-cpp CONFIG REQUIRED)
 
-add_library(config STATIC
+add_library(
+    config
+    STATIC
     config.cpp
     config_mgr.cpp
     cfg_general.cpp
@@ -9,16 +11,10 @@ add_library(config STATIC
     cfg_skin.cpp
 )
 
-target_include_directories(config PRIVATE
-    ${PROJECT_INCLUDE_DIR}
-)
+target_include_directories(config PRIVATE ${PROJECT_INCLUDE_DIR})
 
-set_target_properties(config PROPERTIES
-    CXX_STANDARD 20)
+set_target_properties(config PROPERTIES CXX_STANDARD 20)
 
-target_link_libraries(config 
-    PUBLIC yaml-cpp::yaml-cpp
-    PUBLIC common
-)
+target_link_libraries(config PUBLIC yaml-cpp::yaml-cpp PUBLIC common)
 
 target_precompile_headers(config REUSE_FROM common)

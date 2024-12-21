@@ -2322,10 +2322,7 @@ void SceneSelect::decide()
     case eEntryType::ARENA_COMMAND:
     case eEntryType::ARENA_LOBBY:
     case eEntryType::CHART_LINK:
-    case eEntryType::REPLAY:
-        LOG_ERROR << "[Select] decide() with wrong entry type";
-        LVF_DEBUG_ASSERT(false && "decide() with wrong entry type");
-        break;
+    case eEntryType::REPLAY: lunaticvibes::assert_failed("[Select] decide() with wrong entry type");
     }
 
     if (!gPlayContext.isReplay)

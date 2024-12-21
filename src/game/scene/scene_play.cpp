@@ -2017,6 +2017,8 @@ void ScenePlay::updateLoading()
             LOG_DEBUG << "[Play] State changed to READY";
         }
     }
+
+    spinTurntable(false);
 }
 
 void ScenePlay::updateLoadEnd()

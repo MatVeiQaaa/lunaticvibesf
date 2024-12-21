@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <functional>
+#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>

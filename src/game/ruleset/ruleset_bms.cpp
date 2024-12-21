@@ -454,7 +454,7 @@ static RulesetBMS::GaugeType get_gauge(PlayModifierGaugeType gauge)
     case P::GRADE_DEATH:
     case P::GRADE_HARD: return G::EXGRADE;
     }
-    panic("error", "invalid PlayModifierGaugeType");
+    lunaticvibes::assert_failed("invalid PlayModifierGaugeType");
 }
 
 void RulesetBMS::initGaugeParams(PlayModifierGaugeType gauge)

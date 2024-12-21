@@ -293,7 +293,7 @@ static const char* get_iconv_encoding_name(eFileEncoding encoding)
     case eFileEncoding::EUC_KR: return "CP949";
     case eFileEncoding::UTF8: return "UTF-8";
     }
-    panic("Error", "Incorrect eFileEncoding");
+    lunaticvibes::assert_failed("Incorrect eFileEncoding");
 }
 
 struct IcdDeleter

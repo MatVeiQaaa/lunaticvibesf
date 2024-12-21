@@ -5,6 +5,7 @@
 #include <common/log.h>
 #include <common/meta.h>
 #include <common/sysutil.h>
+#include <common/u8.h>
 #include <common/utils.h>
 #include <config/config_mgr.h>
 #include <db/db_score.h>
@@ -25,8 +26,10 @@
 #include <game/sound/sound_mgr.h>
 #include <git_version.h>
 
+#include <format>
 #include <memory>
 #include <string_view>
+#include <type_traits>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -41,6 +44,7 @@
 
 #include <curl/curl.h>
 #include <imgui.h>
+#include <tinyfiledialogs.h>
 
 static constexpr auto&& IN_MEMORY_DB_PATH = ":memory:";
 
@@ -69,11 +73,11 @@ int main(int argc, char* argv[])
     LOG_INFO << "Initializing libcurl...";
     if (CURLcode ret = curl_global_init(CURL_GLOBAL_DEFAULT); ret != CURLE_OK)
     {
-        std::stringstream ss;
-        ss << "libcurl init error: " << ret;
-        std::string str = ss.str();
-        LOG_FATAL << str;
-        panic("Error", str.c_str());
+        const std::string msg =
+            std::format("libcurl init error: {}", static_cast<std::underlying_type_t<decltype(ret)>>(ret));
+        LOG_FATAL << msg;
+        tinyfd_messageBox("Fatal error", msg.c_str(), "ok", "error", 0);
+        return 1;
     }
     LOG_INFO << "libcurl version: " << curl_version();
 
@@ -86,8 +90,10 @@ int main(int argc, char* argv[])
     Path lr2path = convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/");
     if (!fs::is_directory(lr2path))
     {
-        LOG_FATAL << "LR2files directory not found! " << lr2path;
-        panic("Error", "LR2files directory not found!");
+        const std::string msg = std::format("LR2files directory not found! {}", lunaticvibes::s(lr2path.u8string()));
+        LOG_FATAL << msg;
+        tinyfd_messageBox("Fatal error", msg.c_str(), "ok", "error", 0);
+        return 1;
     }
 
     // init imgui
@@ -156,8 +162,10 @@ int main(int argc, char* argv[])
     Path imguiFontPath = getSysFontPath(NULL, &fontIndex, i18n::getCurrentLanguage());
     if (!fs::exists(imguiFontPath))
     {
-        LOG_FATAL << "Font file not found. Please reinstall the game.";
-        panic("Error", "Font file not found. Please reinstall the game.");
+        constexpr auto&& msg = "Font file not found. Please reinstall the game.";
+        LOG_FATAL << msg;
+        tinyfd_messageBox("Fatal error", msg, "ok", "error", 0);
+        return 1;
     }
     ImFontConfig fontConfig;
     fontConfig.FontNo = fontIndex;

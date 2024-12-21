@@ -141,7 +141,7 @@ if(WIN32)
 else()
     add_executable(LunaticVibesF game.cpp)
 endif()
-target_link_libraries(LunaticVibesF PRIVATE gamelib)
+target_link_libraries(LunaticVibesF PRIVATE gamelib PRIVATE tinyfiledialogs)
 set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 20)
 install(TARGETS LunaticVibesF COMPONENT Game)
 

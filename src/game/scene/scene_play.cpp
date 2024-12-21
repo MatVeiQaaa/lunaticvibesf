@@ -750,8 +750,8 @@ bool ScenePlay::createChartObj()
         if (gPlayContext.replayMybest)
             gPlayContext.chartObj[PLAYER_SLOT_MYBEST] = std::make_shared<ChartObjectBMS>(PLAYER_SLOT_MYBEST, *bms);
 
-        if (gPlayContext.isReplay &&
-            (!gPlayContext.isBattle || State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
+        if (gPlayContext.isReplay ||
+            (gPlayContext.isBattle && State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
             itReplayCommand = gPlayContext.replay->commands.begin();
 
         State::set(IndexNumber::PLAY_REMAIN_MIN,
@@ -883,7 +883,7 @@ bool ScenePlay::createRuleset()
                     gPlayContext.shiftFiveKeyForSevenKeyIndex(keys == 5 || keys == 10));
 
             case REPLAY:
-                LVF_DEBUG_ASSERT(gPlayContext.replayMybest != nullptr);
+                LVF_ASSERT(gPlayContext.replayMybest != nullptr);
                 gPlayContext.mods[slot].gauge = gPlayContext.replayMybest->gaugeType;
                 return std::make_shared<RulesetBMSReplay>(
                     gChartContext.chartMybest, gPlayContext.chartObj[slot], gPlayContext.replayMybest,
@@ -2074,6 +2074,7 @@ void ScenePlay::updatePlaying()
     if (gPlayContext.isReplay ||
         (gPlayContext.isBattle && State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST))
     {
+        LVF_DEBUG_ASSERT(gPlayContext.replay != nullptr);
         int slot = !gPlayContext.isBattle ? PLAYER_SLOT_PLAYER : PLAYER_SLOT_TARGET;
         InputMask prev = replayKeyPressing;
         while (itReplayCommand != gPlayContext.replay->commands.end() && rt.norm() >= itReplayCommand->ms)

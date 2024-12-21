@@ -3407,7 +3407,7 @@ void ScenePlay::inputGameHold(InputMask& m, const lunaticvibes::Time& t)
             playerState[slot].hispeedAddPending += val;
         }
     };
-    if (!gPlayContext.isAuto && !gPlayContext.isReplay && gChartContext.started)
+    if (!gPlayContext.isAuto && !gPlayContext.isReplay)
     {
         ttUpdateSide(PLAYER_SLOT_PLAYER, S1L, S1R);
         if (isPlaymodeDP())

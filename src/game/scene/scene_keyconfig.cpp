@@ -541,6 +541,7 @@ void SceneKeyConfig::updateForceBargraphs()
         for (const auto& [p, bar] : forceBargraphMap)
         {
             const auto binding = input->getBindings(p);
+
             if (binding.getType() == KeyMap::DeviceType::JOYSTICK &&
                 binding.getJoystick().type == Input::Joystick::Type::AXIS_RELATIVE_POSITIVE &&
                 binding.getJoystick().index == index)
@@ -553,14 +554,7 @@ void SceneKeyConfig::updateForceBargraphs()
                     State::set(bar, axis);
                 }
             }
-        }
-    }
 
-    for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_AXIS_COUNT; ++index)
-    {
-        for (const auto& [p, bar] : forceBargraphMap)
-        {
-            const auto binding = input->getBindings(p);
             if (binding.getType() == KeyMap::DeviceType::JOYSTICK &&
                 binding.getJoystick().type == Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE &&
                 binding.getJoystick().index == index)

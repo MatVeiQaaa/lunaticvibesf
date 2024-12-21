@@ -503,31 +503,39 @@ bool lunaticvibes::event_handle()
 
         case SDL_MOUSEWHEEL: sdl::state::g_mouse_wheel_delta = i16_from_i32(e.wheel.y); break;
 
+        case SDL_JOYAXISMOTION: {
+            LVF_DEBUG_ASSERT(e.jaxis.which < static_cast<int>(sdl::state::g_joystick_axes.size()));
+            auto& axes = sdl::state::g_joystick_axes[e.jaxis.which];
+            if (e.jaxis.axis >= axes.size())
+            {
+                LOG_WARNING << "[SDL2] Joystick axis is out of range";
+                break;
+            }
+            axes[e.jaxis.axis] = e.jaxis.value;
+            break;
+        }
+
         case SDL_JOYBUTTONDOWN: {
             LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
-            if (e.jbutton.button < buttons.size())
-            {
-                buttons[e.jbutton.button] = true;
-            }
-            else
+            if (e.jbutton.button >= buttons.size())
             {
                 LOG_WARNING << "[SDL2] Joystick button is out of range";
+                break;
             }
+            buttons[e.jbutton.button] = true;
             break;
         }
 
         case SDL_JOYBUTTONUP: {
             LVF_DEBUG_ASSERT(e.jbutton.which < static_cast<int>(sdl::state::g_joysticks.size()));
             auto& buttons = sdl::state::g_joysticks[e.jbutton.which];
-            if (e.jbutton.button < buttons.size())
-            {
-                buttons[e.jbutton.button] = false;
-            }
-            else
+            if (e.jbutton.button >= buttons.size())
             {
                 LOG_WARNING << "[SDL2] Joystick button is out of range";
+                break;
             }
+            buttons[e.jbutton.button] = false;
             break;
         }
 

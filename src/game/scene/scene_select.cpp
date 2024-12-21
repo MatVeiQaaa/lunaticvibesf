@@ -2036,6 +2036,19 @@ static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(
     return {nullptr, 0};
 }
 
+[[nodiscard]] inline SkinType skinTypeForKeysBattle(unsigned keys)
+{
+    switch (keys)
+    {
+    case 5: return SkinType::PLAY5_2;
+    case 7: return SkinType::PLAY7_2;
+    case 9: return SkinType::PLAY9;
+    case 10: return SkinType::PLAY10;
+    case 14: return SkinType::PLAY14;
+    }
+    lunaticvibes::assert_failed("skinTypeForKeysBattle");
+}
+
 void SceneSelect::decide()
 {
     std::shared_lock<std::shared_mutex> u(gSelectContext._mutex);
@@ -2179,7 +2192,7 @@ void SceneSelect::decide()
                 if (State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_LOCAL ||
                     State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST)
                 {
-                    gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
+                    gPlayContext.mode = skinTypeForKeysBattle(pBMS->gamemode);
                     auto canBattleInGameMode = [](unsigned keys) {
                         switch (keys)
                         {
@@ -2209,17 +2222,14 @@ void SceneSelect::decide()
             LVF_DEBUG_ASSERT(!gPlayContext.isBattle);
             LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
             break;
-
         case SkinType::PLAY5_2:
         case SkinType::PLAY7_2:
         case SkinType::PLAY9_2:
             LVF_DEBUG_ASSERT(gPlayContext.isBattle);
             LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
             break;
-
         case SkinType::PLAY10:
         case SkinType::PLAY14: LVF_DEBUG_ASSERT(!gPlayContext.isBattle); break;
-
         default: break;
         }
 

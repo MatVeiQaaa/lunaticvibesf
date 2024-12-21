@@ -5,7 +5,8 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs?ref=nixos-unstable";
   };
 
-  outputs = { self, nixpkgs-unstable }:
+  outputs =
+    { self, nixpkgs-unstable }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs-unstable.legacyPackages.${system};
@@ -26,57 +27,64 @@
           "-DTAOCPP_JSON_BUILD_TESTS=OFF"
         ];
       });
-      imgui = (pkgs.imgui.override {
-        IMGUI_BUILD_SDL2_BINDING = true;
-        IMGUI_BUILD_SDL2_RENDERER_BINDING = true;
-      });
+      imgui = (
+        pkgs.imgui.override {
+          IMGUI_BUILD_SDL2_BINDING = true;
+          IMGUI_BUILD_SDL2_RENDERER_BINDING = true;
+        }
+      );
 
-      buildInputs = [ taocpp-json imgui ] ++ (with pkgs; [
-        pegtl
+      buildInputs =
+        [
+          taocpp-json
+          imgui
+        ]
+        ++ (with pkgs; [
+          pegtl
 
-        libtiff
-        lerc
+          libtiff
+          lerc
 
-        harfbuzz
-        freetype
-        glib
-        pcre2
+          harfbuzz
+          freetype
+          glib
+          pcre2
 
-        SDL2
-        SDL2_gfx
-        SDL2_image
-        SDL2_ttf
-        boost
-        cereal_1_3_2
-        curl
-        ffmpeg
-        gtest
+          SDL2
+          SDL2_gfx
+          SDL2_image
+          SDL2_ttf
+          boost
+          cereal_1_3_2
+          curl
+          ffmpeg
+          gtest
 
-        openssl
-        plog
-        re2
-        sqlite
-        yaml-cpp
+          openssl
+          plog
+          re2
+          sqlite
+          yaml-cpp
 
-        # Something here is required for GPU acceleration.
-        libdrm.dev
-        libglvnd.dev
-        mesa.dev
-        mesa_glu.dev
-        xorg.libX11.dev
-        xorg.libXext.dev
-        xorg.libXi.dev
-        xorg.libpthreadstubs
-        xorg.libxcb.dev
-        xorg.xcbproto
-        xorg.xcbutil.dev
-        xorg.xcbutilcursor.dev
-        xorg.xcbutilerrors
-        xorg.xcbutilkeysyms.dev
-        xorg.xcbutilrenderutil.dev
-        xorg.xcbutilwm.dev
-        xorg.xorgproto
-      ]);
+          # Something here is required for GPU acceleration.
+          libdrm.dev
+          libglvnd.dev
+          mesa.dev
+          mesa_glu.dev
+          xorg.libX11.dev
+          xorg.libXext.dev
+          xorg.libXi.dev
+          xorg.libpthreadstubs
+          xorg.libxcb.dev
+          xorg.xcbproto
+          xorg.xcbutil.dev
+          xorg.xcbutilcursor.dev
+          xorg.xcbutilerrors
+          xorg.xcbutilkeysyms.dev
+          xorg.xcbutilrenderutil.dev
+          xorg.xcbutilwm.dev
+          xorg.xorgproto
+        ]);
       nativeBuildInputs = with pkgs; [
         ccache # not sccache since it doesn't support precompiled headers.
         cmake
@@ -84,12 +92,15 @@
         ninja
         pkg-config
       ];
-    in {
+    in
+    {
       devShells.${system}.default = pkgs.mkShell {
         inherit buildInputs nativeBuildInputs system;
         # To override fmod rpath.
-        LD_LIBRARY_PATH =
-          pkgs.lib.makeLibraryPath [ pkgs.alsa-lib pkgs.libpulseaudio ];
+        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+          pkgs.alsa-lib
+          pkgs.libpulseaudio
+        ];
       };
     };
 }

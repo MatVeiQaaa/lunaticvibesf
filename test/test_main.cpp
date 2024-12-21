@@ -1,13 +1,9 @@
-#include "common/sysutil.h"
-#include "config/config_mgr.h"
 #include <common/in_test_mode.h>
+#include <common/log.h>
+#include <common/sysutil.h>
+#include <config/config_mgr.h>
 
-#include "gmock/gmock.h"
-#include <plog/Appenders/ColorConsoleAppender.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Init.h>
-#include <plog/Log.h>
-#include <plog/Severity.h>
+#include <gmock/gmock.h>
 
 bool lunaticvibes::in_test_mode()
 {

@@ -47,6 +47,7 @@ ls build/bin/Debug
 ```
 
 To enable additional warnings when compiling with GCC change preset above to `linux-vcpkg-gcc`.
+Similarly for clang use `linux-vcpkg-clang`.
 
 ## License
 

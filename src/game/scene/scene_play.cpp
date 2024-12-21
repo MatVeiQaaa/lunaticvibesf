@@ -2499,15 +2499,21 @@ void ScenePlay::updateFadeout()
                 IndexNumber indLanecoverTop = IndexNumber::LANECOVER_TOP_1P;
                 IndexNumber indLanecoverBottom = IndexNumber::LANECOVER_BOTTOM_1P;
                 IndexSwitch indLanecoverEnabled = IndexSwitch::P1_LANECOVER_ENABLED;
+                const char* cfgGreenNumber = cfg::P_GREENNUMBER;
                 const char* cfgLaneEffect = cfg::P_LANE_EFFECT_OP;
+                const char* cfgLanecoverBottom = cfg::P_LANECOVER_BOTTOM;
+                const char* cfgLanecoverTop = cfg::P_LANECOVER_TOP;
                 if (slot != PLAYER_SLOT_PLAYER)
                 {
-                    indLanecoverType = IndexOption::PLAY_LANE_EFFECT_TYPE_2P;
-                    indLockSpeed = IndexSwitch::P2_LOCK_SPEED;
-                    indLanecoverTop = IndexNumber::LANECOVER_TOP_2P;
                     indLanecoverBottom = IndexNumber::LANECOVER_BOTTOM_2P;
                     indLanecoverEnabled = IndexSwitch::P2_LANECOVER_ENABLED;
+                    indLanecoverTop = IndexNumber::LANECOVER_TOP_2P;
+                    indLanecoverType = IndexOption::PLAY_LANE_EFFECT_TYPE_2P;
+                    indLockSpeed = IndexSwitch::P2_LOCK_SPEED;
+                    cfgGreenNumber = cfg::P_GREENNUMBER_2P;
                     cfgLaneEffect = cfg::P_LANE_EFFECT_OP_2P;
+                    cfgLanecoverBottom = cfg::P_LANECOVER_BOTTOM_2P;
+                    cfgLanecoverTop = cfg::P_LANECOVER_TOP_2P;
                 }
 
                 auto lanecoverType = State::get(indLanecoverType);
@@ -2527,13 +2533,13 @@ void ScenePlay::updateFadeout()
                 case Option::LANE_LIFTSUD: saveBottom = true; break;
                 }
                 if (saveTop)
-                    ConfigMgr::set('P', cfg::P_LANECOVER_TOP, State::get(indLanecoverTop));
+                    ConfigMgr::set('P', cfgLanecoverTop, State::get(indLanecoverTop));
                 if (saveBottom)
-                    ConfigMgr::set('P', cfg::P_LANECOVER_BOTTOM, State::get(indLanecoverBottom));
+                    ConfigMgr::set('P', cfgLanecoverBottom, State::get(indLanecoverBottom));
 
                 if (State::get(indLockSpeed))
                 {
-                    ConfigMgr::set('P', cfg::P_GREENNUMBER, playerState[slot].lockspeedGreenNumber);
+                    ConfigMgr::set('P', cfgGreenNumber, playerState[slot].lockspeedGreenNumber);
 
                     if (State::get(IndexOption::PLAY_HSFIX_TYPE) == Option::SPEED_NORMAL)
                     {

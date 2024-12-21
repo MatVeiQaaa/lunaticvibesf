@@ -26,7 +26,6 @@ int main(int argc, char** argv)
     lunaticvibes::SetLogLevel(lunaticvibes::LogLevel::Verbose);
 
     ConfigMgr::init();
-    ConfigMgr::load();
 
     ::testing::InitGoogleTest(&argc, argv);
     ::testing::InitGoogleMock(&argc, argv);

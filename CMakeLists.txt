@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.29.2)
 
-#########################################################################
-# PROJECT CONFIG
 
 project(LunaticVibesF
     VERSION 0.20.0
@@ -24,39 +22,22 @@ endif()
 
 if (WIN32)
     add_definitions(-DNOMINMAX)
-
-    #set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-    #set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT runtime)
-    #include(InstallRequiredSystemLibraries)
 endif()
 
-#########################################################################
-# GRAPHICS BACKEND
 
-# SDL2, 
 set(GRAPHICS_BACKEND SDL2 CACHE STRING "Graphics backend" )
-
 if (${GRAPHICS_BACKEND} STREQUAL SDL2)
     add_definitions(-DRENDER_SDL2)
 endif()
 
-#########################################################################
-# DEPENDENCIES
 
 add_subdirectory(ext)
 
-#########################################################################
-# SOURCE
 
 set(PROJECT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src CACHE INTERNAL "include directory")
 list(APPEND PROJECT_INCLUDE_DIR ${PROJECT_BINARY_DIR})
 add_subdirectory(src)
 
-#########################################################################
-# LIBRARY
-
-#########################################################################
-# GTEST
 
 option(BUILD_TEST "Enable building gtest targets" YES)
 if (${BUILD_TEST})
@@ -64,7 +45,5 @@ if (${BUILD_TEST})
     add_subdirectory(test)
 endif()
 
-#########################################################################
-# PACKAGING
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 include(CPack)

@@ -49,7 +49,7 @@ bool ScenePlay::isHoldingSelect(int player) const
     return holdingSelect[player];
 }
 
-int getLanecoverTop(int slot)
+static int getLanecoverTop(int slot)
 {
     IndexNumber lcTopInd;
     IndexOption lcTypeInd;
@@ -68,14 +68,13 @@ int getLanecoverTop(int slot)
     case Option::LANE_SUDDEN:
     case Option::LANE_SUDHID:
     case Option::LANE_LIFTSUD: return State::get(lcTopInd);
-
     case Option::LANE_OFF:
     case Option::LANE_HIDDEN:
-    case Option::LANE_LIFT: break;
+    case Option::LANE_LIFT: return 0;
     }
-    return 0;
+    lunaticvibes::assert_failed("getLanecoverTop");
 }
-int getLanecoverBottom(int slot)
+static int getLanecoverBottom(int slot)
 {
     IndexNumber lcTopInd, lcBottomInd;
     IndexOption lcTypeInd;
@@ -93,24 +92,23 @@ int getLanecoverBottom(int slot)
     }
     switch ((Option::e_lane_effect_type)State::get(lcTypeInd))
     {
-    case Option::LANE_SUDHID: return State::get(lcTopInd); // FIXME: why is this here?
+    case Option::LANE_SUDHID: return State::get(lcTopInd);
     case Option::LANE_HIDDEN:
     case Option::LANE_LIFT:
     case Option::LANE_LIFTSUD: return State::get(lcBottomInd);
-
     case Option::LANE_OFF:
-    case Option::LANE_SUDDEN: break;
+    case Option::LANE_SUDDEN: return 0;
     }
-    return 0;
+    lunaticvibes::assert_failed("getLanecoverBottom");
 }
 
-double getLaneVisible(int slot)
+static double getLaneVisible(int slot)
 {
     return std::max(0, (1000 - getLanecoverTop(slot) - getLanecoverBottom(slot))) / 1000.0;
 }
 
 // HiSpeed, InternalSpeedValue
-std::pair<double, double> calcHiSpeed(double bpm, int slot, int green)
+static std::pair<double, double> calcHiSpeed(double bpm, int slot, int green)
 {
     double visible = getLaneVisible(slot);
     double hs = (green * bpm <= 0.0) ? 200 : std::min(visible * 120.0 * 1200 / green / bpm, 10.0);
@@ -118,14 +116,14 @@ std::pair<double, double> calcHiSpeed(double bpm, int slot, int green)
     return {hs, speedValue};
 }
 
-double getHiSpeed(double bpm, int slot, double speedValue)
+static double getHiSpeed(double bpm, int slot, double speedValue)
 {
     double visible = getLaneVisible(slot);
     return speedValue / bpm * visible;
 }
 
 // HiSpeed, InternalSpeedValue
-std::pair<int, double> calcGreenNumber(double bpm, int slot, double hs)
+static std::pair<int, double> calcGreenNumber(double bpm, int slot, double hs)
 {
     double visible = getLaneVisible(slot);
     double speedValue = (visible == 0.0) ? std::numeric_limits<double>::max() : (bpm * hs / visible);
@@ -454,7 +452,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
             case Option::LANE_HIDDEN: sudden = 0.; break;
             case Option::LANE_SUDHID: hidden = sudden; break;
             case Option::LANE_LIFT: sudden = 0.; break;
-            case Option::LANE_LIFTSUD: break; // FIXME
+            case Option::LANE_LIFTSUD: break;
             }
             lcTop = int(sudden * 1000);
             lcBottom = int(hidden * 1000);

@@ -4433,8 +4433,9 @@ void SkinLR2::update()
                         break;
                     case 1: comboShiftUnitCount -= combo->digitCount - 1; break;
                     case 2:
-                        // FIXME: MSVC 'unary minus operator applied to unsigned type, result still unsigned'
-                        comboShiftUnitCount += (-combo->maxDigits - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
+                        // Number starts on right, additional digits add up on left.
+                        comboShiftUnitCount +=
+                            (static_cast<int>(-combo->maxDigits) - 1) + (combo->maxDigits - combo->digitCount + 1) * 2;
                         break;
                     }
                     // NOTE: std ceil - magic for off-by-one errors, fixes odd/uneven combos with Remi-S.

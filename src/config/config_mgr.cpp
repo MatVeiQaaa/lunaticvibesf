@@ -785,10 +785,11 @@ void setText()
             State::set(IndexText::VSYNC, Option::s_vsync_mode[Option::VSYNC_OFF]);
     }
 
-    //autoadjust
+    // autoadjust
     {
         State::set(IndexText::AUTOADJUST,
-                   Option::s_autoadjust[std::min((unsigned int)std::size(Option::s_autoadjust), (unsigned int)ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0))]);
+                   Option::s_autoadjust[std::min((unsigned int)std::size(Option::s_autoadjust),
+                                                 (unsigned int)ConfigMgr::get('P', P_JUDGE_AUTOADJUST, 0))]);
     }
 
     // fixed tokens

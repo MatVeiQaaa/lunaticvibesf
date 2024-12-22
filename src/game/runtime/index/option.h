@@ -289,7 +289,7 @@ static constexpr const char* s_target_type[] = {
     "NO TARGET", "MY BEST", "RANK AAA", "RANK AA", "RANK A", "50%", "IR TOP", "IR NEXT", "IR AVERAGE",
 };
 
-static constexpr const char* s_autoadjust[] = { "OFF", "ON", "SILENT" };
+static constexpr const char* s_autoadjust[] = {"OFF", "ON", "SILENT"};
 
 enum e_gauge_type
 {

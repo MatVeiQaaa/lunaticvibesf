@@ -9,9 +9,9 @@
 #include "game/scene/scene_context.h"
 #include "game/sound/sound_mgr.h"
 #include "game/sound/sound_sample.h"
-#include <config/config_mgr.h>
 #include <common/assert.h>
 #include <common/sysutil.h>
+#include <config/config_mgr.h>
 
 using namespace chart;
 
@@ -1186,19 +1186,19 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
 
 void RulesetBMS::updateAutoadjust(const HitableNote& pNote, const lunaticvibes::Time& rt)
 {
-    if (!State::get(IndexOption::PLAY_AUTOADJUST)) {
+    if (!State::get(IndexOption::PLAY_AUTOADJUST))
         return;
-    }
-    bool isOffsetPositive = (rt - pNote.time).norm() >= 0; 
+    bool isOffsetPositive = (rt - pNote.time).norm() >= 0;
     lunaticvibes::Time hitOffset = rt > pNote.time ? rt - pNote.time : pNote.time - rt;
-    if (hitOffset <= judgeTime[(int)_judgeDifficulty].BAD) {
+    if (hitOffset <= judgeTime[(int)_judgeDifficulty].BAD)
+    {
         _notesSinceLastAutoadjust++;
         if (_notesSinceLastAutoadjust > 9)
         {
             if (hitOffset.norm() != 0)
             {
                 int newAdjust = State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1);
-                State::set(IndexNumber::TIMING_ADJUST_VISUAL, newAdjust );
+                State::set(IndexNumber::TIMING_ADJUST_VISUAL, newAdjust);
             }
             _notesSinceLastAutoadjust = 0;
         }

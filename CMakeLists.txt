@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.29.2)
 
-project(LunaticVibesF VERSION 0.20.2 LANGUAGES CXX)
+project(LunaticVibesF VERSION 0.20.3 LANGUAGES CXX)
 set(PROJECT_TITLE "Lunatic Vibes F")
 
 configure_file(

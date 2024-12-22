@@ -18,6 +18,7 @@
 #include <boost/format.hpp>
 
 #include <algorithm>
+#include <filesystem>
 
 ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
 {
@@ -255,6 +256,7 @@ static void saveReplay(const lunaticvibes::Time t, std::string replayFileName, S
     // save replay
     std::unique_lock l{gPlayContext._mutex};
     std::unique_lock rl{gPlayContext.replayNew->mutex};
+    try
     {
         auto replayPath = gPlayContext.replayNew->replay->getReplayPath() / replayFileName;
         LOG_DEBUG << "[Result] Saving replay to " << replayPath;
@@ -262,6 +264,12 @@ static void saveReplay(const lunaticvibes::Time t, std::string replayFileName, S
         gPlayContext.replayNew->replay->saveFile(replayPath);
         if (also_save_for_course)
             gPlayContext.courseStageReplayPathNew.push_back(replayPath);
+    }
+    catch (const std::filesystem::filesystem_error& e)
+    {
+        // `cannot create directories: Not a directory` lol
+        LOG_ERROR << "[Result] Failed to save replay: " << e.what();
+        replayFileName.clear();
     }
 
     // save score

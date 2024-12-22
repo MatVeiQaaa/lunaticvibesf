@@ -42,6 +42,7 @@ private:
 protected:
     bool _scoreSyncFinished = false;
     bool _retryRequested = false;
+    bool _savedScore = false;
     std::shared_ptr<ScoreBase> _pScoreOld;
 
     bool saveScore = false;

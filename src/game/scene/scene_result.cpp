@@ -17,6 +17,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 
+#include <algorithm>
+
 ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
 {
     switch (lamp)
@@ -247,10 +249,95 @@ void SceneResult::_updateAsync()
     }
 }
 
+static void saveReplay(const lunaticvibes::Time t, std::string replayFileName, ScoreBMS::Lamp lamp,
+                       bool also_save_for_course)
+{
+    // save replay
+    std::unique_lock l{gPlayContext._mutex};
+    std::unique_lock rl{gPlayContext.replayNew->mutex};
+    {
+        auto replayPath = gPlayContext.replayNew->replay->getReplayPath() / replayFileName;
+        LOG_DEBUG << "[Result] Saving replay to " << replayPath;
+        std::ranges::stable_sort(gPlayContext.replayNew->replay->commands, {}, &ReplayChart::Commands::ms);
+        gPlayContext.replayNew->replay->saveFile(replayPath);
+        if (also_save_for_course)
+            gPlayContext.courseStageReplayPathNew.push_back(replayPath);
+    }
+
+    // save score
+    LVF_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
+    LVF_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
+    std::shared_ptr<ScoreBase> pScore = nullptr;
+    switch (gChartContext.chart->type())
+    {
+    case eChartFormat::BMS:
+    case eChartFormat::BMSON: {
+        auto score = std::make_shared<ScoreBMS>();
+
+        auto& chart = gPlayContext.chartObj[PLAYER_SLOT_PLAYER];
+        auto& ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER];
+        const auto data = ruleset->getData();
+        score->notes = chart->getNoteTotalCount();
+        score->rate = data.total_acc;
+        score->first_max_combo = data.firstMaxCombo;
+        score->final_combo = data.combo;
+        score->maxcombo = data.maxCombo;
+        score->addtime = t.norm() / 1000;
+        score->play_time = data.play_time;
+        score->playcount = 1;
+        score->clearcount = ruleset->isCleared() ? 1 : 0;
+        score->replayFileName = std::move(replayFileName);
+
+        auto rBMS = std::dynamic_pointer_cast<RulesetBMS>(ruleset);
+        score->score = int(std::floor(rBMS->getScore()));
+        score->exscore = rBMS->getExScore();
+        score->fast = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_EARLY);
+        score->slow = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_LATE);
+        score->lamp = lamp;
+
+        if (gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask == 0)
+        {
+            score->pgreat = rBMS->getJudgeCount(RulesetBMS::JudgeType::PERFECT);
+            score->great = rBMS->getJudgeCount(RulesetBMS::JudgeType::GREAT);
+            score->good = rBMS->getJudgeCount(RulesetBMS::JudgeType::GOOD);
+            score->bad = rBMS->getJudgeCount(RulesetBMS::JudgeType::BAD);
+            score->kpoor = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_KPOOR);
+            score->miss = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_MISS);
+            score->bp = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_BP);
+            score->combobreak = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_CB);
+        }
+
+        g_pScoreDB->insertChartScoreBMS(gChartContext.hash, *score);
+        pScore = std::move(score);
+
+        break;
+    }
+    case eChartFormat::UNKNOWN: lunaticvibes::verify_failed("saveReplay"); break;
+    }
+
+    // update entry list score
+    for (auto& frame : gSelectContext.backtrace)
+        for (auto& [entry, scoreOld] : frame.displayEntries)
+            if (entry->md5 == gChartContext.hash)
+                scoreOld = pScore;
+}
+
 void SceneResult::updateDraw()
 {
     auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::SCENE_START);
+
+    if (!_savedScore and !gChartContext.hash.empty() && saveScore)
+    {
+        _savedScore = true;
+        std::string replayFileName = std::format("{:04}{:02}{:02}-{:02}{:02}{:02}.rep",
+                                                 State::get(IndexNumber::DATE_YEAR), State::get(IndexNumber::DATE_MON),
+                                                 State::get(IndexNumber::DATE_DAY), State::get(IndexNumber::DATE_HOUR),
+                                                 State::get(IndexNumber::DATE_MIN), State::get(IndexNumber::DATE_SEC));
+        saveReplay(State::get(IndexTimer::SCENE_START), std::move(replayFileName),
+                   std::min(lamp[PLAYER_SLOT_PLAYER], saveLampMax),
+                   !(_retryRequested && gPlayContext.canRetry) && gPlayContext.isCourse);
+    }
 
     if (rt.norm() >= pSkin->info.timeResultRank)
     {
@@ -358,94 +445,6 @@ void SceneResult::updateFadeout()
     {
         SoundMgr::stopNoteSamples();
 
-        std::string replayFileName =
-            (boost::format("%04d%02d%02d-%02d%02d%02d.rep") % State::get(IndexNumber::DATE_YEAR) %
-             State::get(IndexNumber::DATE_MON) % State::get(IndexNumber::DATE_DAY) %
-             State::get(IndexNumber::DATE_HOUR) % State::get(IndexNumber::DATE_MIN) % State::get(IndexNumber::DATE_SEC))
-                .str();
-        Path replayPath =
-            ConfigMgr::Profile()->getPath() / "replay" / "chart" / gChartContext.hash.hexdigest() / replayFileName;
-
-        // FIXME: save BEFORE fadeout, e.g. on entrance.
-        // save replay
-        if (saveScore)
-        {
-            LOG_DEBUG << "[Result] Saving replay to " << replayPath;
-            std::unique_lock l{gPlayContext._mutex};
-            std::unique_lock rl{gPlayContext.replayNew->mutex};
-            auto& cmds = gPlayContext.replayNew->replay->commands;
-            std::stable_sort(cmds.begin(), cmds.end(),
-                             [](ReplayChart::Commands lhs, ReplayChart::Commands rhs) { return lhs.ms < rhs.ms; });
-            gPlayContext.replayNew->replay->saveFile(replayPath);
-        }
-        // save score
-        if (saveScore && !gChartContext.hash.empty())
-        {
-            LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
-            auto& format = gChartContext.chart;
-            std::shared_ptr<ScoreBase> pScore = nullptr;
-
-            switch (format->type())
-            {
-            case eChartFormat::BMS:
-            case eChartFormat::BMSON: {
-                auto score = std::make_shared<ScoreBMS>();
-
-                auto& chart = gPlayContext.chartObj[PLAYER_SLOT_PLAYER];
-                auto& ruleset = gPlayContext.ruleset[PLAYER_SLOT_PLAYER];
-                const auto data = ruleset->getData();
-                score->notes = chart->getNoteTotalCount();
-                score->rate = data.total_acc;
-                score->first_max_combo = data.firstMaxCombo;
-                score->final_combo = data.combo;
-                score->maxcombo = data.maxCombo;
-                score->addtime = t.norm() / 1000;
-                score->play_time = data.play_time;
-                score->playcount = _pScoreOld ? _pScoreOld->playcount + 1 : 1;
-                auto isclear = ruleset->isCleared() ? 1 : 0;
-                score->clearcount = _pScoreOld ? _pScoreOld->clearcount + isclear : isclear;
-                score->replayFileName = replayFileName;
-
-                auto rBMS = std::dynamic_pointer_cast<RulesetBMS>(ruleset);
-                score->score = int(std::floor(rBMS->getScore()));
-                score->exscore = rBMS->getExScore();
-                score->fast = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_EARLY);
-                score->slow = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_LATE);
-                score->lamp = std::min(lamp[PLAYER_SLOT_PLAYER], saveLampMax);
-
-                if (gPlayContext.mods[PLAYER_SLOT_PLAYER].assist_mask == 0)
-                {
-                    score->pgreat = rBMS->getJudgeCount(RulesetBMS::JudgeType::PERFECT);
-                    score->great = rBMS->getJudgeCount(RulesetBMS::JudgeType::GREAT);
-                    score->good = rBMS->getJudgeCount(RulesetBMS::JudgeType::GOOD);
-                    score->bad = rBMS->getJudgeCount(RulesetBMS::JudgeType::BAD);
-                    score->kpoor = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_KPOOR);
-                    score->miss = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_MISS);
-                    score->bp = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_BP);
-                    score->combobreak = rBMS->getJudgeCountEx(RulesetBMS::JUDGE_CB);
-                }
-
-                g_pScoreDB->insertChartScoreBMS(gChartContext.hash, *score);
-                pScore = std::move(score);
-
-                break;
-            }
-            case eChartFormat::UNKNOWN: break;
-            }
-
-            // update entry list score
-            for (auto& frame : gSelectContext.backtrace)
-            {
-                for (auto& [entry, scoreOld] : frame.displayEntries)
-                {
-                    if (entry->md5 == gChartContext.hash)
-                    {
-                        scoreOld = pScore;
-                    }
-                }
-            }
-        }
-
         // check retry
         if (_retryRequested && gPlayContext.canRetry)
         {
@@ -478,9 +477,7 @@ void SceneResult::updateFadeout()
         }
         else if (gPlayContext.isCourse)
         {
-            if (saveScore)
-                gPlayContext.courseStageReplayPathNew.push_back(replayPath);
-            else
+            if (!saveScore)
                 gPlayContext.courseStageReplayPathNew.emplace_back();
 
             if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER])
@@ -608,7 +605,7 @@ void SceneResult::inputGamePress(InputMask& m, const lunaticvibes::Time& t)
             break;
 
         case eResultState::FADEOUT:
-        default: break;
+        case eResultState::WAIT_ARENA: break;
         }
     }
 }

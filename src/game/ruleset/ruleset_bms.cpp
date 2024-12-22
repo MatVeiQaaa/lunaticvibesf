@@ -1,5 +1,6 @@
 #include "ruleset_bms.h"
 
+#include <algorithm>
 #include <iterator>
 #include <utility>
 
@@ -1184,20 +1185,67 @@ void RulesetBMS::updateJudge(const lunaticvibes::Time& t, const NoteLaneIndex ch
     }
 }
 
-void RulesetBMS::updateAutoadjust(const HitableNote& pNote, const lunaticvibes::Time& rt)
+static bool isMainUserSide(RulesetBMS::PlaySide side)
 {
-    if (!State::get(IndexOption::PLAY_AUTOADJUST))
+    switch (side)
+    {
+    case RulesetBMS::PlaySide::SINGLE:
+    case RulesetBMS::PlaySide::DOUBLE:
+    case RulesetBMS::PlaySide::BATTLE_1P: return true;
+    case RulesetBMS::PlaySide::BATTLE_2P:
+    case RulesetBMS::PlaySide::AUTO:
+    case RulesetBMS::PlaySide::AUTO_2P:
+    case RulesetBMS::PlaySide::AUTO_DOUBLE:
+    case RulesetBMS::PlaySide::RIVAL:
+    case RulesetBMS::PlaySide::MYBEST:
+    case RulesetBMS::PlaySide::NETWORK: return false;
+    }
+    lunaticvibes::assert_failed("isMainUserSide");
+}
+
+static int clampVisualAdjust(int adjust)
+{
+    return std::clamp(adjust, -99, 99);
+}
+
+static bool isBadOrBetter(const RulesetBMS::JudgeArea area)
+{
+    switch (area)
+    {
+    case RulesetBMS::JudgeArea::EARLY_BAD:
+    case RulesetBMS::JudgeArea::EARLY_GOOD:
+    case RulesetBMS::JudgeArea::EARLY_GREAT:
+    case RulesetBMS::JudgeArea::EARLY_PERFECT:
+    case RulesetBMS::JudgeArea::EXACT_PERFECT:
+    case RulesetBMS::JudgeArea::LATE_PERFECT:
+    case RulesetBMS::JudgeArea::LATE_GREAT:
+    case RulesetBMS::JudgeArea::LATE_GOOD:
+    case RulesetBMS::JudgeArea::LATE_BAD: return true;
+    case RulesetBMS::JudgeArea::NOTHING:
+    case RulesetBMS::JudgeArea::EARLY_KPOOR:
+    case RulesetBMS::JudgeArea::MISS:
+    case RulesetBMS::JudgeArea::LATE_KPOOR:
+    case RulesetBMS::JudgeArea::MINE_KPOOR: return false;
+    }
+    lunaticvibes::assert_failed("isBadOrBetter");
+}
+
+void RulesetBMS::updateAutoadjust(const JudgeRes& j, const lunaticvibes::Time& rt)
+{
+    if (!isMainUserSide(_side))
         return;
-    bool isOffsetPositive = (rt - pNote.time).norm() >= 0;
-    lunaticvibes::Time hitOffset = rt > pNote.time ? rt - pNote.time : pNote.time - rt;
-    if (hitOffset <= judgeTime[(int)_judgeDifficulty].BAD)
+    if (State::get(IndexOption::PLAY_AUTOADJUST) == 0)
+        return;
+    const bool isOffsetPositive = j.time >= 0;
+    if (isBadOrBetter(j.area))
     {
         _notesSinceLastAutoadjust++;
         if (_notesSinceLastAutoadjust > 9)
         {
-            if (hitOffset.norm() != 0)
+            if (j.time.norm() != 0)
             {
-                int newAdjust = State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1);
+                const int newAdjust =
+                    clampVisualAdjust(State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1));
                 State::set(IndexNumber::TIMING_ADJUST_VISUAL, newAdjust);
             }
             _notesSinceLastAutoadjust = 0;
@@ -1205,42 +1253,41 @@ void RulesetBMS::updateAutoadjust(const HitableNote& pNote, const lunaticvibes::
     }
 }
 
+static std::pair<NoteLaneIndex, HitableNote*> getClosestNote(ChartObjectBase& chart, const Input::Pad k,
+                                                             const NoteLaneCategory cat)
+{
+    NoteLaneIndex idx = chart.getLaneFromKey(cat, k);
+    if (idx != _ && !chart.isLastNote(cat, idx))
+    {
+        auto itNote = chart.incomingNote(cat, idx);
+        while (!chart.isLastNote(cat, idx, itNote) && itNote->expired)
+            ++itNote;
+        if (!chart.isLastNote(cat, idx, itNote))
+            return {idx, &*itNote};
+    }
+    return {};
+}
+
 void RulesetBMS::judgeNotePress(const Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt,
                                 const int slot)
 {
-    NoteLaneIndex idx1 = _chart->getLaneFromKey(NoteLaneCategory::Note, k);
-    HitableNote* pNote1 = nullptr;
-    if (idx1 != _ && !_chart->isLastNote(NoteLaneCategory::Note, idx1))
+    auto [idx, note] = getClosestNote(*_chart, k, NoteLaneCategory::Note);
+    auto category = NoteLaneCategory::Note;
     {
-        auto itNote = _chart->incomingNote(NoteLaneCategory::Note, idx1);
-        while (!_chart->isLastNote(NoteLaneCategory::Note, idx1, itNote) && itNote->expired)
-            ++itNote;
-        if (!_chart->isLastNote(NoteLaneCategory::Note, idx1, itNote))
-            pNote1 = &*itNote;
-    }
-    NoteLaneIndex idx2 = _chart->getLaneFromKey(NoteLaneCategory::LN, k);
-    HitableNote* pNote2 = nullptr;
-    if (idx2 != _ && !_chart->isLastNote(NoteLaneCategory::LN, idx2))
-    {
-        auto itNote = _chart->incomingNote(NoteLaneCategory::LN, idx2);
-        while (!_chart->isLastNote(NoteLaneCategory::LN, idx2, itNote) && itNote->expired)
-            ++itNote;
-        if (!_chart->isLastNote(NoteLaneCategory::LN, idx2, itNote))
-            pNote2 = &*itNote;
+        auto [idx2, note2] = getClosestNote(*_chart, k, NoteLaneCategory::LN);
+        if (note2 && (note == nullptr || note2->time < note->time))
+        {
+            idx = idx2;
+            note = note2;
+            category = NoteLaneCategory::LN;
+        }
     }
 
-    JudgeRes j;
-    if (pNote1 && (pNote2 == nullptr || pNote1->time < pNote2->time) && !pNote1->expired)
+    if (note && !note->expired)
     {
-        j = _calcJudgeByTimes(*pNote1, rt);
-        updateAutoadjust(*pNote1, rt);
-        _judgePress(NoteLaneCategory::Note, idx1, *pNote1, j, t, slot);
-    }
-    else if (pNote2 && !pNote2->expired)
-    {
-        j = _calcJudgeByTimes(*pNote2, rt);
-        updateAutoadjust(*pNote2, rt);
-        _judgePress(NoteLaneCategory::LN, idx2, *pNote2, j, t, slot);
+        const JudgeRes j = _calcJudgeByTimes(*note, rt);
+        updateAutoadjust(j, rt);
+        _judgePress(category, idx, *note, j, t, slot);
     }
 }
 void RulesetBMS::judgeNoteHold(Input::Pad k, const lunaticvibes::Time& t, const lunaticvibes::Time& rt, int slot)

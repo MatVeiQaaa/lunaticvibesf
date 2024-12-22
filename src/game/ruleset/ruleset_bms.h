@@ -212,7 +212,7 @@ public:
 private:
     JudgeRes _calcJudgeByTimes(const Note& note, const lunaticvibes::Time& time) const;
 
-    void updateAutoadjust(const HitableNote& pNote, const lunaticvibes::Time& rt);
+    void updateAutoadjust(const JudgeRes& j, const lunaticvibes::Time& rt);
 
     void _judgePress(chart::NoteLaneCategory cat, chart::NoteLaneIndex idx, HitableNote& note, const JudgeRes& judge,
                      const lunaticvibes::Time& t, int slot);

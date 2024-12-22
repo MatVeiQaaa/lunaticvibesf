@@ -41,6 +41,7 @@ vConfig::vConfig(const std::string& profile, const StringPath& file)
 
 void vConfig::load()
 {
+    setDefaults();
     try
     {
         for (const auto& node : YAML::LoadFile(lunaticvibes::u8str(_path)))

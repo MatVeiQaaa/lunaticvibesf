@@ -80,8 +80,6 @@ void refreshInputDevices()
     {
         LOG_DEBUG << "[SDL2] Opening joystick " << i;
         auto j = SDL_JoystickOpen(i);
-        state.joysticks[i] = j;
-
         if (j == nullptr)
         {
             LOG_ERROR << "[SDL2] Failed to open joystick: " << SDL_GetError();
@@ -118,6 +116,8 @@ void refreshInputDevices()
 
         std::array<char, 64> guid{0};
         SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(j), guid.data(), guid.size());
+
+        state.joysticks[i] = j;
 
         LOG_INFO << "[SDL2] Initialized joystick: " << name;
         LOG_DEBUG << "[SDL2] GUID: " << guid.data();

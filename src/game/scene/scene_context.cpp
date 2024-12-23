@@ -1,5 +1,6 @@
 #include "scene_context.h"
 
+#include <atomic>
 #include <mutex>
 #include <random>
 
@@ -17,8 +18,8 @@
 #include <game/runtime/index/option.h>
 #include <game/runtime/state.h>
 
-bool gQuitOnFinish = false;
-bool gAppIsExiting = false;
+std::atomic<bool> gQuitOnFinish = false;
+std::atomic<bool> gAppIsExiting = false;
 ChartContextParams gChartContext;
 PlayContextParams gPlayContext;
 SelectContextParams gSelectContext;

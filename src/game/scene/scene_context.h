@@ -1,14 +1,17 @@
 #pragma once
-#include "common/chartformat/chartformat.h"
-#include "common/difficultytable/table_bms.h"
-#include "common/entry/entry.h"
-#include "common/types.h"
-#include "game/chart/chart.h"
-#include "game/graphics/texture_extra.h"
-#include "game/replay/replay_chart.h"
-#include "game/ruleset/ruleset.h"
-#include "scene.h"
+
+#include <common/chartformat/chartformat.h>
+#include <common/difficultytable/table_bms.h>
+#include <common/entry/entry.h>
+#include <common/types.h>
+#include <game/chart/chart.h>
+#include <game/graphics/texture_extra.h>
+#include <game/replay/replay_chart.h>
+#include <game/ruleset/ruleset.h>
+#include <game/scene/scene.h>
+
 #include <array>
+#include <atomic>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -285,8 +288,8 @@ void createNotification(StringContent text);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-extern bool gQuitOnFinish;
-extern bool gAppIsExiting;
+extern std::atomic<bool> gQuitOnFinish;
+extern std::atomic<bool> gAppIsExiting;
 extern ChartContextParams gChartContext;
 extern PlayContextParams gPlayContext;
 extern SelectContextParams gSelectContext;

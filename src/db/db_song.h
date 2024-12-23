@@ -1,4 +1,6 @@
 #pragma once
+
+#include <atomic>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -85,11 +87,11 @@ private:
     int poolThreadCount = 4;
 
 public:
-    int addChartTaskCount = 0;
-    int addChartTaskFinishCount = 0;
-    int addChartSuccess = 0;
-    int addChartModified = 0;
-    int addChartDeleted = 0;
+    std::atomic<int> addChartTaskCount = 0;
+    std::atomic<int> addChartTaskFinishCount = 0;
+    std::atomic<int> addChartSuccess = 0;
+    std::atomic<int> addChartModified = 0;
+    std::atomic<int> addChartDeleted = 0;
 
     std::shared_mutex addCurrentPathMutex;
     std::string addCurrentPath;

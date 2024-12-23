@@ -1,10 +1,12 @@
 #ifdef _WIN32
 #include "input_dinput8.h"
+#include "input_raw.h"
 #include "input_mgr.h"
 #include <cmath>
 
 void initInput()
 {
+    InputRawInput::inst();
     InputDirectInput8::inst();
 }
 
@@ -20,6 +22,7 @@ void pollInput()
 
 bool isKeyPressed(Input::Keyboard key)
 {
+    return InputRawInput::inst().getKeyboardState()[(size_t)key];
     // refer to virtual key definitions in MSDN
     // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
     static const int vkMap[] = {

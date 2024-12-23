@@ -34,7 +34,7 @@ bool InputDirectInput8::acquireDevices()
         deviceMouse.lpdid->Acquire();
 
     if (deviceKeyboard.lpdid)
-        deviceKeyboard.lpdid->Acquire();
+        //deviceKeyboard.lpdid->Acquire();
 
     for (auto& j : deviceJoysticks)
     {
@@ -202,14 +202,14 @@ void InputDirectInput8::poll()
             deviceMouse.state = DIMOUSESTATE();
         }
 
-        if (deviceKeyboard.lpdid &&
+      /*  if (deviceKeyboard.lpdid &&
             deviceKeyboard.lpdid->GetDeviceState(sizeof(deviceKeyboard.state), deviceKeyboard.state) == DI_OK)
         {
         }
         else
         {
             memset(deviceKeyboard.state, 0, sizeof(deviceKeyboard.state));
-        }
+        }*/
 
         for (auto& j : deviceJoysticks)
         {

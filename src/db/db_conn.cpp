@@ -5,6 +5,7 @@
 
 #include <common/assert.h>
 #include <common/log.h>
+#include <common/u8.h>
 #include <db/db_conn.h>
 
 SQLite::SQLite(const char* path, std::string tag_, SQLite::OpenMode mode) : tag(std::move(tag_))
@@ -30,12 +31,15 @@ SQLite::~SQLite()
 {
     sqlite3_close(_db);
 }
+
 const char* SQLite::errmsg() const
 {
     return sqlite3_errmsg(_db);
 }
 
-std::string any_to_str(const std::any& a)
+#ifndef NDEBUG
+
+[[nodiscard]] static std::string any_to_str(const std::any& a)
 {
     std::stringstream ss;
     if (a.type() == typeid(int))
@@ -52,15 +56,25 @@ std::string any_to_str(const std::any& a)
         ss << std::any_cast<double>(a);
     else if (a.type() == typeid(std::string))
         ss << "'" << std::any_cast<std::string>(a) << "'";
+    else if (a.type() == typeid(std::string_view))
+        ss << "'" << std::any_cast<std::string_view>(a) << "'";
+    else if (a.type() == typeid(std::u8string))
+        ss << "'" << lunaticvibes::s(std::any_cast<std::u8string>(a)) << "'";
+    else if (a.type() == typeid(std::u8string_view))
+        ss << "'" << lunaticvibes::s(std::any_cast<std::u8string_view>(a)) << "'";
     else if (a.type() == typeid(const char*))
         ss << "'" << std::any_cast<const char*>(a) << "'";
     else if (a.type() == typeid(nullptr))
         ss << "NULL";
+    else
+        lunaticvibes::assert_failed("any_to_str");
     return ss.str();
 }
 
+#endif // NDEBUG
+
 // TODO: use std::variant instead of std::any
-void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
+static void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
 {
     int ret = SQLITE_OK;
     if (a.type() == typeid(int))
@@ -109,7 +123,7 @@ void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
         LOG_ERROR << "[sqlite3] Bind error";
     }
 }
-void sql_bind_any(sqlite3_stmt* stmt, const std::initializer_list<std::any>& args)
+static void sql_bind_any(sqlite3_stmt* stmt, const std::initializer_list<std::any>& args)
 {
     int i = 1;
     for (auto& a : args)
@@ -121,8 +135,6 @@ void sql_bind_any(sqlite3_stmt* stmt, const std::initializer_list<std::any>& arg
 std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
                                                  std::initializer_list<std::any> args) const
 {
-    _lastSql = zsql;
-
     sqlite3_stmt* stmt = nullptr;
     int ret = sqlite3_prepare_v3(_db, zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
     if (ret != 0)
@@ -189,8 +201,6 @@ std::vector<std::vector<std::any>> SQLite::query(const std::string_view zsql,
 
 int SQLite::exec(const std::string_view zsql, std::initializer_list<std::any> args)
 {
-    _lastSql = zsql;
-
     sqlite3_stmt* stmt = nullptr;
     int ret = sqlite3_prepare_v3(_db, zsql.data(), static_cast<int>(zsql.size()), 0, &stmt, nullptr);
     if (ret != 0)

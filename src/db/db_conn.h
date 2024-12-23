@@ -41,7 +41,6 @@ class SQLite
 {
 private:
     mutable sqlite3* _db = NULL;
-    mutable std::string _lastSql;
     std::string tag;
     bool inTransaction = false;
 

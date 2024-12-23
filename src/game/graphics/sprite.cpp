@@ -483,7 +483,7 @@ void SpriteText::stopEditing(bool modify)
         stopTextInput();
         editing = false;
         State::set(textInd, (modify ? textAfterEdit : textBeforeEdit));
-        updateText();
+        pushMainThreadTask([this] { updateText(); });
     }
 }
 
@@ -491,7 +491,7 @@ void SpriteText::updateTextWhileEditing(const std::string& text)
 {
     textAfterEdit = text;
     State::set(textInd, text + "|");
-    updateText();
+    pushMainThreadTask([this] { updateText(); });
 }
 
 void SpriteText::draw() const

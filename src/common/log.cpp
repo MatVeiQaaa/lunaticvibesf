@@ -4,12 +4,26 @@
 #include <ostream>
 
 #include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Appenders/IAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 
 #include <common/assert.h>
 #include <common/types.h>
+
+#ifdef _WIN32
+
+#include <common/in_test_mode.h>
+
+#include <plog/Appenders/DebugOutputAppender.h>
+
+static bool have_console_window()
+{
+    return lunaticvibes::in_test_mode();
+}
+
+#endif // _WIN32
 
 namespace plog
 {
@@ -42,15 +56,22 @@ public:
 };
 } // namespace plog
 
-static std::shared_ptr<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>> pConsoleAppender;
-static std::shared_ptr<plog::RollingFileAppender<plog::TxtFormatterFileLine>> pTxtAppender;
+static std::shared_ptr<plog::IAppender> pConsoleAppender;
+static std::shared_ptr<plog::IAppender> pTxtAppender;
 
 namespace lunaticvibes
 {
 
 void InitLogger(const char* logFileName)
 {
+#ifdef _WIN32
+    if (have_console_window())
+        pConsoleAppender = std::make_shared<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>>();
+    else
+        pConsoleAppender = std::make_shared<plog::DebugOutputAppender<plog::TxtFormatterFileLine>>();
+#else
     pConsoleAppender = std::make_shared<plog::ColorConsoleAppender<plog::TxtFormatterFileLine>>();
+#endif // WIN32
     plog::init(plog::info, pConsoleAppender.get());
 
     if (logFileName != nullptr)

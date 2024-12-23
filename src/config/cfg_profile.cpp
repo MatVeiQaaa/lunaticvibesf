@@ -1,7 +1,9 @@
 #include "cfg_profile.h"
-#include "common/log.h"
+
+#include <common/types.h>
+#include <common/u8.h>
+
 #include <filesystem>
-#include <fstream>
 
 namespace fs = std::filesystem;
 
@@ -96,4 +98,11 @@ void ConfigProfile::setDefaults() noexcept
     set(P_ADJUST_LANECOVER_WITH_START_67, false);
     set(P_ADJUST_LANECOVER_WITH_MOUSEWHEEL, true);
     set(P_ADJUST_LANECOVER_WITH_ARROWKEYS, true);
+
+    set(P_LR2_DB_IMPORT_PATH, "");
+    set(P_PREVIEW_CHART_10K, lunaticvibes::u8str(u8"./LR2files/Config/sample_10.bme"_p));
+    set(P_PREVIEW_CHART_14K, lunaticvibes::u8str(u8"./LR2files/Config/sample_14.bme"_p));
+    set(P_PREVIEW_CHART_5K, lunaticvibes::u8str(u8"./LR2files/Config/sample_5.bme"_p));
+    set(P_PREVIEW_CHART_7K, lunaticvibes::u8str(u8"./LR2files/Config/sample_7.bme"_p));
+    set(P_PREVIEW_CHART_9K, lunaticvibes::u8str(u8"./LR2files/Config/sample_9.pms"_p));
 }

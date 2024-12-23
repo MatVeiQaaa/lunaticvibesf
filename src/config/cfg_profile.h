@@ -283,6 +283,12 @@ constexpr char P_SELECT_SHOW_RANDOM_ANY[] = "bSelShowRandomSongAny";
 constexpr char P_SELECT_SHOW_RANDOM_FAILED[] = "bSelShowRandomSongFail";
 constexpr char P_SELECT_SHOW_RANDOM_NOPLAY[] = "bSelShowRandomSongNoPlay";
 
+constexpr char P_PREVIEW_CHART_10K[] = "sPreviewChart10k";
+constexpr char P_PREVIEW_CHART_14K[] = "sPreviewChart14k";
+constexpr char P_PREVIEW_CHART_5K[] = "sPreviewChart5k";
+constexpr char P_PREVIEW_CHART_7K[] = "sPreviewChart7k";
+constexpr char P_PREVIEW_CHART_9K[] = "sPreviewChart9k";
+
 constexpr char P_LR2_DB_IMPORT_PATH[] = "sLr2DbImportPath";
 } // namespace cfg
 

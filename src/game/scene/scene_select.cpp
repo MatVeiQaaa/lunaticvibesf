@@ -515,6 +515,11 @@ SceneSelect::SceneSelect(const std::shared_ptr<SkinMgr>& skinMgr)
     _config_enable_preview_direct = ConfigMgr::get('P', cfg::P_PREVIEW_DIRECT, false);
     _config_list_scroll_time_initial = ConfigMgr::get('P', cfg::P_LIST_SCROLL_TIME_INITIAL, 300);
     lunaticvibes::assign(_lr2_db_import_path, ConfigMgr::get('P', cfg::P_LR2_DB_IMPORT_PATH, ""));
+    lunaticvibes::assign(_preview_chart_10k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_10K, ""));
+    lunaticvibes::assign(_preview_chart_14k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_14K, ""));
+    lunaticvibes::assign(_preview_chart_5k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_5K, ""));
+    lunaticvibes::assign(_preview_chart_7k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_7K, ""));
+    lunaticvibes::assign(_preview_chart_9k, ConfigMgr::get('P', cfg::P_PREVIEW_CHART_9K, ""));
 }
 
 SceneSelect::~SceneSelect()
@@ -544,6 +549,11 @@ SceneSelect::~SceneSelect()
     config_freq();
     config_fx();
     ConfigMgr::set('P', cfg::P_LR2_DB_IMPORT_PATH, _lr2_db_import_path.data());
+    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_10K, _preview_chart_10k.data());
+    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_14K, _preview_chart_14k.data());
+    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_5K, _preview_chart_5k.data());
+    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_7K, _preview_chart_7k.data());
+    ConfigMgr::set('P', cfg::P_PREVIEW_CHART_9K, _preview_chart_9k.data());
     ConfigMgr::save();
 
     _input.loopEnd();

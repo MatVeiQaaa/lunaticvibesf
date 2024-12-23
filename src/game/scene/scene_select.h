@@ -292,6 +292,11 @@ private:
     char imgui_arena_address_buf[256] = {0};
 
     std::array<char, 256> _lr2_db_import_path;
+    std::array<char, 256> _preview_chart_10k;
+    std::array<char, 256> _preview_chart_14k;
+    std::array<char, 256> _preview_chart_5k;
+    std::array<char, 256> _preview_chart_7k;
+    std::array<char, 256> _preview_chart_9k;
 
     bool imgui_play_adjustHispeedWithUpDown = false;
     bool imgui_play_adjustHispeedWithSelect = false;

@@ -2,6 +2,7 @@
 
 #include <common/assert.h>
 #include <common/hash.h>
+#include <common/sysutil.h>
 #include <common/types.h>
 #include <common/u8.h>
 #include <common/utils.h>
@@ -11,6 +12,69 @@
 #include <game/skin/skin_mgr.h>
 #include <game/sound/sound_mgr.h>
 #include <game/sound/soundset_lr2.h>
+
+void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
+
+static void loadPreviewChartIfNeeded(SkinType mode)
+{
+    auto previewChartKeyForMode = [](SkinType mode) -> const char* {
+        switch (mode)
+        {
+        case SkinType::PLAY5:
+        case SkinType::PLAY5_2: return cfg::P_PREVIEW_CHART_5K;
+        case SkinType::PLAY7:
+        case SkinType::PLAY7_2: return cfg::P_PREVIEW_CHART_7K;
+        case SkinType::PLAY9:
+        case SkinType::PLAY9_2: return cfg::P_PREVIEW_CHART_9K;
+        case SkinType::PLAY10: return cfg::P_PREVIEW_CHART_10K;
+        case SkinType::PLAY14: return cfg::P_PREVIEW_CHART_14K;
+        case SkinType::EXIT:
+        case SkinType::TITLE:
+        case SkinType::MUSIC_SELECT:
+        case SkinType::DECIDE:
+        case SkinType::THEME_SELECT:
+        case SkinType::SOUNDSET:
+        case SkinType::KEY_CONFIG:
+        case SkinType::RESULT:
+        case SkinType::COURSE_RESULT:
+        case SkinType::RETRY_TRANS:
+        case SkinType::COURSE_TRANS:
+        case SkinType::EXIT_TRANS:
+        case SkinType::PRE_SELECT:
+        case SkinType::TMPL:
+        case SkinType::TEST:
+        case SkinType::MODE_COUNT: return nullptr;
+        }
+        lunaticvibes::assert_failed("previewChartKeyForMode");
+    };
+
+    const char* key = previewChartKeyForMode(mode);
+    if (key == nullptr)
+        return;
+
+    gChartContext.chart.reset();
+    gChartContext.path.clear();
+
+    auto path = ConfigMgr::get('P', key, "");
+    if (path.empty())
+    {
+        LOG_ERROR << "[Customize] No preview chart specified";
+        return;
+    }
+
+    std::shared_ptr<ChartFormatBase> chart = ChartFormatBase::createFromFile(path, std::time(nullptr));
+    if (chart == nullptr || !chart->isLoaded())
+    {
+        LOG_ERROR << "[Customize] Failed to load preview chart: " << path;
+        return;
+    }
+
+    LOG_DEBUG << "[Customize] Loaded preview chart: " << path;
+
+    gChartContext.started = false;
+    gPlayContext.isBattle = mode == SkinType::PLAY5_2 || mode == SkinType::PLAY7_2 || mode == SkinType::PLAY9_2;
+    prepareChartForPlay(std::move(chart), Option::e_battle_type::BATTLE_LOCAL);
+}
 
 SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::THEME_SELECT, 240), _skinMgr(skinMgr), _state(lunaticvibes::CustomizeState::Start)
@@ -22,7 +86,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
 
     if (gInCustomize)
     {
-        // topest entry is PLAY7
+        // Initial entry is PLAY7.
         selectedMode = SkinType::PLAY7;
         gCustomizeContext.mode = selectedMode;
         gNextScene = SceneType::PLAY;
@@ -528,6 +592,8 @@ void SceneCustomize::load(SkinType mode)
             configFilePath = ps->getFilePath();
 
             pSkin->setThumbnailTextureSize(ps->info.resolution.first, ps->info.resolution.second);
+
+            loadPreviewChartIfNeeded(mode);
         }
         else
         {

@@ -621,9 +621,6 @@ void SceneSelect::imguiPageOptionsJukebox()
 
         ImGui::Spacing();
         ImGui::Separator();
-
-        /////////////////////////////////////////////////////////////////////////////////////////
-
         ImGui::TextUnformatted(i18n::c(JUKEBOX_FOLDER));
         {
             bool enterPath =
@@ -655,9 +652,6 @@ void SceneSelect::imguiPageOptionsJukebox()
 
         ImGui::Spacing();
         ImGui::Separator();
-
-        /////////////////////////////////////////////////////////////////////////////////////////
-
         ImGui::TextUnformatted(i18n::c(JUKEBOX_TABLES));
         {
             bool enterUrl = ImGui::InputTextWithHint("##tableurl", i18n::c(JUKEBOX_TABLE_URL_HINT), imgui_table_url_buf,
@@ -675,6 +669,27 @@ void SceneSelect::imguiPageOptionsJukebox()
                 imguiDelTable();
             }
         }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextUnformatted(_("Skin customize preview charts"));
+        auto chart_input = [](const char* label, const char* button, std::span<char> buf) {
+            constexpr char hint[] = _("Path to file");
+            ImGui::InputTextWithHint(label, hint, buf.data(), buf.size(), 0);
+            ImGui::SameLine();
+            if (ImGui::Button(button))
+            {
+                const char* path = tinyfd_openFileDialog(nullptr, nullptr, 0, nullptr, hint, 0);
+                if (path != nullptr)
+                    lunaticvibes::assign(buf, path);
+            }
+        };
+        chart_input(_("Preview chart (5k)"), _("Browse##preview5k"), _preview_chart_5k);
+        chart_input(_("Preview chart (7k)"), _("Browse##preview7k"), _preview_chart_7k);
+        chart_input(_("Preview chart (9k)"), _("Browse##preview9k"), _preview_chart_9k);
+        chart_input(_("Preview chart (10k)"), _("Browse##preview10k"), _preview_chart_10k);
+        chart_input(_("Preview chart (14k)"), _("Browse##preview14k"), _preview_chart_14k);
+
         ImGui::EndChild();
     }
 }

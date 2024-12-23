@@ -1983,18 +1983,13 @@ void SceneSelect::inputGamePressReadme(InputMask& input, const lunaticvibes::Tim
     }
 }
 
-std::shared_ptr<ChartFormatBase> getChart(EntryBase& entry)
+static std::shared_ptr<ChartFormatBase> getChart(EntryBase& entry)
 {
-
     if (entry.type() == eEntryType::SONG || entry.type() == eEntryType::RIVAL_SONG)
-    {
         return reinterpret_cast<EntryFolderSong&>(entry).getCurrentChart();
-    }
     if (entry.type() == eEntryType::CHART || entry.type() == eEntryType::RIVAL_CHART)
-    {
         return reinterpret_cast<EntryChart&>(entry)._file;
-    }
-    return nullptr;
+    lunaticvibes::assert_failed("getChart");
 };
 
 // NOTE: don't forget to lock mutex for 'entries'.

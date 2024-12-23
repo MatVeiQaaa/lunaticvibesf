@@ -1,20 +1,20 @@
 #pragma once
-#include <array>
+
 #include <boost/asio.hpp>
+
+#include <array>
 #include <functional>
 #include <future>
+#include <map>
+#include <shared_mutex>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "common/asynclooper.h"
-#include "common/beat.h"
-#include "common/hash.h"
-#include "common/types.h"
-
-#ifndef CALLBACK
-#define CALLBACK
-#endif
+#include <common/asynclooper.h>
+#include <common/beat.h>
+#include <common/hash.h>
+#include <common/types.h>
 
 // unused
 struct ArenaLobbyInfo

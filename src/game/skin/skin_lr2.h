@@ -1,23 +1,19 @@
 #pragma once
+
+#include <common/encoding.h>
+#include <common/types.h>
+#include <game/graphics/sprite_bar_entry.h>
+#include <game/graphics/sprite_graph.h>
+#include <game/graphics/sprite_imagetext.h>
+#include <game/graphics/sprite_lane.h>
+#include <game/graphics/sprite_video.h>
+#include <game/skin/skin.h>
+
 #include <array>
 #include <bitset>
 #include <cstdint>
-#include <filesystem>
-#include <functional>
 #include <map>
-#include <stack>
-#include <variant>
-
-#include "common/encoding.h"
-#include "common/types.h"
-#include "game/graphics/sprite_bar_entry.h"
-#include "game/graphics/sprite_graph.h"
-#include "game/graphics/sprite_imagetext.h"
-#include "game/graphics/sprite_lane.h"
-#include "game/graphics/sprite_video.h"
-#include "game/input/input_mgr.h"
-#include "game/runtime/state.h"
-#include "skin.h"
+#include <vector>
 
 namespace LR2SkinDef
 {

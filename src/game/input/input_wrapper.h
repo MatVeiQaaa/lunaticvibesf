@@ -1,17 +1,15 @@
 #pragma once
-#include "common/asynclooper.h"
-#include "common/beat.h"
-#include "input_mgr.h"
+
+#include <common/asynclooper.h>
+#include <common/beat.h>
+#include <game/input/input_mgr.h>
+
 #include <array>
-#include <queue>
-#include <set>
+#include <map>
 #include <shared_mutex>
 
 typedef std::bitset<Input::Pad::KEY_COUNT> InputMask;
 typedef std::function<void(InputMask&, const lunaticvibes::Time&)> INPUTCALLBACK;
-// typedef void(*PressedHandleCallback)(void* owner, InputMask&);
-// typedef void(*HoldHandleCallback)(void* owner, InputMask&);
-// typedef void(*ReleasedHandleCallback)(void* owner, InputMask&);
 
 typedef std::bitset<Input::keyboardKeyCount> KeyboardMask;
 typedef std::function<void(KeyboardMask&, const lunaticvibes::Time&)> KEYBOARDCALLBACK;

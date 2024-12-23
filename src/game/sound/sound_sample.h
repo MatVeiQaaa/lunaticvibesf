@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cstddef>
+
+using size_t = std::size_t;
+
 enum class eSoundSample : size_t
 {
     BGM_TITLE, // unused

@@ -1,5 +1,7 @@
 #pragma once
+
 #include <any>
+#include <functional>
 #include <string>
 #include <string_view>
 #include <utility>

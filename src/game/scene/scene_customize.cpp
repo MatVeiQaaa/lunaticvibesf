@@ -13,6 +13,8 @@
 #include <game/sound/sound_mgr.h>
 #include <game/sound/soundset_lr2.h>
 
+#include <fstream>
+
 void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
 
 static void loadPreviewChartIfNeeded(SkinType mode)

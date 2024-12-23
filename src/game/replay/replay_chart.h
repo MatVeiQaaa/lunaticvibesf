@@ -2,11 +2,14 @@
 
 // FIXME: cereal is not meant for persistent storage.
 
-#include "common/hash.h"
-#include "common/keymap.h"
-#include "common/types.h"
+#include <common/hash.h>
+#include <common/keymap.h>
+#include <common/types.h>
+
 #include <cereal/access.hpp>
 #include <cereal/types/vector.hpp>
+
+#include <map>
 #include <vector>
 
 template <class Archive, size_t bytes> void serialize(Archive& ar, Hash<bytes>& hash)

@@ -1,4 +1,6 @@
 #include "sound_fmod_callback.h"
+
+#include <cstdio>
 #include <mutex>
 #include <queue>
 

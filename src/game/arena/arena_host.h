@@ -1,16 +1,17 @@
 #pragma once
 
+#include <boost/asio.hpp>
+
 #include <array>
 #include <functional>
 #include <future>
+#include <map>
 #include <shared_mutex>
 #include <utility>
 
-#include "common/asynclooper.h"
-#include "common/beat.h"
-#include "common/hash.h"
-
-#include <boost/asio.hpp>
+#include <common/asynclooper.h>
+#include <common/beat.h>
+#include <common/hash.h>
 
 class SceneSelect;
 class ArenaMessage;

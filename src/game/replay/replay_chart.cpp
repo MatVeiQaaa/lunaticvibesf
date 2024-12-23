@@ -7,6 +7,7 @@
 #include <cereal/archives/xml.hpp>
 
 #include <cstdlib>
+#include <fstream>
 #include <sstream>
 #include <string_view>
 

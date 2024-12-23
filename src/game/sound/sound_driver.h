@@ -1,7 +1,7 @@
 #pragma once
-#include "common/asynclooper.h"
-#include "fmod.hpp"
-#include <array>
+
+#include <common/asynclooper.h>
+
 #include <cstdint>
 #include <string>
 #include <utility>

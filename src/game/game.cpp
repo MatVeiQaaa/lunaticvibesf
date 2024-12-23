@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
         gNextScene = SceneType::PLAY;
         gQuitOnFinish = true;
 
-        std::shared_ptr<ChartFormatBMS> bms = std::make_shared<ChartFormatBMS>(bmsFile, std::time(NULL));
+        std::shared_ptr<ChartFormatBase> bms = ChartFormatBase::createFromFile(bmsFile, std::time(NULL));
         gPlayContext.mode = lunaticvibes::skinTypeForKeys(bms->gamemode);
         gChartContext = ChartContextParams{
             bmsFile,

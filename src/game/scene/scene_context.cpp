@@ -14,6 +14,7 @@
 #include <db/db_song.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/runtime/i18n.h>
+#include <game/runtime/index/option.h>
 #include <game/runtime/state.h>
 
 bool gQuitOnFinish = false;
@@ -1537,4 +1538,101 @@ void createNotification(StringContent text)
 {
     std::unique_lock lock(gOverlayContext._mutex);
     gOverlayContext.notifications.emplace_back(lunaticvibes::Time(), std::move(text));
+}
+
+[[nodiscard]] inline SkinType skinTypeForKeysBattle(unsigned keys)
+{
+    switch (keys)
+    {
+    case 5: return SkinType::PLAY5_2;
+    case 7: return SkinType::PLAY7_2;
+    case 9: return SkinType::PLAY9;
+    case 10: return SkinType::PLAY10;
+    case 14: return SkinType::PLAY14;
+    }
+    lunaticvibes::assert_failed("skinTypeForKeysBattle");
+}
+
+// Chart taken from `gChartContext.chart`.
+void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType)
+{
+    gChartContext.chart = std::move(chart_);
+    auto& chart = *gChartContext.chart;
+    gChartContext.path = chart.absolutePath;
+
+    // only reload resources if selected chart is different
+    gChartContext.hash = chart.fileHash;
+    if (gChartContext.hash != gChartContext.sampleLoadedHash)
+    {
+        gChartContext.isSampleLoaded = false;
+        gChartContext.sampleLoadedHash.reset();
+    }
+    if (gChartContext.hash != gChartContext.bgaLoadedHash)
+    {
+        gChartContext.isBgaLoaded = false;
+        gChartContext.bgaLoadedHash.reset();
+    }
+
+    // set metadata
+    gChartContext.title = chart.title;
+    gChartContext.title2 = chart.title2;
+    gChartContext.artist = chart.artist;
+    gChartContext.artist2 = chart.artist2;
+    gChartContext.genre = chart.genre;
+    gChartContext.version = chart.version;
+    gChartContext.level = chart.levelEstimated;
+    gChartContext.minBPM = chart.minBPM;
+    gChartContext.maxBPM = chart.maxBPM;
+    gChartContext.startBPM = chart.startBPM;
+
+    // set gamemode
+    gChartContext.isDoubleBattle = false;
+    if (gChartContext.chart->type() == eChartFormat::BMS)
+    {
+        auto pBMS = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(gChartContext.chart);
+        gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
+        if (gPlayContext.isBattle)
+        {
+            if (battleType == Option::BATTLE_LOCAL || battleType == Option::BATTLE_GHOST)
+            {
+                gPlayContext.mode = skinTypeForKeysBattle(pBMS->gamemode);
+                auto canBattleInGameMode = [](unsigned keys) {
+                    switch (keys)
+                    {
+                    case 5:
+                    case 7: return true;
+                    case 9:
+                    case 10:
+                    case 14: return false;
+                    default: lunaticvibes::verify_failed("canBattleInGameMode"); return false;
+                    }
+                };
+                gPlayContext.isBattle = canBattleInGameMode(pBMS->gamemode);
+            }
+        }
+        else if (battleType == Option::BATTLE_DB)
+        {
+            gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
+            gChartContext.isDoubleBattle = true;
+        }
+    }
+
+    switch (gPlayContext.mode)
+    {
+    case SkinType::PLAY5:
+    case SkinType::PLAY7:
+    case SkinType::PLAY9:
+        LVF_VERIFY(!gPlayContext.isBattle);
+        LVF_VERIFY(!gChartContext.isDoubleBattle);
+        break;
+    case SkinType::PLAY5_2:
+    case SkinType::PLAY7_2:
+    case SkinType::PLAY9_2:
+        LVF_VERIFY(gPlayContext.isBattle);
+        LVF_VERIFY(!gChartContext.isDoubleBattle);
+        break;
+    case SkinType::PLAY10:
+    case SkinType::PLAY14: LVF_VERIFY(!gPlayContext.isBattle); break;
+    default: break;
+    }
 }

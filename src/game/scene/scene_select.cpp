@@ -49,6 +49,8 @@ template <class... Ts> struct overloaded : Ts...
     using Ts::operator()...;
 };
 
+void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
+
 #pragma region save config
 
 void config_sys()
@@ -2030,19 +2032,6 @@ static std::pair<std::shared_ptr<ChartFormatBase>, size_t> selectRandom(
     return {nullptr, 0};
 }
 
-[[nodiscard]] inline SkinType skinTypeForKeysBattle(unsigned keys)
-{
-    switch (keys)
-    {
-    case 5: return SkinType::PLAY5_2;
-    case 7: return SkinType::PLAY7_2;
-    case 9: return SkinType::PLAY9;
-    case 10: return SkinType::PLAY10;
-    case 14: return SkinType::PLAY14;
-    }
-    lunaticvibes::assert_failed("skinTypeForKeysBattle");
-}
-
 void SceneSelect::decide()
 {
     std::shared_lock<std::shared_mutex> u(gSelectContext._mutex);
@@ -2130,103 +2119,15 @@ void SceneSelect::decide()
     case eEntryType::RIVAL_SONG:
     case eEntryType::CHART:
     case eEntryType::RIVAL_CHART:
+        prepareChartForPlay(getChart(*entry), State::get(IndexOption::PLAY_BATTLE_TYPE));
+        break;
     case eEntryType::RANDOM_CHART: {
-        // set metadata
-        if (entry->type() == eEntryType::RANDOM_CHART)
-        {
-            auto e = std::reinterpret_pointer_cast<lunaticvibes::EntryRandomChart>(entry);
-            size_t idx;
-            std::tie(gChartContext.chart, idx) = selectRandom(gSelectContext.entries, e->filter());
-            if (gChartContext.chart == nullptr)
-                return;
-            setEntryInfo(idx);
-        }
-        else
-        {
-            gChartContext.chart = getChart(*entry);
-        }
-
-        auto& chart = *gChartContext.chart;
-        // gChartContext.path = chart._filePath;
-        gChartContext.path = chart.absolutePath;
-
-        // only reload resources if selected chart is different
-        gChartContext.hash = chart.fileHash;
-        if (gChartContext.hash != gChartContext.sampleLoadedHash)
-        {
-            gChartContext.isSampleLoaded = false;
-            gChartContext.sampleLoadedHash.reset();
-        }
-        if (gChartContext.hash != gChartContext.bgaLoadedHash)
-        {
-            gChartContext.isBgaLoaded = false;
-            gChartContext.bgaLoadedHash.reset();
-        }
-
-        // gChartContext.chart = std::make_shared<ChartFormatBase>(chart);
-        gChartContext.title = chart.title;
-        gChartContext.title2 = chart.title2;
-        gChartContext.artist = chart.artist;
-        gChartContext.artist2 = chart.artist2;
-        gChartContext.genre = chart.genre;
-        gChartContext.version = chart.version;
-        gChartContext.level = chart.levelEstimated;
-        gChartContext.minBPM = chart.minBPM;
-        gChartContext.maxBPM = chart.maxBPM;
-        gChartContext.startBPM = chart.startBPM;
-
-        // set gamemode
-        gChartContext.isDoubleBattle = false;
-        if (gChartContext.chart->type() == eChartFormat::BMS)
-        {
-            auto pBMS = std::reinterpret_pointer_cast<ChartFormatBMSMeta>(gChartContext.chart);
-            gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
-            if (gPlayContext.isBattle)
-            {
-                if (State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_LOCAL ||
-                    State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_GHOST)
-                {
-                    gPlayContext.mode = skinTypeForKeysBattle(pBMS->gamemode);
-                    auto canBattleInGameMode = [](unsigned keys) {
-                        switch (keys)
-                        {
-                        case 5:
-                        case 7: return true;
-                        case 9:
-                        case 10:
-                        case 14: return false;
-                        default: LVF_DEBUG_ASSERT(false); return false;
-                        }
-                    };
-                    gPlayContext.isBattle = canBattleInGameMode(pBMS->gamemode);
-                }
-            }
-            else if (State::get(IndexOption::PLAY_BATTLE_TYPE) == Option::BATTLE_DB)
-            {
-                gPlayContext.mode = lunaticvibes::skinTypeForKeys(pBMS->gamemode);
-                gChartContext.isDoubleBattle = true;
-            }
-        }
-
-        switch (gPlayContext.mode)
-        {
-        case SkinType::PLAY5:
-        case SkinType::PLAY7:
-        case SkinType::PLAY9:
-            LVF_DEBUG_ASSERT(!gPlayContext.isBattle);
-            LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
-            break;
-        case SkinType::PLAY5_2:
-        case SkinType::PLAY7_2:
-        case SkinType::PLAY9_2:
-            LVF_DEBUG_ASSERT(gPlayContext.isBattle);
-            LVF_DEBUG_ASSERT(!gChartContext.isDoubleBattle);
-            break;
-        case SkinType::PLAY10:
-        case SkinType::PLAY14: LVF_DEBUG_ASSERT(!gPlayContext.isBattle); break;
-        default: break;
-        }
-
+        auto e = std::reinterpret_pointer_cast<lunaticvibes::EntryRandomChart>(entry);
+        auto [chart, idx] = selectRandom(gSelectContext.entries, e->filter());
+        if (chart == nullptr)
+            return;
+        setEntryInfo(idx);
+        prepareChartForPlay(std::move(chart), State::get(IndexOption::PLAY_BATTLE_TYPE));
         break;
     }
     case eEntryType::COURSE: {

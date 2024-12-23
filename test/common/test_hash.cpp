@@ -1,4 +1,5 @@
 #include <functional>
+#include <string_view>
 
 #include <gmock/gmock.h>
 
@@ -22,7 +23,14 @@ TEST(Hash, HashStdHash)
 
 TEST(Hash, HexToBinToHex)
 {
-    static const std::string hash = "40e94aa51dc5c0ccc5aad4e6aefdde2a";
-    const std::string hex = lunaticvibes::hex2bin(hash);
-    EXPECT_EQ(lunaticvibes::bin2hex({hex.data(), hex.size()}), hash);
+    const std::string hex = lunaticvibes::hex2bin("40E94AA51DC5C0CCc5aad4e6aefdde2a");
+    EXPECT_EQ(lunaticvibes::bin2hex({hex.data(), hex.size()}), "40e94aa51dc5c0ccc5aad4e6aefdde2a");
+}
+
+TEST(Hash, ConstexprConstructorBuilds)
+{
+    static constinit HashMD5 hash_from_array{"deadbeefdeadbeefdeadbeefdeadbeef"};
+    EXPECT_EQ(hash_from_array.hexdigest(), "deadbeefdeadbeefdeadbeefdeadbeef");
+    static constinit HashMD5 hash_from_view{std::string_view{"deadbeefdeadbeefdeadbeefdeadbeef"}};
+    EXPECT_EQ(hash_from_view.hexdigest(), "deadbeefdeadbeefdeadbeefdeadbeef");
 }

@@ -14,7 +14,19 @@ namespace lunaticvibes
 {
     return bin2hex({reinterpret_cast<const unsigned char*>(bin.data()), bin.size()});
 };
-void hex2bin(std::string_view hex, std::span<unsigned char> buf);
+constexpr void hex2bin(std::string_view hex, std::span<unsigned char> buf)
+{
+    auto tolower = [](unsigned char c) { return c >= 'A' && c <= 'Z' ? c + ('a' - 'A') : c; };
+    // LANDMINE. TODO: add size check;
+    for (size_t i = 0, j = 0; i < hex.length() - 1; i += 2, j++)
+    {
+        unsigned char& c = buf[j];
+        unsigned char c1 = tolower(hex[i]);
+        unsigned char c2 = tolower(hex[i + 1]);
+        c += (c1 + ((c1 >= 'a') ? (10 - 'a') : (-'0'))) << 4;
+        c += (c2 + ((c2 >= 'a') ? (10 - 'a') : (-'0')));
+    }
+}
 [[nodiscard]] std::string hex2bin(std::string_view hex);
 
 } // namespace lunaticvibes
@@ -27,21 +39,21 @@ private:
 
 public:
     constexpr Hash() = default;
-    explicit Hash(const std::string_view hex)
+    constexpr explicit Hash(const std::string_view hex)
     {
         if (hex.size() != Len * 2)
             throw std::runtime_error("invalid 'hex' length");
         set = true;
         lunaticvibes::hex2bin(hex, data);
     }
-    template <size_t HexLen> explicit Hash(const char (&hex)[HexLen])
+    template <size_t HexLen> constexpr explicit Hash(const char (&hex)[HexLen])
     {
         static_assert(HexLen - 1 == Len * 2);
         set = true;
         lunaticvibes::hex2bin(hex, data);
     }
 
-    constexpr size_t length() const { return Len; }
+    static constexpr size_t length() { return Len; }
     // TODO: remove this and use std::optional<Hash> where needed.
     constexpr bool empty() const { return !set; }
     std::string hexdigest() const { return lunaticvibes::bin2hex({data, Len}); }
@@ -52,12 +64,7 @@ public:
         memset(data, 0, Len);
     }
 
-    bool operator<(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) < 0; }
-    bool operator>(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) > 0; }
-    bool operator<=(const Hash<Len>& rhs) const { return !(*this > rhs); }
-    bool operator>=(const Hash<Len>& rhs) const { return !(*this > rhs); }
-    bool operator==(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) == 0; }
-    bool operator!=(const Hash<Len>& rhs) const { return memcmp(data, rhs.data, Len) != 0; }
+    auto operator<=>(const Hash<Len>&) const = default;
 
     friend struct std::hash<Hash<Len>>;
 };

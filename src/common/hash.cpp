@@ -17,18 +17,6 @@ std::string lunaticvibes::bin2hex(std::span<const unsigned char> buf)
     return res;
 }
 
-void lunaticvibes::hex2bin(std::string_view hex, std::span<unsigned char> buf)
-{
-    // LANDMINE. TODO: add size check;
-    for (size_t i = 0, j = 0; i < hex.length() - 1; i += 2, j++)
-    {
-        unsigned char& c = buf[j];
-        unsigned char c1 = tolower(hex[i]);
-        unsigned char c2 = tolower(hex[i + 1]);
-        c += (c1 + ((c1 >= 'a') ? (10 - 'a') : (-'0'))) << 4;
-        c += (c2 + ((c2 >= 'a') ? (10 - 'a') : (-'0')));
-    }
-}
 std::string lunaticvibes::hex2bin(std::string_view hex)
 {
     std::string res;

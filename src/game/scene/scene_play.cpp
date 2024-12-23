@@ -2453,8 +2453,9 @@ void ScenePlay::updateFadeout()
 
     if (ft >= pSkin->info.timeOutro)
     {
-        LVF_DEBUG_ASSERT(!sceneEnding);
+        LVF_ASSERT(!sceneEnding);
         sceneEnding = true;
+        postAsyncStop();
         if (_loadChartFuture.valid())
             _loadChartFuture.wait();
 

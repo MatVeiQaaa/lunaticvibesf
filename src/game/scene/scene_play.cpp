@@ -298,8 +298,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
             case PlayModifierGaugeType::GRADE_HARD:
             case PlayModifierGaugeType::GRADE_DEATH: return GaugeDisplayType::EX_SURVIVAL;
             }
-            LVF_DEBUG_ASSERT(false);
-            return {};
+            lunaticvibes::assert_failed("playModifierGaugeTypeToDisplay");
         };
         pSkin->setGaugeDisplayType(slot, playModifierGaugeTypeToDisplay(gPlayContext.mods[slot].gauge));
     };
@@ -1031,14 +1030,12 @@ bool ScenePlay::createRuleset()
             }
         }
 
-        if (auto prb = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]); prb)
+        auto prb = std::dynamic_pointer_cast<RulesetBMS>(gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
+        LVF_DEBUG_ASSERT(prb != nullptr);
+        if (prb != nullptr)
         {
             State::set(IndexText::PLAYER_MODIFIER, prb->getModifierText());
             State::set(IndexText::PLAYER_MODIFIER_SHORT, prb->getModifierTextShort());
-        }
-        else
-        {
-            LVF_DEBUG_ASSERT(false);
         }
 
         return true;
@@ -1170,7 +1167,7 @@ void ScenePlay::loadChart()
 
             auto _pChart = gChartContext.chart;
             auto chartDir = gChartContext.chart->getDirectory();
-            LOG_DEBUG << "[Play] Load files from " << chartDir.c_str();
+            LOG_DEBUG << "[Play] Load files from " << chartDir;
             for (const auto& it : _pChart->wavFiles)
             {
                 if (shouldDiscard(*this))
@@ -1385,9 +1382,7 @@ void ScenePlay::_updateAsync()
         return;
 
     if (gAppIsExiting)
-    {
         gNextScene = SceneType::EXIT_TRANS;
-    }
 
     lunaticvibes::Time t;
 
@@ -1446,13 +1441,10 @@ void ScenePlay::_updateAsync()
     // retry / exit (SELECT+START)
     if ((isHoldingStart(PLAYER_SLOT_PLAYER) && isHoldingSelect(PLAYER_SLOT_PLAYER)) ||
         (isHoldingStart(PLAYER_SLOT_TARGET) && isHoldingSelect(PLAYER_SLOT_TARGET)))
-    {
         retryRequestTick++;
-    }
     else
-    {
         retryRequestTick = 0;
-    }
+
     if (retryRequestTick >= getRate())
     {
         isManuallyRequestedExit = true;
@@ -1471,9 +1463,7 @@ void ScenePlay::_updateAsync()
     }
 
     if (gArenaData.isOnline() && gArenaData.isExpired())
-    {
         gArenaData.reset();
-    }
 }
 
 void ScenePlay::updateAsyncLanecover(const lunaticvibes::Time& t)
@@ -2049,12 +2039,14 @@ void ScenePlay::updateLoadEnd()
 
 void ScenePlay::updatePlaying()
 {
+    LVF_DEBUG_ASSERT(gPlayContext.chartObj[PLAYER_SLOT_PLAYER] != nullptr);
+    LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
+
     auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::PLAY_START);
     State::set(IndexTimer::MUSIC_BEAT,
                int(1000 * (gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentMetre() * 4.0)) % 1000);
 
-    LVF_DEBUG_ASSERT(gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr);
     {
         gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->update(rt);
         gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->update(t);
@@ -3029,8 +3021,8 @@ void ScenePlay::toggleLanecover(int slot, bool state)
         lcType = playerState[slot].origLanecoverType == Option::LANE_OFF ? Option::LANE_SUDDEN
                                                                          : playerState[slot].origLanecoverType;
         break;
-    case Option::LANE_HIDDEN: lcType = Option::LANE_OFF; break;
-    case Option::LANE_SUDDEN: lcType = Option::LANE_OFF; break;
+    case Option::LANE_HIDDEN:
+    case Option::LANE_SUDDEN:
     case Option::LANE_SUDHID: lcType = Option::LANE_OFF; break;
     case Option::LANE_LIFT: lcType = Option::LANE_LIFTSUD; break;
     case Option::LANE_LIFTSUD: lcType = Option::LANE_LIFT; break;

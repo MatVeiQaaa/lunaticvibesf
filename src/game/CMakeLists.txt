@@ -136,11 +136,8 @@ target_precompile_headers(gamelib REUSE_FROM common)
 
 #############################################################
 
-if(WIN32)
-    add_executable(LunaticVibesF game.cpp LunaticVibesF.exe.manifest)
-else()
-    add_executable(LunaticVibesF game.cpp)
-endif()
+# WIN32 - graphical application/don't spawn a console (Windows only).
+add_executable(LunaticVibesF WIN32 game.cpp LunaticVibesF.exe.manifest)
 target_link_libraries(LunaticVibesF PRIVATE gamelib PRIVATE tinyfiledialogs)
 set_target_properties(LunaticVibesF PROPERTIES CXX_STANDARD 20)
 install(TARGETS LunaticVibesF COMPONENT Game)

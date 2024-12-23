@@ -93,6 +93,7 @@ add_library(
     sound/soundset.cpp
     sound/soundset_lr2.cpp
     replay/replay_chart.cpp
+    runtime/generic_info.cpp
     runtime/i18n.cpp
     arena/arena_data.cpp
     arena/arena_internal.cpp

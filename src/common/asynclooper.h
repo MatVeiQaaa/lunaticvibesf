@@ -1,9 +1,9 @@
 #pragma once
 
-#include "types.h"
+#include <atomic>
 #include <functional>
-#include <map>
-#include <shared_mutex>
+
+#include <common/types.h>
 
 #ifdef _WIN32
 
@@ -26,7 +26,7 @@ class AsyncLooper
 protected:
     StringContent _tag;
     unsigned _rate;
-    bool _running = false;
+    std::atomic<bool> _running = false;
     bool _inLoopBody = false;
 
     LooperHandler handler;

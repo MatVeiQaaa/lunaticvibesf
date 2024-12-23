@@ -57,6 +57,7 @@ add_library(
     input/input_dinput8.cpp
     input/input_windows.cpp
     input/input_wrapper.cpp
+    input/input_raw.cpp
     ruleset/ruleset_bms.cpp
     ruleset/ruleset_bms_auto.cpp
     ruleset/ruleset_bms_replay.cpp

@@ -159,6 +159,7 @@ static void reload_preview(SkinType selectedMode)
         case SkinType::PLAY7:
         case SkinType::PLAY7_2:
         case SkinType::PLAY9:
+        case SkinType::PLAY9_2:
         case SkinType::PLAY10:
         case SkinType::PLAY14:
             gPlayContext.mode = selectedMode;

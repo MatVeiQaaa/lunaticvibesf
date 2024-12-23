@@ -3787,6 +3787,7 @@ bool SkinLR2::loadCSV(Path p)
     case SkinType::PLAY7:
     case SkinType::PLAY7_2:
     case SkinType::PLAY9:
+    case SkinType::PLAY9_2:
     case SkinType::PLAY10:
     case SkinType::PLAY14: lr2skin::flipSide = false; break;
     case SkinType::RESULT:

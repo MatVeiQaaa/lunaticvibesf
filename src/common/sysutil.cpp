@@ -1,5 +1,6 @@
 #include "sysutil.h"
 
+#include <atomic>
 #include <queue>
 #include <shared_mutex>
 
@@ -12,12 +13,11 @@ std::shared_mutex mainThreadTaskQueueMutex;
 std::queue<std::function<void()>> mainThreadTaskQueue;
 bool handleMainThreadTask = true;
 
-static bool s_foreground = true;
+static std::atomic<bool> s_foreground = true;
 bool IsWindowForeground()
 {
     return s_foreground;
 }
-
 void SetWindowForeground(bool f)
 {
     s_foreground = f;

@@ -102,11 +102,8 @@ void sql_bind_any(sqlite3_stmt* stmt, int i, const std::any& a)
     else if (a.type() == typeid(nullptr))
         ret = sqlite3_bind_null(stmt, i);
     else
-    {
-        LOG_FATAL << "[sqlite3] Unsupported bind type";
-        LVF_DEBUG_ASSERT(false && "Unsupported bind type");
-        return;
-    }
+        lunaticvibes::assert_failed("[sqlite3] Unsupported bind type");
+
     if (ret != SQLITE_OK)
     {
         LOG_ERROR << "[sqlite3] Bind error";

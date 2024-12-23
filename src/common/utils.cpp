@@ -225,17 +225,17 @@ template <typename DigestUpdater> HashMD5 md5_impl(DigestUpdater updater)
 
     if (!EVP_DigestInit_ex2(ctx.get(), EVP_md5(), NULL))
     {
-        LOG_ERROR << "[Utils] EVP_DigestInit_ex2() failed";
+        lunaticvibes::verify_failed("EVP_DigestInit_ex2()");
         return {};
     };
     if (!updater(ctx.get()))
     {
-        LOG_ERROR << "[Utils] Digest updating failed";
+        lunaticvibes::verify_failed("Digest updating");
         return {};
     }
     if (!EVP_DigestFinal_ex(ctx.get(), digest, &digest_len))
     {
-        LOG_ERROR << "[Utils] EVP_DigestFinal_ex() failed";
+        lunaticvibes::verify_failed("EVP_DigestFinal_ex");
         return {};
     };
 

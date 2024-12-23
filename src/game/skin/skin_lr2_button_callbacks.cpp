@@ -1320,9 +1320,7 @@ void key_config_slot(const int slot)
             case 8: return IndexSwitch::KEY_CONFIG_SLOT8;
             case 9: return IndexSwitch::KEY_CONFIG_SLOT9;
             }
-            LOG_ERROR << "[SkinLR2] Invalid 'slot'";
-            LVF_DEBUG_ASSERT(false && "Invalid 'slot'");
-            return {};
+            lunaticvibes::assert_failed("getSwitch");
         };
         State::set(getSwitch(old), false);
         State::set(getSwitch(slot), true);

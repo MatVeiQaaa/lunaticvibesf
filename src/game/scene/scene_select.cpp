@@ -2983,7 +2983,7 @@ std::optional<DeleteScoreResult> try_delete_score(const std::string_view query, 
         return DeleteScoreResult::Ok;
     default: LOG_DEBUG << "[Select] Not a chart/course"; return DeleteScoreResult::Error;
     }
-    abort(); // unreachable
+    lunaticvibes::assert_failed("try_delete_score");
 }
 
 // LR2 behavior:

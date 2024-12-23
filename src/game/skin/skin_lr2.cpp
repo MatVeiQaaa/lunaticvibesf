@@ -493,8 +493,7 @@ void SkinLR2::setGaugeDisplayType(unsigned slot, GaugeDisplayType type)
         case GaugeDisplayType::EX_SURVIVAL: return SpriteGaugeGrid::GaugeType::EX_SURVIVAL;
         case GaugeDisplayType::ASSIST_EASY: return SpriteGaugeGrid::GaugeType::ASSIST_EASY;
         }
-        LVF_DEBUG_ASSERT(false);
-        return {};
+        lunaticvibes::assert_failed("gaugeDisplayTypeToSpriteType");
     };
     auto sprite = std::reinterpret_pointer_cast<SpriteGaugeGrid>((*_sharedSprites)[spriteIdxForSlot(slot)]);
     if (sprite)

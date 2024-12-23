@@ -418,9 +418,7 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
                 return mode;
             }
             }
-            LOG_ERROR << "[SDL2] Invalid BlendMode";
-            LVF_DEBUG_ASSERT(false);
-            return SDL_BLENDMODE_INVALID;
+            lunaticvibes::assert_failed("to_sdl_blend_mode");
         };
 
         if (const auto blend_mode = to_sdl_blend_mode(b); blend_mode != SDL_BLENDMODE_INVALID)

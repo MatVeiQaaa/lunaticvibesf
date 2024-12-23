@@ -65,7 +65,7 @@ void ScoreDB::deleteLegacyScoreBMS(const char* tableName, const HashMD5& hash)
     ret = exec(static_cast<char*>(sqlbuf), {hashStr});
     if (ret != SQLITE_OK)
     {
-        LOG_ERROR << "[ScoreDB] Failed to delete legacy score: " << errmsg();
+        lunaticvibes::verify_failed(("[ScoreDB] Delete legacy score: " + std::string{errmsg()}).c_str());
         return;
     }
 
@@ -148,10 +148,7 @@ void ScoreDB::updateLegacyScoreBMS(const char* tableName, const HashMD5& hash, c
              score.bp,       score.combobreak, score.replayFileName});
     }
     if (ret != SQLITE_OK)
-    {
-        LOG_ERROR << "[ScoreDB] Upserting legacy score failed: " << errmsg();
-        LVF_DEBUG_ASSERT(false && "upserting legacy score failed");
-    }
+        lunaticvibes::verify_failed(("[ScoreDB] Upserting legacy score: " + std::string{errmsg()}).c_str());
 
     char sqlbuf[96] = {0};
     sprintf(sqlbuf, "SELECT * FROM %s WHERE md5=?", tableName);
@@ -168,16 +165,16 @@ void ScoreDB::deleteAllChartScoresBMS(const HashMD5& hash)
     deleteLegacyScoreBMS("score_bms", hash);
 
     const std::string hash_str = hash.hexdigest();
+
     int ret = exec("DELETE FROM score_history_bms WHERE md5=?", {hash_str});
     if (ret != SQLITE_OK)
-    {
-        LOG_ERROR << "[ScoreDB] Failed to delete score from score_history_bms: " << errmsg();
-    }
+        lunaticvibes::verify_failed(
+            ("[ScoreDB] Delete score from score_history_bms: " + std::string{errmsg()}).c_str());
+
     ret = exec("DELETE FROM score_cache_bms WHERE md5=?", {hash_str});
     if (ret != SQLITE_OK)
-    {
-        LOG_ERROR << "[ScoreDB] Failed to delete score from score_cache_bms: " << errmsg();
-    }
+        lunaticvibes::verify_failed(("[ScoreDB] Delete score from score_cache_bms: " + std::string{errmsg()}).c_str());
+
     cache["score_bms"].erase(hash_str);
 }
 
@@ -262,10 +259,7 @@ void ScoreDB::saveChartScoreBmsToHistory(const HashMD5& hash, const ScoreBMS& sc
                     score.exscore, lamp, score.pgreat, score.great, score.good, score.bad, score.kpoor, score.miss,
                     score.bp, score.combobreak, play_time, score.replayFileName});
     if (ret != SQLITE_OK)
-    {
-        LOG_ERROR << "[ScoreDB] Score saving failed: " << errmsg();
-        LVF_DEBUG_ASSERT(false && "Score saving failed");
-    }
+        lunaticvibes::verify_failed(("[ScoreDB] Save score: " + std::string{errmsg()}).c_str());
 }
 
 void ScoreDB::updateCachedChartPbBms(const HashMD5& hash, const ScoreBMS& score)
@@ -367,7 +361,7 @@ try
 }
 catch (const std::exception& e)
 {
-    LOG_ERROR << e.what();
+    lunaticvibes::verify_failed(("convertHistoryScoreBms: " + std::string{e.what()}).c_str());
     return false;
 }
 
@@ -384,7 +378,10 @@ static ScoreBMS::Lamp from_lr2(int clear)
     // Also good-attack when not FC?
     case 0x4: return L::HARD;
     case 0x5: return L::FULLCOMBO;
-    default: LOG_ERROR << "[ScoreDB] Unknown LR2 clear=" << clear << "; Report this!"; return L::NOPLAY;
+    default:
+        lunaticvibes::verify_failed(
+            ("[ScoreDB] Unknown LR2 clear=" + std::to_string(clear) + "; Report this!").c_str());
+        return L::NOPLAY;
     }
 }
 
@@ -530,9 +527,7 @@ void ScoreDB::updateStats(const ScoreBMS& score)
                {stats.play_count, stats.clear_count, stats.pgreat, stats.great, stats.good, stats.bad, stats.poor,
                 stats.running_combo, stats.max_running_combo, stats.playtime});
     if (ret != SQLITE_OK)
-    {
-        LOG_ERROR << "[ScoreDB] Failed to write new stats: " << errmsg();
-    }
+        lunaticvibes::verify_failed(("[ScoreDB] Write new stats: " + std::string{errmsg()}).c_str());
 }
 
 void ScoreDB::initTables()
@@ -568,10 +563,7 @@ void ScoreDB::initTables()
         )
     )";
     if (exec(create_score_bms_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to create table 'score_bms': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(("[ScoreDB] Failed to create table 'score_bms': " + std::string{errmsg()}).c_str());
 
     static constexpr auto&& create_score_history_bms_sql = R"(
         CREATE TABLE IF NOT EXISTS score_history_bms (
@@ -597,10 +589,8 @@ void ScoreDB::initTables()
         )
     )";
     if (exec(create_score_history_bms_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to create table 'score_history_bms': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(
+            ("[ScoreDB] Failed to create table 'score_history_bms': " + std::string{errmsg()}).c_str());
 
     // Combined score_bms and score_history_bms.
     static constexpr auto&& create_score_cache_bms_sql = R"(
@@ -629,10 +619,8 @@ void ScoreDB::initTables()
         )
     )";
     if (exec(create_score_cache_bms_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to create table 'score_cache_bms': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(
+            ("[ScoreDB] Failed to create table 'score_cache_bms': " + std::string{errmsg()}).c_str());
 
     static constexpr auto&& create_score_course_bms_sql = R"(
         CREATE TABLE IF NOT EXISTS score_course_bms (
@@ -660,10 +648,8 @@ void ScoreDB::initTables()
         )
     )";
     if (exec(create_score_course_bms_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to create table 'score_course_bms': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(
+            ("[ScoreDB] Failed to create table 'score_course_bms': " + std::string{errmsg()}).c_str());
 
     static constexpr auto&& create_stats_sql = R"(
         CREATE TABLE IF NOT EXISTS stats (
@@ -679,10 +665,7 @@ void ScoreDB::initTables()
         )
     )";
     if (exec(create_stats_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to create table 'stats': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(("[ScoreDB] Failed to create table 'stats': " + std::string{errmsg()}).c_str());
 
     static constexpr auto&& init_stats_sql = R"(
         INSERT OR IGNORE INTO stats (
@@ -701,8 +684,5 @@ void ScoreDB::initTables()
          VALUES (573, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     )";
     if (exec(init_stats_sql) != SQLITE_OK)
-    {
-        LOG_FATAL << "[ScoreDB] Failed to initialize table 'stats': " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(("[ScoreDB] Failed to initialize table 'stats': " + std::string{errmsg()}).c_str());
 }

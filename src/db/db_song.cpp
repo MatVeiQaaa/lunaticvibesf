@@ -188,50 +188,30 @@ bool convert_bms(const std::shared_ptr<ChartFormatBMSMeta>& chart, const std::ve
 SongDB::SongDB(const char* path) : SQLite(path, "SONG")
 {
     if (exec("PRAGMA cache_size = -512000") != SQLITE_OK)
-    {
-        LOG_WARNING << "[SongDB] Set cache_size ERROR! " << errmsg();
-    }
+        lunaticvibes::verify_failed(("[SongDB] Set cache_size: " + std::string{errmsg()}).c_str());
 
     poolThreadCount = std::thread::hardware_concurrency() - 1;
 
     if (exec(CREATE_FOLDER_TABLE_STR) != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create table folder ERROR! " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(("[SongDB] Create table folder: " + std::string{errmsg()}).c_str());
     if (query("SELECT parent FROM folder WHERE pathmd5=?", {ROOT_FOLDER_HASH.hexdigest()}).empty())
     {
         if (exec("INSERT INTO folder(pathmd5,parent,path,name,type,modtime) VALUES(?,?,?,?,?,?)",
                  {ROOT_FOLDER_HASH.hexdigest(), nullptr, "", "ROOT", 0, 0}))
-        {
-            LOG_ERROR << "[SongDB] Insert root folder to table ERROR! " << errmsg();
-            abort();
-        }
+            lunaticvibes::assert_failed(("[SongDB] Insert root folder to table: " + std::string{errmsg()}).c_str());
     }
 
     if (exec(CREATE_SONG_TABLE_STR) != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create table song ERROR! " << errmsg();
-        abort();
-    }
+        lunaticvibes::assert_failed(("[SongDB] Create table song: " + std::string{errmsg()}).c_str());
 
     if (exec("CREATE INDEX IF NOT EXISTS index_parent ON folder(parent)") != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create parent index for folder ERROR! " << errmsg();
-    }
-
+        lunaticvibes::assert_failed(("[SongDB] Create parent index for folder: " + std::string{errmsg()}).c_str());
     if (exec("CREATE INDEX IF NOT EXISTS index_md5 ON song(md5)") != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create md5 index for song ERROR! " << errmsg();
-    }
+        lunaticvibes::assert_failed(("[SongDB] Create md5 index for song: " + std::string{errmsg()}).c_str());
     if (exec("CREATE INDEX IF NOT EXISTS index_parent ON song(parent)") != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create parent index for song ERROR! " << errmsg();
-    }
+        lunaticvibes::assert_failed(("[SongDB] Create parent index for song: " + std::string{errmsg()}).c_str());
     if (exec("CREATE INDEX IF NOT EXISTS index_gamemode ON song(gamemode)") != SQLITE_OK)
-    {
-        LOG_ERROR << "[SongDB] Create gamemode index for song ERROR! " << errmsg();
-    }
+        lunaticvibes::assert_failed(("[SongDB] Create gamemode index for song: " + std::string{errmsg()}).c_str());
 }
 
 SongDB::~SongDB()

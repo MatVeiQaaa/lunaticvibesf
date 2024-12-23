@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "common/log.h"
-#include "common/utils.h"
 #include <common/assert.h>
+#include <common/log.h>
+#include <common/utils.h>
 
 std::string KeyMap::toString() const
 {
@@ -15,9 +15,7 @@ std::string KeyMap::toString() const
     case DeviceType::JOYSTICK: return toStringJ();
     case DeviceType::MOUSE: return toStringM();
     }
-    LOG_ERROR << "[Keymap] Invalid KeyMap";
-    LVF_DEBUG_ASSERT(false && "invalid KeyMap");
-    return "";
+    lunaticvibes::assert_failed("KeyMap::toString");
 }
 
 void KeyMap::setKeyboard(Input::Keyboard kb)

@@ -122,6 +122,5 @@ unsigned char sdl_key_from_common_scancode(Input::Keyboard key)
     case Input::Keyboard::K_NONUS_BACKSLASH: return SDL_SCANCODE_NONUSBACKSLASH;
     case Input::Keyboard::K_COUNT: break;
     }
-    LVF_VERIFY(false && "key is SDL_SCANCODE_UNKNOWN");
-    return SDL_SCANCODE_UNKNOWN;
+    lunaticvibes::assert_failed("sdl_key_from_common_scancode");
 }

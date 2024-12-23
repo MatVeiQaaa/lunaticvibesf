@@ -652,5 +652,4 @@ ReplayChart::Commands::Type ReplayChart::Commands::leftSideCmdToRightSide(const 
     case CmdType::JUDGE_LEFT_LANDMINE: return CmdType::JUDGE_RIGHT_LANDMINE;
     default: return cmd;
     }
-    std::abort(); // unreachable
 }

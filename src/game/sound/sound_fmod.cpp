@@ -932,9 +932,7 @@ static FMOD_DSP_TYPE dsp_type_to_fmd(DSPType type)
     case DSPType::CHORUS: return FMOD_DSP_TYPE_CHORUS;
     case DSPType::DISTORTION: return FMOD_DSP_TYPE_DISTORTION;
     }
-    LOG_ERROR << "[FMOD] invalid DSPType " << static_cast<std::underlying_type_t<DSPType>>(type);
-    LVF_DEBUG_ASSERT(false && "invalid DSPType in dsp_type_to_fmd");
-    return {};
+    lunaticvibes::assert_failed("dsp_type_to_fmd");
 }
 
 void SoundDriverFMOD::setDSP(DSPType type, int dspIndex, SampleChannel ch, float p1, float p2)

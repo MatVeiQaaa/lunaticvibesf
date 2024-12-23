@@ -477,17 +477,17 @@ bool SpriteBarEntry::update(const lunaticvibes::Time& time)
 
 void SpriteBarEntry::setMotionLoopTo(int t)
 {
-    LVF_VERIFY(!"[Sprite] setMotionLoopTo(f) of SpriteBarEntry should not be used");
+    lunaticvibes::verify_failed("[Sprite] setMotionLoopTo(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::setMotionStartTimer(IndexTimer t)
 {
-    LVF_VERIFY(!"[Sprite] setMotionStartTimer(f) of SpriteBarEntry should not be used");
+    lunaticvibes::verify_failed("[Sprite] setMotionStartTimer(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::appendMotionKeyFrame(const MotionKeyFrame& f)
 {
-    LVF_VERIFY(!"[Sprite] appendMotionKeyFrame(f) of SpriteBarEntry should not be used");
+    lunaticvibes::verify_failed("[Sprite] appendMotionKeyFrame(f) of SpriteBarEntry should not be used");
 }
 
 void SpriteBarEntry::draw() const {}

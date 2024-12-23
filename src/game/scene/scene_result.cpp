@@ -35,7 +35,7 @@ ScoreBMS::Lamp optionLampToBms(const Option::e_lamp_type lamp)
     case Option::e_lamp_type::LAMP_PERFECT: return ScoreBMS::Lamp::PERFECT;
     case Option::e_lamp_type::LAMP_MAX: return ScoreBMS::Lamp::MAX;
     }
-    abort(); // should be unreachable
+    lunaticvibes::assert_failed("optionLampToBms");
 }
 
 SceneResult::SceneResult(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMgr, SkinType::RESULT, 1000)

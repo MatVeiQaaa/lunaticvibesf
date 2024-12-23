@@ -19,9 +19,7 @@ TEST(DbConn, MigrationSystemWorks)
             EXPECT_TRUE(applyMigration("20240509T010000", addStuff));
             auto badAddStuff = [this]() {
                 if (exec("INSERT INTO some_data(id) VALUES (420);", {}) != SQLITE_OK)
-                {
                     abort();
-                }
                 return false;
             };
             EXPECT_FALSE(applyMigration("20240509T020000", badAddStuff));

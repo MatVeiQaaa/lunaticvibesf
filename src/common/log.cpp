@@ -2,18 +2,17 @@
 
 #include <memory>
 #include <ostream>
-#include <vector>
 
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Appenders/RollingFileAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Init.h>
 
-#include "common/utils.h"
+#include <common/assert.h>
+#include <common/types.h>
 
 namespace plog
 {
-// TxtFormatterImpl
 class TxtFormatterFileLine
 {
 public:
@@ -72,8 +71,7 @@ static plog::Severity plogSeverityFromLogLevel(const LogLevel level)
     case LogLevel::Debug: return plog::debug;
     case LogLevel::Verbose: return plog::verbose;
     }
-    // Normally unreachable.
-    return plog::verbose;
+    lunaticvibes::assert_failed("plogSeverityFromLogLevel");
 }
 
 std::ostream& operator<<(std::ostream& os, const LogLevel& level)
@@ -87,8 +85,7 @@ std::ostream& operator<<(std::ostream& os, const LogLevel& level)
     case LogLevel::Debug: return os << "Debug";
     case LogLevel::Verbose: return os << "Verbose";
     }
-    // Normally unreachable.
-    return os << "INVALID";
+    lunaticvibes::assert_failed("operator<<(LogLevel)");
 }
 
 void SetLogLevel(const LogLevel level)

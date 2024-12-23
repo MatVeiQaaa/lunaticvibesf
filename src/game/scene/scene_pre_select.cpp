@@ -243,7 +243,7 @@ static const std::string_view to_str(const DifficultyTable::UpdateResult result)
     case DifficultyTable::UpdateResult::DATA_TIMEOUT: return "DATA_TIMEOUT";
     case DifficultyTable::UpdateResult::DATA_PARSE_FAILED: return "DATA_PARSE_FAILED";
     }
-    abort();
+    lunaticvibes::assert_failed("to_str(DifficultyTable::UpdateResult)");
 }
 
 void ScenePreSelect::updateLoadTables()

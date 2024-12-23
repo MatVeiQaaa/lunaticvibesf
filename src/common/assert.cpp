@@ -6,12 +6,12 @@
 
 [[noreturn]] static void die_on_assertion_fail(const char* file, int line, const char* msg)
 {
-    LOG_FATAL << "die_on_assertion_fail at " << file << ":" << line << ": " << msg;
     panic("Internal error: assertion failed", msg);
 }
 
 void lunaticvibes::assert_failed(const char* msg, std::source_location loc)
 {
+    LOG_FATAL << "Fatal assertion failed at " << loc.file_name() << ":" << loc.line() << ": " << msg;
     die_on_assertion_fail(loc.file_name(), loc.line(), msg);
 }
 

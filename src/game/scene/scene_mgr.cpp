@@ -35,6 +35,5 @@ std::shared_ptr<SceneBase> lunaticvibes::buildScene(const std::shared_ptr<SkinMg
     case SceneType::COURSE_RESULT: return std::make_shared<SceneCourseResult>(skinMgr);
     case SceneType::EXIT_TRANS: return std::make_shared<SceneExitTrans>();
     }
-    LVF_DEBUG_ASSERT(false);
-    return nullptr;
+    lunaticvibes::assert_failed("lunaticvibes::buildScene");
 }

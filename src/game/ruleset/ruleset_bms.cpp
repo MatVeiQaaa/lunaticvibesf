@@ -1850,7 +1850,7 @@ void RulesetBMS::updateGlobals()
                 case JudgeArea::LATE_PERFECT:
                 case JudgeArea::MINE_KPOOR: return 0;
                 }
-                abort();
+                lunaticvibes::assert_failed("get_fastslow");
             };
 
             const int fs_of_player = get_fastslow(_lastNoteJudge[PLAYER_SLOT_PLAYER].area);

@@ -83,9 +83,7 @@ static SampleChannel get_sample_channel_for_target(unsigned int idx)
     case 1: return SampleChannel::KEY; break;
     case 2: return SampleChannel::BGM; break;
     }
-    LOG_ERROR << "Invalid idx " << idx;
-    LVF_DEBUG_ASSERT(false && "Invalid idx in get_sample_channel_for_target");
-    return {};
+    lunaticvibes::assert_failed("get_sample_channel_for_target");
 };
 
 static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
@@ -101,9 +99,7 @@ static DSPType get_dsp_type_from_sound_fx(unsigned int idx)
     case 6: return DSPType::CHORUS;
     case 7: return DSPType::DISTORTION;
     }
-    LOG_ERROR << "Invalid idx " << idx;
-    LVF_DEBUG_ASSERT(false && "Invalid idx in get_dsp_type_from_sound_fx");
-    return {};
+    lunaticvibes::assert_failed("get_dsp_type_from_sound_fx");
 };
 
 void fx0(int idx, double p)

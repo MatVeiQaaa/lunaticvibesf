@@ -283,7 +283,7 @@ bool InputWrapper::_register(unsigned type, const std::string& key, INPUTCALLBAC
     case 0: _pCallbackMap[key] = std::move(f); break;
     case 1: _hCallbackMap[key] = std::move(f); break;
     case 2: _rCallbackMap[key] = std::move(f); break;
-    default: abort(); break;
+    default: lunaticvibes::assert_failed("InputWrapper::_register");
     }
     return true;
 }
@@ -300,7 +300,7 @@ bool InputWrapper::_unregister(unsigned type, const std::string& key)
     case 0: _pCallbackMap.erase(key); break;
     case 1: _hCallbackMap.erase(key); break;
     case 2: _rCallbackMap.erase(key); break;
-    default: abort(); break;
+    default: lunaticvibes::assert_failed("InputWrapper::_unregister");
     }
 
     return true;

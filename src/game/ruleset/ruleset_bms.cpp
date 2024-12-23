@@ -1,6 +1,5 @@
 #include "ruleset_bms.h"
 
-#include <algorithm>
 #include <iterator>
 #include <utility>
 
@@ -1203,11 +1202,6 @@ static bool isMainUserSide(RulesetBMS::PlaySide side)
     lunaticvibes::assert_failed("isMainUserSide");
 }
 
-static int clampVisualAdjust(int adjust)
-{
-    return std::clamp(adjust, -99, 99);
-}
-
 static bool isBadOrBetter(const RulesetBMS::JudgeArea area)
 {
     switch (area)
@@ -1244,8 +1238,8 @@ void RulesetBMS::updateAutoadjust(const JudgeRes& j, const lunaticvibes::Time& r
         {
             if (j.time.norm() != 0)
             {
-                const int newAdjust =
-                    clampVisualAdjust(State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1));
+                // NOTE: compared to adjust buttons this doesn't need to clamp. Some people do in fact abuse this.
+                const int newAdjust = State::get(IndexNumber::TIMING_ADJUST_VISUAL) + (isOffsetPositive ? 1 : -1);
                 State::set(IndexNumber::TIMING_ADJUST_VISUAL, newAdjust);
             }
             _notesSinceLastAutoadjust = 0;

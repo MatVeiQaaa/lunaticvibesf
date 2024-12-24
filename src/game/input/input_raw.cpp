@@ -55,7 +55,7 @@ InputRawInput::InputRawInput()
 
     rid[0].usUsagePage = 0x01;       // HID_USAGE_PAGE_GENERIC
     rid[0].usUsage = 0x02;           // HID_USAGE_GENERIC_MOUSE
-    rid[0].dwFlags = RIDEV_NOLEGACY; // adds mouse and also ignores legacy mouse messages
+    rid[0].dwFlags = 0;              // adds mouse
     rid[0].hwndTarget = 0;
 
     rid[1].usUsagePage = 0x01;       // HID_USAGE_PAGE_GENERIC
@@ -131,13 +131,96 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
         {
             WORD scanCode = MAKEWORD(input.MakeCode & 0x7f,
                                      ((input.Flags & RI_KEY_E0) ? 0xe0 : ((input.Flags & RI_KEY_E1) ? 0xe1 : 0x00)));
-            deviceKeyboard.state[(size_t)ScanCodeToLVKey(input.MakeCode)] = !(input.Flags & RI_KEY_BREAK);
-            deviceKeyboard.update[(size_t)ScanCodeToLVKey(input.MakeCode)] = timestamp;
+            Input::Keyboard key = ScanCodeToLVKey(input.MakeCode);
+            _deviceKeyboard.state[(size_t)key] = !(input.Flags & RI_KEY_BREAK);
+            _deviceKeyboard.update[(size_t)key] = timestamp;
         }
         break;
     }
     case RIM_TYPEMOUSE: {
         RAWMOUSE& input = raw->data.mouse;
+        { // Mouse move handling.
+            bool moveRelative = input.usFlags & MOUSE_MOVE_RELATIVE;
+            bool moveAbsolute = input.usFlags & MOUSE_MOVE_ABSOLUTE;
+            bool moveNoCoalesce = input.usFlags & MOUSE_MOVE_NOCOALESCE;
+            bool virtDesktop = input.usFlags & MOUSE_VIRTUAL_DESKTOP;
+            bool atrbChanged = input.usFlags & MOUSE_ATTRIBUTES_CHANGED;
+
+            RECT screen;
+
+            if (virtDesktop)
+            {
+                screen.left = GetSystemMetrics(SM_XVIRTUALSCREEN);
+                screen.top = GetSystemMetrics(SM_YVIRTUALSCREEN);
+                screen.right = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+                screen.bottom = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+            }
+            else // Single screen.
+            {
+                screen.left = 0;
+                screen.top = 0;
+                screen.right = GetSystemMetrics(SM_CXSCREEN);
+                screen.bottom = GetSystemMetrics(SM_CYSCREEN);
+            }
+
+            if (moveAbsolute)
+            {
+                _deviceMouse.lastX = MulDiv(input.lLastX, screen.right, USHRT_MAX) + screen.left;
+                _deviceMouse.lastY = MulDiv(input.lLastY, screen.bottom, USHRT_MAX) + screen.top;
+            }
+            else if (input.lLastX != 0 || input.lLastY != 0) // Relative.
+            {
+                _deviceMouse.lastX = std::clamp(_deviceMouse.lastX + input.lLastX, screen.left, screen.right);
+                _deviceMouse.lastY = std::clamp(_deviceMouse.lastY + input.lLastY, screen.top, screen.bottom);
+            }
+        }
+
+        { // Mouse buttons and wheel handling.
+            USHORT& flags = input.usButtonFlags;
+            if (flags)
+            {
+                bool isWheel = flags & RI_MOUSE_WHEEL || flags & RI_MOUSE_HWHEEL;
+                if (!isWheel)
+                { // Buttons.
+                    _deviceMouse.state[0] = flags & RI_MOUSE_BUTTON_1_DOWN ? true
+                                           : flags & RI_MOUSE_BUTTON_1_UP ? false
+                                                                          : _deviceMouse.state[0];
+                    _deviceMouse.state[1] = flags & RI_MOUSE_BUTTON_2_DOWN ? true
+                                           : flags & RI_MOUSE_BUTTON_2_UP ? false
+                                                                          : _deviceMouse.state[1];
+                    _deviceMouse.state[2] = flags & RI_MOUSE_BUTTON_3_DOWN ? true
+                                           : flags & RI_MOUSE_BUTTON_3_UP ? false
+                                                                          : _deviceMouse.state[2];
+                    _deviceMouse.state[3] = flags & RI_MOUSE_BUTTON_4_DOWN ? true
+                                           : flags & RI_MOUSE_BUTTON_4_UP ? false
+                                                                          : _deviceMouse.state[3];
+                    _deviceMouse.state[4] = flags & RI_MOUSE_BUTTON_5_DOWN ? true
+                                           : flags & RI_MOUSE_BUTTON_5_UP ? false
+                                                                          : _deviceMouse.state[4];
+                }
+                else
+                { // Wheel.
+                    short wheelDelta = (short)input.usButtonData;
+                    float scrollDelta = (float)wheelDelta / WHEEL_DELTA;
+
+                    if (flags & RI_MOUSE_HWHEEL) // Horizontal
+                    {
+                        unsigned long scrollChars = 1;
+                        SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &scrollChars, 0);
+                        scrollDelta *= scrollChars;
+                        _deviceMouse.wheelHorz = scrollDelta;
+                    }
+                    else // Vertical
+                    {
+                        unsigned long scrollLines = 3;
+                        SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &scrollLines, 0);
+                        if (scrollLines != WHEEL_PAGESCROLL)
+                            scrollDelta *= scrollLines;
+                        _deviceMouse.wheelVert = scrollDelta;
+                    }
+                }
+            }
+        }
         break;
     }
     case RIM_TYPEHID: {
@@ -153,7 +236,7 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
 
 size_t InputRawInput::getJoystickCount() const
 {
-    return deviceJoysticks.size();
+    return _deviceJoysticks.size();
 }
 
 int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
@@ -376,7 +459,17 @@ Input::Keyboard InputRawInput::ScanCodeToLVKey(WORD scanCode)
 
 const std::array<bool, (size_t)Input::Keyboard::K_COUNT>& InputRawInput::getKeyboardState() const
 {
-    return deviceKeyboard.state;
+    return _deviceKeyboard.state;
+}
+
+const std::array<bool, 5>& InputRawInput::getMouseState() const
+{
+    return _deviceMouse.state;
+}
+
+float InputRawInput::getMouseZ() 
+{
+    return std::exchange(_deviceMouse.wheelVert, 0.f);
 }
 
 InputRawInput& InputRawInput::inst()

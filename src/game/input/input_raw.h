@@ -16,7 +16,12 @@ class InputRawInput
 public:
     struct DeviceMouse
     {
-        
+        std::array<lunaticvibes::Time, 5> update = {0};
+        std::array<bool, 5> state = {0};
+        float wheelVert = 0.f;
+        float wheelHorz = 0.f;
+        LONG lastX = 0;
+        LONG lastY = 0;
     };
     struct DeviceKeyboard
     {
@@ -29,9 +34,9 @@ public:
     };
 
 protected:
-    DeviceMouse deviceMouse;
-    DeviceKeyboard deviceKeyboard;
-    std::vector<DeviceJoystick> deviceJoysticks;
+    DeviceMouse _deviceMouse;
+    DeviceKeyboard _deviceKeyboard;
+    std::vector<DeviceJoystick> _deviceJoysticks;
 
 public:
 
@@ -45,6 +50,8 @@ public:
     const std::array<bool, (size_t)Input::Keyboard::K_COUNT>& getKeyboardState() const;
     static int LVKeyToScanCode(Input::Keyboard key);
     static Input::Keyboard ScanCodeToLVKey(WORD scanCode);
+    const std::array<bool, 5>& getMouseState() const;
+    float getMouseZ();
     //const DIJOYSTATE& getJoystickState(size_t idx) const;
     //const DeviceJoystick::Capabilities& getJoystickCapabilities(size_t idx) const;
 

@@ -140,6 +140,16 @@ enum class IndexTimer : unsigned
     RESULT_RANK_START,      // graph end
     RESULT_HIGHSCORE_START, // push any key from RESULT_RANK_START
 
+    DATABASE_LOADING = 170,
+    DATABASE_LOAD_END,
+
+    IR_CONNECT = 172,
+    IR_SUCCESS,
+    IR_FAILED_TIMER,
+
+    COURSE_EDITOR_START = 180,
+    COURSE_EDITOR_END,
+
     // new
     S1L_DOWN = 200,
     S1L_UP,

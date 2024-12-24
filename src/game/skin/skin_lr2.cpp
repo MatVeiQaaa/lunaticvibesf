@@ -703,7 +703,8 @@ int SkinLR2::HELPFILE()
     if (!matchToken(parseKeyBuf, "#HELPFILE"))
         return 0;
 
-    if (_helpFiles.size() > (HELP_10 - HELP_1))
+    constexpr size_t max_help_files = 10 - 1;
+    if (_helpFiles.size() > max_help_files)
     {
         LOG_DEBUG << "[Skin] Too many #HELPFILE";
         return 1;
@@ -2715,23 +2716,21 @@ bool SkinLR2::DST()
             if (type == DefType::NUMBER)
             {
                 auto p = std::reinterpret_pointer_cast<SpriteNumber>(e);
+                enum somedst
+                {
+                    SELECT_HAVE_BEGINNER_IN_SAME_FOLDER = 505,
+                    SELECT_HAVE_NORMAL_IN_SAME_FOLDER,
+                    SELECT_HAVE_HYPER_IN_SAME_FOLDER,
+                    SELECT_HAVE_ANOTHER_IN_SAME_FOLDER,
+                    SELECT_HAVE_INSANE_IN_SAME_FOLDER,
+                };
                 switch (p->numInd)
                 {
-                case IndexNumber::MUSIC_BEGINNER_LEVEL:
-                    dstOpt.push_back(dst_option::SELECT_HAVE_BEGINNER_IN_SAME_FOLDER);
-                    break;
-                case IndexNumber::MUSIC_NORMAL_LEVEL:
-                    dstOpt.push_back(dst_option::SELECT_HAVE_NORMAL_IN_SAME_FOLDER);
-                    break;
-                case IndexNumber::MUSIC_HYPER_LEVEL:
-                    dstOpt.push_back(dst_option::SELECT_HAVE_HYPER_IN_SAME_FOLDER);
-                    break;
-                case IndexNumber::MUSIC_ANOTHER_LEVEL:
-                    dstOpt.push_back(dst_option::SELECT_HAVE_ANOTHER_IN_SAME_FOLDER);
-                    break;
-                case IndexNumber::MUSIC_INSANE_LEVEL:
-                    dstOpt.push_back(dst_option::SELECT_HAVE_INSANE_IN_SAME_FOLDER);
-                    break;
+                case IndexNumber::MUSIC_BEGINNER_LEVEL: dstOpt.push_back(SELECT_HAVE_BEGINNER_IN_SAME_FOLDER); break;
+                case IndexNumber::MUSIC_NORMAL_LEVEL: dstOpt.push_back(SELECT_HAVE_NORMAL_IN_SAME_FOLDER); break;
+                case IndexNumber::MUSIC_HYPER_LEVEL: dstOpt.push_back(SELECT_HAVE_HYPER_IN_SAME_FOLDER); break;
+                case IndexNumber::MUSIC_ANOTHER_LEVEL: dstOpt.push_back(SELECT_HAVE_ANOTHER_IN_SAME_FOLDER); break;
+                case IndexNumber::MUSIC_INSANE_LEVEL: dstOpt.push_back(SELECT_HAVE_INSANE_IN_SAME_FOLDER); break;
                 default: break;
                 }
             }

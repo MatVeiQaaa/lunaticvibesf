@@ -1483,10 +1483,9 @@ static void requestOpenChartReadme()
 std::function<void(int)> getButtonCallback(int type)
 {
     auto createUnsupportedCb = [type](const std::string_view description) {
-        LOG_DEBUG << "[SkinLR2] Creating unsupported button [" << type << "] '" << description << "'";
+        LOG_DEBUG << "[SkinLR2] Unsupported button [" << type << "] '" << description << "'";
         return [type, description](int value) {
-            LOG_DEBUG << "[SkinLR2] Unsupported button [" << type << "] '" << description
-                      << "' pressed, value=" << value;
+            LOG_DEBUG << "[SkinLR2] Pressed unsupported button [" << type << "] '" << description << ": " << value;
         };
     };
 
@@ -1533,10 +1532,13 @@ std::function<void(int)> getButtonCallback(int type)
     case 44: return std::bind_front(autoscr, 0);
     case 45: return std::bind_front(autoscr, 1);
     case 46: return std::bind_front(shutter);
-    case 47: return std::bind_front(lock_speed_value, 0);
-    case 48: return std::bind_front(lock_speed_value, 1);
+    case 47: return std::bind_front(lock_speed_value, 0); // LV extension
+    case 48: return std::bind_front(lock_speed_value, 1); // LR2 unused and reserved but LV extension ;)
+    case 49: return [](auto) {};                          // LR2 unused and reserved
     case 50: return std::bind_front(lane_effect, 0);
     case 51: return std::bind_front(lane_effect, 1);
+    case 52:
+    case 53: return [](auto) {}; // LR2 unused and reserved
     case 54: return std::bind_front(flip);
     case 55: return std::bind_front(hs_fix);
     case 56: return std::bind_front(battle);
@@ -1588,6 +1590,9 @@ std::function<void(int)> getButtonCallback(int type)
     case 132: return std::bind(key_config_pad, Input::Pad::K2START, false);
     case 133: return std::bind(key_config_pad, Input::Pad::K2SELECT, false);
     case 136: return std::bind(key_config_pad, Input::Pad::S2A, false);
+    case 140: return createUnsupportedCb("鍵盤変更ボタン(7鍵用)");
+    case 141: return createUnsupportedCb("鍵盤変更ボタン(9鍵用)");
+    case 142: return createUnsupportedCb("鍵盤変更ボタン(5鍵用)");
     case 143: return [](auto) { key_config_mode_rotate(); };
     case 150:
     case 151:

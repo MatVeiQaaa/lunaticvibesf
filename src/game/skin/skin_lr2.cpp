@@ -1222,7 +1222,6 @@ bool SkinLR2::SRC()
         {
             textureBuf = getTextureCustomizeThumbnail();
             videoBuf = nullptr;
-            useVideo = false;
         }
         else
         {
@@ -1239,20 +1238,17 @@ bool SkinLR2::SRC()
             {
                 textureBuf = textureNameMap["White"];
                 videoBuf = videoNameMap[gr_key];
-                useVideo = true;
             }
             else if (textureNameMap.find(gr_key) != textureNameMap.end())
             {
                 textureBuf = textureNameMap[gr_key];
                 videoBuf = nullptr;
-                useVideo = false;
             }
             else
             {
                 // textureBuf = textureNameMap["Error"];
                 textureBuf = std::make_shared<Texture>(nullptr, 0, 0);
                 videoBuf = nullptr;
-                useVideo = false;
             }
         }
     }
@@ -1316,7 +1312,7 @@ ParseRet SkinLR2::SRC_IMAGE()
 {
     lr2skin::s_basic d(parseParamBuf, csvLineNumber);
 
-    if (useVideo && videoBuf && videoBuf->haveVideo)
+    if (videoBuf && videoBuf->haveVideo)
     {
         auto psv = std::make_shared<SpriteVideo>(d.w, d.h, videoBuf, csvLineNumber);
         _sprites.push_back(psv);

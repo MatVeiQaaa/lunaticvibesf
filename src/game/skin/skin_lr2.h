@@ -178,7 +178,6 @@ private:
 
     std::shared_ptr<Texture> textureBuf;
     std::shared_ptr<sVideo> videoBuf;
-    bool useVideo = false;
 
     int parseHeader(const Tokens& raw);
     int parseBody(const Tokens& raw);

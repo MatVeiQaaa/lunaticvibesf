@@ -31,7 +31,7 @@ bool InputDirectInput8::acquireDevices()
     }
 
     if (deviceMouse.lpdid)
-        deviceMouse.lpdid->Acquire();
+        //deviceMouse.lpdid->Acquire();
 
     if (deviceKeyboard.lpdid)
         //deviceKeyboard.lpdid->Acquire();
@@ -193,14 +193,14 @@ void InputDirectInput8::poll()
 
     if (lpdi)
     {
-        if (deviceMouse.lpdid &&
+       /* if (deviceMouse.lpdid &&
             deviceMouse.lpdid->GetDeviceState(sizeof(deviceMouse.state), &deviceMouse.state) == DI_OK)
         {
         }
         else
         {
             deviceMouse.state = DIMOUSESTATE();
-        }
+        }*/
 
       /*  if (deviceKeyboard.lpdid &&
             deviceKeyboard.lpdid->GetDeviceState(sizeof(deviceKeyboard.state), deviceKeyboard.state) == DI_OK)

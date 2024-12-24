@@ -269,6 +269,9 @@ double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
 
 bool isMouseButtonPressed(int idx)
 {
+    std::array<bool, 5> mouseState = InputRawInput::inst().getMouseState();
+    return mouseState[std::min((unsigned int)idx, (unsigned int)std::size(mouseState)) - 1];
+
     switch (idx)
     {
     case 1:
@@ -281,6 +284,7 @@ bool isMouseButtonPressed(int idx)
 
 short getLastMouseWheelState()
 {
+    return InputRawInput::inst().getMouseZ();
     int z = InputDirectInput8::inst().getMouseState().lZ;
     return z == 0 ? 0 : z / WHEEL_DELTA;
 }

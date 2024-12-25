@@ -10,7 +10,7 @@
 #include <game/runtime/generic_info.h>
 
 InputWrapper::InputWrapper(unsigned rate, bool background)
-    : AsyncLooper("InputLoop", std::bind_front(&InputWrapper::_loop, this), rate), _background(background)
+    : AsyncLooper("InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate), _background(background)
 {
 }
 
@@ -32,7 +32,7 @@ void InputWrapper::setRate(unsigned rate)
     AsyncLooper::setRate(rate);
 }
 
-void InputWrapper::_loop()
+void InputWrapper::loopAsync()
 {
     gFrameCount[FRAMECOUNT_IDX_INPUT]++;
 

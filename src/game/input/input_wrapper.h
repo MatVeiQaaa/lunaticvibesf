@@ -87,7 +87,7 @@ public:
     void setRate(unsigned rate_per_sec);
 
 private:
-    virtual void _loop();
+    void loopAsync();
 
 public:
     bool isPressed(Input::Pad k) { return (!_prev[k]) && (_curr[k]); }

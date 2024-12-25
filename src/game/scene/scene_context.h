@@ -279,7 +279,7 @@ struct KeyConfigContextParams
     std::pair<Input::Pad, int> selecting = {Input::Pad::K11, 0};
     bool modeChanged = false;
     bool skinHasAbsAxis = false;
-    std::map<IndexBargraph, double> bargraphForce; // Sheisse
+    std::array<double, Input::Pad::KEY_COUNT> bargraphForce;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,9 +1,11 @@
 #include "scene_keyconfig.h"
-#include "config/config_mgr.h"
-#include "game/runtime/i18n.h"
-#include "game/sound/sound_mgr.h"
-#include "scene_context.h"
 
+#include <config/config_mgr.h>
+#include <game/runtime/i18n.h>
+#include <game/scene/scene_context.h>
+#include <game/sound/sound_mgr.h>
+
+#include <array>
 #include <functional>
 #include <string_view>
 
@@ -221,22 +223,6 @@ void SceneKeyConfig::inputGameAxis(double S1, double S2, const lunaticvibes::Tim
     playerTurntableAngleAdd[PLAYER_SLOT_PLAYER] += S1 * 2.0 * 360;
     playerTurntableAngleAdd[PLAYER_SLOT_TARGET] += S2 * 2.0 * 360;
 }
-
-static const std::map<Input::Pad, IndexBargraph> forceBargraphMap = {
-    {Input::Pad::S1L, IndexBargraph::FORCE_S1L},         {Input::Pad::S1R, IndexBargraph::FORCE_S1R},
-    {Input::Pad::K1START, IndexBargraph::FORCE_K1Start}, {Input::Pad::K1SELECT, IndexBargraph::FORCE_K1Select},
-    {Input::Pad::S2L, IndexBargraph::FORCE_S2L},         {Input::Pad::S2R, IndexBargraph::FORCE_S2R},
-    {Input::Pad::K2START, IndexBargraph::FORCE_K2Start}, {Input::Pad::K2SELECT, IndexBargraph::FORCE_K2Select},
-    {Input::Pad::K11, IndexBargraph::FORCE_K11},         {Input::Pad::K12, IndexBargraph::FORCE_K12},
-    {Input::Pad::K13, IndexBargraph::FORCE_K13},         {Input::Pad::K14, IndexBargraph::FORCE_K14},
-    {Input::Pad::K15, IndexBargraph::FORCE_K15},         {Input::Pad::K16, IndexBargraph::FORCE_K16},
-    {Input::Pad::K17, IndexBargraph::FORCE_K17},         {Input::Pad::K18, IndexBargraph::FORCE_K18},
-    {Input::Pad::K19, IndexBargraph::FORCE_K19},         {Input::Pad::K21, IndexBargraph::FORCE_K21},
-    {Input::Pad::K22, IndexBargraph::FORCE_K22},         {Input::Pad::K23, IndexBargraph::FORCE_K23},
-    {Input::Pad::K24, IndexBargraph::FORCE_K24},         {Input::Pad::K25, IndexBargraph::FORCE_K25},
-    {Input::Pad::K26, IndexBargraph::FORCE_K26},         {Input::Pad::K27, IndexBargraph::FORCE_K27},
-    {Input::Pad::K28, IndexBargraph::FORCE_K28},         {Input::Pad::K29, IndexBargraph::FORCE_K29},
-};
 
 void SceneKeyConfig::inputGamePressKeyboard(KeyboardMask& mask, const lunaticvibes::Time& t)
 {
@@ -475,6 +461,15 @@ void SceneKeyConfig::setInputBindingText(GameModeKeys keys, Input::Pad pad)
 
 void SceneKeyConfig::updateForceBargraphs()
 {
+    static const std::array wantForceBargraph = {
+        Input::Pad::S1L, Input::Pad::K1START,  Input::Pad::S2L, Input::Pad::K2START, Input::Pad::K11,
+        Input::Pad::K13, Input::Pad::K15,      Input::Pad::K17, Input::Pad::K19,     Input::Pad::K22,
+        Input::Pad::K24, Input::Pad::K26,      Input::Pad::K28, Input::Pad::S1R,     Input::Pad::K1SELECT,
+        Input::Pad::S2R, Input::Pad::K2SELECT, Input::Pad::K12, Input::Pad::K14,     Input::Pad::K16,
+        Input::Pad::K18, Input::Pad::K21,      Input::Pad::K23, Input::Pad::K25,     Input::Pad::K27,
+        Input::Pad::K29,
+    };
+
     std::shared_lock l(_mutex);
 
     const GameModeKeys keys = gKeyconfigContext.keys;
@@ -486,7 +481,7 @@ void SceneKeyConfig::updateForceBargraphs()
          ++i)
     {
         const auto k = static_cast<Input::Keyboard>(i);
-        for (const auto& [p, bar] : forceBargraphMap)
+        for (const auto p : wantForceBargraph)
         {
             const auto binding = input->getBindings(p);
             if (binding.getType() == KeyMap::DeviceType::KEYBOARD && binding.getKeyboard() == k)
@@ -494,7 +489,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isKeyPressed(k))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    gKeyconfigContext.bargraphForce[bar] = 1.0;
+                    gKeyconfigContext.bargraphForce[p] = 1.0;
                 }
             }
         }
@@ -503,7 +498,7 @@ void SceneKeyConfig::updateForceBargraphs()
 
     for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_BUTTON_COUNT; ++index)
     {
-        for (const auto& [p, bar] : forceBargraphMap)
+        for (const auto p : wantForceBargraph)
         {
             const auto binding = input->getBindings(p);
             if (binding.getType() == KeyMap::DeviceType::JOYSTICK &&
@@ -512,8 +507,8 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isButtonPressed(binding.getJoystick(), 0.0))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    gKeyconfigContext.bargraphForce[bar] = 1.0;
-                    gKeyconfigContext.bargraphForce[bar] = 1.0;
+                    gKeyconfigContext.bargraphForce[p] = 1.0;
+                    gKeyconfigContext.bargraphForce[p] = 1.0;
                 }
             }
         }
@@ -521,7 +516,7 @@ void SceneKeyConfig::updateForceBargraphs()
 
     for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_POV_COUNT; ++index)
     {
-        for (const auto& [p, bar] : forceBargraphMap)
+        for (const auto p : wantForceBargraph)
         {
             const auto binding = input->getBindings(p);
             if (binding.getType() == KeyMap::DeviceType::JOYSTICK &&
@@ -531,7 +526,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isButtonPressed(binding.getJoystick(), 0.0))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    gKeyconfigContext.bargraphForce[bar] = 1.0;
+                    gKeyconfigContext.bargraphForce[p] = 1.0;
                 }
             }
         }
@@ -539,7 +534,7 @@ void SceneKeyConfig::updateForceBargraphs()
 
     for (size_t index = 0; index < InputMgr::MAX_JOYSTICK_AXIS_COUNT; ++index)
     {
-        for (const auto& [p, bar] : forceBargraphMap)
+        for (const auto p : wantForceBargraph)
         {
             const auto binding = input->getBindings(p);
 
@@ -552,7 +547,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    gKeyconfigContext.bargraphForce[bar] = axis;
+                    gKeyconfigContext.bargraphForce[p] = axis;
                 }
             }
 
@@ -565,18 +560,18 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    gKeyconfigContext.bargraphForce[bar] = axis;
+                    gKeyconfigContext.bargraphForce[p] = axis;
                 }
             }
         }
     }
 
-    for (auto& [pad, bar] : forceBargraphMap)
+    for (const auto pad : wantForceBargraph)
     {
-        if (forceBargraphTriggerTimestamp.find(pad) != forceBargraphTriggerTimestamp.end() &&
-            forceBargraphTriggerTimestamp[pad] != 0 && t - forceBargraphTriggerTimestamp[pad] > 200) // 1s timeout
+        if (auto it = forceBargraphTriggerTimestamp.find(pad);
+            it != forceBargraphTriggerTimestamp.end() && it->second != 0 && t - it->second > 200) // 1s timeout
         {
-            gKeyconfigContext.bargraphForce[bar] = 0.0;
+            gKeyconfigContext.bargraphForce[pad] = 0.0;
         }
     }
 }

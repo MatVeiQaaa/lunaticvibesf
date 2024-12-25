@@ -1,5 +1,6 @@
 #include "skin_lr2_bargraph.h"
 
+#include <common/keymap.h>
 #include <game/arena/arena_data.h>
 #include <game/ruleset/ruleset_bms.h>
 #include <game/ruleset/ruleset_bms_auto.h>
@@ -162,32 +163,34 @@ double lunaticvibes::get_bargraph(IndexBargraph ind)
         if (auto ruleset = gPlayContext.ruleset[PLAYER_SLOT_TARGET]; ruleset)
             return (double)ruleset->getData().judge[RulesetBMS::JUDGE_EARLY] / ruleset->getNoteCount();
         break;
-    case IndexBargraph::FORCE_K11:
-    case IndexBargraph::FORCE_K12:
-    case IndexBargraph::FORCE_K13:
-    case IndexBargraph::FORCE_K14:
-    case IndexBargraph::FORCE_K15:
-    case IndexBargraph::FORCE_K16:
-    case IndexBargraph::FORCE_K17:
-    case IndexBargraph::FORCE_K18:
-    case IndexBargraph::FORCE_K19:
-    case IndexBargraph::FORCE_S1L:
-    case IndexBargraph::FORCE_S1R:
-    case IndexBargraph::FORCE_K1Start:
-    case IndexBargraph::FORCE_K1Select:
-    case IndexBargraph::FORCE_K21:
-    case IndexBargraph::FORCE_K22:
-    case IndexBargraph::FORCE_K23:
-    case IndexBargraph::FORCE_K24:
-    case IndexBargraph::FORCE_K25:
-    case IndexBargraph::FORCE_K26:
-    case IndexBargraph::FORCE_K27:
-    case IndexBargraph::FORCE_K28:
-    case IndexBargraph::FORCE_K29:
-    case IndexBargraph::FORCE_S2L:
-    case IndexBargraph::FORCE_S2R:
-    case IndexBargraph::FORCE_K2Start:
-    case IndexBargraph::FORCE_K2Select: return gKeyconfigContext.bargraphForce[ind];
+    // `case IndexBargraph::FORCE_\(.*\):/case IndexBargraph::FORCE_\1: return
+    // gKeyconfigContext.bargraphForce[Input::Pad::\1];`
+    case IndexBargraph::FORCE_K11: return gKeyconfigContext.bargraphForce[Input::Pad::K11];
+    case IndexBargraph::FORCE_K12: return gKeyconfigContext.bargraphForce[Input::Pad::K12];
+    case IndexBargraph::FORCE_K13: return gKeyconfigContext.bargraphForce[Input::Pad::K13];
+    case IndexBargraph::FORCE_K14: return gKeyconfigContext.bargraphForce[Input::Pad::K14];
+    case IndexBargraph::FORCE_K15: return gKeyconfigContext.bargraphForce[Input::Pad::K15];
+    case IndexBargraph::FORCE_K16: return gKeyconfigContext.bargraphForce[Input::Pad::K16];
+    case IndexBargraph::FORCE_K17: return gKeyconfigContext.bargraphForce[Input::Pad::K17];
+    case IndexBargraph::FORCE_K18: return gKeyconfigContext.bargraphForce[Input::Pad::K18];
+    case IndexBargraph::FORCE_K19: return gKeyconfigContext.bargraphForce[Input::Pad::K19];
+    case IndexBargraph::FORCE_S1L: return gKeyconfigContext.bargraphForce[Input::Pad::S1L];
+    case IndexBargraph::FORCE_S1R: return gKeyconfigContext.bargraphForce[Input::Pad::S1R];
+    case IndexBargraph::FORCE_K1Start: return gKeyconfigContext.bargraphForce[Input::Pad::K1START];
+    case IndexBargraph::FORCE_K1Select: return gKeyconfigContext.bargraphForce[Input::Pad::K1SELECT];
+    case IndexBargraph::FORCE_K21: return gKeyconfigContext.bargraphForce[Input::Pad::K21];
+    case IndexBargraph::FORCE_K22: return gKeyconfigContext.bargraphForce[Input::Pad::K22];
+    case IndexBargraph::FORCE_K23: return gKeyconfigContext.bargraphForce[Input::Pad::K23];
+    case IndexBargraph::FORCE_K24: return gKeyconfigContext.bargraphForce[Input::Pad::K24];
+    case IndexBargraph::FORCE_K25: return gKeyconfigContext.bargraphForce[Input::Pad::K25];
+    case IndexBargraph::FORCE_K26: return gKeyconfigContext.bargraphForce[Input::Pad::K26];
+    case IndexBargraph::FORCE_K27: return gKeyconfigContext.bargraphForce[Input::Pad::K27];
+    case IndexBargraph::FORCE_K28: return gKeyconfigContext.bargraphForce[Input::Pad::K28];
+    case IndexBargraph::FORCE_K29: return gKeyconfigContext.bargraphForce[Input::Pad::K29];
+    case IndexBargraph::FORCE_S2L: return gKeyconfigContext.bargraphForce[Input::Pad::S2L];
+    case IndexBargraph::FORCE_S2R: return gKeyconfigContext.bargraphForce[Input::Pad::S2R];
+    case IndexBargraph::FORCE_K2Start: return gKeyconfigContext.bargraphForce[Input::Pad::K2START];
+    case IndexBargraph::FORCE_K2Select: return gKeyconfigContext.bargraphForce[Input::Pad::K2SELECT];
     case IndexBargraph::ARENA_PLAYDATA_EXSCORE:
     case IndexBargraph::ARENA_PLAYDATA_EXSCORE_PREDICT:
     case IndexBargraph::ARENA_PLAYDATA_MAX:

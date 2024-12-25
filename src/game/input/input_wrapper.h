@@ -8,21 +8,21 @@
 #include <map>
 #include <shared_mutex>
 
-typedef std::bitset<Input::Pad::KEY_COUNT> InputMask;
-typedef std::function<void(InputMask&, const lunaticvibes::Time&)> INPUTCALLBACK;
+using InputMask = std::bitset<Input::Pad::KEY_COUNT>;
+using INPUTCALLBACK = std::function<void(InputMask&, const lunaticvibes::Time&)>;
 
-typedef std::bitset<Input::keyboardKeyCount> KeyboardMask;
-typedef std::function<void(KeyboardMask&, const lunaticvibes::Time&)> KEYBOARDCALLBACK;
+using KeyboardMask = std::bitset<Input::keyboardKeyCount>;
+using KEYBOARDCALLBACK = std::function<void(KeyboardMask&, const lunaticvibes::Time&)>;
 
-typedef std::function<void(double, double, const lunaticvibes::Time&)> AXISPLUSCALLBACK;
+using AXISPLUSCALLBACK = std::function<void(double, double, const lunaticvibes::Time&)>;
 
 constexpr size_t MAX_JOYSTICK_MASK_BIT_COUNT =
     InputMgr::MAX_JOYSTICK_BUTTON_COUNT + InputMgr::MAX_JOYSTICK_POV_COUNT * 4 + InputMgr::MAX_JOYSTICK_AXIS_COUNT * 2;
-typedef std::bitset<MAX_JOYSTICK_MASK_BIT_COUNT> JoystickMask;
-typedef std::function<void(JoystickMask&, size_t, const lunaticvibes::Time&)> JOYSTICKCALLBACK;
+using JoystickMask = std::bitset<MAX_JOYSTICK_MASK_BIT_COUNT>;
+using JOYSTICKCALLBACK = std::function<void(JoystickMask&, size_t, const lunaticvibes::Time&)>;
 
-typedef std::array<double, InputMgr::MAX_JOYSTICK_AXIS_COUNT> JoystickAxis;
-typedef std::function<void(JoystickAxis&, size_t, const lunaticvibes::Time&)> ABSAXISCALLBACK;
+using JoystickAxis = std::array<double, InputMgr::MAX_JOYSTICK_AXIS_COUNT>;
+using ABSAXISCALLBACK = std::function<void(JoystickAxis&, size_t, const lunaticvibes::Time&)>;
 
 // FUNC:                                          BRDUEHDI><v^543210987654321_
 inline const InputMask INPUT_MASK_FUNC{"0000000111111111111111111111111111100000000000000000000000000000000"};

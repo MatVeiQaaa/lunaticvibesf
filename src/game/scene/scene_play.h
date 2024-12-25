@@ -1,13 +1,14 @@
 #pragma once
-#include "common/chartformat/chartformat.h"
-#include "game/chart/chart.h"
-#include "game/skin/skin_mgr.h"
-#include "scene.h"
-#include "scene_context.h"
+
+#include <common/chartformat/chartformat.h>
+#include <game/chart/chart.h>
+#include <game/input/input_wrapper.h>
+#include <game/scene/scene.h>
+#include <game/scene/scene_context.h>
+#include <game/skin/skin_mgr.h>
+
 #include <future>
 #include <memory>
-#include <mutex>
-#include <variant>
 
 enum class ePlayState
 {

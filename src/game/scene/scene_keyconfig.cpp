@@ -494,7 +494,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isKeyPressed(k))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    State::set(bar, 1.0);
+                    gKeyconfigContext.bargraphForce[bar] = 1.0;
                 }
             }
         }
@@ -512,7 +512,8 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isButtonPressed(binding.getJoystick(), 0.0))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    State::set(bar, 1.0);
+                    gKeyconfigContext.bargraphForce[bar] = 1.0;
+                    gKeyconfigContext.bargraphForce[bar] = 1.0;
                 }
             }
         }
@@ -530,7 +531,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (isButtonPressed(binding.getJoystick(), 0.0))
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    State::set(bar, 1.0);
+                    gKeyconfigContext.bargraphForce[bar] = 1.0;
                 }
             }
         }
@@ -551,7 +552,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    State::set(bar, axis);
+                    gKeyconfigContext.bargraphForce[bar] = axis;
                 }
             }
 
@@ -564,7 +565,7 @@ void SceneKeyConfig::updateForceBargraphs()
                 if (axis > 0.01 && axis <= 1.0)
                 {
                     forceBargraphTriggerTimestamp[p] = t.norm();
-                    State::set(bar, axis);
+                    gKeyconfigContext.bargraphForce[bar] = axis;
                 }
             }
         }
@@ -575,7 +576,7 @@ void SceneKeyConfig::updateForceBargraphs()
         if (forceBargraphTriggerTimestamp.find(pad) != forceBargraphTriggerTimestamp.end() &&
             forceBargraphTriggerTimestamp[pad] != 0 && t - forceBargraphTriggerTimestamp[pad] > 200) // 1s timeout
         {
-            State::set(bar, 0.0);
+            gKeyconfigContext.bargraphForce[bar] = 0.0;
         }
     }
 }

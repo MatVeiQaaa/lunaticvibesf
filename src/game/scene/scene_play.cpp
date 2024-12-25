@@ -256,7 +256,7 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     gChartContext.maxBPM = gChartContext.chart->maxBPM;
 
     // chartobj
-    chartObjLoaded = createChartObj();
+    gPlayContext.chartObjLoaded = createChartObj();
     gPlayContext.remainTime = gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getTotalLength();
 
     LOG_DEBUG << "[Play] Real BPM: " << gPlayContext.chartObj[PLAYER_SLOT_PLAYER]->getCurrentBPM() << " ("
@@ -309,9 +309,9 @@ ScenePlay::ScenePlay(const std::shared_ptr<SkinMgr>& skinMgr) : SceneBase(skinMg
     //////////////////////////////////////////////////////////////////////////////////////////
 
     // ruleset, should be called after initial health set
-    rulesetLoaded = createRuleset();
+    gPlayContext.rulesetLoaded = createRuleset();
 
-    if (rulesetLoaded && gArenaData.isOnline())
+    if (gPlayContext.rulesetLoaded && gArenaData.isOnline())
     {
         if (gArenaData.isClient())
             g_pArenaClient->setCreatedRuleset();
@@ -679,47 +679,8 @@ void ScenePlay::clearGlobalDatas()
         State::set((IndexNumber)i, 0);
     }
 
-    IndexBargraph bargraphsReset[] = {
-        IndexBargraph::PLAY_EXSCORE,
-        IndexBargraph::PLAY_EXSCORE_PREDICT,
-        IndexBargraph::PLAY_MYBEST_NOW,
-        IndexBargraph::PLAY_MYBEST_FINAL,
-        IndexBargraph::PLAY_RIVAL_EXSCORE,
-        IndexBargraph::PLAY_RIVAL_EXSCORE_FINAL,
-        IndexBargraph::PLAY_EXSCORE_BACKUP,
-        IndexBargraph::PLAY_RIVAL_EXSCORE_BACKUP,
-        IndexBargraph::RESULT_PG,
-        IndexBargraph::RESULT_GR,
-        IndexBargraph::RESULT_GD,
-        IndexBargraph::RESULT_BD,
-        IndexBargraph::RESULT_PR,
-        IndexBargraph::RESULT_MAXCOMBO,
-        IndexBargraph::RESULT_SCORE,
-        IndexBargraph::RESULT_EXSCORE,
-        IndexBargraph::RESULT_RIVAL_PG,
-        IndexBargraph::RESULT_RIVAL_GR,
-        IndexBargraph::RESULT_RIVAL_GD,
-        IndexBargraph::RESULT_RIVAL_BD,
-        IndexBargraph::RESULT_RIVAL_PR,
-        IndexBargraph::RESULT_RIVAL_MAXCOMBO,
-        IndexBargraph::RESULT_RIVAL_SCORE,
-        IndexBargraph::RESULT_RIVAL_EXSCORE,
-        IndexBargraph::PLAY_1P_SLOW_COUNT,
-        IndexBargraph::PLAY_1P_FAST_COUNT,
-        IndexBargraph::PLAY_2P_SLOW_COUNT,
-        IndexBargraph::PLAY_2P_FAST_COUNT,
-        IndexBargraph::MUSIC_LOAD_PROGRESS_SYS,
-        IndexBargraph::MUSIC_LOAD_PROGRESS_WAV,
-        IndexBargraph::MUSIC_LOAD_PROGRESS_BGA,
-    };
-    for (auto& e : bargraphsReset)
-    {
-        State::set(e, 0.0);
-    }
-    for (int i = (int)IndexBargraph::ARENA_PLAYDATA_BASE; i <= (int)IndexBargraph::ARENA_PLAYDATA_ALL_MAX; i++)
-    {
-        State::set((IndexBargraph)i, 0);
-    }
+    gPlayContext.bargraph_mybest_final = 0.;
+    gPlayContext.bargraph_mybest_now_fallback = 0.;
 
     IndexSlider slidersReset[] = {IndexSlider::SONG_PROGRESS};
     for (auto& e : slidersReset)
@@ -999,10 +960,6 @@ bool ScenePlay::createRuleset()
 
             std::dynamic_pointer_cast<RulesetBMSAuto>(gPlayContext.ruleset[PLAYER_SLOT_TARGET])
                 ->setTargetRate(targetRateReal);
-            if (!gArenaData.isOnline())
-            {
-                State::set(IndexBargraph::PLAY_RIVAL_EXSCORE_FINAL, targetRateReal);
-            }
         }
 
         // load mybest score
@@ -1013,15 +970,15 @@ bool ScenePlay::createRuleset()
         {
             if (!gArenaData.isOnline())
             {
-                State::set(IndexBargraph::PLAY_MYBEST_FINAL,
-                           (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore());
+                gPlayContext.bargraph_mybest_final =
+                    (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
             }
             if (!gPlayContext.replayMybest)
             {
                 if (!gArenaData.isOnline())
                 {
-                    State::set(IndexBargraph::PLAY_MYBEST_NOW,
-                               (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore());
+                    gPlayContext.bargraph_mybest_now_fallback =
+                        (double)pScore->exscore / gPlayContext.ruleset[PLAYER_SLOT_PLAYER]->getMaxScore();
                 }
                 State::set(IndexNumber::RESULT_MYBEST_EX, pScore->exscore);
                 State::set(IndexNumber::RESULT_MYBEST_RATE, (int)std::floor(pScore->rate * 100.0));
@@ -1174,11 +1131,11 @@ void ScenePlay::loadChart()
                     break;
                 if (it.empty())
                     continue;
-                ++wavTotal;
+                ++gPlayContext.wavTotal;
             }
-            if (wavTotal == 0)
+            if (gPlayContext.wavTotal == 0)
             {
-                wavLoaded = 1;
+                gPlayContext.wavLoaded = 1;
                 gChartContext.isSampleLoaded = true;
                 gChartContext.sampleLoadedHash = gChartContext.hash;
                 return;
@@ -1211,7 +1168,7 @@ void ScenePlay::loadChart()
 #endif // _WIN32
                         SoundMgr::loadNoteSample(p, i);
                     }
-                    ++wavLoaded;
+                    ++gPlayContext.wavLoaded;
                 });
             }
             pool.wait();
@@ -1249,11 +1206,11 @@ void ScenePlay::loadChart()
                         return;
                     if (it.empty())
                         continue;
-                    ++bmpTotal;
+                    ++gPlayContext.bmpTotal;
                 }
-                if (bmpTotal == 0)
+                if (gPlayContext.bmpTotal == 0)
                 {
-                    bmpLoaded = 1;
+                    gPlayContext.bmpLoaded = 1;
                     gChartContext.isBgaLoaded = true;
                     gChartContext.bgaLoadedHash = gChartContext.hash;
                     return;
@@ -1282,7 +1239,7 @@ void ScenePlay::loadChart()
 #endif // _WIN32
                             gPlayContext.bgaTexture->addBmp(i, p);
                         }
-                        ++bmpLoaded;
+                        ++gPlayContext.bmpLoaded;
                     }
                 }
 
@@ -1293,7 +1250,7 @@ void ScenePlay::loadChart()
                 }
 
                 LOG_DEBUG << "[Play] BGA loaded";
-                if (bmpLoaded > 0)
+                if (gPlayContext.bmpLoaded > 0)
                 {
                     gPlayContext.bgaTexture->setLoaded();
                 }
@@ -1964,18 +1921,14 @@ void ScenePlay::updateLoading()
     auto t = lunaticvibes::Time();
     auto rt = t - State::get(IndexTimer::_LOAD_START);
 
-    State::set(IndexNumber::PLAY_LOAD_PROGRESS_SYS, int(chartObjLoaded * 50 + rulesetLoaded * 50));
-    State::set(IndexNumber::PLAY_LOAD_PROGRESS_WAV, int(getWavLoadProgress() * 100));
-    State::set(IndexNumber::PLAY_LOAD_PROGRESS_BGA, int(getBgaLoadProgress() * 100));
+    State::set(IndexNumber::PLAY_LOAD_PROGRESS_SYS,
+               int(gPlayContext.chartObjLoaded * 50 + gPlayContext.rulesetLoaded * 50));
+    State::set(IndexNumber::PLAY_LOAD_PROGRESS_WAV, int(lunaticvibes::getWavLoadProgress() * 100));
+    State::set(IndexNumber::PLAY_LOAD_PROGRESS_BGA, int(lunaticvibes::getBgaLoadProgress() * 100));
     State::set(IndexNumber::PLAY_LOAD_PROGRESS_PERCENT,
-               int(getWavLoadProgress() * 100 + getBgaLoadProgress() * 100) / 2);
+               int(lunaticvibes::getWavLoadProgress() * 100 + lunaticvibes::getBgaLoadProgress() * 100) / 2);
 
-    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_SYS, int(chartObjLoaded) * 0.5 + int(rulesetLoaded) * 0.5);
-    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_WAV, getWavLoadProgress());
-    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS_BGA, getBgaLoadProgress());
-    State::set(IndexBargraph::MUSIC_LOAD_PROGRESS, (getWavLoadProgress() + getBgaLoadProgress()) / 2.0);
-
-    if (chartObjLoaded && rulesetLoaded && gChartContext.isSampleLoaded &&
+    if (gPlayContext.chartObjLoaded && gPlayContext.rulesetLoaded && gChartContext.isSampleLoaded &&
         (!State::get(IndexSwitch::_LOAD_BGA) || gChartContext.isBgaLoaded) && (t - delayedReadyTime) > 1000 &&
         rt > pSkin->info.timeMinimumLoad)
     {

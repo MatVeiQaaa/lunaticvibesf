@@ -20,16 +20,6 @@ State::State()
     gTimers.reset();
 }
 
-bool State::set(IndexBargraph ind, Ratio val)
-{
-    return _inst.gBargraphs.set(ind, val);
-}
-
-double State::get(IndexBargraph ind)
-{
-    return _inst.gBargraphs.get(ind);
-}
-
 bool State::set(IndexNumber ind, int val)
 {
     return _inst.gNumbers.set(ind, val);

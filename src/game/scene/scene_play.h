@@ -130,28 +130,9 @@ public:
 protected:
     // common
     void loadChart();
-    constexpr double getWavLoadProgress()
-    {
-        return (wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0) : (double)wavLoaded / wavTotal;
-    }
-    constexpr double getBgaLoadProgress()
-    {
-        return (bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0) : (double)bmpLoaded / bmpTotal;
-    }
 
     void setInputJudgeCallback();
     void removeInputJudgeCallback();
-
-protected:
-    // loading indicators
-    bool chartObjLoaded = false;
-    bool rulesetLoaded = false;
-    // bool _sampleLoaded = false;
-    // bool _bgaLoaded = false;
-    unsigned wavLoaded = 0;
-    unsigned wavTotal = 0;
-    unsigned bmpLoaded = 0;
-    unsigned bmpTotal = 0;
 
 protected:
     // Looper callbacks

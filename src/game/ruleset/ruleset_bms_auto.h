@@ -1,7 +1,7 @@
 #pragma once
 
-#include "game/scene/scene_context.h"
-#include "ruleset_bms.h"
+#include <game/ruleset/ruleset_bms.h>
+#include <game/scene/scene_context.h>
 
 class RulesetBMSAuto : public RulesetBMS
 {
@@ -21,6 +21,7 @@ protected:
     std::array<bool, Input::Pad::LANE_COUNT> isPressingLN;
 
 public:
+    double getTargetRate() const { return targetRate; };
     void setTargetRate(double rate);
 
     // Register to InputWrapper

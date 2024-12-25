@@ -1,7 +1,13 @@
 #pragma once
-#include "common/beat.h"
-#include "game/runtime/state.h"
-#include "graphics.h"
+
+#include <common/beat.h>
+#include <game/graphics/graphics.h>
+#include <game/runtime/index/bargraph.h>
+#include <game/runtime/index/number.h>
+#include <game/runtime/index/option.h>
+#include <game/runtime/index/switch.h>
+#include <game/runtime/state.h>
+
 #include <functional>
 #include <memory>
 #include <vector>

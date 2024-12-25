@@ -1794,13 +1794,6 @@ void RulesetBMS::updateGlobals()
     if (_side == PlaySide::SINGLE || _side == PlaySide::DOUBLE || _side == PlaySide::BATTLE_1P ||
         _side == PlaySide::AUTO || _side == PlaySide::AUTO_DOUBLE) // includes DP
     {
-        if (!gArenaData.isOnline())
-        {
-            State::set(IndexBargraph::PLAY_EXSCORE, _basic.total_acc / 100.0);
-            State::set(IndexBargraph::PLAY_EXSCORE_PREDICT, _basic.acc / 100.0);
-        }
-        State::set(IndexBargraph::PLAY_EXSCORE_BACKUP, _basic.total_acc / 100.0);
-
         State::set(IndexNumber::PLAY_1P_SCORE, int(std::round(moneyScore)));
         State::set(IndexNumber::PLAY_1P_EXSCORE, exScore);
         State::set(IndexNumber::PLAY_1P_NOWCOMBO, _basic.combo + _basic.comboDisplay);
@@ -1871,17 +1864,6 @@ void RulesetBMS::updateGlobals()
             }
         }
 
-        State::set(IndexBargraph::RESULT_PG, (double)_basic.judge[JUDGE_PERFECT] / getNoteCount());
-        State::set(IndexBargraph::RESULT_GR, (double)_basic.judge[JUDGE_GREAT] / getNoteCount());
-        State::set(IndexBargraph::RESULT_GD, (double)_basic.judge[JUDGE_GOOD] / getNoteCount());
-        State::set(IndexBargraph::RESULT_BD, (double)_basic.judge[JUDGE_BAD] / getNoteCount());
-        State::set(IndexBargraph::RESULT_PR, (double)_basic.judge[JUDGE_POOR] / getNoteCount());
-        State::set(IndexBargraph::RESULT_MAXCOMBO, (double)_basic.maxCombo / getMaxCombo());
-        State::set(IndexBargraph::RESULT_SCORE, moneyScore / maxMoneyScore);
-        State::set(IndexBargraph::RESULT_EXSCORE, (double)exScore / getMaxScore());
-        State::set(IndexBargraph::PLAY_1P_FAST_COUNT, (double)_basic.judge[JUDGE_EARLY] / getNoteCount());
-        State::set(IndexBargraph::PLAY_1P_SLOW_COUNT, (double)_basic.judge[JUDGE_LATE] / getNoteCount());
-
         State::set(IndexOption::PLAY_RANK_ESTIMATED_1P, Option::getRankType(_basic.acc));
         State::set(IndexOption::PLAY_RANK_BORDER_1P, Option::getRankType(_basic.total_acc));
         State::set(IndexOption::RESULT_RANK_1P, Option::getRankType(_basic.total_acc));
@@ -1950,12 +1932,6 @@ void RulesetBMS::updateGlobals()
     }
     else if (_side == PlaySide::BATTLE_2P || _side == PlaySide::AUTO_2P || _side == PlaySide::RIVAL) // excludes DP
     {
-        if (!gArenaData.isOnline())
-        {
-            State::set(IndexBargraph::PLAY_RIVAL_EXSCORE, _basic.total_acc / 100.0);
-        }
-        State::set(IndexBargraph::PLAY_RIVAL_EXSCORE_BACKUP, _basic.total_acc / 100.0);
-
         State::set(IndexNumber::PLAY_2P_SCORE, int(std::round(moneyScore)));
         if (_side == PlaySide::RIVAL)
         {
@@ -2014,17 +1990,6 @@ void RulesetBMS::updateGlobals()
                        _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
             State::set(IndexNumber::PLAY_2P_JUDGE_TIME_ERROR_MS, _lastNoteJudge[PLAYER_SLOT_TARGET].time.norm());
         }
-
-        State::set(IndexBargraph::RESULT_RIVAL_PG, (double)_basic.judge[JUDGE_PERFECT] / getNoteCount());
-        State::set(IndexBargraph::RESULT_RIVAL_GR, (double)_basic.judge[JUDGE_GREAT] / getNoteCount());
-        State::set(IndexBargraph::RESULT_RIVAL_GD, (double)_basic.judge[JUDGE_GOOD] / getNoteCount());
-        State::set(IndexBargraph::RESULT_RIVAL_BD, (double)_basic.judge[JUDGE_BAD] / getNoteCount());
-        State::set(IndexBargraph::RESULT_RIVAL_PR, (double)_basic.judge[JUDGE_POOR] / getNoteCount());
-        State::set(IndexBargraph::RESULT_RIVAL_MAXCOMBO, (double)_basic.maxCombo / getMaxCombo());
-        State::set(IndexBargraph::RESULT_RIVAL_SCORE, moneyScore / maxMoneyScore);
-        State::set(IndexBargraph::RESULT_RIVAL_EXSCORE, (double)exScore / getMaxScore());
-        State::set(IndexBargraph::PLAY_2P_FAST_COUNT, (double)_basic.judge[JUDGE_EARLY] / getNoteCount());
-        State::set(IndexBargraph::PLAY_2P_SLOW_COUNT, (double)_basic.judge[JUDGE_LATE] / getNoteCount());
 
         State::set(IndexOption::PLAY_RANK_ESTIMATED_2P, Option::getRankType(_basic.acc));
         State::set(IndexOption::PLAY_RANK_BORDER_2P, Option::getRankType(_basic.total_acc));
@@ -2089,9 +2054,5 @@ void RulesetBMS::updateGlobals()
             lamp = Option::LAMP_FAILED;
         }
         State::set(IndexOption::RESULT_CLEAR_TYPE_2P, std::min(lamp, saveLampMax));
-    }
-    else if (_side == PlaySide::MYBEST && !gArenaData.isOnline())
-    {
-        State::set(IndexBargraph::PLAY_MYBEST_NOW, _basic.total_acc / 100.0);
     }
 }

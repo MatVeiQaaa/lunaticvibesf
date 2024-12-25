@@ -1,5 +1,7 @@
-#include "game/graphics/sprite.h"
-#include "gmock/gmock.h"
+#include <game/graphics/sprite.h>
+#include <game/skin/skin_lr2_bargraph.h>
+
+#include <gmock/gmock.h>
 
 class mock_Image : public Image
 {
@@ -1219,27 +1221,27 @@ TEST_F(sBargraph, updateLeft)
     auto& s = sL;
 
     // InSequence dummy;
-    State::set(IndexBargraph::_TEST1, 0);
+    lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.33);
+    lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
     EXPECT_CALL(*pt,
                 draw(TEST_RECT, RectF(200 - 66, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.50);
+    lunaticvibes::set_bargraph_test1(0.50);
     s.update(t0);
     EXPECT_CALL(*pt,
                 draw(TEST_RECT, RectF(200 - 100, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 1.00);
+    lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
     EXPECT_CALL(*pt,
                 draw(TEST_RECT, RectF(200 - 200, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1254,25 +1256,25 @@ TEST_F(sBargraph, updateRight)
     auto& s = sR;
 
     // InSequence dummy;
-    State::set(IndexBargraph::_TEST1, 0);
+    lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.33);
+    lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 66, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.5);
+    lunaticvibes::set_bargraph_test1(0.5);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 100, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 1);
+    lunaticvibes::set_bargraph_test1(1);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
@@ -1286,25 +1288,25 @@ TEST_F(sBargraph, updateUp)
     auto& s = sU;
 
     // InSequence dummy;
-    State::set(IndexBargraph::_TEST1, 0);
+    lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 200, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.33);
+    lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 134, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.50);
+    lunaticvibes::set_bargraph_test1(0.50);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 100, 200, 100), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 1.00);
+    lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
@@ -1318,25 +1320,25 @@ TEST_F(sBargraph, updateDown)
     auto& s = sD;
 
     // InSequence dummy;
-    State::set(IndexBargraph::_TEST1, 0);
+    lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.33);
+    lunaticvibes::set_bargraph_test1(0.33);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 66), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 0.505);
+    lunaticvibes::set_bargraph_test1(0.505);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 101), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);
     s.draw();
 
-    State::set(IndexBargraph::_TEST1, 1.00);
+    lunaticvibes::set_bargraph_test1(1.00);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
         .Times(1);

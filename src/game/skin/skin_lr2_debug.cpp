@@ -1,10 +1,12 @@
 #include "skin_lr2_debug.h"
 
-#include "common/sysutil.h"
-#include "game/runtime/state.h"
-#include "game/skin/skin_lr2.h"
-#include "imgui.h"
+#include <common/sysutil.h>
+#include <game/runtime/state.h>
+#include <game/skin/skin_lr2.h>
+#include <game/skin/skin_lr2_bargraph.h>
 #include <common/assert.h>
+
+#include <imgui.h>
 
 void imguiMonitorLR2DST()
 {
@@ -197,7 +199,7 @@ void imguiMonitorBargraph()
             {
                 for (int j = 0; j <= 20; j++)
                 {
-                    ImGui::Text("% 4d: %lf", i + j, State::get((IndexBargraph)(i + j)));
+                    ImGui::Text("% 4d: %lf", i + j, lunaticvibes::get_bargraph((IndexBargraph)(i + j)));
                 }
             }
         }

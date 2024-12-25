@@ -1218,14 +1218,14 @@ void setEntryInfo(const size_t idx)
         State::set(IndexNumber::INFO_BAD_RATE, param["bdrate"]);
         State::set(IndexNumber::INFO_POOR_RATE, param["prrate"]);
 
-        State::set(IndexBargraph::SELECT_MYBEST_PG, paramf["pg"]);
-        State::set(IndexBargraph::SELECT_MYBEST_GR, paramf["gr"]);
-        State::set(IndexBargraph::SELECT_MYBEST_GD, paramf["gd"]);
-        State::set(IndexBargraph::SELECT_MYBEST_BD, paramf["bd"]);
-        State::set(IndexBargraph::SELECT_MYBEST_PR, paramf["pr"]);
-        State::set(IndexBargraph::SELECT_MYBEST_MAXCOMBO, paramf["maxcombo"]);
-        State::set(IndexBargraph::SELECT_MYBEST_SCORE, paramf["score"]);
-        State::set(IndexBargraph::SELECT_MYBEST_EXSCORE, paramf["exscore"]);
+        gSelectContext.bargraph_select_mybest_pg = paramf["pg"];
+        gSelectContext.bargraph_select_mybest_gr = paramf["gr"];
+        gSelectContext.bargraph_select_mybest_gd = paramf["gd"];
+        gSelectContext.bargraph_select_mybest_bd = paramf["bd"];
+        gSelectContext.bargraph_select_mybest_pr = paramf["pr"];
+        gSelectContext.bargraph_select_mybest_maxcombo = paramf["maxcombo"];
+        gSelectContext.bargraph_select_mybest_score = paramf["score"];
+        gSelectContext.bargraph_select_mybest_exscore = paramf["exscore"];
 
         State::set(IndexSwitch::CHART_HAVE_DIFFICULTY_1, param["havedifficulty1"]);
         State::set(IndexSwitch::CHART_HAVE_DIFFICULTY_2, param["havedifficulty2"]);
@@ -1242,11 +1242,11 @@ void setEntryInfo(const size_t idx)
         State::set(IndexNumber::MUSIC_HYPER_LEVEL, param["level3"]);
         State::set(IndexNumber::MUSIC_ANOTHER_LEVEL, param["level4"]);
         State::set(IndexNumber::MUSIC_INSANE_LEVEL, param["level5"]);
-        State::set(IndexBargraph::LEVEL_BAR_BEGINNER, paramf["levelbar1"]);
-        State::set(IndexBargraph::LEVEL_BAR_NORMAL, paramf["levelbar2"]);
-        State::set(IndexBargraph::LEVEL_BAR_HYPER, paramf["levelbar3"]);
-        State::set(IndexBargraph::LEVEL_BAR_ANOTHER, paramf["levelbar4"]);
-        State::set(IndexBargraph::LEVEL_BAR_INSANE, paramf["levelbar5"]);
+        gSelectContext.bargraph_level_bar_beginner = paramf["levelbar1"];
+        gSelectContext.bargraph_level_bar_normal = paramf["levelbar2"];
+        gSelectContext.bargraph_level_bar_hyper = paramf["levelbar3"];
+        gSelectContext.bargraph_level_bar_another = paramf["levelbar4"];
+        gSelectContext.bargraph_level_bar_insane = paramf["levelbar5"];
 
         State::set(IndexOption::COURSE_TYPE, param["coursetype"]);
         State::set(IndexOption::COURSE_STAGE_COUNT, param["coursestagecount"]);
@@ -1636,4 +1636,19 @@ void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battl
     case SkinType::PLAY14: LVF_VERIFY(!gPlayContext.isBattle); break;
     default: break;
     }
+}
+
+double lunaticvibes::getSysLoadProgress()
+{
+    return int(gPlayContext.chartObjLoaded) * 0.5 + int(gPlayContext.rulesetLoaded) * 0.5;
+}
+double lunaticvibes::getWavLoadProgress()
+{
+    return (gPlayContext.wavTotal == 0) ? (gChartContext.isSampleLoaded ? 1.0 : 0.0)
+                                        : (double)gPlayContext.wavLoaded / gPlayContext.wavTotal;
+}
+double lunaticvibes::getBgaLoadProgress()
+{
+    return (gPlayContext.bmpTotal == 0) ? (gChartContext.isBgaLoaded ? 1.0 : 0.0)
+                                        : (double)gPlayContext.bmpLoaded / gPlayContext.bmpTotal;
 }

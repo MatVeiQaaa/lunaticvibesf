@@ -12,6 +12,7 @@
 
 #include <array>
 #include <atomic>
+#include <map>
 #include <memory>
 #include <shared_mutex>
 #include <string>
@@ -110,6 +111,17 @@ struct PlayContextParams
     unsigned courseRunningCombo[2] = {0, 0};
     unsigned courseMaxCombo[2] = {0, 0};
 
+    double bargraph_mybest_final;
+    double bargraph_mybest_now_fallback;
+
+    // loading indicators
+    bool chartObjLoaded = false;
+    bool rulesetLoaded = false;
+    unsigned wavLoaded = 0;
+    unsigned wavTotal = 0;
+    unsigned bmpLoaded = 0;
+    unsigned bmpTotal = 0;
+
     lunaticvibes::Time remainTime;
 
     uint64_t randomSeed;
@@ -146,6 +158,13 @@ void clearContextPlayForRetry();
 void clearContextPlay();
 
 void pushGraphPoints();
+
+namespace lunaticvibes
+{
+double getSysLoadProgress();
+double getWavLoadProgress();
+double getBgaLoadProgress();
+} // namespace lunaticvibes
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -213,6 +232,20 @@ struct SelectContextParams
 
     ReadmeOpenRequest readmeOpenRequest;
 
+    double bargraph_level_bar_another;
+    double bargraph_level_bar_beginner;
+    double bargraph_level_bar_hyper;
+    double bargraph_level_bar_insane;
+    double bargraph_level_bar_normal;
+    double bargraph_select_mybest_bd;
+    double bargraph_select_mybest_exscore;
+    double bargraph_select_mybest_gd;
+    double bargraph_select_mybest_gr;
+    double bargraph_select_mybest_maxcombo;
+    double bargraph_select_mybest_pg;
+    double bargraph_select_mybest_pr;
+    double bargraph_select_mybest_score;
+
     HashMD5 remoteRequestedChart;      // only valid when remote is requesting a new chart; reset after list change
     std::string remoteRequestedPlayer; // only valid when remote is requesting a new chart; reset after list change
 
@@ -246,6 +279,7 @@ struct KeyConfigContextParams
     std::pair<Input::Pad, int> selecting = {Input::Pad::K11, 0};
     bool modeChanged = false;
     bool skinHasAbsAxis = false;
+    std::map<IndexBargraph, double> bargraphForce; // Sheisse
 };
 
 ////////////////////////////////////////////////////////////////////////////////

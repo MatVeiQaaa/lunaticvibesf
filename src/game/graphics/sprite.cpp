@@ -4,6 +4,7 @@
 
 #include <common/assert.h>
 #include <common/sysutil.h>
+#include <game/skin/skin_lr2_bargraph.h>
 
 constexpr double grad(int dst, int src, double t)
 {
@@ -870,7 +871,7 @@ void SpriteBargraph::updateVal(Ratio v)
 
 void SpriteBargraph::updateValByInd()
 {
-    updateVal(State::get(barInd));
+    updateVal(lunaticvibes::get_bargraph(barInd));
 }
 
 #pragma warning(push)

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/types.h"
-#include "index/bargraph.h"
 #include "index/number.h"
 #include "index/option.h"
 #include "index/slider.h"
@@ -93,7 +92,6 @@ protected:
 
         void reset() { _data = _dataDefault; }
     };
-    StateContainer<IndexBargraph, Ratio, (size_t)IndexBargraph::BARGRAPH_COUNT> gBargraphs;
     StateContainer<IndexNumber, int, (size_t)IndexNumber::NUMBER_COUNT> gNumbers;
     StateContainer<IndexOption, unsigned, (size_t)IndexOption::OPTION_COUNT> gOptions;
     StateContainer<IndexSlider, Ratio, (size_t)IndexSlider::SLIDER_COUNT> gSliders;
@@ -105,9 +103,6 @@ private:
     State();
 
 public:
-    static bool set(IndexBargraph ind, Ratio val);
-    static double get(IndexBargraph ind);
-
     static bool set(IndexNumber ind, int val);
     static int get(IndexNumber ind);
 

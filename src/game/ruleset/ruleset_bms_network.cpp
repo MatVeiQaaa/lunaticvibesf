@@ -23,11 +23,6 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
     auto rt = t - _startTime.norm();
     _basic.play_time = rt;
 
-    auto B = [this](IndexBargraph base) -> IndexBargraph {
-        return IndexBargraph((int)base +
-                             ((int)IndexBargraph::ARENA_PLAYDATA_MAX - (int)IndexBargraph::ARENA_PLAYDATA_BASE + 1) *
-                                 playerIndex);
-    };
     auto N = [this](IndexNumber base) -> IndexNumber {
         return IndexNumber((int)base +
                            ((int)IndexNumber::ARENA_PLAYDATA_MAX - (int)IndexNumber::ARENA_PLAYDATA_BASE + 1) *
@@ -38,9 +33,6 @@ void RulesetBMSNetwork::update(const lunaticvibes::Time& t)
                            ((int)IndexOption::ARENA_PLAYDATA_MAX - (int)IndexOption::ARENA_PLAYDATA_BASE + 1) *
                                playerIndex);
     };
-
-    State::set(B(IndexBargraph::ARENA_PLAYDATA_EXSCORE), _basic.total_acc / 100.0);
-    State::set(B(IndexBargraph::ARENA_PLAYDATA_EXSCORE_PREDICT), _basic.acc / 100.0);
 
     State::set(N(IndexNumber::ARENA_PLAYDATA_SCORE), int(std::round(moneyScore)));
     State::set(N(IndexNumber::ARENA_PLAYDATA_EXSCORE), exScore);

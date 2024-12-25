@@ -80,6 +80,7 @@ add_library(
     scene/scene_play_imgui.cpp
     skin/skin.cpp
     skin/skin_lr2.cpp
+    skin/skin_lr2_bargraph.cpp
     skin/skin_lr2_button_callbacks.cpp
     skin/skin_lr2_slider_callbacks.cpp
     skin/skin_lr2_converters.cpp

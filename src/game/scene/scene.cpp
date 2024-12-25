@@ -115,8 +115,8 @@ SceneBase::SceneBase(const std::shared_ptr<SkinMgr>& skinMgr, SkinType skinType,
 
 SceneBase::~SceneBase()
 {
-    LVF_DEBUG_ASSERT(!_input.isRunning());
-    LVF_DEBUG_ASSERT(!isRunning());
+    LVF_ASSERT(!_input.isRunning());
+    LVF_ASSERT(!isRunning());
     _input.unregister_r("SKIN_MOUSE_RELEASE");
     _input.unregister_h("SKIN_MOUSE_DRAG");
     _input.unregister_p("SKIN_MOUSE_CLICK");
@@ -133,9 +133,7 @@ void SceneBase::postAsyncStart()
 SceneBase::AsyncStopState SceneBase::postAsyncStop()
 {
     if (_asyncStopState == AsyncStopState::Running)
-    {
         _asyncStopState = AsyncStopState::Stopping;
-    }
     return _asyncStopState;
 }
 

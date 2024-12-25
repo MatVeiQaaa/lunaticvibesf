@@ -51,7 +51,7 @@ public:
     void loopStart();
     void loopEnd();
     bool isRunning() const { return _running; }
-    unsigned getRate();
+    unsigned getRate() const { return _rate; };
 
 private:
     std::function<void()> _loopFunc;

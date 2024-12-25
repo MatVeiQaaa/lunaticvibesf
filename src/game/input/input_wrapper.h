@@ -56,13 +56,14 @@ inline const InputMask INPUT_MASK_NAV_DN_9K{"00000000000000000100000000000000000
 // Interface:
 //  Pressed / Holding / Released FULL bitset
 //  Pressed / Holding / Released per key
-class InputWrapper : public AsyncLooper
+class InputWrapper
 {
 public:
     unsigned release_delay_ms = 5;
 
 private:
     std::shared_mutex _inputMutex;
+    AsyncLooper _looper;
 
 protected:
     std::array<std::pair<long long, bool>, Input::KEY_COUNT> _inputBuffer{{{0, false}}};
@@ -81,10 +82,16 @@ protected:
 
 public:
     InputWrapper(unsigned rate = 1000, bool background = false);
-    ~InputWrapper() override;
+    ~InputWrapper();
 
 public:
-    void setRate(unsigned rate_per_sec);
+    void loopEnd() { _looper.loopEnd(); }
+    void loopStart() { _looper.loopStart(); }
+
+    [[nodiscard]] bool isRunning() const { return _looper.isRunning(); }
+
+    [[nodiscard]] unsigned getRate() { return _looper.getRate(); }
+    void setRate(unsigned rate_per_sec) { _looper.setRate(rate_per_sec); }
 
 private:
     void loopAsync();

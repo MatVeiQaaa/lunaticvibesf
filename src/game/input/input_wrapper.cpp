@@ -10,18 +10,13 @@
 #include <game/runtime/generic_info.h>
 
 InputWrapper::InputWrapper(unsigned rate, bool background)
-    : AsyncLooper("InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate), _background(background)
+    : _looper{"InputLoop", std::bind_front(&InputWrapper::loopAsync, this), rate}, _background(background)
 {
 }
 
 InputWrapper::~InputWrapper()
 {
-    LVF_ASSERT(!isRunning());
-}
-
-void InputWrapper::setRate(unsigned rate)
-{
-    AsyncLooper::setRate(rate);
+    LVF_ASSERT(!_looper.isRunning());
 }
 
 void InputWrapper::loopAsync()

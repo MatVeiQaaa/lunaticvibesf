@@ -26,7 +26,7 @@ AsyncLooper::AsyncLooper(StringContentView tag, std::function<void()> func, unsi
 
 AsyncLooper::~AsyncLooper()
 {
-    LVF_DEBUG_ASSERT(!_running);
+    LVF_ASSERT(!_running);
 
 #ifdef _WIN32
     if (handler)
@@ -58,11 +58,6 @@ void AsyncLooper::run()
         _loopFunc();
         _inLoopBody = false;
     }
-}
-
-unsigned AsyncLooper::getRate()
-{
-    return _rate;
 }
 
 #ifdef _WIN32

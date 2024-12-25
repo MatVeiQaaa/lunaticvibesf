@@ -61,7 +61,7 @@ public:
     virtual ~RulesetBase() = default;
 
 public:
-    virtual void updatePress(InputMask& pg, const lunaticvibes::Time& t) = 0;
+    virtual void updatePress(InputMask& pg, const lunaticvibes::Time& t, const lunaticvibes::InputMaskTimes& tt) = 0;
     virtual void updateHold(InputMask& hg, const lunaticvibes::Time& t) = 0;
     virtual void updateRelease(InputMask& rg, const lunaticvibes::Time& t) = 0;
     virtual void updateAxis(double s1, double s2, const lunaticvibes::Time& t) = 0;

@@ -4,6 +4,7 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <game/input/input_wrapper.h>
 
 RulesetBMSReplay::RulesetBMSReplay(std::shared_ptr<ChartFormatBase> format_, std::shared_ptr<ChartObjectBase> chart_,
                                    std::shared_ptr<ReplayChart> replay_, const PlayModifiers mods, GameModeKeys keys,
@@ -59,9 +60,11 @@ void RulesetBMSReplay::update(const lunaticvibes::Time& t)
         if (isSkippingToEnd)
             _chart->update(prevReplayT);
         InputMask pressed = keyPressing & ~prevKeyPressing;
+        lunaticvibes::InputMaskTimes tt;
+        tt.fill(prevReplayT);
         InputMask released = ~keyPressing & prevKeyPressing;
         if (pressed.any())
-            RulesetBMS::updatePress(pressed, prevReplayT);
+            RulesetBMS::updatePress(pressed, prevReplayT, tt);
         if (keyPressing.any())
             RulesetBMS::updateHold(keyPressing, prevReplayT);
         if (released.any())

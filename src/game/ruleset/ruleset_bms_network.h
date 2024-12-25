@@ -26,7 +26,7 @@ public:
     bool isFinished() const override { return _isFinished; }
 
     // Register to InputWrapper
-    void updatePress(InputMask& pg, const lunaticvibes::Time& t) override {}
+    void updatePress(InputMask& pg, const lunaticvibes::Time& t, const lunaticvibes::InputMaskTimes& tt) override {}
     // Register to InputWrapper
     void updateHold(InputMask& hg, const lunaticvibes::Time& t) override {}
     // Register to InputWrapper

@@ -24,6 +24,15 @@ using JOYSTICKCALLBACK = std::function<void(JoystickMask&, size_t, const lunatic
 using JoystickAxis = std::array<double, InputMgr::MAX_JOYSTICK_AXIS_COUNT>;
 using ABSAXISCALLBACK = std::function<void(JoystickAxis&, size_t, const lunaticvibes::Time&)>;
 
+namespace lunaticvibes
+{
+
+using InputMaskTimes = std::array<lunaticvibes::Time, Input::Pad::KEY_COUNT>;
+// This will eventually replace ::INPUTCALLBACK.
+using InputCallback = std::function<void(InputMask&, const lunaticvibes::Time&, const lunaticvibes::InputMaskTimes&)>;
+
+} // namespace lunaticvibes
+
 // FUNC:                                          BRDUEHDI><v^543210987654321_
 inline const InputMask INPUT_MASK_FUNC{"0000000111111111111111111111111111100000000000000000000000000000000"};
 // 1P:                                                                                        sDUEA987654321SS
@@ -116,6 +125,7 @@ public:
 
 private:
     // Callback function maps
+    std::map<const std::string, lunaticvibes::InputCallback> _pCallbackMapNew;
     std::map<const std::string, INPUTCALLBACK> _pCallbackMap;
     std::map<const std::string, INPUTCALLBACK> _hCallbackMap;
     std::map<const std::string, INPUTCALLBACK> _rCallbackMap;
@@ -128,6 +138,7 @@ private:
 
 public:
     bool register_p(const std::string& key, INPUTCALLBACK f) { return _register(0, key, std::move(f)); }
+    bool register_p_new(const std::string& key, lunaticvibes::InputCallback f);
     bool register_h(const std::string& key, INPUTCALLBACK f) { return _register(1, key, std::move(f)); }
     bool register_r(const std::string& key, INPUTCALLBACK f) { return _register(2, key, std::move(f)); }
     bool unregister_p(const std::string& key) { return _unregister(0, key); }

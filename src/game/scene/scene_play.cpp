@@ -1277,8 +1277,8 @@ void ScenePlay::setInputJudgeCallback()
 {
     if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr)
     {
-        _input.register_p("JUDGE_PRESS_1",
-                          std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
+        _input.register_p_new("JUDGE_PRESS_1",
+                              std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
         _input.register_h("JUDGE_HOLD_1",
                           std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
         _input.register_r("JUDGE_RELEASE_1",
@@ -1293,8 +1293,8 @@ void ScenePlay::setInputJudgeCallback()
 
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr)
     {
-        _input.register_p("JUDGE_PRESS_2",
-                          std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
+        _input.register_p_new("JUDGE_PRESS_2",
+                              std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
         _input.register_h("JUDGE_HOLD_2",
                           std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
         _input.register_r("JUDGE_RELEASE_2",

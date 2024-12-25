@@ -5,6 +5,7 @@
 #include <utility>
 
 #include <common/assert.h>
+#include <common/log.h>
 #include <common/sysutil.h>
 #include <common/utils.h>
 #include <game/runtime/generic_info.h>
@@ -29,6 +30,7 @@ void InputWrapper::loopAsync()
 
     // detect key / button
     InputMask p{0}, h{0}, r{0};
+    lunaticvibes::InputMaskTimes pTimes{};
     auto curr = _curr;
     if (!_background && !IsWindowForeground())
     {
@@ -47,6 +49,7 @@ void InputWrapper::loopAsync()
             ms = now.norm();
             stat = true;
             p.set(i);
+            pTimes[i] = ms; // TODO: take time from the input manager lol.
         }
         else if (!curr[i] && stat)
         {
@@ -226,8 +229,12 @@ void InputWrapper::loopAsync()
         if (l.try_lock())
         {
             if (p != 0)
+            {
                 for (auto& [cbname, callback] : _pCallbackMap)
                     callback(p, now);
+                for (auto& [cbname, callback] : _pCallbackMapNew)
+                    callback(p, now, pTimes);
+            }
             if (h != 0)
                 for (auto& [cbname, callback] : _hCallbackMap)
                     callback(h, now);
@@ -283,6 +290,14 @@ bool InputWrapper::_unregister(unsigned type, const std::string& key)
     case 2: _rCallbackMap.erase(key); return true;
     default: lunaticvibes::assert_failed("InputWrapper::_register");
     }
+}
+
+bool InputWrapper::register_p_new(const std::string& key, lunaticvibes::InputCallback f)
+{
+    std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(_pCallbackMapNew.find(key) == _pCallbackMapNew.end());
+    _pCallbackMapNew[key] = std::move(f);
+    return true;
 }
 
 bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)

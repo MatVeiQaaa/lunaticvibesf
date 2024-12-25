@@ -1323,10 +1323,9 @@ void RulesetBMS::judgeNoteRelease(Input::Pad k, const lunaticvibes::Time& t, con
     }
 }
 
-void RulesetBMS::updatePress(InputMask& pg, const lunaticvibes::Time& t)
+void RulesetBMS::updatePress(InputMask& pg, const lunaticvibes::Time& t, const lunaticvibes::InputMaskTimes& tt)
 {
-    lunaticvibes::Time rt = t - _startTime.norm();
-    if (rt.norm() < 0)
+    if (t.norm() - _startTime.norm() < 0)
         return;
     if (gPlayContext.isAuto)
         return;
@@ -1335,7 +1334,7 @@ void RulesetBMS::updatePress(InputMask& pg, const lunaticvibes::Time& t)
         {
             if (!pg[k])
                 continue;
-            judgeNotePress((Input::Pad)k, t, rt, slot);
+            judgeNotePress((Input::Pad)k, t, tt[k] - _startTime, slot);
         }
     };
     if (_k1P)

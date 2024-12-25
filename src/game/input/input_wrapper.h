@@ -97,19 +97,19 @@ private:
     void loopAsync();
 
 public:
-    bool isPressed(Input::Pad k) { return (!_prev[k]) && (_curr[k]); }
+    [[nodiscard]] bool isPressed(Input::Pad k) { return (!_prev[k]) && (_curr[k]); }
 
-    bool isReleased(Input::Pad k) { return (_prev[k]) && (!_curr[k]); }
+    [[nodiscard]] bool isReleased(Input::Pad k) { return (_prev[k]) && (!_curr[k]); }
 
-    bool isHolding(Input::Pad k) { return (_prev[k]) && (_curr[k]); }
+    [[nodiscard]] bool isHolding(Input::Pad k) { return (_prev[k]) && (_curr[k]); }
 
-    InputMask Pressed() const { return ~_prev & _curr; }
-    InputMask Holding() const { return _prev & _curr; }
-    InputMask Released() const { return _prev & ~_curr; }
+    [[nodiscard]] InputMask Pressed() const { return ~_prev & _curr; }
+    [[nodiscard]] InputMask Holding() const { return _prev & _curr; }
+    [[nodiscard]] InputMask Released() const { return _prev & ~_curr; }
 
-    std::pair<int, int> getCursorPos() const { return {_cursor_x, _cursor_y}; }
+    [[nodiscard]] std::pair<int, int> getCursorPos() const { return {_cursor_x, _cursor_y}; }
 
-    double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index);
+    [[nodiscard]] double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index);
 
     // Merge 2P button inputs into 1P. Note that abs axis are ALSO merged.
     void setMergeInput() { mergeInput = true; }

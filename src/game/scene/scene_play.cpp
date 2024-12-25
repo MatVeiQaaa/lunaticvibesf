@@ -1277,14 +1277,14 @@ void ScenePlay::setInputJudgeCallback()
 {
     if (gPlayContext.ruleset[PLAYER_SLOT_PLAYER] != nullptr)
     {
-        auto fp = std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
-        _input.register_p("JUDGE_PRESS_1", fp);
-        auto fh = std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
-        _input.register_h("JUDGE_HOLD_1", fh);
-        auto fr = std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
-        _input.register_r("JUDGE_RELEASE_1", fr);
-        auto fa = std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]);
-        _input.register_a("JUDGE_AXIS_1", fa);
+        _input.register_p("JUDGE_PRESS_1",
+                          std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
+        _input.register_h("JUDGE_HOLD_1",
+                          std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
+        _input.register_r("JUDGE_RELEASE_1",
+                          std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
+        _input.register_a("JUDGE_AXIS_1",
+                          std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_PLAYER]));
     }
     else
     {
@@ -1293,14 +1293,14 @@ void ScenePlay::setInputJudgeCallback()
 
     if (gPlayContext.ruleset[PLAYER_SLOT_TARGET] != nullptr)
     {
-        auto fp = std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
-        _input.register_p("JUDGE_PRESS_2", fp);
-        auto fh = std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
-        _input.register_h("JUDGE_HOLD_2", fh);
-        auto fr = std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
-        _input.register_r("JUDGE_RELEASE_2", fr);
-        auto fa = std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_TARGET]);
-        _input.register_a("JUDGE_AXIS_2", fa);
+        _input.register_p("JUDGE_PRESS_2",
+                          std::bind_front(&RulesetBase::updatePress, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
+        _input.register_h("JUDGE_HOLD_2",
+                          std::bind_front(&RulesetBase::updateHold, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
+        _input.register_r("JUDGE_RELEASE_2",
+                          std::bind_front(&RulesetBase::updateRelease, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
+        _input.register_a("JUDGE_AXIS_2",
+                          std::bind_front(&RulesetBase::updateAxis, gPlayContext.ruleset[PLAYER_SLOT_TARGET]));
     }
     else if (!gPlayContext.isAuto)
     {

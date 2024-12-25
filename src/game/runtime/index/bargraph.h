@@ -110,6 +110,4 @@ enum class IndexBargraph : unsigned
     MUSIC_LOAD_PROGRESS_BGA,
 
     _TEST1,
-
-    BARGRAPH_COUNT
 };

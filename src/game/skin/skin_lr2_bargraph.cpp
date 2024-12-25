@@ -199,7 +199,6 @@ double lunaticvibes::get_bargraph(IndexBargraph ind)
     case IndexBargraph::MUSIC_LOAD_PROGRESS_WAV: return lunaticvibes::getWavLoadProgress();
     case IndexBargraph::MUSIC_LOAD_PROGRESS_BGA: return lunaticvibes::getBgaLoadProgress();
     case IndexBargraph::_TEST1: return s_test1;
-    case IndexBargraph::BARGRAPH_COUNT: break;
     }
     return 0.;
 };

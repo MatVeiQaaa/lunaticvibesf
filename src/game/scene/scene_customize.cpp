@@ -14,6 +14,7 @@
 #include <game/sound/soundset_lr2.h>
 
 #include <fstream>
+#include <string_view>
 
 void prepareChartForPlay(std::shared_ptr<ChartFormatBase> chart_, unsigned battleType);
 
@@ -78,6 +79,15 @@ static void loadPreviewChartIfNeeded(SkinType mode)
     prepareChartForPlay(std::move(chart), Option::e_battle_type::BATTLE_LOCAL);
 }
 
+[[nodiscard]] static std::vector<Path> recursiveFindFiles(const Path& p, std::string_view extension)
+{
+    std::vector<Path> out;
+    for (const auto& entry : fs::recursive_directory_iterator{p})
+        if (lunaticvibes::iequals(lunaticvibes::s(entry.path().extension().u8string()), extension))
+            out.push_back(entry.path());
+    return out;
+}
+
 SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     : SceneBase(skinMgr, SkinType::THEME_SELECT, 240), _skinMgr(skinMgr), _state(lunaticvibes::CustomizeState::Start)
 {
@@ -120,7 +130,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     load(selectedMode);
 
     auto skinFileList =
-        findFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/*.lr2skin"), true);
+        recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Theme/"), ".lr2skin");
     std::sort(skinFileList.begin(), skinFileList.end());
     auto dummySharedSprites = std::make_shared<std::array<std::shared_ptr<SpriteBase>, SPRITE_GLOBAL_MAX>>();
     for (auto& p : skinFileList)
@@ -139,7 +149,7 @@ SceneCustomize::SceneCustomize(const std::shared_ptr<SkinMgr>& skinMgr)
     }
 
     auto soundsetFileList =
-        findFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/*.lr2ss"), true);
+        recursiveFindFiles(convertLR2Path(ConfigMgr::get('E', cfg::E_LR2PATH, "."), "LR2files/Sound/"), ".lr2ss");
     std::sort(soundsetFileList.begin(), soundsetFileList.end());
     for (auto& p : soundsetFileList)
     {

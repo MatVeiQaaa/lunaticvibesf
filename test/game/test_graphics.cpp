@@ -317,7 +317,6 @@ TEST_F(sAnimated, animUpdate)
     int hh = h / 2;
 
     using namespace ::testing;
-    // InSequence dummy;
 
     s.update(t0);
     EXPECT_CALL(
@@ -645,7 +644,6 @@ TEST_F(sNumber, rect_normal_4)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 456);
         s.update(t0);
 
@@ -657,7 +655,6 @@ TEST_F(sNumber, rect_normal_4)
         s.draw();
     }
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 1234);
         s.update(t0);
 
@@ -669,7 +666,6 @@ TEST_F(sNumber, rect_normal_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         s.update(t0);
 
@@ -681,7 +677,6 @@ TEST_F(sNumber, rect_normal_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 0);
         s.update(t0);
 
@@ -700,7 +695,6 @@ TEST_F(sNumber, rect_bzero_4)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 123);
         s11.update(t0);
 
@@ -713,7 +707,6 @@ TEST_F(sNumber, rect_bzero_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         s11.update(t0);
 
@@ -725,7 +718,6 @@ TEST_F(sNumber, rect_bzero_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 0);
         s11.update(t0);
 
@@ -746,7 +738,6 @@ TEST_F(sNumber, rect_full_4)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 123);
         s24.update(t0);
 
@@ -762,7 +753,6 @@ TEST_F(sNumber, rect_full_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         s24.update(t0);
 
@@ -778,7 +768,6 @@ TEST_F(sNumber, rect_full_4)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, -20);
         s24.update(t0);
 
@@ -801,7 +790,6 @@ TEST_F(sNumber, rect_bzero_4_right)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 123);
         sr.update(t0);
 
@@ -813,7 +801,6 @@ TEST_F(sNumber, rect_bzero_4_right)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         sr.update(t0);
 
@@ -825,7 +812,6 @@ TEST_F(sNumber, rect_bzero_4_right)
     }
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 0);
         sr.update(t0);
 
@@ -844,7 +830,6 @@ TEST_F(sNumber, rect_bzero_4_anim_1_123)
 
     // time: 1
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 123);
         sa11.update(t1);
 
@@ -862,7 +847,6 @@ TEST_F(sNumber, rect_bzero_4_anim_1_6789)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         sa11.update(t1);
 
@@ -879,7 +863,6 @@ TEST_F(sNumber, rect_bzero_4_anim_1_0)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 0);
         sa11.update(t1);
 
@@ -898,7 +881,6 @@ TEST_F(sNumber, rect_bzero_4_anim_3_123)
 
     // time: 3
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 123);
         sa11.update(t3);
 
@@ -916,7 +898,6 @@ TEST_F(sNumber, rect_bzero_4_anim_3_6789)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 6789);
         sa11.update(t3);
 
@@ -933,7 +914,6 @@ TEST_F(sNumber, rect_bzero_4_anim_3_0)
     using namespace ::testing;
 
     {
-        // InSequence dummy;
         State::set(IndexNumber::_TEST1, 0);
         sa11.update(t3);
 
@@ -1046,7 +1026,6 @@ TEST_F(sSlider, updateLeft)
     using namespace ::testing;
     auto& s = sL;
 
-    // InSequence dummy;
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1078,7 +1057,6 @@ TEST_F(sSlider, updateRight)
     using namespace ::testing;
     auto& s = sR;
 
-    // InSequence dummy;
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1110,7 +1088,6 @@ TEST_F(sSlider, updateUp)
     using namespace ::testing;
     auto& s = sU;
 
-    // InSequence dummy;
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1142,7 +1119,6 @@ TEST_F(sSlider, updateDown)
     using namespace ::testing;
     auto& s = sD;
 
-    // InSequence dummy;
     State::set(IndexSlider::_TEST1, 0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1220,7 +1196,6 @@ TEST_F(sBargraph, updateLeft)
     using namespace ::testing;
     auto& s = sL;
 
-    // InSequence dummy;
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(200, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1255,7 +1230,6 @@ TEST_F(sBargraph, updateRight)
     using namespace ::testing;
     auto& s = sR;
 
-    // InSequence dummy;
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 0, 200), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1287,7 +1261,6 @@ TEST_F(sBargraph, updateUp)
     using namespace ::testing;
     auto& s = sU;
 
-    // InSequence dummy;
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 200, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))
@@ -1319,7 +1292,6 @@ TEST_F(sBargraph, updateDown)
     using namespace ::testing;
     auto& s = sD;
 
-    // InSequence dummy;
     lunaticvibes::set_bargraph_test1(0);
     s.update(t0);
     EXPECT_CALL(*pt, draw(TEST_RECT, RectF(0, 0, 200, 0), Color(0xFFFFFFFF), BlendMode::ALPHA, 0, 0, Point(0, 0)))

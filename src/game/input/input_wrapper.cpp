@@ -16,15 +16,7 @@ InputWrapper::InputWrapper(unsigned rate, bool background)
 
 InputWrapper::~InputWrapper()
 {
-    LVF_DEBUG_ASSERT(!isRunning());
-    {
-        std::unique_lock _lock(_inputMutex);
-        _pCallbackMap.clear();
-        _hCallbackMap.clear();
-        _rCallbackMap.clear();
-        _aCallbackMap.clear();
-        _keyboardCallbackMap.clear();
-    }
+    LVF_ASSERT(!isRunning());
 }
 
 void InputWrapper::setRate(unsigned rate)

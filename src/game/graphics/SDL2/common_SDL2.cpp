@@ -216,15 +216,11 @@ Texture::Texture(const Image& srcImage)
     if (!srcImage.loaded)
         return;
 
-    _textures[0] = std::shared_ptr<SDL_Texture>(
+    _texture = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(
             std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
         std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, &*srcImage._pSurface)),
-        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    if (_textures[0] || _textures[1])
+    if (_texture)
     {
         textureRect = srcImage.getRect();
         loaded = true;
@@ -239,17 +235,11 @@ Texture::Texture(const Image& srcImage)
 
 Texture::Texture(const SDL_Surface* pSurface)
 {
-    _textures[0] = std::shared_ptr<SDL_Texture>(
+    _texture = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(
             std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
         std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    if (!_textures[0])
-        return;
-    _textures[1] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(
-            std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, const_cast<SDL_Surface*>(pSurface))),
-        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    if (!_textures[1])
+    if (!_texture)
         return;
     textureRect = pSurface->clip_rect;
     loaded = true;
@@ -257,7 +247,7 @@ Texture::Texture(const SDL_Surface* pSurface)
 
 Texture::Texture(SDL_Texture* pTexture, int w, int h)
 {
-    _textures[0] = std::shared_ptr<SDL_Texture>(
+    _texture = std::shared_ptr<SDL_Texture>(
         pTexture, std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     if (!pTexture)
         return;
@@ -283,12 +273,12 @@ Texture::Texture(int w, int h, PixelFormat fmt, bool target)
 
     if (sdlfmt != SDL_PIXELFORMAT_UNKNOWN)
     {
-        _textures[0] = std::shared_ptr<SDL_Texture>(
+        _texture = std::shared_ptr<SDL_Texture>(
             pushAndWaitMainThreadTask<SDL_Texture*>(
                 std::bind_front(SDL_CreateTexture, gFrameRenderer, sdlfmt,
                                 target ? SDL_TEXTUREACCESS_TARGET : SDL_TEXTUREACCESS_STREAMING, w, h)),
             std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-        if (_textures[0])
+        if (_texture)
         {
             textureRect = {0, 0, w, h};
             loaded = true;
@@ -298,13 +288,7 @@ Texture::Texture(int w, int h, PixelFormat fmt, bool target)
 
 void* Texture::raw()
 {
-    // FIXME: replace with code below when textures are only copied when needed.
-    return _textures[1].get();
-    // Oof. The skin is broken if it wants to use the texture with both filter=0 and 1.
-    // for (const auto& tex : _textures)
-    //     if (tex)
-    //         return tex.get();
-    // return nullptr;
+    return _texture.get();
 }
 
 int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* V, int Vpitch)
@@ -315,14 +299,13 @@ int Texture::updateYUV(uint8_t* Y, int Ypitch, uint8_t* U, int Upitch, uint8_t* 
         return -1;
     if (!Ypitch || !Upitch || !Vpitch)
         return -2;
-    for (const auto& tex : _textures)
-        if (tex)
-            SDL_UpdateYUVTexture(tex.get(), nullptr, Y, Ypitch, U, Upitch, V, Vpitch);
+    if (_texture)
+        SDL_UpdateYUVTexture(_texture.get(), nullptr, Y, Ypitch, U, Upitch, V, Vpitch);
     return 0;
 }
 
 static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, const Color c, const BlendMode b,
-                    const double angle, const Point* center)
+                    const bool filter, const double angle, const Point* center)
 {
     int flipFlags = 0;
     if (dstRectF.w < 0)
@@ -337,6 +320,13 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
     }
 
     SDL_SetTextureColorMod(pTex, c.r, c.g, c.b);
+
+    const SDL_ScaleMode mode = filter ? SDL_ScaleModeLinear : SDL_ScaleModeNearest;
+    SDL_ScaleMode current_mode;
+    SDL_GetTextureScaleMode(pTex, &current_mode);
+    // SDL_SetTextureScaleMode is very expensive, while SDL_GetTextureScaleMode is practically free.
+    if (mode != current_mode)
+        SDL_SetTextureScaleMode(pTex, mode);
 
     int ssLevel = graphics_get_supersample_level();
     dstRectF.x *= ssLevel;
@@ -439,79 +429,37 @@ static void do_draw(SDL_Texture* pTex, const Rect* srcRect, RectF dstRectF, cons
     // #endif
 }
 
-// TODO: store 'filter' within Texture itself.
-static void copy_if_needed(const bool filter, std::array<std::shared_ptr<SDL_Texture>, 2>& textures,
-                           bool& didRenderOnce)
-{
-    // NOTE: textures produced by this are of noticeably lower quality.
-    auto duplicate_texture = [](SDL_Renderer* renderer, SDL_Texture* tex) {
-        Uint32 format;
-        int w, h;
-        SDL_QueryTexture(tex, &format, nullptr, &w, &h);
-        SDL_BlendMode blendmode;
-        SDL_GetTextureBlendMode(tex, &blendmode);
-        SDL_Texture* oldTarget = SDL_GetRenderTarget(renderer);
-        SDL_Texture* newTex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, w, h);
-        SDL_SetTextureBlendMode(newTex, SDL_BLENDMODE_NONE);
-        SDL_SetRenderTarget(renderer, newTex);
-        SDL_RenderCopy(renderer, tex, nullptr, nullptr);
-        SDL_SetTextureBlendMode(newTex, blendmode);
-        SDL_SetRenderTarget(renderer, oldTarget);
-        return std::shared_ptr<SDL_Texture>(
-            newTex, std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    };
-
-    // SDL_SetTextureScaleMode calls are expensive and only the last call on the same texture within the rendering cycle
-    // has effect.
-    if (!didRenderOnce)
-    {
-        didRenderOnce = true;
-        // TODO: only copy on first use, and make the first used 'filter' use the original texture.
-        if (textures[1] == nullptr && textures[0] != nullptr)
-        {
-            LOG_WARNING << "[Texture] Duplicating a texture, this may lead to quality degradation";
-            textures[1] = duplicate_texture(gFrameRenderer, textures[0].get());
-        }
-        SDL_SetTextureScaleMode(textures[0].get(), SDL_ScaleModeNearest);
-        SDL_SetTextureScaleMode(textures[1].get(), SDL_ScaleModeBest);
-    }
-}
-
 void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle) const
 {
-    copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, nullptr);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, nullptr);
 }
 
 void Texture::draw(RectF dstRect, const Color c, const BlendMode b, const bool filter, const double angle,
                    const Point& center) const
 {
-    copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, &center);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, &center);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                    const double angle) const
 {
-    copy_if_needed(filter, _textures, _didRenderOnce);
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w)
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)
         srcRectTmp.h = textureRect.h;
-    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, nullptr);
+    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, filter, angle, nullptr);
 }
 
 void Texture::draw(const Rect& srcRect, RectF dstRect, const Color c, const BlendMode b, const bool filter,
                    const double angle, const Point& center) const
 {
-    copy_if_needed(filter, _textures, _didRenderOnce);
     Rect srcRectTmp(srcRect);
     if (srcRectTmp.w == RECT_FULL.w)
         srcRectTmp.w = textureRect.w;
     if (srcRectTmp.h == RECT_FULL.h)
         srcRectTmp.h = textureRect.h;
-    do_draw(_textures[static_cast<int>(filter)].get(), &srcRectTmp, dstRect, c, b, angle, &center);
+    do_draw(_texture.get(), &srcRectTmp, dstRect, c, b, filter, angle, &center);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -522,10 +470,7 @@ TextureFull::TextureFull(const Color& c) : Texture(nullptr)
     auto surface = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 24, SDL_PIXELFORMAT_RGB24);
     textureRect = {0, 0, 1, 1};
     SDL_FillRect(&*surface, &textureRect, SDL_MapRGBA(surface->format, c.r, c.g, c.b, c.a));
-    _textures[0] = std::shared_ptr<SDL_Texture>(
-        pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
-        std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
-    _textures[1] = std::shared_ptr<SDL_Texture>(
+    _texture = std::shared_ptr<SDL_Texture>(
         pushAndWaitMainThreadTask<SDL_Texture*>(std::bind_front(SDL_CreateTextureFromSurface, gFrameRenderer, surface)),
         std::bind_front(pushAndWaitMainThreadTask<void, SDL_Texture*>, SDL_DestroyTexture));
     loaded = true;
@@ -544,8 +489,7 @@ void TextureFull::draw(const Rect& ignored, RectF dstRect, const Color c, const 
                        const double angle) const
 {
     (void)ignored;
-    copy_if_needed(filter, _textures, _didRenderOnce);
-    do_draw(_textures[static_cast<int>(filter)].get(), nullptr, dstRect, c, b, angle, nullptr);
+    do_draw(_texture.get(), nullptr, dstRect, c, b, filter, angle, nullptr);
 }
 
 void GraphLine::draw(Point p1, Point p2, Color c) const

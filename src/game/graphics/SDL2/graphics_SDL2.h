@@ -169,8 +169,7 @@ class Texture
     friend class SpriteVideo;
 
 protected:
-    mutable std::array<std::shared_ptr<SDL_Texture>, 2> _textures{}; // Only 'mutable' to copy in draw() when needed.
-    mutable bool _didRenderOnce = false; // shows if _textures is sorted by 'filter'. Set on first draw() call.
+    std::shared_ptr<SDL_Texture> _texture;
     bool loaded = false;
     Rect textureRect;
 

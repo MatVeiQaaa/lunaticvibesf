@@ -104,8 +104,6 @@ public:
 
     double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index);
 
-    double getScratchAxis(int player);
-
     // Merge 2P button inputs into 1P. Note that abs axis are ALSO merged.
     void setMergeInput() { mergeInput = true; }
 

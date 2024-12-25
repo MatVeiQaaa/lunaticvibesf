@@ -265,62 +265,49 @@ double InputWrapper::getJoystickAxis(size_t device, Input::Joystick::Type type, 
     return ::getJoystickAxis(device, type, index);
 }
 
-double InputWrapper::getScratchAxis(int player)
-{
-    LVF_DEBUG_ASSERT(player == 0 || player == 1);
-    return scratchAxisCurr[player];
-}
-
 bool InputWrapper::_register(unsigned type, const std::string& key, INPUTCALLBACK f)
 {
-    if (_pCallbackMap.find(key) != _pCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
-
     switch (type)
     {
-    case 0: _pCallbackMap[key] = std::move(f); break;
-    case 1: _hCallbackMap[key] = std::move(f); break;
-    case 2: _rCallbackMap[key] = std::move(f); break;
+    case 0:
+        LVF_ASSERT(_pCallbackMap.find(key) == _pCallbackMap.end());
+        _pCallbackMap[key] = std::move(f);
+        return true;
+    case 1:
+        LVF_ASSERT(_hCallbackMap.find(key) == _hCallbackMap.end());
+        _hCallbackMap[key] = std::move(f);
+        return true;
+    case 2:
+        LVF_ASSERT(_rCallbackMap.find(key) == _rCallbackMap.end());
+        _rCallbackMap[key] = std::move(f);
+        return true;
     default: lunaticvibes::assert_failed("InputWrapper::_register");
     }
-    return true;
 }
 
 bool InputWrapper::_unregister(unsigned type, const std::string& key)
 {
-    if (_pCallbackMap.find(key) == _pCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
-
     switch (type)
     {
-    case 0: _pCallbackMap.erase(key); break;
-    case 1: _hCallbackMap.erase(key); break;
-    case 2: _rCallbackMap.erase(key); break;
-    default: lunaticvibes::assert_failed("InputWrapper::_unregister");
+    case 0: _pCallbackMap.erase(key); return true;
+    case 1: _hCallbackMap.erase(key); return true;
+    case 2: _rCallbackMap.erase(key); return true;
+    default: lunaticvibes::assert_failed("InputWrapper::_register");
     }
-
-    return true;
 }
 
 bool InputWrapper::register_a(const std::string& key, AXISPLUSCALLBACK f)
 {
-    if (_aCallbackMap.find(key) != _aCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(_aCallbackMap.find(key) == _aCallbackMap.end());
     _aCallbackMap[key] = std::move(f);
     return true;
 }
 
 bool InputWrapper::unregister_a(const std::string& key)
 {
-    if (_aCallbackMap.find(key) == _aCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
     _aCallbackMap.erase(key);
     return true;
@@ -328,18 +315,13 @@ bool InputWrapper::unregister_a(const std::string& key)
 
 bool InputWrapper::register_kb(const std::string& key, KEYBOARDCALLBACK f)
 {
-    if (_keyboardCallbackMap.find(key) != _keyboardCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(_keyboardCallbackMap.find(key) == _keyboardCallbackMap.end());
     _keyboardCallbackMap[key] = std::move(f);
     return true;
 }
 bool InputWrapper::unregister_kb(const std::string& key)
 {
-    if (_keyboardCallbackMap.find(key) == _keyboardCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
     _keyboardCallbackMap.erase(key);
     return true;
@@ -347,18 +329,13 @@ bool InputWrapper::unregister_kb(const std::string& key)
 
 bool InputWrapper::register_joy(const std::string& key, JOYSTICKCALLBACK f)
 {
-    if (_joystickCallbackMap.find(key) != _joystickCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(_joystickCallbackMap.find(key) == _joystickCallbackMap.end());
     _joystickCallbackMap[key] = std::move(f);
     return true;
 }
 bool InputWrapper::unregister_joy(const std::string& key)
 {
-    if (_joystickCallbackMap.find(key) == _joystickCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
     _joystickCallbackMap.erase(key);
     return true;
@@ -366,18 +343,13 @@ bool InputWrapper::unregister_joy(const std::string& key)
 
 bool InputWrapper::register_aa(const std::string& key, ABSAXISCALLBACK f)
 {
-    if (_absaxisCallbackMap.find(key) != _absaxisCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
+    LVF_ASSERT(_absaxisCallbackMap.find(key) == _absaxisCallbackMap.end());
     _absaxisCallbackMap[key] = std::move(f);
     return true;
 }
 bool InputWrapper::unregister_aa(const std::string& key)
 {
-    if (_absaxisCallbackMap.find(key) == _absaxisCallbackMap.end())
-        return false;
-
     std::unique_lock _lock(_inputMutex);
     _absaxisCallbackMap.erase(key);
     return true;

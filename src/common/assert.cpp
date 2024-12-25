@@ -17,7 +17,7 @@ void lunaticvibes::assert_failed(const char* msg, std::source_location loc)
 
 void lunaticvibes::verify_failed(const char* msg, std::source_location loc)
 {
-    LOG_FATAL << "Assertion failed at " << loc.file_name() << ":" << loc.line() << ": " << msg;
+    LOG_ERROR << "Assertion failed at " << loc.file_name() << ":" << loc.line() << ": " << msg;
     if (lunaticvibes::in_test_mode())
         die_on_assertion_fail(loc.file_name(), loc.line(), msg);
 }

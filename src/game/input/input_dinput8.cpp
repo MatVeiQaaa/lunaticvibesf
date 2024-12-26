@@ -38,8 +38,8 @@ bool InputDirectInput8::acquireDevices()
 
     for (auto& j : deviceJoysticks)
     {
-        if (j.lpdid)
-            j.lpdid->Acquire();
+        /*if (j.lpdid)
+            j.lpdid->Acquire();*/
     }
 
     return true;
@@ -211,7 +211,7 @@ void InputDirectInput8::poll()
             memset(deviceKeyboard.state, 0, sizeof(deviceKeyboard.state));
         }*/
 
-        for (auto& j : deviceJoysticks)
+       /* for (auto& j : deviceJoysticks)
         {
             if (j.lpdid)
             {
@@ -229,7 +229,7 @@ void InputDirectInput8::poll()
             {
                 j.state = DIJOYSTATE();
             }
-        }
+        }*/
     }
 }
 

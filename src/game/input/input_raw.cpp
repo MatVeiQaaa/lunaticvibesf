@@ -5,6 +5,11 @@
 #include <common/sysutil.h>
 #include <game/input/input_raw.h>
 
+#include <hidclass.h>
+#include <hidsdi.h>
+
+#pragma comment(lib, "Hid.lib")
+
 static const std::string GetWinErrorMessage(DWORD dwErr)
 {
     CHAR wszMsgBuff[512];
@@ -44,6 +49,39 @@ const static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
     return CallWindowProc(InputRawInput::inst().GetPreviousWndProc(), hWnd, msg, wParam, lParam);
 };
 
+InputRawInput::DeviceJoystick::~DeviceJoystick() 
+{
+    free(_preparsedData);
+}
+
+bool InputRawInput::DeviceJoystick::isButtonPressed(size_t idx) const
+{
+    if (idx < buttons.state.size())
+        return buttons.state[idx];
+    return false;
+}
+
+float InputRawInput::DeviceJoystick::getAxis(size_t idx) const
+{
+    if (idx < axis.state.size())
+        return static_cast<float>(axis.state[idx]);
+    return 0.f;
+}
+
+float InputRawInput::DeviceJoystick::getAxisMin(size_t idx) const
+{
+    if (idx < axis.minMaxVal.size())
+        return static_cast<float>(axis.minMaxVal[idx].first);
+    return 0.f;
+}
+
+float InputRawInput::DeviceJoystick::getAxisMax(size_t idx) const
+{
+    if (idx < axis.minMaxVal.size())
+        return static_cast<float>(axis.minMaxVal[idx].second);
+    return 0.f;
+}
+
 InputRawInput::InputRawInput()
 {
     HWND hwnd = NULL;
@@ -51,7 +89,7 @@ InputRawInput::InputRawInput()
     _prevWndProc = reinterpret_cast<WNDPROC>(
         SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc)));
 
-    RAWINPUTDEVICE rid[2];
+    RAWINPUTDEVICE rid[4];
 
     rid[0].usUsagePage = 0x01;       // HID_USAGE_PAGE_GENERIC
     rid[0].usUsage = 0x02;           // HID_USAGE_GENERIC_MOUSE
@@ -63,15 +101,15 @@ InputRawInput::InputRawInput()
     rid[1].dwFlags = RIDEV_NOLEGACY; // adds keyboard and also ignores legacy keyboard messages
     rid[1].hwndTarget = 0;
 
-    //rid[2].usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
-    //rid[2].usUsage = 0x05;     // HID_USAGE_GENERIC_GAMEPAD
-    //rid[2].dwFlags = 0;        // adds game pad
-    //rid[2].hwndTarget = 0;
+    rid[2].usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+    rid[2].usUsage = 0x05;     // HID_USAGE_GENERIC_GAMEPAD
+    rid[2].dwFlags = 0;        // adds game pad
+    rid[2].hwndTarget = 0;
 
-    //rid[3].usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
-    //rid[3].usUsage = 0x04;     // HID_USAGE_GENERIC_JOYSTICK
-    //rid[3].dwFlags = 0;        // adds joystick
-    //rid[3].hwndTarget = 0;
+    rid[3].usUsagePage = 0x01; // HID_USAGE_PAGE_GENERIC
+    rid[3].usUsage = 0x04;     // HID_USAGE_GENERIC_JOYSTICK
+    rid[3].dwFlags = 0;        // adds joystick
+    rid[3].hwndTarget = 0;
 
     UINT nDevices = 0;
     if (GetRawInputDeviceList(NULL, &nDevices, sizeof(RAWINPUTDEVICELIST)) != 0)
@@ -225,6 +263,96 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
     }
     case RIM_TYPEHID: {
         RAWHID& input = raw->data.hid;
+        HANDLE hDevice = raw->header.hDevice;
+
+        DeviceJoystick& device = _deviceJoysticks[hDevice];
+
+        PHIDP_PREPARSED_DATA preparsedData = nullptr;
+        if (device._preparsedData == nullptr)
+        {
+            UINT pcbSize = 0;
+            GetRawInputDeviceInfo(hDevice, RIDI_PREPARSEDDATA, NULL, &pcbSize);
+            preparsedData = (PHIDP_PREPARSED_DATA)calloc(1, pcbSize);
+            GetRawInputDeviceInfo(hDevice, RIDI_PREPARSEDDATA, preparsedData, &pcbSize);
+            device._preparsedData = preparsedData;
+
+            HIDP_CAPS caps;
+            HidP_GetCaps(preparsedData, &caps);
+
+            USHORT buttonCapsCount = caps.NumberInputButtonCaps;
+            PHIDP_BUTTON_CAPS buttonCaps = (PHIDP_BUTTON_CAPS)alloca(buttonCapsCount * sizeof(HIDP_BUTTON_CAPS));
+            memset(buttonCaps, 0, buttonCapsCount * sizeof(HIDP_BUTTON_CAPS));
+            HidP_GetButtonCaps(HidP_Input, buttonCaps, &buttonCapsCount, preparsedData);
+
+            for (int i = 0; i < buttonCapsCount; i++)
+            {
+                HIDP_BUTTON_CAPS& caps = buttonCaps[i];
+                if (i == 0)
+                    device.buttons.dataIndexMin = caps.Range.DataIndexMin;
+                device.buttons.dataIndexMax =
+                    std::max(device.buttons.dataIndexMax, (unsigned int)caps.Range.DataIndexMax);
+                device.buttons.count += caps.Range.DataIndexMax - caps.Range.DataIndexMin + 1;
+            }
+            device.buttons.state.resize(device.buttons.count);
+            device.buttons.update.resize(device.buttons.count);
+
+            USHORT valueCapsCount = caps.NumberInputValueCaps;
+            PHIDP_VALUE_CAPS valueCaps = (PHIDP_VALUE_CAPS)alloca(valueCapsCount * sizeof(HIDP_VALUE_CAPS));
+            memset(valueCaps, 0, valueCapsCount * sizeof(HIDP_VALUE_CAPS));
+            HidP_GetValueCaps(HidP_Input, valueCaps, &valueCapsCount, preparsedData);
+
+            for (int i = 0; i < valueCapsCount; i++)
+            {
+                HIDP_VALUE_CAPS& caps = valueCaps[i];
+                if (i == 0)
+                    device.axis.dataIndexMin = caps.Range.DataIndexMin;
+                device.axis.dataIndexMax = std::max(device.axis.dataIndexMax, (unsigned int)caps.Range.DataIndexMax);
+                device.axis.count += caps.Range.DataIndexMax - caps.Range.DataIndexMin + 1;
+                for (int i = caps.Range.DataIndexMin; i <= caps.Range.DataIndexMax; i++)
+                {
+                    device.axis.minMaxVal.push_back({ caps.LogicalMin, caps.LogicalMax });
+                }
+            }
+            device.axis.state.resize(device.axis.count);
+            device.axis.update.resize(device.axis.count);
+        }
+        else
+        {
+            preparsedData = (PHIDP_PREPARSED_DATA)device._preparsedData;
+        }
+
+        ULONG dataListLength = HidP_MaxDataListLength(HidP_Input, preparsedData);
+        PHIDP_DATA dataList = (PHIDP_DATA)alloca(dataListLength * sizeof(HIDP_DATA));
+        memset(dataList, 0, dataListLength * sizeof(HIDP_DATA));
+        HidP_GetData(HidP_Input, dataList, &dataListLength, preparsedData, (PCHAR)input.bRawData, input.dwSizeHid);
+        {
+            PHIDP_DATA unsortedDataList = (PHIDP_DATA)alloca(dataListLength * sizeof(HIDP_DATA));
+            memcpy(unsortedDataList, dataList, dataListLength * sizeof(HIDP_DATA));
+            memset(dataList, 0, HidP_MaxDataListLength(HidP_Input, preparsedData) * sizeof(HIDP_DATA));
+            for (int i = 0; i < dataListLength; i++)
+            {
+                memcpy(&dataList[unsortedDataList[i].DataIndex], &unsortedDataList[i], sizeof(HIDP_DATA));
+            }
+        }
+
+        for (int i = device.buttons.dataIndexMin; i <= device.buttons.dataIndexMax; i++)
+        {
+            if (device.buttons.state[i - device.buttons.dataIndexMin] != dataList[i].On)
+            {
+                device.buttons.state[i - device.buttons.dataIndexMin] = dataList[i].On;
+                device.buttons.update[i - device.buttons.dataIndexMin] = timestamp;
+            }
+        }
+
+        for (int i = device.axis.dataIndexMin; i <= device.axis.dataIndexMax; i++)
+        {
+            if (device.axis.state[i - device.axis.dataIndexMin] != dataList[i].RawValue)
+            {
+                device.axis.state[i - device.axis.dataIndexMin] = dataList[i].RawValue;
+                device.axis.update[i - device.axis.dataIndexMin] = timestamp;
+            }
+        }
+        
         break;
     }
     default: {
@@ -232,11 +360,6 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
         break;
     }
     }
-}
-
-size_t InputRawInput::getJoystickCount() const
-{
-    return _deviceJoysticks.size();
 }
 
 int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
@@ -470,6 +593,17 @@ const std::array<bool, 5>& InputRawInput::getMouseState() const
 float InputRawInput::getMouseZ() 
 {
     return std::exchange(_deviceMouse.wheelVert, 0.f);
+}
+
+const InputRawInput::DeviceJoystick& InputRawInput::getJoystick(size_t idx) const
+{
+    LVF_DEBUG_ASSERT(idx < _deviceJoysticks.size());
+    return std::next(_deviceJoysticks.begin(), idx)->second;
+}
+
+size_t InputRawInput::getJoystickCount() const
+{
+    return _deviceJoysticks.size();
 }
 
 InputRawInput& InputRawInput::inst()

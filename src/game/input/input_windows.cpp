@@ -165,6 +165,16 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
     if (deadzone < 0.01)
         deadzone = 0.01;
 
+    if (c.device < InputRawInput::inst().getJoystickCount())
+    {
+        const InputRawInput::DeviceJoystick& device = InputRawInput::inst().getJoystick(c.device);
+        switch (c.type)
+        {
+        case Input::Joystick::Type::BUTTON: return device.isButtonPressed(c.index);
+        default: return false;
+        }
+    }
+
     if (c.device < InputDirectInput8::inst().getJoystickCount())
     {
         auto& stat = InputDirectInput8::inst().getJoystickState(c.device);
@@ -219,6 +229,16 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
 
 double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
 {
+    if (device < InputRawInput::inst().getJoystickCount())
+    {
+        const InputRawInput::DeviceJoystick& jdevice = InputRawInput::inst().getJoystick(device);
+        switch (index)
+        {
+        case 0: return jdevice.getAxis(1) / jdevice.getAxisMax(1);
+        default: return 0.f;
+        }
+    }
+
     if (device < InputDirectInput8::inst().getJoystickCount())
     {
         auto& stat = InputDirectInput8::inst().getJoystickState(device);

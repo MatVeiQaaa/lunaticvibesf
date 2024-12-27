@@ -169,7 +169,7 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
         {
             WORD scanCode = MAKEWORD(input.MakeCode & 0x7f,
                                      ((input.Flags & RI_KEY_E0) ? 0xe0 : ((input.Flags & RI_KEY_E1) ? 0xe1 : 0x00)));
-            Input::Keyboard key = ScanCodeToLVKey(input.MakeCode);
+            Input::Keyboard key = ScanCodeToLVKey(scanCode);
             _deviceKeyboard.state[(size_t)key] = !(input.Flags & RI_KEY_BREAK);
             _deviceKeyboard.update[(size_t)key] = timestamp;
         }
@@ -406,6 +406,7 @@ int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
 {
     switch (key)
     {
+    case Input::Keyboard::K_ERROR: return 0;
     case Input::Keyboard::K_ESC: return 1;
     case Input::Keyboard::K_1: return 2;
     case Input::Keyboard::K_2: return 3;
@@ -434,7 +435,9 @@ int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
     case Input::Keyboard::K_LBRACKET: return 26;
     case Input::Keyboard::K_RBRACKET: return 27;
     case Input::Keyboard::K_ENTER: return 28;
+    case Input::Keyboard::K_NUM_ENTER: return 0xe000 + 28;
     case Input::Keyboard::K_LCTRL: return 29;
+    case Input::Keyboard::K_RCTRL: return 0xe000 + 29;
     case Input::Keyboard::K_A: return 30;
     case Input::Keyboard::K_S: return 31;
     case Input::Keyboard::K_D: return 32;
@@ -445,8 +448,8 @@ int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
     case Input::Keyboard::K_K: return 37;
     case Input::Keyboard::K_L: return 38;
     case Input::Keyboard::K_SEMICOLON: return 39;
-    // case Input::Keyboard::K_': return 40; // quote?
-    // case Input::Keyboard::K_GRAVE: return 41; // ???
+    case Input::Keyboard::K_APOSTROPHE: return 40;
+    case Input::Keyboard::K_TYPEWRITER_APS: return 41;
     case Input::Keyboard::K_LSHIFT: return 42;
     case Input::Keyboard::K_BACKSLASH: return 43;
     case Input::Keyboard::K_Z: return 44;
@@ -459,9 +462,12 @@ int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
     case Input::Keyboard::K_COMMA: return 51;
     case Input::Keyboard::K_DOT: return 52;
     case Input::Keyboard::K_SLASH: return 53;
+    case Input::Keyboard::K_NUM_SLASH: return 0xe000 + 53;
     case Input::Keyboard::K_RSHIFT: return 54;
-    case Input::Keyboard::K_PRTSC: return 55;
+    case Input::Keyboard::K_NUM_STAR: return 55;
+    case Input::Keyboard::K_PRTSC: return 0xe000 + 55;
     case Input::Keyboard::K_LALT: return 56;
+    case Input::Keyboard::K_RALT: return 0xe000 + 56;
     case Input::Keyboard::K_SPACE: return 57;
     case Input::Keyboard::K_CAPSLOCK: return 58;
     case Input::Keyboard::K_F1: return 59;
@@ -476,52 +482,41 @@ int InputRawInput::LVKeyToScanCode(Input::Keyboard key)
     case Input::Keyboard::K_F10: return 68;
     case Input::Keyboard::K_NUMLOCK: return 69;
     case Input::Keyboard::K_SCRLOCK: return 70;
-    case Input::Keyboard::K_HOME: return 71;
-    case Input::Keyboard::K_UP: return 72;
-    case Input::Keyboard::K_PGUP: return 73;
-    // case Input::Keyboard::K_MINUS: return 74; // dolbaeb?
-    case Input::Keyboard::K_LEFT: return 75;
-    // case Input::Keyboard::K_CENTER: return 76;
-    case Input::Keyboard::K_RIGHT: return 77;
-    // case Input::Keyboard::K_PLUS: return 78;
-    case Input::Keyboard::K_END: return 79;
-    case Input::Keyboard::K_DOWN: return 80;
-    case Input::Keyboard::K_PGDN: return 81;
-    case Input::Keyboard::K_INS: return 82;
-    case Input::Keyboard::K_DEL: return 83;
-    case Input::Keyboard::K_ERROR:
-    case Input::Keyboard::K_APOSTROPHE:
-    case Input::Keyboard::K_TYPEWRITER_APS:
-    case Input::Keyboard::K_NUM7:
-    case Input::Keyboard::K_NUM8:
-    case Input::Keyboard::K_NUM9:
-    case Input::Keyboard::K_NUM_MINUS:
-    case Input::Keyboard::K_NUM4:
-    case Input::Keyboard::K_NUM5:
-    case Input::Keyboard::K_NUM6:
-    case Input::Keyboard::K_NUM_PLUS:
-    case Input::Keyboard::K_NUM1:
-    case Input::Keyboard::K_NUM2:
-    case Input::Keyboard::K_NUM3:
-    case Input::Keyboard::K_NUM0:
-    case Input::Keyboard::K_NUM_DOT:
-    case Input::Keyboard::K_SYSRQ:
-    case Input::Keyboard::K_F11:
-    case Input::Keyboard::K_F12:
-    case Input::Keyboard::K_F13:
-    case Input::Keyboard::K_F14:
-    case Input::Keyboard::K_F15:
-    case Input::Keyboard::K_PAUSE:
-    case Input::Keyboard::K_RALT:
-    case Input::Keyboard::K_RCTRL:
-    case Input::Keyboard::K_JP_YEN:
-    case Input::Keyboard::K_JP_NOCONVERT:
-    case Input::Keyboard::K_JP_CONVERT:
-    case Input::Keyboard::K_JP_KANA:
+    case Input::Keyboard::K_NUM7: return 71;
+    case Input::Keyboard::K_HOME: return 0xe000 + 71;
+    case Input::Keyboard::K_NUM8: return 72;
+    case Input::Keyboard::K_UP: return 0xe000 + 72;
+    case Input::Keyboard::K_NUM9: return 73;
+    case Input::Keyboard::K_PGUP: return 0xe000 + 73;
+    case Input::Keyboard::K_NUM_MINUS: return 74;
+    case Input::Keyboard::K_NUM4: return 75;
+    case Input::Keyboard::K_LEFT: return 0xe000 + 75;
+    case Input::Keyboard::K_NUM5: return 76;
+    case Input::Keyboard::K_NUM6: return 77;
+    case Input::Keyboard::K_RIGHT: return 0xe000 + 77;
+    case Input::Keyboard::K_NUM_PLUS: return 78;
+    case Input::Keyboard::K_NUM1: return 79;
+    case Input::Keyboard::K_END: return 0xe000 + 79;
+    case Input::Keyboard::K_NUM2: return 80;
+    case Input::Keyboard::K_DOWN: return 0xe000 + 80;
+    case Input::Keyboard::K_NUM3: return 81;
+    case Input::Keyboard::K_PGDN: return 0xe000 + 81;
+    case Input::Keyboard::K_NUM0: return 82;
+    case Input::Keyboard::K_INS: return 0xe000 + 82;
+    case Input::Keyboard::K_NUM_DOT: return 83;
+    case Input::Keyboard::K_DEL: return 0xe000 + 83;
+    case Input::Keyboard::K_SYSRQ: return 84;
+    case Input::Keyboard::K_F11: return 87;
+    case Input::Keyboard::K_F12: return 88;
+    case Input::Keyboard::K_F13: return 89;
+    case Input::Keyboard::K_F14: return 90;
+    case Input::Keyboard::K_F15: return 91;
+    case Input::Keyboard::K_JP_KANA: return 112;
+    case Input::Keyboard::K_JP_CONVERT: return 121;
+    case Input::Keyboard::K_JP_NOCONVERT: return 123;
+    case Input::Keyboard::K_JP_YEN: return 125;
+    case Input::Keyboard::K_PAUSE: return 0xe11d;
     case Input::Keyboard::K_NONUS_BACKSLASH:
-    case Input::Keyboard::K_NUM_SLASH:
-    case Input::Keyboard::K_NUM_STAR:
-    case Input::Keyboard::K_NUM_ENTER:
     case Input::Keyboard::K_COUNT: return 0;
     }
     lunaticvibes::assert_failed("otsosi");
@@ -559,7 +554,9 @@ Input::Keyboard InputRawInput::ScanCodeToLVKey(WORD scanCode)
     case 26: return Input::Keyboard::K_LBRACKET;
     case 27: return Input::Keyboard::K_RBRACKET;
     case 28: return Input::Keyboard::K_ENTER;
+    case 0xe000 + 28: return Input::Keyboard::K_NUM_ENTER;
     case 29: return Input::Keyboard::K_LCTRL;
+    case 0xe000 + 29: return Input::Keyboard::K_RCTRL;
     case 30: return Input::Keyboard::K_A;
     case 31: return Input::Keyboard::K_S;
     case 32: return Input::Keyboard::K_D;
@@ -570,8 +567,8 @@ Input::Keyboard InputRawInput::ScanCodeToLVKey(WORD scanCode)
     case 37: return Input::Keyboard::K_K;
     case 38: return Input::Keyboard::K_L;
     case 39: return Input::Keyboard::K_SEMICOLON;
-    // case 40: return Input::Keyboard::K_'; // quote?
-    // case 41: return Input::Keyboard::K_GRAVE; // ???
+    case 40: return Input::Keyboard::K_APOSTROPHE;
+    case 41: return Input::Keyboard::K_TYPEWRITER_APS;
     case 42: return Input::Keyboard::K_LSHIFT;
     case 43: return Input::Keyboard::K_BACKSLASH;
     case 44: return Input::Keyboard::K_Z;
@@ -584,9 +581,12 @@ Input::Keyboard InputRawInput::ScanCodeToLVKey(WORD scanCode)
     case 51: return Input::Keyboard::K_COMMA;
     case 52: return Input::Keyboard::K_DOT;
     case 53: return Input::Keyboard::K_SLASH;
+    case 0xe000 + 53: return Input::Keyboard::K_NUM_SLASH;
     case 54: return Input::Keyboard::K_RSHIFT;
-    case 55: return Input::Keyboard::K_PRTSC;
+    case 55: return Input::Keyboard::K_NUM_STAR;
+    case 0xe000 + 55: return Input::Keyboard::K_PRTSC;
     case 56: return Input::Keyboard::K_LALT;
+    case 0xe000 + 56: return Input::Keyboard::K_RALT;
     case 57: return Input::Keyboard::K_SPACE;
     case 58: return Input::Keyboard::K_CAPSLOCK;
     case 59: return Input::Keyboard::K_F1;
@@ -601,24 +601,44 @@ Input::Keyboard InputRawInput::ScanCodeToLVKey(WORD scanCode)
     case 68: return Input::Keyboard::K_F10;
     case 69: return Input::Keyboard::K_NUMLOCK;
     case 70: return Input::Keyboard::K_SCRLOCK;
-    case 71: return Input::Keyboard::K_HOME;
-    case 72: return Input::Keyboard::K_UP;
-    case 73: return Input::Keyboard::K_PGUP;
-    // case 74: return Input::Keyboard::K_MINUS; // dolbaeb?
-    case 75: return Input::Keyboard::K_LEFT;
-    // case 76: return Input::Keyboard::K_CENTER;
-    case 77: return Input::Keyboard::K_RIGHT;
-    // case 78: return Input::Keyboard::K_PLUS;
-    case 79: return Input::Keyboard::K_END;
-    case 80: return Input::Keyboard::K_DOWN;
-    case 81: return Input::Keyboard::K_PGDN;
-    case 82: return Input::Keyboard::K_INS;
-    case 83: return Input::Keyboard::K_DEL;
+    case 71: return Input::Keyboard::K_NUM7;
+    case 0xe000 + 71: return Input::Keyboard::K_HOME;
+    case 72: return Input::Keyboard::K_NUM8;
+    case 0xe000 + 72: return Input::Keyboard::K_UP;
+    case 73: return Input::Keyboard::K_NUM9;
+    case 0xe000 + 73: return Input::Keyboard::K_PGUP;
+    case 74: return Input::Keyboard::K_NUM_MINUS;
+    case 75: return Input::Keyboard::K_NUM4;
+    case 0xe000 + 75: return Input::Keyboard::K_LEFT;
+    case 76: return Input::Keyboard::K_NUM5;
+    case 77: return Input::Keyboard::K_NUM6;
+    case 0xe000 + 77: return Input::Keyboard::K_RIGHT;
+    case 78: return Input::Keyboard::K_NUM_PLUS;
+    case 79: return Input::Keyboard::K_NUM1;
+    case 0xe000 + 79: return Input::Keyboard::K_END;
+    case 80: return Input::Keyboard::K_NUM2;
+    case 0xe000 + 80: return Input::Keyboard::K_DOWN;
+    case 81: return Input::Keyboard::K_NUM3;
+    case 0xe000 + 81: return Input::Keyboard::K_PGDN;
+    case 82: return Input::Keyboard::K_NUM0;
+    case 0xe000 + 82: return Input::Keyboard::K_INS;
+    case 83: return Input::Keyboard::K_NUM_DOT;
+    case 0xe000 + 83: return Input::Keyboard::K_DEL;
+    case 84: return Input::Keyboard::K_SYSRQ;
+    case 87: return Input::Keyboard::K_F11;
+    case 88: return Input::Keyboard::K_F12;
+    case 89: return Input::Keyboard::K_F13;
+    case 90: return Input::Keyboard::K_F14;
+    case 91: return Input::Keyboard::K_F15;
+    case 112: return Input::Keyboard::K_JP_KANA;
+    case 121: return Input::Keyboard::K_JP_CONVERT;
+    case 123: return Input::Keyboard::K_JP_NOCONVERT;
+    case 125: return Input::Keyboard::K_JP_YEN;
+    case 0xe11d: return Input::Keyboard::K_PAUSE;
     case 0:
     default: return Input::Keyboard::K_ERROR; // pizda
     }
 }
-
 
 const std::array<bool, (size_t)Input::Keyboard::K_COUNT>& InputRawInput::getKeyboardState() const
 {

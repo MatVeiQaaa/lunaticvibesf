@@ -171,6 +171,21 @@ bool isButtonPressed(Input::Joystick c, double deadzone)
         switch (c.type)
         {
         case Input::Joystick::Type::BUTTON: return device.isButtonPressed(c.index);
+        case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE:
+        {
+            float value = device.getAxis(c.index);
+            if (value == 0 || value > device.getAxisHalf(c.index))
+                return false;
+            return value / device.getAxisHalf(c.index) >= deadzone ? true : false;
+        }
+        case Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE:
+        {
+            float value = device.getAxis(c.index);
+            if (value == 0 || value <= device.getAxisHalf(c.index))
+                return false;
+            return (device.getAxisMax(c.index) - value) / device.getAxisHalf(c.index) >= deadzone ? true : false;
+        }
+        case Input::Joystick::Type::AXIS_ABSOLUTE: return (device.getAxis(c.index) / device.getAxisMax(c.index)) >= deadzone;
         default: return false;
         }
     }
@@ -232,10 +247,13 @@ double getJoystickAxis(size_t device, Input::Joystick::Type type, size_t index)
     if (device < InputRawInput::inst().getJoystickCount())
     {
         const InputRawInput::DeviceJoystick& jdevice = InputRawInput::inst().getJoystick(device);
-        switch (index)
+        switch (type)
         {
-        case 0: return jdevice.getAxis(1) / jdevice.getAxisMax(1);
-        default: return 0.f;
+        case Input::Joystick::Type::AXIS_RELATIVE_POSITIVE: return jdevice.getAxis(index) / jdevice.getAxisHalf(index);
+        case Input::Joystick::Type::AXIS_RELATIVE_NEGATIVE:
+            return (jdevice.getAxisMax(index) - jdevice.getAxis(index)) / jdevice.getAxisHalf(index);
+        case Input::Joystick::Type::AXIS_ABSOLUTE: return jdevice.getAxis(index) / jdevice.getAxisMax(index);
+        default: return -1.0;
         }
     }
 

@@ -35,8 +35,8 @@ public:
 
         bool isButtonPressed(size_t idx) const;
         float getAxis(size_t idx) const;
-        float getAxisMin(size_t idx) const;
         float getAxisMax(size_t idx) const;
+        float getAxisHalf(size_t idx) const;
         struct Buttons
         {
             std::vector<lunaticvibes::Time> update;
@@ -50,7 +50,8 @@ public:
         {
             std::vector<lunaticvibes::Time> update;
             std::vector<int> state;
-            std::vector<std::pair<int, int>> minMaxVal;
+            std::vector<float> max;
+            std::vector<float> half;
             unsigned int count = 0;
             unsigned int dataIndexMin = 0;
             unsigned int dataIndexMax = 0;

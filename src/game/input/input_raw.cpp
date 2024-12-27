@@ -68,18 +68,18 @@ float InputRawInput::DeviceJoystick::getAxis(size_t idx) const
     return 0.f;
 }
 
-float InputRawInput::DeviceJoystick::getAxisMin(size_t idx) const
-{
-    if (idx < axis.minMaxVal.size())
-        return static_cast<float>(axis.minMaxVal[idx].first);
-    return 0.f;
-}
-
 float InputRawInput::DeviceJoystick::getAxisMax(size_t idx) const
 {
-    if (idx < axis.minMaxVal.size())
-        return static_cast<float>(axis.minMaxVal[idx].second);
-    return 0.f;
+    if (idx < axis.max.size())
+        return axis.max[idx];
+    return -1.f;
+}
+
+float InputRawInput::DeviceJoystick::getAxisHalf(size_t idx) const
+{
+    if (idx < axis.half.size())
+        return axis.half[idx];
+    return -1.f;
 }
 
 InputRawInput::InputRawInput()
@@ -310,7 +310,8 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
                 device.axis.count += caps.Range.DataIndexMax - caps.Range.DataIndexMin + 1;
                 for (int i = caps.Range.DataIndexMin; i <= caps.Range.DataIndexMax; i++)
                 {
-                    device.axis.minMaxVal.push_back({ caps.LogicalMin, caps.LogicalMax });
+                    device.axis.max.push_back(std::powf(2, caps.BitSize) - 1.f);
+                    device.axis.half.push_back(trunc(device.axis.max.back() / 2));
                 }
             }
             device.axis.state.resize(device.axis.count);

@@ -42,19 +42,19 @@ public:
             std::vector<lunaticvibes::Time> update;
             std::vector<bool> state;
             unsigned int count = 0;
-            unsigned int dataIndexMin = 0;
-            unsigned int dataIndexMax = 0;
+            std::vector<unsigned int> dataIndexMin;
+            std::vector<unsigned int> dataIndexMax;
         };
         Buttons buttons;
         struct Axis
         {
-            std::vector<lunaticvibes::Time> update;
-            std::vector<int> state;
-            std::vector<float> max;
-            std::vector<float> half;
+            std::vector<lunaticvibes::Time> update = std::vector<lunaticvibes::Time>(7);
+            std::vector<int> state = std::vector<int>(7);
+            std::vector<float> max = std::vector<float>(7, -1.0);
+            std::vector<float> half = std::vector<float>(7, -1.0);
             unsigned int count = 0;
-            unsigned int dataIndexMin = 0;
-            unsigned int dataIndexMax = 0;
+            std::vector<int> usage = std::vector<int>(7, -1);
+            std::vector<int> dataIdx = std::vector<int>(7, -1);
         };
         Axis axis;
 

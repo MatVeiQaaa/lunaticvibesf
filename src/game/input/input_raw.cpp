@@ -262,6 +262,16 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
         break;
     }
     case RIM_TYPEHID: {
+        enum UsageType
+        {
+            X = 0x30,
+            Y,
+            Z,
+            Rx,
+            Ry,
+            Rz,
+            Hat = 0x39
+        };
         RAWHID& input = raw->data.hid;
         HANDLE hDevice = raw->header.hDevice;
 
@@ -287,10 +297,8 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
             for (int i = 0; i < buttonCapsCount; i++)
             {
                 HIDP_BUTTON_CAPS& caps = buttonCaps[i];
-                if (i == 0)
-                    device.buttons.dataIndexMin = caps.Range.DataIndexMin;
-                device.buttons.dataIndexMax =
-                    std::max(device.buttons.dataIndexMax, (unsigned int)caps.Range.DataIndexMax);
+                device.buttons.dataIndexMin.push_back(caps.Range.DataIndexMin);
+                device.buttons.dataIndexMax.push_back(caps.Range.DataIndexMax);
                 device.buttons.count += caps.Range.DataIndexMax - caps.Range.DataIndexMin + 1;
             }
             device.buttons.state.resize(device.buttons.count);
@@ -304,18 +312,40 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
             for (int i = 0; i < valueCapsCount; i++)
             {
                 HIDP_VALUE_CAPS& caps = valueCaps[i];
-                if (i == 0)
-                    device.axis.dataIndexMin = caps.Range.DataIndexMin;
-                device.axis.dataIndexMax = std::max(device.axis.dataIndexMax, (unsigned int)caps.Range.DataIndexMax);
-                device.axis.count += caps.Range.DataIndexMax - caps.Range.DataIndexMin + 1;
-                for (int i = caps.Range.DataIndexMin; i <= caps.Range.DataIndexMax; i++)
+                unsigned int usageIdx = caps.NotRange.Usage;
+                unsigned int valueIdx = -1;
+                switch (usageIdx)
                 {
+                case X: valueIdx = 0; break;
+                case Y: valueIdx = 1; break;
+                case Z: valueIdx = 2; break;
+                case Rx: valueIdx = 3; break;
+                case Ry: valueIdx = 4; break;
+                case Rz: valueIdx = 5; break;
+                case Hat: valueIdx = 6; break;
+                }
+                if (valueIdx != -1)
+                {
+                    device.axis.usage[valueIdx] = usageIdx;
+                    device.axis.dataIdx[valueIdx] = caps.NotRange.DataIndex;
+                    device.axis.max[valueIdx] = std::powf(2, caps.BitSize) - 1.f;
+                    device.axis.half[valueIdx] = trunc(device.axis.max[valueIdx] / 2);
+                }
+                else
+                {
+                    device.axis.usage.push_back(usageIdx);
+                    device.axis.dataIdx.push_back(caps.NotRange.DataIndex);
                     device.axis.max.push_back(std::powf(2, caps.BitSize) - 1.f);
                     device.axis.half.push_back(trunc(device.axis.max.back() / 2));
                 }
+                device.axis.count++;
             }
-            device.axis.state.resize(device.axis.count);
-            device.axis.update.resize(device.axis.count);
+            unsigned int dataIdxCount = device.axis.dataIdx.size();
+            if (device.axis.state.size() < dataIdxCount)
+            {
+                device.axis.state.resize(dataIdxCount);
+                device.axis.update.resize(dataIdxCount);
+            }
         }
         else
         {
@@ -336,21 +366,30 @@ void InputRawInput::InputMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPAR
             }
         }
 
-        for (int i = device.buttons.dataIndexMin; i <= device.buttons.dataIndexMax; i++)
         {
-            if (device.buttons.state[i - device.buttons.dataIndexMin] != dataList[i].On)
+            unsigned int buttonIdx = 0;
+            for (int collectionIdx = 0; collectionIdx < device.buttons.dataIndexMin.size(); collectionIdx++)
             {
-                device.buttons.state[i - device.buttons.dataIndexMin] = dataList[i].On;
-                device.buttons.update[i - device.buttons.dataIndexMin] = timestamp;
+                for (int dataIdx = device.buttons.dataIndexMin[collectionIdx];
+                     dataIdx <= device.buttons.dataIndexMax[collectionIdx]; dataIdx++)
+                {
+                    if (device.buttons.state[buttonIdx] != dataList[dataIdx].On)
+                    {
+                        device.buttons.state[buttonIdx] = dataList[dataIdx].On;
+                        device.buttons.update[buttonIdx] = timestamp;
+                    }
+                    buttonIdx++;
+                }
             }
         }
 
-        for (int i = device.axis.dataIndexMin; i <= device.axis.dataIndexMax; i++)
+        for (unsigned int valueIdx = 0; valueIdx < device.axis.dataIdx.size(); valueIdx++)
         {
-            if (device.axis.state[i - device.axis.dataIndexMin] != dataList[i].RawValue)
+            int dataIdx = device.axis.dataIdx[valueIdx];
+            if (dataIdx != -1 && device.axis.state[valueIdx] != dataList[dataIdx].RawValue)
             {
-                device.axis.state[i - device.axis.dataIndexMin] = dataList[i].RawValue;
-                device.axis.update[i - device.axis.dataIndexMin] = timestamp;
+                device.axis.state[valueIdx] = dataList[dataIdx].RawValue;
+                device.axis.update[valueIdx] = timestamp;   
             }
         }
         
